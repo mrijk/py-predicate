@@ -1,4 +1,11 @@
-from predicate.predicate import ge_p, always_false_p, NotPredicate, AlwaysTruePredicate, always_true_p, AlwaysFalsePredicate
+from predicate.predicate import (
+    ge_p,
+    always_false_p,
+    NotPredicate,
+    AlwaysTruePredicate,
+    always_true_p,
+    AlwaysFalsePredicate,
+)
 from predicate.predicate_optimizer import optimize, can_optimize
 
 
@@ -23,7 +30,7 @@ def test_not_not():
 
 
 def test_optimize_not_not():
-    """ ~~p == p """
+    """~~p == p"""
     ge_2 = ge_p(2)
     ge_2_to = ~~ge_2
 
@@ -38,7 +45,7 @@ def test_optimize_not_not():
 
 
 def test_not_optimize_always_true():
-    """ ~False == True"""
+    """~False == True"""
     always_true = ~always_false_p
 
     assert isinstance(always_true, NotPredicate)
@@ -50,7 +57,7 @@ def test_not_optimize_always_true():
 
 
 def test_not_optimize_always_false():
-    """ ~True == False"""
+    """~True == False"""
     always_false = ~always_true_p
 
     assert isinstance(always_false, NotPredicate)

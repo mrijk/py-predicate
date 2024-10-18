@@ -1,5 +1,14 @@
-from predicate.predicate import ge_p, le_p, AndPredicate, gt_p, lt_p, always_false_p, always_true_p, AlwaysTruePredicate, \
-    AlwaysFalsePredicate
+from predicate.predicate import (
+    ge_p,
+    le_p,
+    AndPredicate,
+    gt_p,
+    lt_p,
+    always_false_p,
+    always_true_p,
+    AlwaysTruePredicate,
+    AlwaysFalsePredicate,
+)
 from predicate.predicate_optimizer import optimize, can_optimize
 
 
@@ -18,7 +27,7 @@ def test_and():
 
 
 def test_and_commutative():
-    """ a & b == b & a """
+    """a & b == b & a"""
     gt_2 = gt_p(2)
     lt_4 = lt_p(4)
 
@@ -39,7 +48,7 @@ def test_and_associative():
 
 
 def test_and_always_false():
-    """ p & False == False """
+    """p & False == False"""
     ge_4 = ge_p(4)
     always_false = ge_4 & always_false_p
 
@@ -48,7 +57,7 @@ def test_and_always_false():
 
 
 def test_and_always_true():
-    """ True & True == True """
+    """True & True == True"""
     always_true = always_true_p & always_true_p
 
     assert always_true.always_false is False
@@ -56,7 +65,7 @@ def test_and_always_true():
 
 
 def test_and_optimize_right_false():
-    """ p & False == False """
+    """p & False == False"""
     ge_4 = ge_p(4)
     always_false = ge_4 & always_false_p
 
@@ -69,7 +78,7 @@ def test_and_optimize_right_false():
 
 
 def test_and_optimize_always_true():
-    """ True & True == True """
+    """True & True == True"""
     always_true = always_true_p & always_true_p
 
     assert isinstance(always_true, AndPredicate)
@@ -81,7 +90,7 @@ def test_and_optimize_always_true():
 
 
 def test_and_optimize_always_false():
-    """ True & False == False """
+    """True & False == False"""
     always_false = always_true_p & always_false_p
 
     assert isinstance(always_false, AndPredicate)
@@ -93,7 +102,7 @@ def test_and_optimize_always_false():
 
 
 def test_and_optimize_eq():
-    """ p & p == p"""
+    """p & p == p"""
     p_1 = gt_p(2)
     p_2 = gt_p(2)
     p_3 = gt_p(3)
@@ -118,7 +127,7 @@ def test_and_optimize_eq():
 
 
 def test_and_optimize_not():
-    """ p & ~p == False """
+    """p & ~p == False"""
     p_1 = gt_p(2)
     p_2 = gt_p(2)
     p_3 = gt_p(3)

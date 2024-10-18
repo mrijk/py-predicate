@@ -1,5 +1,26 @@
-from predicate.predicate import is_not_none_p, is_none_p, Predicate, ge_p, le_p, all_p, is_int_p, eq_p, is_str_p, any_p, in_p, \
-    is_list_p, is_dict_p, is_instance_p, always_true_p, always_false_p, gt_p, lt_p, eq_true_p, eq_false_p, ne_p
+from predicate.predicate import (
+    is_not_none_p,
+    is_none_p,
+    Predicate,
+    ge_p,
+    le_p,
+    all_p,
+    is_int_p,
+    eq_p,
+    is_str_p,
+    any_p,
+    in_p,
+    is_list_p,
+    is_dict_p,
+    is_instance_p,
+    always_true_p,
+    always_false_p,
+    gt_p,
+    lt_p,
+    eq_true_p,
+    eq_false_p,
+    ne_p,
+)
 
 
 def test_always_true_p():
@@ -108,7 +129,7 @@ def test_is_str_p():
 
 def test_is_list_p():
     assert is_list_p(None) is False
-    assert is_list_p((3, )) is False
+    assert is_list_p((3,)) is False
     assert is_list_p(3) is False
 
     assert is_list_p([]) is True
@@ -192,4 +213,3 @@ def test_lambda():
     assert exists_p(None) is False
     assert exists_p(4) is False
     assert exists_p(3) is True
-

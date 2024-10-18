@@ -1,10 +1,18 @@
-from predicate.predicate import ge_p, always_true_p, XorPredicate, always_false_p, AlwaysTruePredicate, AlwaysFalsePredicate, \
-    gt_p, NotPredicate
+from predicate.predicate import (
+    ge_p,
+    always_true_p,
+    XorPredicate,
+    always_false_p,
+    AlwaysTruePredicate,
+    AlwaysFalsePredicate,
+    gt_p,
+    NotPredicate,
+)
 from predicate.predicate_optimizer import optimize, can_optimize
 
 
 def test_xor():
-    """ a ^ b """
+    """a ^ b"""
     ge_2 = ge_p(2)
     ge_4 = ge_p(4)
 
@@ -16,7 +24,7 @@ def test_xor():
 
 
 def test_xor_commutative():
-    """ a ^ b == b ^ a """
+    """a ^ b == b ^ a"""
     ge_2 = ge_p(2)
     ge_4 = ge_p(4)
 
@@ -34,7 +42,7 @@ def test_xor_commutative():
 
 
 def test_xor_optimize_false_true():
-    """ False ^ True == True """
+    """False ^ True == True"""
     always_true = always_false_p ^ always_true_p
 
     assert isinstance(always_true, XorPredicate)
@@ -46,7 +54,7 @@ def test_xor_optimize_false_true():
 
 
 def test_xor_optimize_false_false():
-    """ False ^ False == False """
+    """False ^ False == False"""
     xor_false = always_false_p ^ always_false_p
 
     assert isinstance(xor_false, XorPredicate)
@@ -58,7 +66,7 @@ def test_xor_optimize_false_false():
 
 
 def test_xor_optimize_true_true():
-    """ False ^ False == False """
+    """False ^ False == False"""
     xor_true = always_true_p ^ always_true_p
 
     assert isinstance(xor_true, XorPredicate)
@@ -70,7 +78,7 @@ def test_xor_optimize_true_true():
 
 
 def test_xor_optimize_eq():
-    """ p ^ p == False """
+    """p ^ p == False"""
     p_1 = gt_p(2)
     p_2 = gt_p(2)
     p_3 = gt_p(3)
@@ -94,7 +102,7 @@ def test_xor_optimize_eq():
 
 
 def test_xor_optimize_not():
-    """ p ^ ~p == True """
+    """p ^ ~p == True"""
     p_1 = gt_p(2)
     p_2 = gt_p(2)
     p_3 = gt_p(3)
@@ -125,7 +133,7 @@ def test_xor_optimize_not():
 
 
 def test_xor_optimize_always_false_right():
-    """ a ^ False == a """
+    """a ^ False == a"""
     ge_2 = ge_p(2)
 
     ge_2_xor_false = ge_2 ^ always_false_p
@@ -139,7 +147,7 @@ def test_xor_optimize_always_false_right():
 
 
 def test_xor_optimize_always_false_left():
-    """ False ^ a == a """
+    """False ^ a == a"""
     ge_2 = ge_p(2)
 
     false_xor_ge_2 = always_false_p ^ ge_2
@@ -153,7 +161,7 @@ def test_xor_optimize_always_false_left():
 
 
 def test_xor_optimize_always_true_right():
-    """ a ^ True == ~a """
+    """a ^ True == ~a"""
     ge_2 = ge_p(2)
 
     ge_2_xor_true = ge_2 ^ always_true_p
@@ -167,7 +175,7 @@ def test_xor_optimize_always_true_right():
 
 
 def test_xor_optimize_always_true_left():
-    """ True ^ a == ~a """
+    """True ^ a == ~a"""
     ge_2 = ge_p(2)
 
     true_xor_ge_2 = always_true_p ^ ge_2

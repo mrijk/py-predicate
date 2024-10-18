@@ -1,5 +1,13 @@
-from predicate.predicate import Predicate, NotPredicate, AlwaysTruePredicate, AlwaysFalsePredicate, AndPredicate, \
-    get_as_not_predicate, OrPredicate, XorPredicate
+from predicate.predicate import (
+    Predicate,
+    NotPredicate,
+    AlwaysTruePredicate,
+    AlwaysFalsePredicate,
+    AndPredicate,
+    get_as_not_predicate,
+    OrPredicate,
+    XorPredicate,
+)
 
 
 def optimize[T](predicate: Predicate[T]) -> Predicate[T]:
@@ -22,9 +30,9 @@ def can_optimize[T](predicate: Predicate[T]) -> bool:
 
 def optimize_predicate[T](predicate: Predicate[T]) -> Predicate[T]:
     if predicate.always_true:
-        return AlwaysTruePredicate[T]()
+        return AlwaysTruePredicate()
     if predicate.always_false:
-        return AlwaysFalsePredicate[T]()
+        return AlwaysFalsePredicate()
     return predicate
 
 
@@ -51,7 +59,9 @@ def optimize_not_predicate[T](predicate: NotPredicate[T]) -> Predicate[T]:
         case NotPredicate() as p:  # ~~p == p
             return optimize(p.predicate_1)
         case _:
-            return optimize_predicate(predicate=NotPredicate(predicate=optimize(predicate.predicate_1)))
+            return optimize_predicate(
+                predicate=NotPredicate(predicate=optimize(predicate.predicate_1))
+            )
 
 
 def optimize_or_predicate[T](predicate: OrPredicate[T]) -> Predicate[T]:

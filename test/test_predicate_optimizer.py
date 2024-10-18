@@ -1,9 +1,14 @@
-from predicate.predicate import gt_p, NotPredicate, AlwaysFalsePredicate, AlwaysTruePredicate
+from predicate.predicate import (
+    gt_p,
+    NotPredicate,
+    AlwaysFalsePredicate,
+    AlwaysTruePredicate,
+)
 from predicate.predicate_optimizer import can_optimize, optimize
 
 
 def test_optimize_not_or():
-    """ ~(p | ~p) == False"""
+    """~(p | ~p) == False"""
     p = gt_p(2)
 
     always_false = ~(p | ~p)
@@ -17,7 +22,7 @@ def test_optimize_not_or():
 
 
 def test_optimize_not_and():
-    """ ~(p & ~p) == True"""
+    """~(p & ~p) == True"""
     p = gt_p(2)
 
     always_true = ~(p & ~p)

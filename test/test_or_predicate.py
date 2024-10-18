@@ -1,5 +1,15 @@
-from predicate.predicate import ge_p, le_p, lt_p, gt_p, is_none_p, is_not_none_p, always_true_p, OrPredicate, \
-    AlwaysTruePredicate, AlwaysFalsePredicate
+from predicate.predicate import (
+    ge_p,
+    le_p,
+    lt_p,
+    gt_p,
+    is_none_p,
+    is_not_none_p,
+    always_true_p,
+    OrPredicate,
+    AlwaysTruePredicate,
+    AlwaysFalsePredicate,
+)
 from predicate.predicate_optimizer import optimize, can_optimize
 
 
@@ -58,7 +68,7 @@ def test_or_optimize_always_false():
 
 
 def test_or_optimize_eq():
-    """ p | p == p """
+    """p | p == p"""
     p_1 = gt_p(2)
     p_2 = gt_p(2)
     p_3 = gt_p(3)
@@ -81,7 +91,7 @@ def test_or_optimize_eq():
 
 
 def test_or_optimize_not():
-    """ p | ~p == True """
+    """p | ~p == True"""
     p_1 = gt_p(2)
     p_2 = gt_p(2)
     p_3 = gt_p(3)
