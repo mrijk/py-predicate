@@ -9,7 +9,7 @@ from predicate.predicate import (
     AlwaysTruePredicate,
     AlwaysFalsePredicate,
 )
-from predicate.predicate_optimizer import optimize, can_optimize
+from predicate.optimizer.predicate_optimizer import optimize, can_optimize
 
 
 def test_and():
@@ -126,13 +126,38 @@ def test_and_optimize_eq():
     assert isinstance(not_optimized, AndPredicate)
 
 
-def test_and_optimize_not():
+def test_and_optimize_not_right():
     """p & ~p == False"""
     p_1 = gt_p(2)
     p_2 = gt_p(2)
     p_3 = gt_p(3)
 
     same = p_1 & ~p_2
+
+    assert isinstance(same, AndPredicate)
+    assert can_optimize(same) is True
+
+    optimized = optimize(same)
+
+    assert isinstance(optimized, AlwaysFalsePredicate)
+
+    not_same = p_1 & ~p_3
+
+    assert isinstance(not_same, AndPredicate)
+    assert can_optimize(not_same) is False
+
+    not_optimized = optimize(not_same)
+
+    assert isinstance(not_optimized, AndPredicate)
+
+
+def test_and_optimize_not_left():
+    """~p & p == False"""
+    p_1 = gt_p(2)
+    p_2 = gt_p(2)
+    p_3 = gt_p(3)
+
+    same = ~p_1 & p_2
 
     assert isinstance(same, AndPredicate)
     assert can_optimize(same) is True

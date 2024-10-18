@@ -1,10 +1,12 @@
-from predicate.predicate import (
+from predicate import (
     gt_p,
     NotPredicate,
     AlwaysFalsePredicate,
     AlwaysTruePredicate,
+    can_optimize,
+    optimize,
 )
-from predicate.predicate_optimizer import can_optimize, optimize
+from predicate.predicate import le_p, OrPredicate
 
 
 def test_optimize_not_or():
@@ -33,3 +35,18 @@ def test_optimize_not_and():
     optimized = optimize(always_true)
 
     assert isinstance(optimized, AlwaysTruePredicate)
+
+
+def test_optimize_or_1():
+    """p | (~p & q) == p | q"""
+    p = gt_p(2)
+    q = le_p(0)
+
+    le_0_or_gt_2 = p | (~p & q)
+
+    assert isinstance(le_0_or_gt_2, OrPredicate)
+    assert can_optimize(le_0_or_gt_2)
+
+    optimized = optimize(le_0_or_gt_2)
+
+    assert isinstance(optimized, OrPredicate)

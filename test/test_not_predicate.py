@@ -6,7 +6,7 @@ from predicate.predicate import (
     always_true_p,
     AlwaysFalsePredicate,
 )
-from predicate.predicate_optimizer import optimize, can_optimize
+from predicate.optimizer.predicate_optimizer import optimize, can_optimize
 
 
 def test_not():

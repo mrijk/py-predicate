@@ -1,4 +1,6 @@
-from predicate.predicate import (
+from predicate import (
+    can_optimize,
+    optimize,
     ge_p,
     always_true_p,
     XorPredicate,
@@ -8,7 +10,6 @@ from predicate.predicate import (
     gt_p,
     NotPredicate,
 )
-from predicate.predicate_optimizer import optimize, can_optimize
 
 
 def test_xor():
@@ -86,6 +87,7 @@ def test_xor_optimize_eq():
     same = p_1 ^ p_2
 
     assert isinstance(same, XorPredicate)
+    assert can_optimize(same) is True
 
     optimized = optimize(same)
 
@@ -110,6 +112,7 @@ def test_xor_optimize_not():
     same = p_1 ^ ~p_2
 
     assert isinstance(same, XorPredicate)
+    assert can_optimize(same) is True
 
     optimized = optimize(same)
 
@@ -118,6 +121,7 @@ def test_xor_optimize_not():
     same = ~p_1 ^ p_2
 
     assert isinstance(same, XorPredicate)
+    assert can_optimize(same) is True
 
     optimized = optimize(same)
 
@@ -126,6 +130,7 @@ def test_xor_optimize_not():
     not_same = p_1 ^ p_3
 
     assert isinstance(not_same, XorPredicate)
+    assert can_optimize(not_same) is False
 
     not_optimized = optimize(not_same)
 
