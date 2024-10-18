@@ -3,6 +3,7 @@ from predicate.predicate import (
     Predicate,
     get_as_not_predicate,
     AlwaysFalsePredicate,
+    get_as_or_predicate,
 )
 
 
@@ -22,5 +23,25 @@ def optimize_and_predicate[T](predicate: AndPredicate[T]) -> Predicate[T]:
     if not_predicate := get_as_not_predicate(predicate.right):
         if predicate.left == not_predicate.predicate:
             return AlwaysFalsePredicate()
+
+    if or_predicate := get_as_or_predicate(predicate.right):
+        # p & (~p | q) == p & q
+        if not_predicate := get_as_not_predicate(or_predicate.left):
+            if not_predicate.predicate == predicate.left:
+                return AndPredicate(left=predicate.left, right=or_predicate.right)
+        # p & (q | ~p) == p & q
+        if not_predicate := get_as_not_predicate(or_predicate.right):
+            if not_predicate.predicate == predicate.left:
+                return AndPredicate(left=predicate.left, right=or_predicate.left)
+
+    if or_predicate := get_as_or_predicate(predicate.left):
+        # (~p | q) & p == q & p
+        if not_predicate := get_as_not_predicate(or_predicate.left):
+            if not_predicate.predicate == predicate.right:
+                return AndPredicate(left=or_predicate.right, right=predicate.right)
+        # (q | ~p) & p == q & p
+        if not_predicate := get_as_not_predicate(or_predicate.right):
+            if not_predicate.predicate == predicate.right:
+                return AndPredicate(left=or_predicate.left, right=predicate.right)
 
     return optimize_predicate(predicate)

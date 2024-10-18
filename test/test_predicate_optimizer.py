@@ -1,12 +1,14 @@
 from predicate import (
     gt_p,
+    le_p,
+    AndPredicate,
     NotPredicate,
+    OrPredicate,
     AlwaysFalsePredicate,
     AlwaysTruePredicate,
     can_optimize,
     optimize,
 )
-from predicate.predicate import le_p, OrPredicate
 
 
 def test_optimize_not_or():
@@ -45,8 +47,61 @@ def test_optimize_or_1():
     le_0_or_gt_2 = p | (~p & q)
 
     assert isinstance(le_0_or_gt_2, OrPredicate)
-    assert can_optimize(le_0_or_gt_2)
+    assert can_optimize(le_0_or_gt_2) is True
 
     optimized = optimize(le_0_or_gt_2)
 
     assert isinstance(optimized, OrPredicate)
+    assert optimized.left == p
+    assert optimized.right == q
+
+
+def test_optimize_and_1():
+    """p & (~p | q) == p & q"""
+    p = gt_p(2)
+    q = le_p(0)
+
+    le_0_and_gt_2 = p & (~p | q)
+
+    assert isinstance(le_0_and_gt_2, AndPredicate)
+    assert can_optimize(le_0_and_gt_2) is True
+
+    optimized = optimize(le_0_and_gt_2)
+
+    assert isinstance(optimized, AndPredicate)
+    assert optimized.left == p
+    assert optimized.right == q
+
+
+def test_optimize_and_2():
+    """p & (q | ~p) == p & q"""
+    p = gt_p(2)
+    q = le_p(0)
+
+    le_0_and_gt_2 = p & (q | ~p)
+
+    assert isinstance(le_0_and_gt_2, AndPredicate)
+    assert can_optimize(le_0_and_gt_2) is True
+
+    optimized = optimize(le_0_and_gt_2)
+
+    assert isinstance(optimized, AndPredicate)
+    assert optimized.left == p
+    assert optimized.right == q
+
+
+def test_optimize_and_3():
+    """(~p | q) & p == q & p"""
+    p = gt_p(2)
+    q = le_p(0)
+
+    le_0_and_gt_2 = (~p | q) & p
+
+    assert isinstance(le_0_and_gt_2, AndPredicate)
+    assert can_optimize(le_0_and_gt_2) is True
+
+    optimized = optimize(le_0_and_gt_2)
+
+    assert isinstance(optimized, AndPredicate)
+    assert optimized.left == q
+    assert optimized.right == p

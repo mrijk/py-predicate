@@ -1,11 +1,11 @@
 from predicate.predicate import (
-    ge_p,
     always_false_p,
     NotPredicate,
     AlwaysTruePredicate,
     always_true_p,
     AlwaysFalsePredicate,
 )
+from predicate import ge_p
 from predicate.optimizer.predicate_optimizer import optimize, can_optimize
 
 

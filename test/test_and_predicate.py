@@ -1,14 +1,11 @@
 from predicate.predicate import (
-    ge_p,
-    le_p,
     AndPredicate,
-    gt_p,
-    lt_p,
     always_false_p,
     always_true_p,
     AlwaysTruePredicate,
     AlwaysFalsePredicate,
 )
+from predicate import ge_p, gt_p, le_p, lt_p
 from predicate.optimizer.predicate_optimizer import optimize, can_optimize
 
 

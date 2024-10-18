@@ -1,25 +1,24 @@
 from predicate.predicate import (
-    is_not_none_p,
-    is_none_p,
     Predicate,
-    ge_p,
-    le_p,
-    all_p,
-    is_int_p,
-    eq_p,
-    is_str_p,
-    any_p,
-    in_p,
-    is_list_p,
-    is_dict_p,
-    is_instance_p,
     always_true_p,
     always_false_p,
-    gt_p,
-    lt_p,
+)
+from predicate import ge_p, gt_p, le_p, lt_p
+from predicate.standard_predicates import (
+    is_not_none_p,
+    is_none_p,
+    in_p,
+    eq_p,
+    ne_p,
+    any_p,
+    all_p,
+    is_instance_p,
+    is_int_p,
+    is_str_p,
+    is_dict_p,
+    is_list_p,
     eq_true_p,
     eq_false_p,
-    ne_p,
 )
 
 

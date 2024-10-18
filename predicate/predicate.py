@@ -1,7 +1,5 @@
-from _operator import is_not, is_
 from dataclasses import dataclass
-from functools import partial
-from typing import Any, Callable, Self, Iterable, cast
+from typing import Any, Callable, Self, cast
 
 from predicate.helpers import const
 
@@ -34,16 +32,16 @@ class Predicate[T]:
     def __call__(self, x: T) -> bool:
         return self.predicate_fn(x)
 
-    def __and__(self, predicate: Self) -> "AndPredicate":
+    def __and__(self, predicate: Self) -> Self:
         return AndPredicate(left=self, right=predicate)
 
-    def __or__(self, predicate: Self) -> "OrPredicate":
+    def __or__(self, predicate: Self) -> Self:
         return OrPredicate(left=self, right=predicate)
 
-    def __xor__(self, predicate: Self) -> "XorPredicate":
-        return XorPredicate(left=self, right=predicate)
+    def __xor__(self, predicate: Self) -> Self:
+        return XorPredicate[T](left=self, right=predicate)
 
-    def __invert__(self) -> "NotPredicate":
+    def __invert__(self) -> Self:
         return NotPredicate(predicate=self)
 
     def __str__(self) -> str:
@@ -94,18 +92,6 @@ class NotPredicate[T](Predicate[T]):
         return self.predicate.always_true
 
 
-def get_as_not_predicate[T](predicate: Predicate[T]) -> NotPredicate[T] | None:
-    return (
-        cast(NotPredicate, predicate) if isinstance(predicate, NotPredicate) else None
-    )
-
-
-def get_as_and_predicate[T](predicate: Predicate[T]) -> AndPredicate[T] | None:
-    return (
-        cast(AndPredicate, predicate) if isinstance(predicate, AndPredicate) else None
-    )
-
-
 @dataclass
 class OrPredicate[T](Predicate[T]):
     def __init__(self, left: Predicate[T], right: Predicate[T]):
@@ -148,66 +134,20 @@ def to_filtered(
     return [x for x in iter if predicate(x)]
 
 
-# Couple of standard predicates
+def get_as_not_predicate[T](predicate: Predicate[T]) -> NotPredicate[T] | None:
+    return (
+        cast(NotPredicate, predicate) if isinstance(predicate, NotPredicate) else None
+    )
 
 
-is_not_none_p: Predicate[Any | None] = Predicate(partial(is_not, None))
-is_none_p: Predicate[Any | None] = Predicate(partial(is_, None))
+def get_as_and_predicate[T](predicate: Predicate[T]) -> AndPredicate[T] | None:
+    return (
+        cast(AndPredicate, predicate) if isinstance(predicate, AndPredicate) else None
+    )
 
 
-def in_p(*v) -> Predicate:
-    return Predicate(lambda x: x in v)
-
-
-def eq_p[T](v: T) -> Predicate[T]:
-    return Predicate(lambda x: x == v)
-
-
-def ne_p[T](v: T) -> Predicate[T]:
-    return Predicate(lambda x: x != v)
-
-
-def ge_p[T: (int, str)](v: T) -> Predicate[T]:
-    def _ge(x: T) -> bool:
-        return x >= v
-
-    return Predicate(_ge)
-
-
-def gt_p[T: (int, str)](v: T) -> Predicate[T]:
-    def _gt(x: T) -> bool:
-        return x > v
-
-    return Predicate(_gt)
-
-
-def le_p[T: (int, str)](v: T) -> Predicate[T]:
-    return Predicate(lambda x: x <= v)
-
-
-def lt_p[T: (int, str)](v: T) -> Predicate[T]:
-    return Predicate(lambda x: x < v)
-
-
-def any_p[T](predicate: Predicate[T]) -> Predicate[Iterable[T]]:
-    return Predicate(lambda iter: any(predicate(x) for x in iter))
-
-
-def all_p[T](predicate: Predicate[T]) -> Predicate[Iterable[T]]:
-    return Predicate(lambda iter: all(predicate(x) for x in iter))
-
-
-def is_instance_p(*klass: type) -> Predicate:
-    return Predicate(lambda x: isinstance(x, klass))
-
-
-is_int_p = is_instance_p(int)
-is_str_p = is_instance_p(str)
-is_dict_p = is_instance_p(dict)
-is_list_p = is_instance_p(list)
-
-eq_true_p = eq_p(True)
-eq_false_p = eq_p(False)
+def get_as_or_predicate[T](predicate: Predicate[T]) -> OrPredicate[T] | None:
+    return cast(OrPredicate, predicate) if isinstance(predicate, OrPredicate) else None
 
 
 @dataclass

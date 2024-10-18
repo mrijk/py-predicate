@@ -1,15 +1,10 @@
-from predicate import always_false_p
+from predicate import always_false_p, ge_p, gt_p, le_p, lt_p
 from predicate.predicate import (
-    ge_p,
-    le_p,
-    lt_p,
-    gt_p,
-    is_none_p,
-    is_not_none_p,
     always_true_p,
     OrPredicate,
     AlwaysTruePredicate,
 )
+from predicate.standard_predicates import is_not_none_p, is_none_p
 from predicate.optimizer.predicate_optimizer import optimize, can_optimize
 
 
