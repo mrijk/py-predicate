@@ -1,13 +1,22 @@
-from predicate.predicate import NotPredicate, Predicate
+from predicate.predicate import NotPredicate, Predicate, XorPredicate, get_as_not_predicate, get_as_xor_predicate
 
 
 def optimize_not_predicate[T](predicate: NotPredicate[T]) -> Predicate[T]:
     from predicate.optimizer.predicate_optimizer import optimize, optimize_predicate
 
-    match predicate.predicate:
-        case NotPredicate() as p:  # ~~p == p
-            return optimize(p.predicate)
-        case _:
-            return optimize_predicate(
-                predicate=NotPredicate(predicate=optimize(predicate.predicate))
-            )
+    # ~~p == p
+    if not_predicate := get_as_not_predicate(predicate.predicate):
+        return optimize(not_predicate.predicate)
+
+    if xor_predicate := get_as_xor_predicate(predicate.predicate):
+        match xor_predicate.left, xor_predicate.right:
+            case NotPredicate() as not_predicate, _:  # ~(~p ^ q) == p ^ q
+                return XorPredicate(left=not_predicate.predicate, right=xor_predicate.right)
+            case _, NotPredicate() as not_predicate:  # ~(p ^ ~q) == p ^ q
+                return XorPredicate(left=xor_predicate.left, right=not_predicate.predicate)
+            case _, _:  # ~(p ^ q) == ~p ^ q
+                return XorPredicate(left=NotPredicate(predicate=xor_predicate.left), right=xor_predicate.right)
+
+    return optimize_predicate(
+        predicate=NotPredicate(predicate=optimize(predicate.predicate))
+    )

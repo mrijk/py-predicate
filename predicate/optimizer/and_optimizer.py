@@ -1,4 +1,5 @@
 from predicate.predicate import (
+    AlwaysTruePredicate,
     AndPredicate,
     Predicate,
     get_as_not_predicate,
@@ -9,6 +10,14 @@ from predicate.predicate import (
 
 def optimize_and_predicate[T](predicate: AndPredicate[T]) -> Predicate[T]:
     from predicate.optimizer.predicate_optimizer import optimize_predicate, optimize
+
+    # p & True == p
+    if isinstance(predicate.right, AlwaysTruePredicate):
+        return optimize(predicate.left)
+
+    # True & p == p
+    if isinstance(predicate.left, AlwaysTruePredicate):
+        return optimize(predicate.right)
 
     # p & p == p
     if predicate.left == predicate.right:

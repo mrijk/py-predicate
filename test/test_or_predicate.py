@@ -1,11 +1,12 @@
-from predicate import always_false_p, ge_p, gt_p, le_p, lt_p
-from predicate.predicate import (
+from predicate import (
     always_true_p,
+    always_false_p, ge_p, gt_p, le_p, lt_p,
     OrPredicate,
     AlwaysTruePredicate,
 )
 from predicate.standard_predicates import is_not_none_p, is_none_p
 from predicate.optimizer.predicate_optimizer import optimize, can_optimize
+from helpers import is_or_p
 
 
 def test_or():
@@ -40,20 +41,20 @@ def test_or_always_true():
     assert always_true(None) is True
 
 
-def test_or_optimize_always_true_left():
+def test_or_optimize_true_left():
     """True | p == True"""
     lt_2 = lt_p(2)
     always_true = always_true_p | lt_2
 
-    assert isinstance(always_true, OrPredicate)
-    assert can_optimize(always_true) is True
+    assert is_or_p(always_true)
+    assert can_optimize(always_true)
 
     optimized = optimize(always_true)
 
     assert isinstance(optimized, AlwaysTruePredicate)
 
 
-def test_or_optimize_always_false_right():
+def test_or_optimize_right_false():
     """p | False == p"""
     lt_2 = lt_p(2)
     lt_2_or_false = lt_2 | always_false_p
@@ -66,12 +67,12 @@ def test_or_optimize_always_false_right():
     assert isinstance(optimized, type(lt_2))
 
 
-def test_or_optimize_always_false_left():
+def test_or_optimize_left_false():
     """False | p == p"""
     lt_2 = lt_p(2)
     false_or_lt_2 = always_false_p | lt_2
 
-    assert isinstance(false_or_lt_2, OrPredicate)
+    assert is_or_p(false_or_lt_2)
     assert can_optimize(false_or_lt_2) is True
 
     optimized = optimize(false_or_lt_2)
@@ -79,12 +80,12 @@ def test_or_optimize_always_false_left():
     assert isinstance(optimized, type(lt_2))
 
 
-def test_or_optimize_always_true_right():
+def test_or_optimize_true_right():
     """p | True == True"""
     lt_2 = lt_p(2)
     always_true = lt_2 | always_true_p
 
-    assert isinstance(always_true, OrPredicate)
+    assert is_or_p(always_true)
     assert can_optimize(always_true) is True
 
     optimized = optimize(always_true)
@@ -100,17 +101,17 @@ def test_or_optimize_eq():
 
     same = p_1 | p_2
 
-    assert isinstance(same, OrPredicate)
-    assert can_optimize(same) is True
+    assert is_or_p(same)
+    assert can_optimize(same)
 
     optimized = optimize(same)
 
-    assert not isinstance(optimized, OrPredicate)
+    assert not is_or_p(optimized)
 
     not_same = p_1 | p_3
 
     assert isinstance(not_same, OrPredicate)
-    assert can_optimize(not_same) is False
+    assert not can_optimize(not_same)
 
     not_optimized = optimize(not_same)
 

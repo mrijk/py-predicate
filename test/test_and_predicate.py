@@ -1,12 +1,16 @@
-from predicate.predicate import (
+from predicate import (
     AndPredicate,
     always_false_p,
     always_true_p,
     AlwaysTruePredicate,
     AlwaysFalsePredicate,
+    ge_p,
+    gt_p,
+    le_p,
+    lt_p,
 )
-from predicate import ge_p, gt_p, le_p, lt_p
 from predicate.optimizer.predicate_optimizer import optimize, can_optimize
+from helpers import is_and_p
 
 
 def test_and():
@@ -15,7 +19,7 @@ def test_and():
 
     between_2_and_3 = ge_2 & le_3
 
-    assert isinstance(between_2_and_3, AndPredicate)
+    assert is_and_p(between_2_and_3)
 
     assert between_2_and_3(2) is True
     assert between_2_and_3(3) is True
@@ -64,7 +68,82 @@ def test_and_always_true():
 def test_and_optimize_right_false():
     """p & False == False"""
     ge_4 = ge_p(4)
-    always_false = ge_4 & always_false_p
+    predicate = ge_4 & always_false_p
+
+    assert is_and_p(predicate)
+    assert can_optimize(predicate)
+
+    optimized = optimize(predicate)
+
+    assert isinstance(optimized, AlwaysFalsePredicate)
+
+
+def test_and_optimize_right_true():
+    """p & True == p"""
+    ge_4 = ge_p(4)
+    predicate = ge_4 & always_true_p
+
+    assert is_and_p(predicate)
+    assert can_optimize(predicate)
+
+    optimized = optimize(predicate)
+
+    assert not is_and_p(optimized)
+
+
+def test_and_optimize_left_false():
+    """False & p == False"""
+    ge_4 = ge_p(4)
+    predicate = always_false_p & ge_4
+
+    assert is_and_p(predicate)
+    assert can_optimize(predicate)
+
+    optimized = optimize(predicate)
+
+    assert isinstance(optimized, AlwaysFalsePredicate)
+
+
+def test_and_optimize_left_true():
+    """True & p & == p"""
+    ge_4 = ge_p(4)
+    predicate = always_true_p & ge_4
+
+    assert is_and_p(predicate)
+    assert can_optimize(predicate)
+
+    optimized = optimize(predicate)
+
+    assert not is_and_p(optimized)
+
+
+def test_and_optimize_false_and_false():
+    """False & False == False"""
+    always_false = always_false_p & always_false_p
+
+    assert is_and_p(always_false)
+    assert can_optimize(always_false)
+
+    optimized = optimize(always_false)
+
+    assert isinstance(optimized, AlwaysFalsePredicate)
+
+
+def test_and_optimize_true_and_true():
+    """True & True == True"""
+    always_true = always_true_p & always_true_p
+
+    assert isinstance(always_true, AndPredicate)
+    assert can_optimize(always_true)
+
+    optimized = optimize(always_true)
+
+    assert isinstance(optimized, AlwaysTruePredicate)
+
+
+def test_and_optimize_true_and_false():
+    """True & False == False"""
+    always_false = always_true_p & always_false_p
 
     assert isinstance(always_false, AndPredicate)
     assert can_optimize(always_false) is True
@@ -74,21 +153,9 @@ def test_and_optimize_right_false():
     assert isinstance(optimized, AlwaysFalsePredicate)
 
 
-def test_and_optimize_always_true():
-    """True & True == True"""
-    always_true = always_true_p & always_true_p
-
-    assert isinstance(always_true, AndPredicate)
-    assert can_optimize(always_true) is True
-
-    optimized = optimize(always_true)
-
-    assert isinstance(optimized, AlwaysTruePredicate)
-
-
-def test_and_optimize_always_false():
-    """True & False == False"""
-    always_false = always_true_p & always_false_p
+def test_and_optimize_false_and_true():
+    """False & True == False"""
+    always_false = always_false_p & always_true_p
 
     assert isinstance(always_false, AndPredicate)
     assert can_optimize(always_false) is True
