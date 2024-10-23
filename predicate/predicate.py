@@ -151,7 +151,9 @@ def get_as_or_predicate[T](predicate: Predicate[T]) -> OrPredicate[T] | None:
 
 
 def get_as_xor_predicate[T](predicate: Predicate[T]) -> XorPredicate[T] | None:
-    return cast(XorPredicate, predicate) if isinstance(predicate, XorPredicate) else None
+    return (
+        cast(XorPredicate, predicate) if isinstance(predicate, XorPredicate) else None
+    )
 
 
 @dataclass

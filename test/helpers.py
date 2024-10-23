@@ -1,4 +1,11 @@
-from predicate import XorPredicate, AndPredicate, OrPredicate, NotPredicate, AlwaysTruePredicate, AlwaysFalsePredicate
+from predicate import (
+    XorPredicate,
+    AndPredicate,
+    OrPredicate,
+    NotPredicate,
+    AlwaysTruePredicate,
+    AlwaysFalsePredicate,
+)
 from predicate.standard_predicates import is_instance_p
 
 is_and_p = is_instance_p(AndPredicate)

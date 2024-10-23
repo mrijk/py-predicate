@@ -1,6 +1,10 @@
 from predicate import (
     always_true_p,
-    always_false_p, ge_p, gt_p, le_p, lt_p,
+    always_false_p,
+    ge_p,
+    gt_p,
+    le_p,
+    lt_p,
     OrPredicate,
     AlwaysTruePredicate,
 )

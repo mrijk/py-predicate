@@ -1,3 +1,5 @@
+from uuid import uuid4
+
 from predicate.predicate import (
     Predicate,
     always_true_p,
@@ -19,6 +21,7 @@ from predicate.standard_predicates import (
     is_list_p,
     eq_true_p,
     eq_false_p,
+    is_uuid_p,
 )
 
 
@@ -136,11 +139,17 @@ def test_is_list_p():
 
 
 def test_is_dict_p():
-    assert is_dict_p(None) is False
-    assert is_dict_p({3}) is False
+    assert not is_dict_p(None)
+    assert not is_dict_p({3})
 
-    assert is_dict_p({}) is True
-    assert is_dict_p({"x": 3}) is True
+    assert is_dict_p({})
+    assert is_dict_p({"x": 3})
+
+
+def test_is_uuid_p():
+    assert not is_uuid_p(None)
+
+    assert is_uuid_p(uuid4())
 
 
 def test_is_instance_p():
@@ -209,6 +218,6 @@ def test_lambda():
     in_123: Predicate[int] = Predicate(lambda x: str(x) in ["1", "2", "3"])
     exists_p = is_not_none_p & in_123
 
-    assert exists_p(None) is False
-    assert exists_p(4) is False
+    assert not exists_p(None)
+    assert not exists_p(4)
     assert exists_p(3) is True

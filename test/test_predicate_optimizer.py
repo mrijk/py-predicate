@@ -3,7 +3,8 @@ from predicate import (
     gt_p,
     le_p,
     can_optimize,
-    optimize, XorPredicate,
+    optimize,
+    XorPredicate,
 )
 
 
