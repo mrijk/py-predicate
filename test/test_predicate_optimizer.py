@@ -4,7 +4,6 @@ from predicate import (
     le_p,
     can_optimize,
     optimize,
-    XorPredicate,
 )
 
 

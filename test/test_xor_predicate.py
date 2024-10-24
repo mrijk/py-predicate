@@ -1,15 +1,5 @@
-from predicate import (
-    can_optimize,
-    optimize,
-    ge_p,
-    always_true_p,
-    XorPredicate,
-    always_false_p,
-    AlwaysTruePredicate,
-    AlwaysFalsePredicate,
-    gt_p,
-)
-from helpers import is_not_p, is_xor_p
+from predicate import can_optimize, optimize, ge_p, always_true_p, always_false_p, gt_p
+from helpers import is_not_p, is_xor_p, is_true_p, is_false_p
 
 
 def test_xor():
@@ -51,7 +41,7 @@ def test_xor_optimize_false_true():
 
     optimized = optimize(always_true)
 
-    assert isinstance(optimized, AlwaysTruePredicate)
+    assert is_true_p(optimized)
 
 
 def test_xor_optimize_true_false():
@@ -63,7 +53,7 @@ def test_xor_optimize_true_false():
 
     optimized = optimize(always_true)
 
-    assert isinstance(optimized, AlwaysTruePredicate)
+    assert is_true_p(optimized)
 
 
 def test_xor_optimize_false_false():
@@ -75,7 +65,7 @@ def test_xor_optimize_false_false():
 
     optimized = optimize(xor_false)
 
-    assert isinstance(optimized, AlwaysFalsePredicate)
+    assert is_false_p(optimized)
 
 
 def test_xor_optimize_true_true():
@@ -87,7 +77,7 @@ def test_xor_optimize_true_true():
 
     optimized = optimize(xor_true)
 
-    assert isinstance(optimized, AlwaysFalsePredicate)
+    assert is_false_p(optimized)
 
 
 def test_xor_optimize_eq():
@@ -103,7 +93,7 @@ def test_xor_optimize_eq():
 
     optimized = optimize(same)
 
-    assert isinstance(optimized, AlwaysFalsePredicate)
+    assert is_false_p(optimized)
 
     not_same = p_1 ^ p_3
 
@@ -128,7 +118,7 @@ def test_xor_optimize_not():
 
     optimized = optimize(same)
 
-    assert isinstance(optimized, AlwaysTruePredicate)
+    assert is_true_p(optimized)
 
     same = ~p_1 ^ p_2
 
@@ -137,16 +127,16 @@ def test_xor_optimize_not():
 
     optimized = optimize(same)
 
-    assert isinstance(optimized, AlwaysTruePredicate)
+    assert is_true_p(optimized)
 
     not_same = p_1 ^ p_3
 
-    assert isinstance(not_same, XorPredicate)
+    assert is_xor_p(not_same)
     assert can_optimize(not_same) is False
 
     not_optimized = optimize(not_same)
 
-    assert isinstance(not_optimized, XorPredicate)
+    assert is_xor_p(not_optimized)
 
 
 def test_xor_optimize_false_right():

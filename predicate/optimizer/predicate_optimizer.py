@@ -6,8 +6,6 @@ from predicate.optimizer.xor_optimizer import optimize_xor_predicate
 from predicate.predicate import (
     Predicate,
     NotPredicate,
-    AlwaysTruePredicate,
-    AlwaysFalsePredicate,
     AndPredicate,
     OrPredicate,
     XorPredicate,
@@ -60,8 +58,4 @@ def can_optimize[T](predicate: Predicate[T]) -> bool:
 
 
 def optimize_predicate[T](predicate: Predicate[T]) -> Predicate[T]:
-    if predicate.always_true:
-        return AlwaysTruePredicate()
-    if predicate.always_false:
-        return AlwaysFalsePredicate()
     return predicate

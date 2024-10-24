@@ -204,16 +204,6 @@ def test_any():
     assert any_int([None, 2, 3]) is True
 
 
-def test_always_false():
-    assert always_true_p.always_false is False
-    assert always_false_p.always_false is True
-
-
-def test_always_true():
-    assert always_true_p.always_true is True
-    assert always_false_p.always_true is False
-
-
 def test_lambda():
     in_123: Predicate[int] = Predicate(lambda x: str(x) in ["1", "2", "3"])
     exists_p = is_not_none_p & in_123

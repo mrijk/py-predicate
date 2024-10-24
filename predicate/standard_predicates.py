@@ -3,7 +3,7 @@ from functools import partial
 from typing import Any, Iterable
 from uuid import UUID
 
-from predicate.predicate import Predicate
+from predicate.predicate import EqPredicate, Predicate
 
 is_not_none_p: Predicate[Any | None] = Predicate(partial(is_not, None))
 is_none_p: Predicate[Any | None] = Predicate(partial(is_, None))
@@ -14,7 +14,7 @@ def in_p[T](*v: T) -> Predicate[T]:
 
 
 def eq_p[T](v: T) -> Predicate[T]:
-    return Predicate(lambda x: x == v)
+    return EqPredicate(v=v)
 
 
 def ne_p[T](v: T) -> Predicate[T]:

@@ -4,17 +4,29 @@ from predicate.predicate import (
     XorPredicate,
     get_as_not_predicate,
     get_as_xor_predicate,
+    AlwaysFalsePredicate,
+    AlwaysTruePredicate,
 )
 
 
 def optimize_not_predicate[T](predicate: NotPredicate[T]) -> Predicate[T]:
     from predicate.optimizer.predicate_optimizer import optimize, optimize_predicate
 
+    optimized = optimize(predicate.predicate)
+
+    # ~False = True
+    if isinstance(optimized, AlwaysFalsePredicate):
+        return AlwaysTruePredicate()
+
+    # ~True = False
+    if isinstance(optimized, AlwaysTruePredicate):
+        return AlwaysFalsePredicate()
+
     # ~~p == p
-    if not_predicate := get_as_not_predicate(predicate.predicate):
+    if not_predicate := get_as_not_predicate(optimized):
         return optimize(not_predicate.predicate)
 
-    if xor_predicate := get_as_xor_predicate(predicate.predicate):
+    if xor_predicate := get_as_xor_predicate(optimized):
         match xor_predicate.left, xor_predicate.right:
             case NotPredicate() as not_predicate, _:  # ~(~p ^ q) == p ^ q
                 return XorPredicate(
@@ -30,6 +42,4 @@ def optimize_not_predicate[T](predicate: NotPredicate[T]) -> Predicate[T]:
                     right=xor_predicate.right,
                 )
 
-    return optimize_predicate(
-        predicate=NotPredicate(predicate=optimize(predicate.predicate))
-    )
+    return optimize_predicate(predicate=NotPredicate(predicate=optimized))

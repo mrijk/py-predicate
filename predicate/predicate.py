@@ -33,16 +33,16 @@ class Predicate[T]:
         return self.predicate_fn(x)
 
     def __and__(self, predicate: Self) -> Self:
-        return AndPredicate(left=self, right=predicate)
+        return cast(Self, AndPredicate(left=self, right=predicate))
 
     def __or__(self, predicate: Self) -> Self:
-        return OrPredicate(left=self, right=predicate)
+        return cast(Self, OrPredicate(left=self, right=predicate))
 
     def __xor__(self, predicate: Self) -> Self:
-        return XorPredicate[T](left=self, right=predicate)
+        return cast(Self, XorPredicate[T](left=self, right=predicate))
 
     def __invert__(self) -> Self:
-        return NotPredicate(predicate=self)
+        return cast(Self, NotPredicate(predicate=self))
 
     def __str__(self) -> str:
         return str(self.predicate_fn)
@@ -52,14 +52,6 @@ class Predicate[T]:
         p2 = other.predicate_fn
         return p1.__code__ == p2.__code__ and p1.__closure__ == p2.__closure__
 
-    @property
-    def always_true(self) -> bool:
-        return False
-
-    @property
-    def always_false(self) -> bool:
-        return False
-
 
 @dataclass
 class AndPredicate[T](Predicate[T]):
@@ -68,28 +60,12 @@ class AndPredicate[T](Predicate[T]):
         self.right = right
         self.predicate_fn = predicate_and(left, right)
 
-    @property
-    def always_false(self) -> bool:
-        return self.left.always_false or self.right.always_false
-
-    @property
-    def always_true(self) -> bool:
-        return self.left.always_true and self.right.always_true
-
 
 @dataclass
 class NotPredicate[T](Predicate[T]):
     def __init__(self, predicate: Predicate[T]):
         self.predicate = predicate
         self.predicate_fn = lambda x: not predicate(x)
-
-    @property
-    def always_true(self) -> bool:
-        return self.predicate.always_false
-
-    @property
-    def always_false(self) -> bool:
-        return self.predicate.always_true
 
 
 @dataclass
@@ -99,14 +75,6 @@ class OrPredicate[T](Predicate[T]):
         self.right = right
         self.predicate_fn = predicate_or(left, right)
 
-    @property
-    def always_false(self) -> bool:
-        return self.left.always_false and self.right.always_false
-
-    @property
-    def always_true(self) -> bool:
-        return self.left.always_true or self.right.always_true
-
 
 @dataclass
 class XorPredicate[T](Predicate[T]):
@@ -115,17 +83,15 @@ class XorPredicate[T](Predicate[T]):
         self.right = right
         self.predicate_fn = predicate_xor(left, right)
 
-    @property
-    def always_false(self) -> bool:
-        return (self.left.always_false and self.right.always_false) or (
-            self.left.always_true and self.right.always_true
-        )
 
-    @property
-    def always_true(self) -> bool:
-        return (self.left.always_true and self.right.always_false) or (
-            self.left.always_false and self.right.always_true
-        )
+@dataclass
+class EqPredicate[T](Predicate[T]):
+    def __init__(self, v: T):
+        self.v = v
+        self.predicate_fn = lambda x: x == v
+
+    def __eq__(self, other: Self) -> bool:
+        return self.v == other.v if isinstance(other, EqPredicate) else False
 
 
 def to_filtered(
@@ -156,24 +122,20 @@ def get_as_xor_predicate[T](predicate: Predicate[T]) -> XorPredicate[T] | None:
     )
 
 
+def get_as_eq_predicate[T](predicate: Predicate[T]) -> EqPredicate[T] | None:
+    return cast(EqPredicate, predicate) if isinstance(predicate, EqPredicate) else None
+
+
 @dataclass
 class AlwaysTruePredicate(Predicate):
     def __init__(self):
         super().__init__(predicate_fn=const(True))
-
-    @property
-    def always_true(self) -> bool:
-        return True
 
 
 @dataclass
 class AlwaysFalsePredicate(Predicate):
     def __init__(self):
         super().__init__(predicate_fn=const(False))
-
-    @property
-    def always_false(self) -> bool:
-        return True
 
 
 always_true_p = AlwaysTruePredicate()

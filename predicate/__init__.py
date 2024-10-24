@@ -2,6 +2,7 @@ from predicate.optimizer.predicate_optimizer import optimize, can_optimize
 from predicate.predicate import (
     always_true_p,
     AndPredicate,
+    EqPredicate,
     XorPredicate,
     always_false_p,
     AlwaysTruePredicate,
@@ -24,6 +25,7 @@ __all__ = [
     "always_false_p",
     "AlwaysTruePredicate",
     "AlwaysFalsePredicate",
+    "EqPredicate",
     "NotPredicate",
     "OrPredicate",
 ]
