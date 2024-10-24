@@ -1,7 +1,7 @@
 from predicate import always_false_p, always_true_p, ge_p, gt_p, le_p, lt_p
 from predicate.optimizer.predicate_optimizer import optimize, can_optimize
 from helpers import is_and_p, is_false_p, is_true_p, is_eq_p
-from predicate.standard_predicates import eq_p
+from predicate.standard_predicates import eq_p, all_p
 
 
 def test_and():
@@ -240,3 +240,32 @@ def test_optimize_eq_v1_eq_v1():
     optimized = optimize(predicate)
 
     assert is_eq_p(optimized)
+
+
+def test_optimize_eq_v1_ge_v1():
+    # x = v & x >= v => x = v
+    p1 = eq_p(2)
+    p2 = ge_p(2)
+
+    predicate = p1 & p2
+
+    assert can_optimize(predicate) is True
+
+    optimized = optimize(predicate)
+
+    assert is_eq_p(optimized)
+    assert optimized == p1
+
+
+def test_optimize_eq_v1_ge_v2():
+    # x = v & x >= w & w > v => False
+    p1 = eq_p(2)
+    p2 = ge_p(3)
+
+    predicate = p1 & p2
+
+    assert can_optimize(predicate) is True
+
+    optimized = optimize(predicate)
+
+    assert is_false_p(optimized)

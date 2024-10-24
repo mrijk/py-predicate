@@ -1,14 +1,16 @@
 from predicate import (
+    AllPredicate,
     XorPredicate,
     AndPredicate,
+    EqPredicate,
     OrPredicate,
     NotPredicate,
     AlwaysTruePredicate,
     AlwaysFalsePredicate,
 )
-from predicate.predicate import EqPredicate
 from predicate.standard_predicates import is_instance_p
 
+is_all_p = is_instance_p(AllPredicate)
 is_and_p = is_instance_p(AndPredicate)
 is_not_p = is_instance_p(NotPredicate)
 is_or_p = is_instance_p(OrPredicate)

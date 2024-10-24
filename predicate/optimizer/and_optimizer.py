@@ -1,4 +1,5 @@
 from predicate.predicate import (
+    AllPredicate,
     AlwaysTruePredicate,
     AndPredicate,
     Predicate,
@@ -6,6 +7,9 @@ from predicate.predicate import (
     AlwaysFalsePredicate,
     get_as_or_predicate,
     get_as_eq_predicate,
+    get_as_ge_predicate,
+    get_as_all_predicate,
+    GePredicate,
 )
 
 
@@ -65,12 +69,35 @@ def optimize_and_predicate[T](predicate: AndPredicate[T]) -> Predicate[T]:
             if not_predicate.predicate == right:
                 return AndPredicate(left=or_predicate.left, right=right)
 
-    # x == v1 & x == v2 & v1 != v2 == False
+    if left_eq := get_as_eq_predicate(left):
+        if right_eq := get_as_eq_predicate(right):
+            # x == v1 & x == v2 & v1 != v2 => False
+            if left_eq != right_eq:
+                return AlwaysFalsePredicate()
 
-    if (left_eq := get_as_eq_predicate(left)) and (
-        right_eq := get_as_eq_predicate(right)
+        if right_ge := get_as_ge_predicate(right):
+            # x = v & x >= v => x = v
+            if left_eq.v == right_ge.v:
+                return left_eq
+
+            # x = v & x >= w & w > v => x = v
+            if right_ge.v > left_eq.v:
+                return AlwaysFalsePredicate()
+
+    # TODO: if right_eq := get_as_eq_predicate(right):
+
+    if (left_ge := get_as_ge_predicate(left)) and (
+        right_ge := get_as_ge_predicate(right)
     ):
-        if left_eq != right_eq:
-            return AlwaysFalsePredicate()
+        return GePredicate(v=max(left_ge.v, right_ge.v))
+
+    if (left_all := get_as_all_predicate(left)) and (
+        right_all := get_as_all_predicate(right)
+    ):
+        return AllPredicate(
+            predicate=optimize(
+                AndPredicate(left=left_all.predicate, right=right_all.predicate)
+            )
+        )
 
     return optimize_predicate(predicate)

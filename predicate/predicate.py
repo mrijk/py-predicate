@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Any, Callable, Self, cast
+from typing import Any, Callable, Self, cast, Iterable
 
 from predicate.helpers import const
 
@@ -94,6 +94,35 @@ class EqPredicate[T](Predicate[T]):
         return self.v == other.v if isinstance(other, EqPredicate) else False
 
 
+@dataclass
+class GePredicate[T](Predicate[T]):
+    def __init__(self, v: T):
+        self.v = v
+        self.predicate_fn = lambda x: x >= v
+
+    def __eq__(self, other: Self) -> bool:
+        return self.v == other.v if isinstance(other, GePredicate) else False
+
+
+@dataclass
+class AllPredicate[T](Predicate[T]):
+    predicate: Predicate[T]
+
+    def __init__(self, predicate: Predicate[T]):
+        self.predicate = predicate
+        self.predicate_fn = lambda iter: all(predicate(x) for x in iter)
+
+    def __call__(self, iter: Iterable[T]) -> bool:
+        return all(self.predicate(x) for x in iter)
+
+    def __eq__(self, other: Self) -> bool:
+        return (
+            self.predicate == other.predicate
+            if isinstance(other, AllPredicate)
+            else False
+        )
+
+
 def to_filtered(
     iter: list[str | None], predicate: Predicate[str | None]
 ) -> list[str | None]:
@@ -126,16 +155,32 @@ def get_as_eq_predicate[T](predicate: Predicate[T]) -> EqPredicate[T] | None:
     return cast(EqPredicate, predicate) if isinstance(predicate, EqPredicate) else None
 
 
+def get_as_ge_predicate[T](predicate: Predicate[T]) -> GePredicate[T] | None:
+    return cast(GePredicate, predicate) if isinstance(predicate, GePredicate) else None
+
+
+def get_as_all_predicate[T](predicate: Predicate[T]) -> AllPredicate[T] | None:
+    return (
+        cast(AllPredicate, predicate) if isinstance(predicate, AllPredicate) else None
+    )
+
+
 @dataclass
 class AlwaysTruePredicate(Predicate):
     def __init__(self):
         super().__init__(predicate_fn=const(True))
+
+    def __eq__(self, other: Self) -> bool:
+        return isinstance(other, AlwaysTruePredicate)
 
 
 @dataclass
 class AlwaysFalsePredicate(Predicate):
     def __init__(self):
         super().__init__(predicate_fn=const(False))
+
+    def __eq__(self, other: Self) -> bool:
+        return isinstance(other, AlwaysFalsePredicate)
 
 
 always_true_p = AlwaysTruePredicate()

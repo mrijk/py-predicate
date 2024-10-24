@@ -3,7 +3,7 @@ from functools import partial
 from typing import Any, Iterable
 from uuid import UUID
 
-from predicate.predicate import EqPredicate, Predicate
+from predicate.predicate import EqPredicate, Predicate, GePredicate, AllPredicate
 
 is_not_none_p: Predicate[Any | None] = Predicate(partial(is_not, None))
 is_none_p: Predicate[Any | None] = Predicate(partial(is_, None))
@@ -13,7 +13,7 @@ def in_p[T](*v: T) -> Predicate[T]:
     return Predicate(lambda x: x in v)
 
 
-def eq_p[T](v: T) -> Predicate[T]:
+def eq_p[T](v: T) -> EqPredicate[T]:
     return EqPredicate(v=v)
 
 
@@ -21,11 +21,8 @@ def ne_p[T](v: T) -> Predicate[T]:
     return Predicate(lambda x: x != v)
 
 
-def ge_p[T: (int, str)](v: T) -> Predicate[T]:
-    def _ge(x: T) -> bool:
-        return x >= v
-
-    return Predicate(_ge)
+def ge_p[T: (int, str)](v: T) -> GePredicate[T]:
+    return GePredicate(v=v)
 
 
 def gt_p[T: (int, str)](v: T) -> Predicate[T]:
@@ -53,7 +50,9 @@ def any_p[T](predicate: Predicate[T]) -> Predicate[Iterable[T]]:
 
 
 def all_p[T](predicate: Predicate[T]) -> Predicate[Iterable[T]]:
-    return Predicate(lambda iter: all(predicate(x) for x in iter))
+    return AllPredicate(predicate=predicate)
+    #
+    # return Predicate(lambda iter: all(predicate(x) for x in iter))
 
 
 def is_instance_p(*klass: type) -> Predicate:

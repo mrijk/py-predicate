@@ -1,10 +1,20 @@
-from helpers import is_xor_p, is_and_p, is_not_p, is_or_p, is_false_p, is_true_p
+from helpers import (
+    is_xor_p,
+    is_and_p,
+    is_not_p,
+    is_or_p,
+    is_false_p,
+    is_true_p,
+    is_all_p,
+)
 from predicate import (
     gt_p,
     le_p,
     can_optimize,
     optimize,
+    always_true_p,
 )
+from predicate.standard_predicates import all_p
 
 
 def test_optimize_not_or():

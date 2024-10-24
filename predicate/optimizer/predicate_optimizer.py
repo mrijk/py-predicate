@@ -1,3 +1,4 @@
+from predicate.optimizer.all_optimizer import optimize_all_predicate
 from predicate.optimizer.and_optimizer import optimize_and_predicate
 from predicate.optimizer.not_optimizer import optimize_not_predicate
 from predicate.optimizer.or_optimizer import optimize_or_predicate
@@ -9,11 +10,14 @@ from predicate.predicate import (
     AndPredicate,
     OrPredicate,
     XorPredicate,
+    AllPredicate,
 )
 
 
 def optimize[T](predicate: Predicate[T]) -> Predicate[T]:
     match predicate:
+        case AllPredicate() as all_predicate:
+            return optimize_all_predicate(all_predicate)
         case AndPredicate() as and_predicate:
             return optimize_and_predicate(and_predicate)
         case NotPredicate() as not_predicate:
