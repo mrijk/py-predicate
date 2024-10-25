@@ -39,14 +39,12 @@ def predicate_matches_rule(predicate: Predicate | None, rule: Predicate | None) 
         case _, None:
             return True
         case NotPredicate() as predicate_child, NotPredicate() as rule_child:
-            return predicate_matches_rule(
-                predicate_child.predicate, rule_child.predicate
-            )
+            return predicate_matches_rule(predicate_child.predicate, rule_child.predicate)
         case OrPredicate() as predicate_child, OrPredicate() as rule_child:
-            return predicate_matches_rule(
-                predicate_child.left, rule_child.left
-            ) and predicate_matches_rule(predicate_child.right, rule_child.right)
-        case Predicate() as p1, Predicate() as p2 if type(p1) == type(p2):
+            return predicate_matches_rule(predicate_child.left, rule_child.left) and predicate_matches_rule(
+                predicate_child.right, rule_child.right
+            )
+        case Predicate() as p1, Predicate() as p2 if type(p1) is type(p2):
             return True
         case _, _:
             return False

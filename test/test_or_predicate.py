@@ -1,5 +1,3 @@
-from xml.sax.saxutils import prepare_input_source
-
 from predicate import (
     always_true_p,
     always_false_p,
@@ -162,4 +160,4 @@ def test_optimize_or_any():
 
     optimized = optimize(predicate)
 
-    assert optimized == any_p(ge_2 | ge_3)
+    assert optimized == any_p(ge_2)

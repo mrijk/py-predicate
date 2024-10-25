@@ -1,4 +1,3 @@
-from typing import Iterable
 from uuid import UUID
 
 from predicate.predicate import (

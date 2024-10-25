@@ -21,9 +21,7 @@ def optimize_xor_predicate[T](predicate: XorPredicate[T]) -> Predicate[T]:
 
     # False ^ False = False
 
-    if isinstance(left, AlwaysFalsePredicate) and isinstance(
-        right, AlwaysFalsePredicate
-    ):
+    if isinstance(left, AlwaysFalsePredicate) and isinstance(right, AlwaysFalsePredicate):
         return AlwaysFalsePredicate()
 
     # True ^ True = False
@@ -62,9 +60,7 @@ def optimize_xor_predicate[T](predicate: XorPredicate[T]) -> Predicate[T]:
         # p ^ (q & ^p) == ~(p | q)
         if not_predicate := get_as_not_predicate(and_predicate.right):
             if left == not_predicate.predicate:
-                return NotPredicate(
-                    AndPredicate(left=predicate.left, right=and_predicate.left)
-                )
+                return NotPredicate(AndPredicate(left=predicate.left, right=and_predicate.left))
 
     if and_predicate := get_as_and_predicate(left):
         # (^p & q) ^ p == ~(p | q)

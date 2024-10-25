@@ -7,15 +7,12 @@ from predicate.predicate import (
     get_as_not_predicate,
     AlwaysFalsePredicate,
     get_as_or_predicate,
-    get_as_eq_predicate,
-    get_as_ge_predicate,
-    get_as_all_predicate,
     GePredicate,
 )
 
 
 def optimize_and_predicate[T](predicate: AndPredicate[T]) -> Predicate[T]:
-    from predicate.optimizer.predicate_optimizer import optimize_predicate, optimize
+    from predicate.optimizer.predicate_optimizer import optimize
 
     left = predicate.left
     right = predicate.right
@@ -88,9 +85,7 @@ def optimize_and_predicate[T](predicate: AndPredicate[T]) -> Predicate[T]:
             return GePredicate(v=max(v1, v2))
         case AllPredicate(left_all), AllPredicate(right_all):
             # All(p1) & All(p2) => All(p1 & p2)
-            return AllPredicate(
-                predicate=optimize(AndPredicate(left=left_all, right=right_all))
-            )
+            return optimize(AllPredicate(predicate=optimize(AndPredicate(left=left_all, right=right_all))))
         case _, _:
             # TODO: complete all cases
             pass

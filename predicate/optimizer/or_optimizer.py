@@ -7,6 +7,7 @@ from predicate.predicate import (
     get_as_not_predicate,
     get_as_and_predicate,
     AnyPredicate,
+    GePredicate,
 )
 
 
@@ -20,22 +21,6 @@ def optimize_or_predicate[T](predicate: OrPredicate[T]) -> Predicate[T]:
 
     left = optimize(predicate.left)
     right = optimize(predicate.right)
-
-    # p | False == p
-    if isinstance(right, AlwaysFalsePredicate):
-        return left
-
-    # False | p == p
-    if isinstance(left, AlwaysFalsePredicate):
-        return right
-
-    # p | True == True
-    if isinstance(right, AlwaysTruePredicate):
-        return AlwaysTruePredicate()
-
-    # True | p == p
-    if isinstance(left, AlwaysTruePredicate):
-        return AlwaysTruePredicate()
 
     # p | p == p
     if left == right:
@@ -51,6 +36,22 @@ def optimize_or_predicate[T](predicate: OrPredicate[T]) -> Predicate[T]:
                 return OrPredicate(left=left, right=and_predicate.right)
 
     match left, right:
+        case _, AlwaysFalsePredicate():
+            # p | False == p
+            return left
+        case AlwaysFalsePredicate(), _:
+            # False | p == p
+            return right
+        case _, AlwaysTruePredicate():
+            # p | True == True
+            return AlwaysTruePredicate()
+        case AlwaysTruePredicate(), _:
+            # True | p == True
+            return AlwaysTruePredicate()
+
+        case GePredicate(v1), GePredicate(v2):
+            # x >= v1 | x >= v2 => x >= min(v1, v2)
+            return GePredicate(v=min(v1, v2))
         case AnyPredicate(left_any), AnyPredicate(right_any):
             return AnyPredicate(optimize(OrPredicate(left=left_any, right=right_any)))
 
