@@ -6,6 +6,8 @@ from predicate.predicate import (
     get_as_xor_predicate,
     AlwaysFalsePredicate,
     AlwaysTruePredicate,
+    get_as_all_predicate,
+    AnyPredicate,
 )
 
 
@@ -41,5 +43,7 @@ def optimize_not_predicate[T](predicate: NotPredicate[T]) -> Predicate[T]:
                     left=NotPredicate(predicate=xor_predicate.left),
                     right=xor_predicate.right,
                 )
+
+    # ~(x >=v) => x < v
 
     return optimize_predicate(predicate=NotPredicate(predicate=optimized))

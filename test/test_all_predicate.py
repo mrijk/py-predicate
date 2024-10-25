@@ -1,5 +1,5 @@
 from predicate import can_optimize, optimize
-from predicate.predicate import Predicate, always_true_p, always_false_p
+from predicate.predicate import FnPredicate as Predicate, always_true_p, always_false_p
 from predicate.standard_predicates import all_p, is_int_p, eq_p, is_str_p, ge_p
 from helpers import is_all_p, is_true_p
 

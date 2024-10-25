@@ -13,6 +13,7 @@ from predicate import (
     can_optimize,
     optimize,
     always_true_p,
+    always_false_p,
 )
 from predicate.standard_predicates import all_p
 
@@ -28,7 +29,7 @@ def test_optimize_not_or():
 
     optimized = optimize(predicate)
 
-    assert is_false_p(optimized)
+    assert optimized == always_false_p
 
 
 def test_optimize_not_and():
@@ -42,7 +43,7 @@ def test_optimize_not_and():
 
     optimized = optimize(predicate)
 
-    assert is_true_p(optimized)
+    assert optimized == always_true_p
 
 
 def test_optimize_not_xor_p_q():
@@ -57,8 +58,7 @@ def test_optimize_not_xor_p_q():
 
     optimized = optimize(predicate)
 
-    assert is_xor_p(optimized)
-    assert is_not_p(optimized.left)
+    assert optimized == ~p ^ q
 
 
 def test_optimize_not_xor_not_p_q():
@@ -73,8 +73,7 @@ def test_optimize_not_xor_not_p_q():
 
     optimized = optimize(predicate)
 
-    assert is_xor_p(optimized)
-    assert not is_not_p(optimized.left)
+    assert optimized == p ^ q
 
 
 def test_optimize_not_xor_p_not_q():
@@ -235,3 +234,5 @@ def test_optimize_xor_4():
     assert is_and_p(not_predicate)
     assert not_predicate.left == p
     assert not_predicate.right == q
+
+    assert optimized == ~(p | q)

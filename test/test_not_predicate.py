@@ -1,6 +1,7 @@
 from helpers import is_not_p, is_false_p, is_true_p
 from predicate import always_false_p, ge_p, always_true_p
 from predicate.optimizer.predicate_optimizer import optimize, can_optimize
+from predicate.standard_predicates import all_p, ne_p, eq_p, any_p
 
 
 def test_not():
@@ -61,3 +62,15 @@ def test_not_optimize_always_false():
     optimized = optimize(always_false)
 
     assert is_false_p(optimized)
+
+
+def test_not_optimize_all():
+    """"""
+    eq_2 = eq_p(2)
+    predicate = all_p(predicate=~eq_2)
+
+    assert can_optimize(predicate)
+
+    optimized = optimize(predicate)
+
+    assert optimized == ~any_p(predicate=eq_2)

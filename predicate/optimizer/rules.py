@@ -1,8 +1,12 @@
-from predicate.helpers import const
-from predicate.predicate import Predicate, always_true_p, always_false_p
+from predicate.predicate import (
+    AlwaysTruePredicate,
+    AlwaysFalsePredicate,
+    always_true_p,
+    always_false_p,
+)
 
-p = Predicate(predicate_fn=const(True))
-q = Predicate(predicate_fn=const(True))
+p = AlwaysTruePredicate()
+q = AlwaysFalsePredicate()
 
 optimization_rules = [
     {"title": "Double not", "from": ~~p, "to": p},

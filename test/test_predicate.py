@@ -1,11 +1,7 @@
 from uuid import uuid4
 
-from predicate.predicate import (
-    Predicate,
-    always_true_p,
-    always_false_p,
-)
 from predicate import ge_p, gt_p, le_p, lt_p
+from predicate.predicate import always_true_p, always_false_p, FnPredicate
 from predicate.standard_predicates import (
     is_not_none_p,
     is_none_p,
@@ -13,7 +9,6 @@ from predicate.standard_predicates import (
     eq_p,
     ne_p,
     any_p,
-    all_p,
     is_instance_p,
     is_int_p,
     is_str_p,
@@ -182,7 +177,7 @@ def test_any():
 
 
 def test_lambda():
-    in_123: Predicate[int] = Predicate(lambda x: str(x) in ["1", "2", "3"])
+    in_123 = FnPredicate(lambda x: str(x) in ["1", "2", "3"])
     exists_p = is_not_none_p & in_123
 
     assert not exists_p(None)

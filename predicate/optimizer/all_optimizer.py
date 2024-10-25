@@ -1,8 +1,12 @@
 from predicate.predicate import (
     AllPredicate,
+    FnPredicate,
+    NotPredicate,
     Predicate,
     AlwaysTruePredicate,
     AlwaysFalsePredicate,
+    get_as_not_predicate,
+    AnyPredicate,
 )
 
 
@@ -15,6 +19,11 @@ def optimize_all_predicate[T](predicate: AllPredicate[T]) -> Predicate[T]:
         return AlwaysTruePredicate()
 
     if isinstance(optimized, AlwaysFalsePredicate):
-        return Predicate(predicate_fn=lambda l: len(l) == 0)
+        return FnPredicate(predicate_fn=lambda l: len(l) == 0)
+
+    # not all => any
+
+    if not_predicate := get_as_not_predicate(predicate.predicate):
+        return NotPredicate(predicate=AnyPredicate(predicate=not_predicate.predicate))
 
     return predicate

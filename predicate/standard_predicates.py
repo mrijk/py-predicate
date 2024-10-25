@@ -1,43 +1,52 @@
-from _operator import is_not, is_
-from functools import partial
-from typing import Any, Iterable
+from typing import Iterable
 from uuid import UUID
 
-from predicate.predicate import EqPredicate, Predicate, GePredicate, AllPredicate
+from predicate.predicate import (
+    EqPredicate,
+    GePredicate,
+    AllPredicate,
+    GtPredicate,
+    NePredicate,
+    AnyPredicate,
+    LePredicate,
+    LtPredicate,
+    IsInstancePredicate,
+    IsNonePredicate,
+    IsNotNonePredicate,
+    Predicate,
+    InPredicate,
+)
 
-is_not_none_p: Predicate[Any | None] = Predicate(partial(is_not, None))
-is_none_p: Predicate[Any | None] = Predicate(partial(is_, None))
+is_not_none_p = IsNotNonePredicate()
+is_none_p = IsNonePredicate()
 
 
-def in_p[T](*v: T) -> Predicate[T]:
-    return Predicate(lambda x: x in v)
+def in_p[T](*v: T) -> InPredicate[T]:
+    return InPredicate(v=v)
 
 
 def eq_p[T](v: T) -> EqPredicate[T]:
     return EqPredicate(v=v)
 
 
-def ne_p[T](v: T) -> Predicate[T]:
-    return Predicate(lambda x: x != v)
+def ne_p[T](v: T) -> NePredicate[T]:
+    return NePredicate(v=v)
 
 
 def ge_p[T: (int, str)](v: T) -> GePredicate[T]:
     return GePredicate(v=v)
 
 
-def gt_p[T: (int, str)](v: T) -> Predicate[T]:
-    def _gt(x: T) -> bool:
-        return x > v
-
-    return Predicate(_gt)
+def gt_p[T: (int, str)](v: T) -> GtPredicate[T]:
+    return GtPredicate(v=v)
 
 
-def le_p[T: (int, str)](v: T) -> Predicate[T]:
-    return Predicate(lambda x: x <= v)
+def le_p[T: (int, str)](v: T) -> LePredicate[T]:
+    return LePredicate(v=v)
 
 
-def lt_p[T: (int, str)](v: T) -> Predicate[T]:
-    return Predicate(lambda x: x < v)
+def lt_p[T: (int, str)](v: T) -> LtPredicate[T]:
+    return LtPredicate(v=v)
 
 
 neg_p = lt_p(0)
@@ -45,18 +54,16 @@ zero_p = eq_p(0)
 pos_p = gt_p(0)
 
 
-def any_p[T](predicate: Predicate[T]) -> Predicate[Iterable[T]]:
-    return Predicate(lambda iter: any(predicate(x) for x in iter))
+def any_p[T](predicate: Predicate[T]) -> AnyPredicate[Iterable[T]]:
+    return AnyPredicate(predicate=predicate)
 
 
-def all_p[T](predicate: Predicate[T]) -> Predicate[Iterable[T]]:
+def all_p[T](predicate: Predicate[T]) -> AllPredicate[Iterable[T]]:
     return AllPredicate(predicate=predicate)
-    #
-    # return Predicate(lambda iter: all(predicate(x) for x in iter))
 
 
-def is_instance_p(*klass: type) -> Predicate:
-    return Predicate(lambda x: isinstance(x, klass))
+def is_instance_p(*klass: type) -> IsInstancePredicate:
+    return IsInstancePredicate(klass=klass)
 
 
 is_int_p = is_instance_p(int)
