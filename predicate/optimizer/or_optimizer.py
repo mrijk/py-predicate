@@ -2,14 +2,21 @@ from predicate.predicate import (
     OrPredicate,
     AlwaysFalsePredicate,
     AlwaysTruePredicate,
+    NotPredicate,
     Predicate,
     get_as_not_predicate,
     get_as_and_predicate,
+    AnyPredicate,
 )
 
 
 def optimize_or_predicate[T](predicate: OrPredicate[T]) -> Predicate[T]:
-    from predicate.optimizer.predicate_optimizer import optimize_predicate, optimize
+    from predicate.optimizer.predicate_optimizer import optimize
+
+    # before optimization
+
+    if optimized := optimize_or_not(left=predicate.left, right=predicate.right):
+        return optimized
 
     left = optimize(predicate.left)
     right = optimize(predicate.right)
@@ -34,15 +41,8 @@ def optimize_or_predicate[T](predicate: OrPredicate[T]) -> Predicate[T]:
     if left == right:
         return left
 
-    # ~p | p == True
-    if not_predicate := get_as_not_predicate(left):
-        if right == not_predicate.predicate:
-            return AlwaysTruePredicate()
-
-    # p | ~p == True
-    if not_predicate := get_as_not_predicate(right):
-        if left == not_predicate.predicate:
-            return AlwaysTruePredicate()
+    if optimized := optimize_or_not(left=left, right=right):
+        return optimized
 
     # p | (~p & q) == p | q
     if and_predicate := get_as_and_predicate(right):
@@ -50,4 +50,18 @@ def optimize_or_predicate[T](predicate: OrPredicate[T]) -> Predicate[T]:
             if not_predicate.predicate == left:
                 return OrPredicate(left=left, right=and_predicate.right)
 
-    return optimize_predicate(predicate)
+    match left, right:
+        case AnyPredicate(left_any), AnyPredicate(right_any):
+            return AnyPredicate(optimize(OrPredicate(left=left_any, right=right_any)))
+
+    return predicate
+
+
+def optimize_or_not[T](left: Predicate[T], right: Predicate[T]) -> Predicate[T] | None:
+    match left, right:
+        case NotPredicate(left_p), _ if right == left_p:  # ~p | p == True
+            return AlwaysTruePredicate()
+        case _, NotPredicate(right_p) if left == right_p:  # p | ~p == True
+            return AlwaysTruePredicate()
+
+    return None

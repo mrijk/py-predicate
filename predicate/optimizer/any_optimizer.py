@@ -1,16 +1,16 @@
 from predicate.predicate import (
-    AllPredicate,
-    FnPredicate,
     NotPredicate,
     Predicate,
     AlwaysTruePredicate,
     AlwaysFalsePredicate,
-    get_as_not_predicate,
+    AllPredicate,
     AnyPredicate,
+    NePredicate,
+    EqPredicate,
 )
 
 
-def optimize_all_predicate[T](predicate: AllPredicate[T]) -> Predicate[T]:
+def optimize_any_predicate[T](predicate: AnyPredicate[T]) -> Predicate[T]:
     from predicate.optimizer.predicate_optimizer import optimize
 
     optimized = optimize(predicate.predicate)
@@ -19,13 +19,12 @@ def optimize_all_predicate[T](predicate: AllPredicate[T]) -> Predicate[T]:
         case AlwaysTruePredicate():
             return AlwaysTruePredicate()
         case AlwaysFalsePredicate():
-            return FnPredicate(predicate_fn=lambda l: len(l) == 0)
+            return AlwaysFalsePredicate()
+        case NePredicate(v):
+            return NotPredicate(predicate=AllPredicate(predicate=EqPredicate(v)))
         case NotPredicate(not_predicate):
-            return NotPredicate(predicate=AnyPredicate(predicate=not_predicate))
+            return NotPredicate(predicate=AllPredicate(predicate=not_predicate))
         case _:
             pass
-
-    if not_predicate := get_as_not_predicate(predicate.predicate):
-        return NotPredicate(predicate=AnyPredicate(predicate=not_predicate.predicate))
 
     return predicate

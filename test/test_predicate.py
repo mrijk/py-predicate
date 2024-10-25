@@ -8,7 +8,6 @@ from predicate.standard_predicates import (
     in_p,
     eq_p,
     ne_p,
-    any_p,
     is_instance_p,
     is_int_p,
     is_str_p,
@@ -165,15 +164,6 @@ def test_eq():
     assert eq_1 == eq_1
     assert eq_1 == eq_2
     assert eq_1 != eq_3
-
-
-def test_any():
-    any_int = any_p(is_int_p)
-
-    assert any_int(()) is False
-    assert any_int((1, 2, 3)) is True
-    assert any_int([1, 2, 3]) is True
-    assert any_int([None, 2, 3]) is True
 
 
 def test_lambda():

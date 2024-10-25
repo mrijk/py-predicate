@@ -1,3 +1,5 @@
+from xml.sax.saxutils import prepare_input_source
+
 from predicate import (
     always_true_p,
     always_false_p,
@@ -8,7 +10,7 @@ from predicate import (
     OrPredicate,
     AlwaysTruePredicate,
 )
-from predicate.standard_predicates import is_not_none_p, is_none_p
+from predicate.standard_predicates import is_not_none_p, is_none_p, any_p
 from predicate.optimizer.predicate_optimizer import optimize, can_optimize
 from helpers import is_or_p
 
@@ -122,26 +124,42 @@ def test_or_optimize_eq():
     assert isinstance(not_optimized, OrPredicate)
 
 
-def test_or_optimize_not():
+def test_or_optimize_not_same():
     """p | ~p == True"""
     p_1 = gt_p(2)
     p_2 = gt_p(2)
-    p_3 = gt_p(3)
 
-    same = p_1 | ~p_2
+    predicate = p_1 | ~p_2
 
-    assert isinstance(same, OrPredicate)
-    assert can_optimize(same) is True
+    assert is_or_p(predicate)
+    assert can_optimize(predicate)
 
-    optimized = optimize(same)
+    optimized = optimize(predicate)
 
-    assert isinstance(optimized, AlwaysTruePredicate)
+    assert optimized == always_true_p
 
-    not_same = p_1 | ~p_3
 
-    assert isinstance(not_same, OrPredicate)
-    assert can_optimize(not_same) is False
+def test_or_optimize_not_not_same():
+    """p | ~q with p != q"""
+    p_1 = gt_p(2)
+    p_2 = gt_p(3)
 
-    not_optimized = optimize(not_same)
+    predicate = p_1 | ~p_2
 
-    assert isinstance(not_optimized, OrPredicate)
+    assert is_or_p(predicate)
+    assert not can_optimize(predicate)
+
+
+def test_optimize_or_any():
+    ge_2 = ge_p(2)
+    ge_3 = ge_p(3)
+    any_ge_2 = any_p(ge_2)
+    any_ge_3 = any_p(ge_3)
+
+    predicate = any_ge_2 | any_ge_3
+
+    assert can_optimize(predicate)
+
+    optimized = optimize(predicate)
+
+    assert optimized == any_p(ge_2 | ge_3)

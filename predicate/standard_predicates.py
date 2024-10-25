@@ -54,11 +54,11 @@ zero_p = eq_p(0)
 pos_p = gt_p(0)
 
 
-def any_p[T](predicate: Predicate[T]) -> AnyPredicate[Iterable[T]]:
+def any_p[T](predicate: Predicate[T]) -> AnyPredicate[T]:
     return AnyPredicate(predicate=predicate)
 
 
-def all_p[T](predicate: Predicate[T]) -> AllPredicate[Iterable[T]]:
+def all_p[T](predicate: Predicate[T]) -> AllPredicate[T]:
     return AllPredicate(predicate=predicate)
 
 

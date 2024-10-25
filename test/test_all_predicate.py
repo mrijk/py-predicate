@@ -47,16 +47,3 @@ def test_optimize_all_false():
     optimized = optimize(predicate)
 
     assert not is_all_p(optimized)
-
-
-def test_optimize_and_all():
-    all_ge_2 = all_p(ge_p(2))
-    all_ge_3 = all_p(ge_p(3))
-
-    predicate = all_ge_2 & all_ge_3
-
-    assert can_optimize(predicate)
-
-    optimized = optimize(predicate)
-
-    assert optimized == all_ge_3

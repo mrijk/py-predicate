@@ -1,7 +1,7 @@
 from helpers import is_not_p, is_false_p, is_true_p
 from predicate import always_false_p, ge_p, always_true_p
 from predicate.optimizer.predicate_optimizer import optimize, can_optimize
-from predicate.standard_predicates import all_p, ne_p, eq_p, any_p
+from predicate.standard_predicates import all_p, ne_p, eq_p, any_p, lt_p, gt_p, le_p
 
 
 def test_not():
@@ -34,10 +34,7 @@ def test_optimize_not_not():
 
     optimized = optimize(ge_2_to)
 
-    assert is_not_p(optimized) is False
-
-    assert optimized(2) is True
-    assert optimized(1) is False
+    assert optimized == ge_2
 
 
 def test_not_optimize_always_true():
@@ -74,3 +71,75 @@ def test_not_optimize_all():
     optimized = optimize(predicate)
 
     assert optimized == ~any_p(predicate=eq_2)
+
+
+def test_not_optimize_ge():
+    """~ge(v) => lt(v)"""
+    ge_2 = ge_p(2)
+    predicate = ~ge_2
+
+    assert can_optimize(predicate)
+
+    optimized = optimize(predicate)
+
+    assert optimized == lt_p(2)
+
+
+def test_not_optimize_gt():
+    """~gt(v) => le(v)"""
+    gt_2 = gt_p(2)
+    predicate = ~gt_2
+
+    assert can_optimize(predicate)
+
+    optimized = optimize(predicate)
+
+    assert optimized == le_p(2)
+
+
+def test_not_optimize_le():
+    """~lt(v) => ge(v)"""
+    le_2 = le_p(2)
+    predicate = ~le_2
+
+    assert can_optimize(predicate)
+
+    optimized = optimize(predicate)
+
+    assert optimized == gt_p(2)
+
+
+def test_not_optimize_lt():
+    """~lt(v) => ge(v)"""
+    lt_2 = lt_p(2)
+    predicate = ~lt_2
+
+    assert can_optimize(predicate)
+
+    optimized = optimize(predicate)
+
+    assert optimized == ge_p(2)
+
+
+def test_not_optimize_eq():
+    """~(x == v) => x != v"""
+    eq_2 = eq_p(2)
+    predicate = ~eq_2
+
+    assert can_optimize(predicate)
+
+    optimized = optimize(predicate)
+
+    assert optimized == ne_p(2)
+
+
+def test_not_optimize_ne():
+    """~(x != v) => x == v"""
+    ne_2 = ne_p(2)
+    predicate = ~ne_2
+
+    assert can_optimize(predicate)
+
+    optimized = optimize(predicate)
+
+    assert optimized == eq_p(2)
