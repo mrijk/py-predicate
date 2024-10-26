@@ -32,6 +32,7 @@ requires-python = ">=3.12"
 
 [tool.flit.metadata.requires-extra]
 test = [
+    "black",
     "mypy",
     "mypy_extensions",
     "pytest",
