@@ -1,5 +1,5 @@
 [tool.flit.metadata]
-module = "py-predicate"
+module = "py_predicate"
 dist-name = "py-predicate"
 author = "Maurits Rijk"
 author-email = "maurits.rijk@gmail.com"
