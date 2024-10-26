@@ -30,5 +30,20 @@ requires = [
 description-file = "README.md"
 requires-python = ">=3.12"
 
+[tool.flit.metadata.requires-extra]
+test = [
+    "mypy",
+    "mypy_extensions",
+    "pytest",
+    "pytest-cov",
+    "pytest-asyncio",
+    "ruff",
+]
+dev = [
+    "bumpversion",
+    "jsonschema",
+    "pre-commit",
+]
+
 [tool.black]
 line-length = 120
