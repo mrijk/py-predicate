@@ -1,3 +1,7 @@
+"""The py-predicate module."""
+
+__version__ = "0.0.1"
+
 from predicate.optimizer.predicate_optimizer import optimize, can_optimize
 from predicate.predicate import (
     always_true_p,
