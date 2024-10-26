@@ -7,9 +7,7 @@ def test_format_json_false():
 
     json = to_json(predicate)
 
-    assert json == {
-        "false": False
-    }
+    assert json == {"false": False}
 
 
 def test_format_json_true():
@@ -17,9 +15,7 @@ def test_format_json_true():
 
     json = to_json(predicate)
 
-    assert json == {
-        "true": True
-    }
+    assert json == {"true": True}
 
 
 def test_format_json_and():
@@ -27,12 +23,7 @@ def test_format_json_and():
 
     json = to_json(predicate)
 
-    assert json == {
-        "and": {
-            "left": {"true": True},
-            "right": {"false": False}
-        }
-    }
+    assert json == {"and": {"left": {"true": True}, "right": {"false": False}}}
 
 
 def test_format_json_or():
@@ -40,12 +31,7 @@ def test_format_json_or():
 
     json = to_json(predicate)
 
-    assert json == {
-        "or": {
-            "left": {"true": True},
-            "right": {"false": False}
-        }
-    }
+    assert json == {"or": {"left": {"true": True}, "right": {"false": False}}}
 
 
 def test_format_json_xor():
@@ -66,9 +52,4 @@ def test_format_json_not():
 
     json = to_json(predicate)
 
-    assert json == {
-        "not": {
-            "predicate": {"true": True}
-        }
-    }
-
+    assert json == {"not": {"predicate": {"true": True}}}
