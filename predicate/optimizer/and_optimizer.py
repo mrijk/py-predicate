@@ -5,6 +5,8 @@ from predicate.predicate import (
     AndPredicate,
     EqPredicate,
     GePredicate,
+    IsNonePredicate,
+    IsNotNonePredicate,
     Predicate,
     get_as_not_predicate,
     get_as_or_predicate,
@@ -86,6 +88,12 @@ def optimize_and_predicate[T](predicate: AndPredicate[T]) -> Predicate[T]:
         case AllPredicate(left_all), AllPredicate(right_all):
             # All(p1) & All(p2) => All(p1 & p2)
             return optimize(AllPredicate(predicate=optimize(AndPredicate(left=left_all, right=right_all))))
+        case IsNonePredicate(), IsNotNonePredicate():
+            # None & ~None => False
+            return AlwaysFalsePredicate()
+        case IsNotNonePredicate(), IsNonePredicate():
+            # ~None & None => False
+            return AlwaysFalsePredicate()
         case _, _:
             # TODO: complete all cases
             pass

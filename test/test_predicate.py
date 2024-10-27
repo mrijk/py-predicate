@@ -11,7 +11,6 @@ from predicate.standard_predicates import (
     is_instance_p,
     is_int_p,
     is_list_p,
-    is_none_p,
     is_not_none_p,
     is_str_p,
     is_uuid_p,
@@ -25,16 +24,6 @@ def test_always_true_p():
 
 def test_always_false_p():
     assert always_false_p(13) is False
-
-
-def test_is_not_none_p():
-    assert is_not_none_p(13) is True
-    assert is_not_none_p(None) is False
-
-
-def test_is_none_p():
-    assert is_none_p(13) is False
-    assert is_none_p(None) is True
 
 
 def test_in_p():

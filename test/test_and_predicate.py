@@ -3,7 +3,7 @@ from helpers import is_and_p, is_eq_p, is_false_p, is_true_p
 from predicate import always_false_p, always_true_p, ge_p, gt_p, le_p, lt_p
 from predicate.optimizer.predicate_optimizer import can_optimize, optimize
 from predicate.predicate import is_empty_p
-from predicate.standard_predicates import all_p, eq_p
+from predicate.standard_predicates import all_p, eq_p, is_none_p, is_not_none_p
 
 
 def test_and():
@@ -21,7 +21,7 @@ def test_and():
 
 
 def test_and_commutative():
-    """A & b == b & a"""
+    #  p & q == q & p
     gt_2 = gt_p(2)
     lt_4 = lt_p(4)
 
@@ -42,7 +42,7 @@ def test_and_associative():
 
 
 def test_and_optimize_right_false():
-    """P & False == False"""
+    # p & False == False
     ge_4 = ge_p(4)
     predicate = ge_4 & always_false_p
 
@@ -55,7 +55,7 @@ def test_and_optimize_right_false():
 
 
 def test_and_optimize_right_true():
-    """P & True == p"""
+    # p & True == p
     ge_4 = ge_p(4)
     predicate = ge_4 & always_true_p
 
@@ -68,7 +68,7 @@ def test_and_optimize_right_true():
 
 
 def test_and_optimize_left_false():
-    """False & p == False"""
+    # False & p == False
     ge_4 = ge_p(4)
     predicate = always_false_p & ge_4
 
@@ -81,7 +81,7 @@ def test_and_optimize_left_false():
 
 
 def test_and_optimize_left_true():
-    """True & p & == p"""
+    # True & p == p
     ge_4 = ge_p(4)
     predicate = always_true_p & ge_4
 
@@ -94,7 +94,7 @@ def test_and_optimize_left_true():
 
 
 def test_and_optimize_false_and_false():
-    """False & False == False"""
+    # False & False == False
     always_false = always_false_p & always_false_p
 
     assert is_and_p(always_false)
@@ -106,7 +106,7 @@ def test_and_optimize_false_and_false():
 
 
 def test_and_optimize_true_and_true():
-    """True & True == True"""
+    # True & True == True
     always_true = always_true_p & always_true_p
 
     assert is_and_p(always_true)
@@ -118,7 +118,7 @@ def test_and_optimize_true_and_true():
 
 
 def test_and_optimize_true_and_false():
-    """True & False == False"""
+    # rue & False == False
     always_false = always_true_p & always_false_p
 
     assert is_and_p(always_false)
@@ -130,7 +130,7 @@ def test_and_optimize_true_and_false():
 
 
 def test_and_optimize_false_and_true():
-    """False & True == False"""
+    # False & True == False
     always_false = always_false_p & always_true_p
 
     assert is_and_p(always_false)
@@ -142,7 +142,7 @@ def test_and_optimize_false_and_true():
 
 
 def test_and_optimize_eq():
-    """P & p == p"""
+    # p & p == p
     p_1 = gt_p(2)
     p_2 = gt_p(2)
     p_3 = gt_p(3)
@@ -167,7 +167,7 @@ def test_and_optimize_eq():
 
 
 def test_and_optimize_not_right():
-    """P & ~p == False"""
+    # p & ~p == False
     p_1 = gt_p(2)
     p_2 = gt_p(2)
     p_3 = gt_p(3)
@@ -192,7 +192,7 @@ def test_and_optimize_not_right():
 
 
 def test_and_optimize_not_left():
-    """~p & p == False"""
+    # ~p & p == False
     p_1 = gt_p(2)
     p_2 = gt_p(2)
     p_3 = gt_p(3)
@@ -300,3 +300,25 @@ def test_optimize_and_all_not():
     assert optimized == is_empty_p
 
     assert optimized([])
+
+
+def test_optimize_none_and_not_none():
+    # None & ~None => False
+    predicate = is_none_p & is_not_none_p
+
+    assert can_optimize(predicate)
+
+    optimized = optimize(predicate)
+
+    assert optimized == always_false_p
+
+
+def test_optimize_not_none_and_none():
+    # None & ~None => False
+    predicate = is_not_none_p & is_none_p
+
+    assert can_optimize(predicate)
+
+    optimized = optimize(predicate)
+
+    assert optimized == always_false_p
