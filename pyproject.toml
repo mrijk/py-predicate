@@ -48,3 +48,20 @@ dev = [
 
 [tool.black]
 line-length = 120
+
+[tool.ruff]
+lint.ignore = [
+    "C901",
+    "D100",
+    "D101",
+    "D102",
+    "D103",
+    "D104",
+    "D105",
+]
+line-length = 120
+lint.select = ["B", "C", "D", "E", "F", "I", "N", "RET", "S", "T", "W"]
+target-version = "py312"
+
+[tool.ruff.lint.flake8-tidy-imports]
+ban-relative-imports = "all"

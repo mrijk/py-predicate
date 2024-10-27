@@ -1,17 +1,17 @@
 from predicate.predicate import (
+    AlwaysFalsePredicate,
+    AlwaysTruePredicate,
+    EqPredicate,
+    GePredicate,
+    GtPredicate,
+    LePredicate,
+    LtPredicate,
+    NePredicate,
     NotPredicate,
     Predicate,
     XorPredicate,
     get_as_not_predicate,
     get_as_xor_predicate,
-    AlwaysFalsePredicate,
-    AlwaysTruePredicate,
-    GePredicate,
-    LtPredicate,
-    GtPredicate,
-    LePredicate,
-    NePredicate,
-    EqPredicate,
 )
 
 

@@ -6,13 +6,13 @@ from predicate.optimizer.or_optimizer import optimize_or_predicate
 from predicate.optimizer.rules import optimization_rules
 from predicate.optimizer.xor_optimizer import optimize_xor_predicate
 from predicate.predicate import (
-    Predicate,
-    NotPredicate,
+    AllPredicate,
     AndPredicate,
     AnyPredicate,
+    NotPredicate,
     OrPredicate,
+    Predicate,
     XorPredicate,
-    AllPredicate,
 )
 
 
@@ -38,8 +38,8 @@ def predicate_matches_rule(predicate: Predicate | None, rule: Predicate | None) 
     match predicate, rule:
         case _, None:
             return True
-        case NotPredicate() as predicate_child, NotPredicate() as rule_child:
-            return predicate_matches_rule(predicate_child.predicate, rule_child.predicate)
+        case NotPredicate(not_predicate), NotPredicate(rule_predicate):
+            return predicate_matches_rule(not_predicate, rule_predicate)
         case OrPredicate() as predicate_child, OrPredicate() as rule_child:
             return predicate_matches_rule(predicate_child.left, rule_child.left) and predicate_matches_rule(
                 predicate_child.right, rule_child.right

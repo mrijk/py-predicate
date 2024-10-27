@@ -1,5 +1,6 @@
-from predicate import can_optimize, optimize, ge_p, always_true_p, always_false_p, gt_p
+from predicate import can_optimize, optimize, ge_p, always_true_p, always_false_p, gt_p, le_p
 from helpers import is_not_p, is_xor_p, is_true_p, is_false_p
+from predicate.standard_predicates import all_p
 
 
 def test_xor():
@@ -185,11 +186,25 @@ def test_xor_optimize_true_left():
     """True ^ a == ~a"""
     ge_2 = ge_p(2)
 
-    true_xor_ge_2 = always_true_p ^ ge_2
+    predicate = always_true_p ^ ge_2
 
-    assert is_xor_p(true_xor_ge_2)
-    assert can_optimize(true_xor_ge_2) is True
+    assert is_xor_p(predicate)
+    assert can_optimize(predicate) is True
 
-    optimized = optimize(true_xor_ge_2)
+    optimized = optimize(predicate)
 
-    assert is_not_p(optimized)
+    assert optimized == ~ge_2
+
+
+def test_xor_optimize_not_not():
+    """~p ^ ~q == p ^ q"""
+    p = all_p(ge_p(2))
+    q = all_p(le_p(3))
+
+    predicate = ~p ^ ~q
+
+    assert can_optimize(predicate) is True
+
+    optimized = optimize(predicate)
+
+    assert optimized == p ^ q

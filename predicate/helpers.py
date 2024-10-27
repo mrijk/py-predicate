@@ -1,4 +1,4 @@
-from typing import Callable, Any
+from typing import Any, Callable
 
 
 def const[T](x: T) -> Callable[[Any], T]:

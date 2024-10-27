@@ -1,8 +1,8 @@
 from predicate.predicate import (
-    AlwaysTruePredicate,
     AlwaysFalsePredicate,
-    always_true_p,
+    AlwaysTruePredicate,
     always_false_p,
+    always_true_p,
 )
 
 p = AlwaysTruePredicate()

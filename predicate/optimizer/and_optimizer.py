@@ -1,13 +1,13 @@
 from predicate.predicate import (
     AllPredicate,
+    AlwaysFalsePredicate,
     AlwaysTruePredicate,
     AndPredicate,
     EqPredicate,
+    GePredicate,
     Predicate,
     get_as_not_predicate,
-    AlwaysFalsePredicate,
     get_as_or_predicate,
-    GePredicate,
 )
 
 

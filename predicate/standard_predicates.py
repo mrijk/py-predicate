@@ -1,19 +1,19 @@
 from uuid import UUID
 
 from predicate.predicate import (
+    AllPredicate,
+    AnyPredicate,
     EqPredicate,
     GePredicate,
-    AllPredicate,
     GtPredicate,
-    NePredicate,
-    AnyPredicate,
-    LePredicate,
-    LtPredicate,
+    InPredicate,
     IsInstancePredicate,
     IsNonePredicate,
     IsNotNonePredicate,
+    LePredicate,
+    LtPredicate,
+    NePredicate,
     Predicate,
-    InPredicate,
 )
 
 is_not_none_p = IsNotNonePredicate()

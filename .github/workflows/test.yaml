@@ -31,3 +31,5 @@ jobs:
         run: ruff check .
       - name: Black
         run: black . --check
+      - name: Test with pytest
+        run: pytest --cov-branch --cov=py-predicate --cov-report=xml --ignore=tests --ignore=benchmarks

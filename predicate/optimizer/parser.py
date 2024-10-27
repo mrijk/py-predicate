@@ -1,7 +1,7 @@
 from functools import partial
 
 from predicate import AlwaysTruePredicate, NotPredicate
-from predicate.predicate import Predicate, AlwaysFalsePredicate, AndPredicate, OrPredicate, XorPredicate
+from predicate.predicate import AlwaysFalsePredicate, AndPredicate, OrPredicate, Predicate, XorPredicate
 
 # Tokens
 FALSE = "false"

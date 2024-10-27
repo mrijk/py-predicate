@@ -2,18 +2,18 @@
 
 __version__ = "0.0.1"
 
-from predicate.optimizer.predicate_optimizer import optimize, can_optimize
+from predicate.optimizer.predicate_optimizer import can_optimize, optimize
 from predicate.predicate import (
-    always_true_p,
     AllPredicate,
+    AlwaysFalsePredicate,
+    AlwaysTruePredicate,
     AndPredicate,
     EqPredicate,
-    XorPredicate,
-    always_false_p,
-    AlwaysTruePredicate,
-    AlwaysFalsePredicate,
     NotPredicate,
     OrPredicate,
+    XorPredicate,
+    always_false_p,
+    always_true_p,
 )
 from predicate.standard_predicates import ge_p, gt_p, le_p, lt_p
 

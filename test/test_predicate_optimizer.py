@@ -168,11 +168,7 @@ def test_optimize_xor_1():
 
     optimized = optimize(predicate)
 
-    assert is_not_p(optimized)
-    not_predicate = optimized.predicate
-    assert is_and_p(not_predicate)
-    assert not_predicate.left == p
-    assert not_predicate.right == q
+    assert optimized == ~(p | q)
 
 
 def test_optimize_xor_2():
@@ -187,11 +183,7 @@ def test_optimize_xor_2():
 
     optimized = optimize(predicate)
 
-    assert is_not_p(optimized)
-    not_predicate = optimized.predicate
-    assert is_and_p(not_predicate)
-    assert not_predicate.left == p
-    assert not_predicate.right == q
+    assert optimized == ~(p | q)
 
 
 def test_optimize_xor_3():
@@ -206,11 +198,7 @@ def test_optimize_xor_3():
 
     optimized = optimize(predicate)
 
-    assert is_not_p(optimized)
-    not_predicate = optimized.predicate
-    assert is_and_p(not_predicate)
-    assert not_predicate.left == p
-    assert not_predicate.right == q
+    assert optimized == ~(p | q)
 
 
 def test_optimize_xor_4():
@@ -224,11 +212,5 @@ def test_optimize_xor_4():
     assert can_optimize(predicate)
 
     optimized = optimize(predicate)
-
-    assert is_not_p(optimized)
-    not_predicate = optimized.predicate
-    assert is_and_p(not_predicate)
-    assert not_predicate.left == p
-    assert not_predicate.right == q
 
     assert optimized == ~(p | q)

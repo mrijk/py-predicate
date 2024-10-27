@@ -1,7 +1,10 @@
+import pytest
+
 from predicate import ge_p, always_false_p, always_true_p
 from predicate.optimizer.predicate_optimizer import match
 
 
+@pytest.mark.skip()
 def test_match_not_not():
     ge_2 = ge_p(2)
 

@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Callable, Self, cast, Iterable
+from typing import Callable, Iterable, Self, cast
 
 
 @dataclass

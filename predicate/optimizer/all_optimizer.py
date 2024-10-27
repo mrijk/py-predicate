@@ -1,12 +1,12 @@
 from predicate.predicate import (
     AllPredicate,
-    NotPredicate,
-    Predicate,
-    AlwaysTruePredicate,
     AlwaysFalsePredicate,
-    get_as_not_predicate,
+    AlwaysTruePredicate,
     AnyPredicate,
     IsEmptyPredicate,
+    NotPredicate,
+    Predicate,
+    get_as_not_predicate,
 )
 
 

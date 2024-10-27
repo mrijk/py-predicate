@@ -1,7 +1,7 @@
 from typing import Any
 
 from predicate import AlwaysFalsePredicate, AlwaysTruePredicate, AndPredicate
-from predicate.predicate import Predicate, OrPredicate, XorPredicate, NotPredicate
+from predicate.predicate import NotPredicate, OrPredicate, Predicate, XorPredicate
 
 
 def to_json(predicate: Predicate) -> dict[str, Any]:
