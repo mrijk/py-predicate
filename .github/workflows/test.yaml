@@ -33,3 +33,9 @@ jobs:
         run: black . --check
       - name: Test with pytest
         run: pytest --cov-branch --cov=py-predicate --cov-report=xml --ignore=tests --ignore=benchmarks
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          fail_ci_if_error: true
+          files: ./coverage.xml
