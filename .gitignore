@@ -3,3 +3,10 @@ __pycache__/
 
 .venv/
 .idea/
+
+# Unit test / coverage reports
+.tox/
+.coverage
+.coverage.*
+.cache
+coverage.xml

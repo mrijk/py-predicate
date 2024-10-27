@@ -181,10 +181,6 @@ class IsInstancePredicate[T](Predicate[T]):
         return self.klass == other.klass if isinstance(other, IsInstancePredicate) else False
 
 
-def to_filtered(iter: list[str | None], predicate: Predicate[str | None]) -> list[str | None]:
-    return [x for x in iter if predicate(x)]
-
-
 def get_as_not_predicate[T](predicate: Predicate[T]) -> NotPredicate[T] | None:
     return cast(NotPredicate, predicate) if isinstance(predicate, NotPredicate) else None
 
@@ -199,18 +195,6 @@ def get_as_or_predicate[T](predicate: Predicate[T]) -> OrPredicate[T] | None:
 
 def get_as_xor_predicate[T](predicate: Predicate[T]) -> XorPredicate[T] | None:
     return cast(XorPredicate, predicate) if isinstance(predicate, XorPredicate) else None
-
-
-def get_as_eq_predicate[T](predicate: Predicate[T]) -> EqPredicate[T] | None:
-    return cast(EqPredicate, predicate) if isinstance(predicate, EqPredicate) else None
-
-
-def get_as_ge_predicate[T](predicate: Predicate[T]) -> GePredicate[T] | None:
-    return cast(GePredicate, predicate) if isinstance(predicate, GePredicate) else None
-
-
-def get_as_all_predicate[T](predicate: Predicate[T]) -> AllPredicate[T] | None:
-    return cast(AllPredicate, predicate) if isinstance(predicate, AllPredicate) else None
 
 
 @dataclass
