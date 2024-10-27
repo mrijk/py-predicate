@@ -16,7 +16,7 @@ from predicate import (
 
 
 def test_optimize_not_or():
-    """~(p | ~p) == False"""
+    # ~(p | ~p) == False
     p = gt_p(2)
 
     predicate = ~(p | ~p)
@@ -30,7 +30,7 @@ def test_optimize_not_or():
 
 
 def test_optimize_not_and():
-    """~(p & ~p) == True"""
+    # ~(p & ~p) == True
     p = gt_p(2)
 
     predicate = ~(p & ~p)
@@ -44,7 +44,7 @@ def test_optimize_not_and():
 
 
 def test_optimize_not_xor_p_q():
-    """~(p ^ q) == ~p ^ q"""
+    # ~(p ^ q) == ~p ^ q
     p = gt_p(2)
     q = le_p(0)
 
@@ -59,7 +59,7 @@ def test_optimize_not_xor_p_q():
 
 
 def test_optimize_not_xor_not_p_q():
-    """~(~p ^ q) == p ^ q"""
+    # ~(~p ^ q) == p ^ q
     p = gt_p(2)
     q = le_p(0)
 
@@ -74,7 +74,7 @@ def test_optimize_not_xor_not_p_q():
 
 
 def test_optimize_not_xor_p_not_q():
-    """~(p ^ ~q) == p ^ q"""
+    # ~(p ^ ~q) == p ^ q
     p = gt_p(2)
     q = le_p(0)
 
@@ -85,12 +85,11 @@ def test_optimize_not_xor_p_not_q():
 
     optimized = optimize(predicate)
 
-    assert is_xor_p(optimized)
-    assert not is_not_p(optimized.right)
+    assert optimized == p ^ q
 
 
 def test_optimize_or_1():
-    """P | (~p & q) == p | q"""
+    # p | (~p & q) == p | q
     p = gt_p(2)
     q = le_p(0)
 
@@ -101,13 +100,11 @@ def test_optimize_or_1():
 
     optimized = optimize(le_0_or_gt_2)
 
-    assert is_or_p(optimized)
-    assert optimized.left == p
-    assert optimized.right == q
+    assert optimized == p | q
 
 
 def test_optimize_and_1():
-    """P & (~p | q) == p & q"""
+    # p & (~p | q) == p & q
     p = gt_p(2)
     q = le_p(0)
 
@@ -118,13 +115,11 @@ def test_optimize_and_1():
 
     optimized = optimize(le_0_and_gt_2)
 
-    assert is_and_p(optimized)
-    assert optimized.left == p
-    assert optimized.right == q
+    assert optimized == p & q
 
 
 def test_optimize_and_2():
-    """P & (q | ~p) == p & q"""
+    # p & (q | ~p) == p & q
     p = gt_p(2)
     q = le_p(0)
 
@@ -135,13 +130,11 @@ def test_optimize_and_2():
 
     optimized = optimize(le_0_and_gt_2)
 
-    assert is_and_p(optimized)
-    assert optimized.left == p
-    assert optimized.right == q
+    assert optimized == p & q
 
 
 def test_optimize_and_3():
-    """(~p | q) & p == q & p"""
+    # (~p | q) & p == q & p
     p = gt_p(2)
     q = le_p(0)
 
@@ -152,13 +145,26 @@ def test_optimize_and_3():
 
     optimized = optimize(predicate)
 
-    assert is_and_p(optimized)
-    assert optimized.left == q
-    assert optimized.right == p
+    assert optimized == q & p
+
+
+def test_optimize_and_4():
+    # (q | ~p) & p == q & p
+    p = gt_p(2)
+    q = le_p(0)
+
+    predicate = (q | ~p) & p
+
+    assert is_and_p(predicate)
+    assert can_optimize(predicate)
+
+    optimized = optimize(predicate)
+
+    assert optimized == q & p
 
 
 def test_optimize_xor_1():
-    """P ^ (^p & q) = ~(p | q)"""
+    # p ^ (^p & q) = ~(p | q)
     p = gt_p(2)
     q = le_p(0)
 
@@ -173,7 +179,7 @@ def test_optimize_xor_1():
 
 
 def test_optimize_xor_2():
-    """P ^ (q & ~p) = ~(p | q)"""
+    # p ^ (q & ~p) = ~(p | q)
     p = gt_p(2)
     q = le_p(0)
 
@@ -188,7 +194,7 @@ def test_optimize_xor_2():
 
 
 def test_optimize_xor_3():
-    """(q & ~p) ^ p = ~(p | q)"""
+    # (q & ~p) ^ p = ~(p | q)
     p = gt_p(2)
     q = le_p(0)
 
@@ -203,7 +209,7 @@ def test_optimize_xor_3():
 
 
 def test_optimize_xor_4():
-    """(~p & q) ^ p = ~(p | q)"""
+    # (~p & q) ^ p = ~(p | q)
     p = gt_p(2)
     q = le_p(0)
 

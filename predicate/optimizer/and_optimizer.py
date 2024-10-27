@@ -7,6 +7,7 @@ from predicate.predicate import (
     GePredicate,
     IsNonePredicate,
     IsNotNonePredicate,
+    NotPredicate,
     Predicate,
     get_as_not_predicate,
     get_as_or_predicate,
@@ -19,35 +20,21 @@ def optimize_and_predicate[T](predicate: AndPredicate[T]) -> Predicate[T]:
     left = predicate.left
     right = predicate.right
 
-    # p & False = False
-    if isinstance(right, AlwaysFalsePredicate):
-        return AlwaysFalsePredicate()
-
-    # False & p = False
-    if isinstance(left, AlwaysFalsePredicate):
-        return AlwaysFalsePredicate()
-
-    # p & True == p
-    if isinstance(right, AlwaysTruePredicate):
-        return optimize(left)
-
-    # True & p == p
-    if isinstance(left, AlwaysTruePredicate):
-        return optimize(right)
-
-    # p & p == p
-    if left == right:
-        return optimize(left)
-
-    # ~p & p == False
-    if not_predicate := get_as_not_predicate(left):
-        if right == not_predicate.predicate:
+    match left, right:
+        case _, AlwaysFalsePredicate():  # p & False = False
             return AlwaysFalsePredicate()
-
-    # p & ~p == False
-    if not_predicate := get_as_not_predicate(right):
-        if left == not_predicate.predicate:
+        case AlwaysFalsePredicate(), _:  # False & p = False
             return AlwaysFalsePredicate()
+        case _, AlwaysTruePredicate():  # p & True == p
+            return optimize(left)
+        case AlwaysTruePredicate(), _:  # True & p == p
+            return optimize(right)
+        case NotPredicate(not_predicate), _ if right == not_predicate:  # ~p & p == False
+            return AlwaysFalsePredicate()
+        case _, NotPredicate(not_predicate) if left == not_predicate:  # p & ~p == False
+            return AlwaysFalsePredicate()
+        case _, _ if left == right:  # p & p == p
+            return optimize(left)
 
     if or_predicate := get_as_or_predicate(right):
         # p & (~p | q) == p & q

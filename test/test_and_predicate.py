@@ -118,7 +118,7 @@ def test_and_optimize_true_and_true():
 
 
 def test_and_optimize_true_and_false():
-    # rue & False == False
+    # True & False == False
     always_false = always_true_p & always_false_p
 
     assert is_and_p(always_false)
