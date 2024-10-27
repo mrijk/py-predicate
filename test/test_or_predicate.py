@@ -1,16 +1,17 @@
+from helpers import is_or_p
+
 from predicate import (
-    always_true_p,
+    AlwaysTruePredicate,
+    OrPredicate,
     always_false_p,
+    always_true_p,
     ge_p,
     gt_p,
     le_p,
     lt_p,
-    OrPredicate,
-    AlwaysTruePredicate,
 )
-from predicate.standard_predicates import is_not_none_p, is_none_p, any_p
-from predicate.optimizer.predicate_optimizer import optimize, can_optimize
-from helpers import is_or_p
+from predicate.optimizer.predicate_optimizer import can_optimize, optimize
+from predicate.standard_predicates import any_p, is_none_p, is_not_none_p
 
 
 def test_or():
@@ -59,7 +60,7 @@ def test_or_optimize_true_left():
 
 
 def test_or_optimize_right_false():
-    """p | False == p"""
+    """P | False == p"""
     lt_2 = lt_p(2)
     lt_2_or_false = lt_2 | always_false_p
 
@@ -85,7 +86,7 @@ def test_or_optimize_left_false():
 
 
 def test_or_optimize_true_right():
-    """p | True == True"""
+    """P | True == True"""
     lt_2 = lt_p(2)
     always_true = lt_2 | always_true_p
 
@@ -98,7 +99,7 @@ def test_or_optimize_true_right():
 
 
 def test_or_optimize_eq():
-    """p | p == p"""
+    """P | p == p"""
     p_1 = gt_p(2)
     p_2 = gt_p(2)
     p_3 = gt_p(3)
@@ -123,7 +124,7 @@ def test_or_optimize_eq():
 
 
 def test_or_optimize_not_same():
-    """p | ~p == True"""
+    """P | ~p == True"""
     p_1 = gt_p(2)
     p_2 = gt_p(2)
 
@@ -138,7 +139,7 @@ def test_or_optimize_not_same():
 
 
 def test_or_optimize_not_not_same():
-    """p | ~q with p != q"""
+    """P | ~q with p != q"""
     p_1 = gt_p(2)
     p_2 = gt_p(3)
 

@@ -1,5 +1,5 @@
-from predicate import can_optimize, optimize, always_false_p, always_true_p
-from predicate.standard_predicates import any_p, is_int_p, eq_p, all_p
+from predicate import always_false_p, always_true_p, can_optimize, optimize
+from predicate.standard_predicates import all_p, any_p, eq_p, is_int_p
 
 
 def test_any():

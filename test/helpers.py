@@ -1,12 +1,12 @@
 from predicate import (
     AllPredicate,
-    XorPredicate,
+    AlwaysFalsePredicate,
+    AlwaysTruePredicate,
     AndPredicate,
     EqPredicate,
-    OrPredicate,
     NotPredicate,
-    AlwaysTruePredicate,
-    AlwaysFalsePredicate,
+    OrPredicate,
+    XorPredicate,
 )
 from predicate.standard_predicates import is_instance_p
 

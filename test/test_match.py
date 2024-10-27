@@ -1,6 +1,6 @@
 import pytest
 
-from predicate import ge_p, always_false_p, always_true_p
+from predicate import always_false_p, always_true_p, ge_p
 from predicate.optimizer.predicate_optimizer import match
 
 

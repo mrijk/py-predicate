@@ -1,21 +1,21 @@
 from uuid import uuid4
 
 from predicate import ge_p, gt_p, le_p, lt_p
-from predicate.predicate import always_true_p, always_false_p, FnPredicate
+from predicate.predicate import FnPredicate, always_false_p, always_true_p
 from predicate.standard_predicates import (
-    is_not_none_p,
-    is_none_p,
-    in_p,
+    eq_false_p,
     eq_p,
-    ne_p,
+    eq_true_p,
+    in_p,
+    is_dict_p,
     is_instance_p,
     is_int_p,
-    is_str_p,
-    is_dict_p,
     is_list_p,
-    eq_true_p,
-    eq_false_p,
+    is_none_p,
+    is_not_none_p,
+    is_str_p,
     is_uuid_p,
+    ne_p,
 )
 
 

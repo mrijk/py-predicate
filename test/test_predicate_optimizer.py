@@ -1,16 +1,17 @@
 from helpers import (
-    is_xor_p,
     is_and_p,
     is_not_p,
     is_or_p,
+    is_xor_p,
 )
+
 from predicate import (
+    always_false_p,
+    always_true_p,
+    can_optimize,
     gt_p,
     le_p,
-    can_optimize,
     optimize,
-    always_true_p,
-    always_false_p,
 )
 
 
@@ -89,7 +90,7 @@ def test_optimize_not_xor_p_not_q():
 
 
 def test_optimize_or_1():
-    """p | (~p & q) == p | q"""
+    """P | (~p & q) == p | q"""
     p = gt_p(2)
     q = le_p(0)
 
@@ -106,7 +107,7 @@ def test_optimize_or_1():
 
 
 def test_optimize_and_1():
-    """p & (~p | q) == p & q"""
+    """P & (~p | q) == p & q"""
     p = gt_p(2)
     q = le_p(0)
 
@@ -123,7 +124,7 @@ def test_optimize_and_1():
 
 
 def test_optimize_and_2():
-    """p & (q | ~p) == p & q"""
+    """P & (q | ~p) == p & q"""
     p = gt_p(2)
     q = le_p(0)
 
@@ -157,7 +158,7 @@ def test_optimize_and_3():
 
 
 def test_optimize_xor_1():
-    """p ^ (^p & q) = ~(p | q)"""
+    """P ^ (^p & q) = ~(p | q)"""
     p = gt_p(2)
     q = le_p(0)
 
@@ -172,7 +173,7 @@ def test_optimize_xor_1():
 
 
 def test_optimize_xor_2():
-    """p ^ (q & ~p) = ~(p | q)"""
+    """P ^ (q & ~p) = ~(p | q)"""
     p = gt_p(2)
     q = le_p(0)
 

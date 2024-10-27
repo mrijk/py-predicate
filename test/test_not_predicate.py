@@ -1,7 +1,8 @@
-from helpers import is_not_p, is_false_p, is_true_p
-from predicate import always_false_p, ge_p, always_true_p
-from predicate.optimizer.predicate_optimizer import optimize, can_optimize
-from predicate.standard_predicates import all_p, ne_p, eq_p, any_p, lt_p, gt_p, le_p
+from helpers import is_false_p, is_not_p, is_true_p
+
+from predicate import always_false_p, always_true_p, ge_p
+from predicate.optimizer.predicate_optimizer import can_optimize, optimize
+from predicate.standard_predicates import all_p, any_p, eq_p, gt_p, le_p, lt_p, ne_p
 
 
 def test_not():
@@ -25,7 +26,7 @@ def test_not_not():
 
 
 def test_optimize_not_not():
-    """~~p == p"""
+    # ~~p == p
     ge_2 = ge_p(2)
     ge_2_to = ~~ge_2
 
@@ -38,7 +39,7 @@ def test_optimize_not_not():
 
 
 def test_not_optimize_always_true():
-    """~False == True"""
+    # ~False == True
     always_true = ~always_false_p
 
     assert is_not_p(always_true)
@@ -50,7 +51,7 @@ def test_not_optimize_always_true():
 
 
 def test_not_optimize_always_false():
-    """~True == False"""
+    # ~True == False
     always_false = ~always_true_p
 
     assert is_not_p(always_false)
@@ -62,7 +63,6 @@ def test_not_optimize_always_false():
 
 
 def test_not_optimize_all():
-    """"""
     eq_2 = eq_p(2)
     predicate = all_p(predicate=~eq_2)
 
@@ -74,7 +74,7 @@ def test_not_optimize_all():
 
 
 def test_not_optimize_ge():
-    """~ge(v) => lt(v)"""
+    # ~ge(v) => lt(v)
     ge_2 = ge_p(2)
     predicate = ~ge_2
 
@@ -86,7 +86,7 @@ def test_not_optimize_ge():
 
 
 def test_not_optimize_gt():
-    """~gt(v) => le(v)"""
+    # ~gt(v) => le(v)
     gt_2 = gt_p(2)
     predicate = ~gt_2
 
@@ -98,7 +98,7 @@ def test_not_optimize_gt():
 
 
 def test_not_optimize_le():
-    """~lt(v) => ge(v)"""
+    # ~lt(v) => ge(v)
     le_2 = le_p(2)
     predicate = ~le_2
 
@@ -110,7 +110,7 @@ def test_not_optimize_le():
 
 
 def test_not_optimize_lt():
-    """~lt(v) => ge(v)"""
+    # ~lt(v) => ge(v)
     lt_2 = lt_p(2)
     predicate = ~lt_2
 
@@ -122,7 +122,7 @@ def test_not_optimize_lt():
 
 
 def test_not_optimize_eq():
-    """~(x == v) => x != v"""
+    # ~(x == v) => x != v
     eq_2 = eq_p(2)
     predicate = ~eq_2
 
@@ -134,7 +134,7 @@ def test_not_optimize_eq():
 
 
 def test_not_optimize_ne():
-    """~(x != v) => x == v"""
+    # ~(x != v) => x == v
     ne_2 = ne_p(2)
     predicate = ~ne_2
 

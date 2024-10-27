@@ -1,8 +1,9 @@
+from helpers import is_and_p, is_eq_p, is_false_p, is_true_p
+
 from predicate import always_false_p, always_true_p, ge_p, gt_p, le_p, lt_p
-from predicate.optimizer.predicate_optimizer import optimize, can_optimize
-from helpers import is_and_p, is_false_p, is_true_p, is_eq_p
+from predicate.optimizer.predicate_optimizer import can_optimize, optimize
 from predicate.predicate import is_empty_p
-from predicate.standard_predicates import eq_p, all_p
+from predicate.standard_predicates import all_p, eq_p
 
 
 def test_and():
@@ -20,7 +21,7 @@ def test_and():
 
 
 def test_and_commutative():
-    """a & b == b & a"""
+    """A & b == b & a"""
     gt_2 = gt_p(2)
     lt_4 = lt_p(4)
 
@@ -41,7 +42,7 @@ def test_and_associative():
 
 
 def test_and_optimize_right_false():
-    """p & False == False"""
+    """P & False == False"""
     ge_4 = ge_p(4)
     predicate = ge_4 & always_false_p
 
@@ -54,7 +55,7 @@ def test_and_optimize_right_false():
 
 
 def test_and_optimize_right_true():
-    """p & True == p"""
+    """P & True == p"""
     ge_4 = ge_p(4)
     predicate = ge_4 & always_true_p
 
@@ -141,7 +142,7 @@ def test_and_optimize_false_and_true():
 
 
 def test_and_optimize_eq():
-    """p & p == p"""
+    """P & p == p"""
     p_1 = gt_p(2)
     p_2 = gt_p(2)
     p_3 = gt_p(3)
@@ -166,7 +167,7 @@ def test_and_optimize_eq():
 
 
 def test_and_optimize_not_right():
-    """p & ~p == False"""
+    """P & ~p == False"""
     p_1 = gt_p(2)
     p_2 = gt_p(2)
     p_3 = gt_p(3)

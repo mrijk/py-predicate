@@ -65,3 +65,6 @@ target-version = "py312"
 
 [tool.ruff.lint.flake8-tidy-imports]
 ban-relative-imports = "all"
+
+[tool.ruff.lint.per-file-ignores]
+"test/*" = ["D400", "D415", "S101", "B033", "N816", "N802"]
