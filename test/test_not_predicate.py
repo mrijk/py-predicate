@@ -1,4 +1,4 @@
-from helpers import is_false_p, is_not_p, is_true_p
+from helpers import is_not_p
 
 from predicate import always_false_p, always_true_p, ge_p
 from predicate.optimizer.predicate_optimizer import can_optimize, optimize
@@ -47,7 +47,7 @@ def test_not_optimize_always_true():
 
     optimized = optimize(always_true)
 
-    assert is_true_p(optimized)
+    assert optimized == always_true_p
 
 
 def test_not_optimize_always_false():
@@ -59,7 +59,7 @@ def test_not_optimize_always_false():
 
     optimized = optimize(always_false)
 
-    assert is_false_p(optimized)
+    assert optimized == always_false_p
 
 
 def test_not_optimize_all():

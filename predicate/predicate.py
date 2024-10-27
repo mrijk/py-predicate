@@ -193,10 +193,6 @@ def get_as_or_predicate[T](predicate: Predicate[T]) -> OrPredicate[T] | None:
     return cast(OrPredicate, predicate) if isinstance(predicate, OrPredicate) else None
 
 
-def get_as_xor_predicate[T](predicate: Predicate[T]) -> XorPredicate[T] | None:
-    return cast(XorPredicate, predicate) if isinstance(predicate, XorPredicate) else None
-
-
 @dataclass
 class AlwaysTruePredicate(Predicate):
     def __call__(self, *args, **kwargs):
