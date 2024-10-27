@@ -3,7 +3,7 @@ from helpers import is_all_p
 from predicate import can_optimize, optimize
 from predicate.predicate import FnPredicate as Predicate
 from predicate.predicate import always_false_p, always_true_p
-from predicate.standard_predicates import all_p, eq_p, is_int_p, is_str_p
+from predicate.standard_predicates import all_p, any_p, eq_p, is_int_p, is_str_p
 
 
 def test_all():
@@ -49,3 +49,14 @@ def test_optimize_all_false():
     optimized = optimize(predicate)
 
     assert not is_all_p(optimized)
+
+
+def test_not_optimize_all():
+    eq_2 = eq_p(2)
+    predicate = all_p(predicate=~eq_2)
+
+    assert can_optimize(predicate)
+
+    optimized = optimize(predicate)
+
+    assert optimized == ~any_p(predicate=eq_2)

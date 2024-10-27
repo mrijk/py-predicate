@@ -2,7 +2,7 @@ from helpers import is_not_p
 
 from predicate import always_false_p, always_true_p, ge_p
 from predicate.optimizer.predicate_optimizer import can_optimize, optimize
-from predicate.standard_predicates import all_p, any_p, eq_p, gt_p, le_p, lt_p, ne_p
+from predicate.standard_predicates import all_p, eq_p, gt_p, is_none_p, is_not_none_p, le_p, lt_p, ne_p
 
 
 def test_not():
@@ -60,17 +60,6 @@ def test_not_optimize_always_false():
     optimized = optimize(always_false)
 
     assert optimized == always_false_p
-
-
-def test_not_optimize_all():
-    eq_2 = eq_p(2)
-    predicate = all_p(predicate=~eq_2)
-
-    assert can_optimize(predicate)
-
-    optimized = optimize(predicate)
-
-    assert optimized == ~any_p(predicate=eq_2)
 
 
 def test_not_optimize_ge():
@@ -143,3 +132,29 @@ def test_not_optimize_ne():
     optimized = optimize(predicate)
 
     assert optimized == eq_p(2)
+
+
+def test_not_optimize_none():
+    predicate = ~is_none_p
+
+    assert can_optimize(predicate)
+
+    optimized = optimize(predicate)
+
+    assert optimized == is_not_none_p
+
+
+def test_not_optimize_not_none():
+    predicate = ~is_not_none_p
+
+    assert can_optimize(predicate)
+
+    optimized = optimize(predicate)
+
+    assert optimized == is_none_p
+
+
+def test_not_optimize_all():
+    predicate = ~all_p(is_none_p)
+
+    assert not can_optimize(predicate)

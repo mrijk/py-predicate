@@ -4,6 +4,8 @@ from predicate.predicate import (
     EqPredicate,
     GePredicate,
     GtPredicate,
+    IsNonePredicate,
+    IsNotNonePredicate,
     LePredicate,
     LtPredicate,
     NePredicate,
@@ -30,10 +32,10 @@ def optimize_not_predicate[T](predicate: NotPredicate[T]) -> Predicate[T]:
             return AlwaysFalsePredicate()
         case XorPredicate(left, right):
             match left, right:
-                case NotPredicate() as not_predicate, _:  # ~(~p ^ q) == p ^ q
-                    return XorPredicate(left=not_predicate.predicate, right=right)
-                case _, NotPredicate() as not_predicate:  # ~(p ^ ~q) == p ^ q
-                    return XorPredicate(left=left, right=not_predicate.predicate)
+                case NotPredicate(not_predicate), _:  # ~(~p ^ q) == p ^ q
+                    return XorPredicate(left=not_predicate, right=right)
+                case _, NotPredicate(not_predicate):  # ~(p ^ ~q) == p ^ q
+                    return XorPredicate(left=left, right=not_predicate)
                 case _, _:  # ~(p ^ q) == ~p ^ q
                     return XorPredicate(left=NotPredicate(predicate=left), right=right)
         case EqPredicate(v):
@@ -48,5 +50,9 @@ def optimize_not_predicate[T](predicate: NotPredicate[T]) -> Predicate[T]:
             return GePredicate(v=v)
         case NePredicate(v):
             return EqPredicate(v=v)
+        case IsNonePredicate():
+            return IsNotNonePredicate()
+        case IsNotNonePredicate():
+            return IsNonePredicate()
         case _:
-            return optimize(predicate=NotPredicate(predicate=optimized))
+            return NotPredicate(predicate=optimized)

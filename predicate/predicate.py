@@ -217,7 +217,7 @@ class IsNonePredicate[T](Predicate[T]):
         return x is None
 
     def __eq__(self, other: Self) -> bool:
-        return isinstance(other, IsInstancePredicate)
+        return isinstance(other, IsNonePredicate)
 
 
 @dataclass
