@@ -1,11 +1,12 @@
+from abc import abstractmethod
 from dataclasses import dataclass
 from typing import Callable, Iterable, Self, cast
 
 
 @dataclass
 class Predicate[T]:
-    def __call__(self, *args, **kwargs) -> bool:
-        return False
+    @abstractmethod
+    def __call__(self, *args, **kwargs) -> bool: ...
 
     def __and__(self, predicate: "Predicate") -> "Predicate":
         return cast(Self, AndPredicate(left=self, right=predicate))

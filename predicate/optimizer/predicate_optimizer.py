@@ -36,8 +36,6 @@ def optimize[T](predicate: Predicate[T]) -> Predicate[T]:
 
 def predicate_matches_rule(predicate: Predicate | None, rule: Predicate | None) -> bool:
     match predicate, rule:
-        case _, None:
-            return True
         case NotPredicate(not_predicate), NotPredicate(rule_predicate):
             return predicate_matches_rule(not_predicate, rule_predicate)
         case OrPredicate() as predicate_child, OrPredicate() as rule_child:
@@ -46,8 +44,6 @@ def predicate_matches_rule(predicate: Predicate | None, rule: Predicate | None) 
             )
         case Predicate() as p1, Predicate() as p2 if type(p1) is type(p2):
             return True
-        case _, _:
-            return False
     return False
 
 

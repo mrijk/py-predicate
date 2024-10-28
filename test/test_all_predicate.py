@@ -71,3 +71,4 @@ def test_optimize_all_any():
     optimized = optimize(predicate)
 
     assert optimized == ~any_p(predicate=any_p(eq_2))
+
