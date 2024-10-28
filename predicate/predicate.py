@@ -4,7 +4,8 @@ from typing import Callable, Iterable, Self, cast
 
 @dataclass
 class Predicate[T]:
-    def __call__(self, *args, **kwargs) -> bool: ...
+    def __call__(self, *args, **kwargs) -> bool:
+        return False
 
     def __and__(self, predicate: "Predicate") -> "Predicate":
         return cast(Self, AndPredicate(left=self, right=predicate))
@@ -64,12 +65,12 @@ class XorPredicate[T](Predicate[T]):
 
 @dataclass
 class InPredicate[T](Predicate[T]):
-    v: T
+    v: Iterable[T]
 
     def __call__(self, x: T) -> bool:
         return x in self.v
 
-    def __eq__(self, other: Self) -> bool:
+    def __eq__(self, other: object) -> bool:
         return self.v == other.v if isinstance(other, InPredicate) else False
 
 
@@ -80,7 +81,7 @@ class EqPredicate[T](Predicate[T]):
     def __call__(self, x: T) -> bool:
         return x == self.v
 
-    def __eq__(self, other: Self) -> bool:
+    def __eq__(self, other: object) -> bool:
         return self.v == other.v if isinstance(other, EqPredicate) else False
 
 
@@ -91,51 +92,51 @@ class NePredicate[T](Predicate[T]):
     def __call__(self, x: T) -> bool:
         return x != self.v
 
-    def __eq__(self, other: Self) -> bool:
+    def __eq__(self, other: object) -> bool:
         return self.v == other.v if isinstance(other, NePredicate) else False
 
 
 @dataclass
-class GePredicate[T](Predicate[T]):
+class GePredicate[T: (int, str)](Predicate[T]):
     v: T
 
     def __call__(self, x: T) -> bool:
         return x >= self.v
 
-    def __eq__(self, other: Self) -> bool:
+    def __eq__(self, other: object) -> bool:
         return self.v == other.v if isinstance(other, GePredicate) else False
 
 
 @dataclass
-class GtPredicate[T](Predicate[T]):
+class GtPredicate[T: (int, str)](Predicate[T]):
     v: T
 
     def __call__(self, x: T) -> bool:
         return x > self.v
 
-    def __eq__(self, other: Self) -> bool:
+    def __eq__(self, other: object) -> bool:
         return self.v == other.v if isinstance(other, GtPredicate) else False
 
 
 @dataclass
-class LePredicate[T](Predicate[T]):
+class LePredicate[T: (int, str)](Predicate[T]):
     v: T
 
     def __call__(self, x: T) -> bool:
         return x <= self.v
 
-    def __eq__(self, other: Self) -> bool:
+    def __eq__(self, other: object) -> bool:
         return self.v == other.v if isinstance(other, LePredicate) else False
 
 
 @dataclass
-class LtPredicate[T](Predicate[T]):
+class LtPredicate[T: (int, str)](Predicate[T]):
     v: T
 
     def __call__(self, x: T) -> bool:
         return x < self.v
 
-    def __eq__(self, other: Self) -> bool:
+    def __eq__(self, other: object) -> bool:
         return self.v == other.v if isinstance(other, LtPredicate) else False
 
 
@@ -146,7 +147,7 @@ class AllPredicate[T](Predicate[T]):
     def __call__(self, iter: Iterable[T]) -> bool:
         return all(self.predicate(x) for x in iter)
 
-    def __eq__(self, other: Self) -> bool:
+    def __eq__(self, other: object) -> bool:
         return self.predicate == other.predicate if isinstance(other, AllPredicate) else False
 
 
@@ -157,7 +158,7 @@ class AnyPredicate[T](Predicate[T]):
     def __call__(self, iter: Iterable[T]) -> bool:
         return any(self.predicate(x) for x in iter)
 
-    def __eq__(self, other: Self) -> bool:
+    def __eq__(self, other: object) -> bool:
         return self.predicate == other.predicate if isinstance(other, AnyPredicate) else False
 
 
@@ -166,7 +167,7 @@ class IsEmptyPredicate[T](Predicate[T]):
     def __call__(self, iter: Iterable[T]) -> bool:
         return len(list(iter)) == 0
 
-    def __eq__(self, other: Self) -> bool:
+    def __eq__(self, other: object) -> bool:
         return isinstance(other, IsEmptyPredicate)
 
 
@@ -177,7 +178,7 @@ class IsInstancePredicate[T](Predicate[T]):
     def __call__(self, x: object) -> bool:
         return isinstance(x, self.klass)
 
-    def __eq__(self, other: Self) -> bool:
+    def __eq__(self, other: object) -> bool:
         return self.klass == other.klass if isinstance(other, IsInstancePredicate) else False
 
 
@@ -189,16 +190,12 @@ def get_as_and_predicate[T](predicate: Predicate[T]) -> AndPredicate[T] | None:
     return cast(AndPredicate, predicate) if isinstance(predicate, AndPredicate) else None
 
 
-def get_as_or_predicate[T](predicate: Predicate[T]) -> OrPredicate[T] | None:
-    return cast(OrPredicate, predicate) if isinstance(predicate, OrPredicate) else None
-
-
 @dataclass
 class AlwaysTruePredicate(Predicate):
     def __call__(self, *args, **kwargs):
         return True
 
-    def __eq__(self, other: Self) -> bool:
+    def __eq__(self, other: object) -> bool:
         return isinstance(other, AlwaysTruePredicate)
 
 
@@ -207,7 +204,7 @@ class AlwaysFalsePredicate(Predicate):
     def __call__(self, *args, **kwargs):
         return False
 
-    def __eq__(self, other: Self) -> bool:
+    def __eq__(self, other: object) -> bool:
         return isinstance(other, AlwaysFalsePredicate)
 
 
@@ -216,7 +213,7 @@ class IsNonePredicate[T](Predicate[T]):
     def __call__(self, x: T) -> bool:
         return x is None
 
-    def __eq__(self, other: Self) -> bool:
+    def __eq__(self, other: object) -> bool:
         return isinstance(other, IsNonePredicate)
 
 
@@ -225,10 +222,10 @@ class IsNotNonePredicate[T](Predicate[T]):
     def __call__(self, x: T) -> bool:
         return x is not None
 
-    def __eq__(self, other: Self) -> bool:
+    def __eq__(self, other: object) -> bool:
         return isinstance(other, IsNotNonePredicate)
 
 
-always_true_p = AlwaysTruePredicate()
-always_false_p = AlwaysFalsePredicate()
-is_empty_p = IsEmptyPredicate()
+always_true_p: AlwaysTruePredicate = AlwaysTruePredicate()
+always_false_p: AlwaysFalsePredicate = AlwaysFalsePredicate()
+is_empty_p: IsEmptyPredicate = IsEmptyPredicate()

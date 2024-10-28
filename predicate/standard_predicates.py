@@ -16,8 +16,8 @@ from predicate.predicate import (
     Predicate,
 )
 
-is_not_none_p = IsNotNonePredicate()
-is_none_p = IsNonePredicate()
+is_not_none_p: IsNotNonePredicate = IsNotNonePredicate()
+is_none_p: IsNonePredicate = IsNonePredicate()
 
 
 def in_p[T](*v: T) -> InPredicate[T]:

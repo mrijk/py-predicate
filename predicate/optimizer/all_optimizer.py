@@ -6,12 +6,15 @@ from predicate.predicate import (
     IsEmptyPredicate,
     NotPredicate,
     Predicate,
-    get_as_not_predicate,
 )
 
 
 def optimize_all_predicate[T](predicate: AllPredicate[T]) -> Predicate[T]:
     from predicate.optimizer.predicate_optimizer import optimize
+
+    match predicate.predicate:
+        case NotPredicate(not_predicate):
+            return NotPredicate(predicate=AnyPredicate(predicate=not_predicate))
 
     optimized = optimize(predicate.predicate)
 
@@ -24,8 +27,5 @@ def optimize_all_predicate[T](predicate: AllPredicate[T]) -> Predicate[T]:
             return NotPredicate(predicate=AnyPredicate(predicate=not_predicate))
         case _:
             pass
-
-    if not_predicate := get_as_not_predicate(predicate.predicate):
-        return NotPredicate(predicate=AnyPredicate(predicate=not_predicate.predicate))
 
     return predicate

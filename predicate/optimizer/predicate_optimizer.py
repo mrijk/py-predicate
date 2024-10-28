@@ -53,7 +53,7 @@ def predicate_matches_rule(predicate: Predicate | None, rule: Predicate | None) 
 
 def match(predicate: Predicate) -> dict | None:
     for rule in optimization_rules:
-        if predicate_matches_rule(predicate, rule["from"]):
+        if predicate_matches_rule(predicate, rule["from"]):  # type: ignore
             return rule
 
     return None

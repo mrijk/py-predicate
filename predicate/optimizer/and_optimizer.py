@@ -8,9 +8,8 @@ from predicate.predicate import (
     IsNonePredicate,
     IsNotNonePredicate,
     NotPredicate,
+    OrPredicate,
     Predicate,
-    get_as_not_predicate,
-    get_as_or_predicate,
 )
 
 
@@ -33,28 +32,20 @@ def optimize_and_predicate[T](predicate: AndPredicate[T]) -> Predicate[T]:
             return AlwaysFalsePredicate()
         case _, NotPredicate(not_predicate) if left == not_predicate:  # p & ~p == False
             return AlwaysFalsePredicate()
+        case OrPredicate(or_left, or_right), _:
+            match or_left, or_right:
+                case NotPredicate(not_predicate), _ if not_predicate == right:  # (~p | q) & p == q & p
+                    return AndPredicate(left=or_right, right=right)
+                case _, NotPredicate(not_predicate) if not_predicate == right:  # (q | ~p) & p == q & p
+                    return AndPredicate(left=or_left, right=right)
+        case _, OrPredicate(or_left, or_right):
+            match or_left, or_right:
+                case NotPredicate(not_predicate), _ if not_predicate == left:  # p & (~p | q) == p & q
+                    return AndPredicate(left=left, right=or_right)
+                case _, NotPredicate(not_predicate) if not_predicate == left:  # p & (q | ~p) == p & q
+                    return AndPredicate(left=left, right=or_left)
         case _, _ if left == right:  # p & p == p
             return optimize(left)
-
-    if or_predicate := get_as_or_predicate(right):
-        # p & (~p | q) == p & q
-        if not_predicate := get_as_not_predicate(or_predicate.left):
-            if not_predicate.predicate == left:
-                return AndPredicate(left=left, right=or_predicate.right)
-        # p & (q | ~p) == p & q
-        if not_predicate := get_as_not_predicate(or_predicate.right):
-            if not_predicate.predicate == left:
-                return AndPredicate(left=left, right=or_predicate.left)
-
-    if or_predicate := get_as_or_predicate(left):
-        # (~p | q) & p == q & p
-        if not_predicate := get_as_not_predicate(or_predicate.left):
-            if not_predicate.predicate == right:
-                return AndPredicate(left=or_predicate.right, right=right)
-        # (q | ~p) & p == q & p
-        if not_predicate := get_as_not_predicate(or_predicate.right):
-            if not_predicate.predicate == right:
-                return AndPredicate(left=or_predicate.left, right=right)
 
     match left, right:
         case EqPredicate(v1), EqPredicate(v2) if v1 == v2:

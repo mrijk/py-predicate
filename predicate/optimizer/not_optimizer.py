@@ -12,7 +12,6 @@ from predicate.predicate import (
     NotPredicate,
     Predicate,
     XorPredicate,
-    get_as_not_predicate,
 )
 
 
@@ -20,8 +19,9 @@ def optimize_not_predicate[T](predicate: NotPredicate[T]) -> Predicate[T]:
     from predicate.optimizer.predicate_optimizer import optimize
 
     # ~~p == p
-    if not_predicate := get_as_not_predicate(predicate.predicate):
-        return optimize(not_predicate.predicate)
+    match predicate.predicate:
+        case NotPredicate(not_predicate):
+            return optimize(not_predicate)
 
     optimized = optimize(predicate.predicate)
 
@@ -54,5 +54,5 @@ def optimize_not_predicate[T](predicate: NotPredicate[T]) -> Predicate[T]:
             return IsNotNonePredicate()
         case IsNotNonePredicate():
             return IsNonePredicate()
-        case _:
-            return NotPredicate(predicate=optimized)
+
+    return NotPredicate(predicate=optimized)
