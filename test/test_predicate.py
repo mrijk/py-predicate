@@ -33,6 +33,20 @@ def test_in_p():
     assert in_123("0") is False
 
 
+def test_in_p_eq():
+    p = in_p("1", "2", "3")
+    q = in_p("1", "2", "3")
+
+    assert p == q
+
+
+def test_in_p_ne():
+    p = in_p("1", "2", "3")
+    q = in_p("1", "2")
+
+    assert p != q
+
+
 def test_ge_p():
     ge_2 = ge_p(2)
 
@@ -143,6 +157,20 @@ def test_is_instance_p():
 
     assert is_str_or_int_p(3) is True
     assert is_str_or_int_p("3") is True
+
+
+def test_is_instance_eq():
+    p = is_instance_p(int)
+    q = is_instance_p(int)
+
+    assert p == q
+
+
+def test_is_instance_ne():
+    p = is_instance_p(int)
+    q = is_instance_p(str, int)
+
+    assert p != q
 
 
 def test_eq():

@@ -1,5 +1,6 @@
 from predicate import always_false_p, always_true_p
 from predicate.formatter.format_json import to_json
+from predicate.predicate import FnPredicate
 
 
 def test_format_json_false():
@@ -53,3 +54,11 @@ def test_format_json_not():
     json = to_json(predicate)
 
     assert json == {"not": {"predicate": {"true": True}}}
+
+
+def test_format_json_unknown():
+    predicate = FnPredicate(predicate_fn=lambda x: x)
+
+    json = to_json(predicate)
+
+    assert json == {"unknown": {}}
