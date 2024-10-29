@@ -11,7 +11,7 @@ from predicate.predicate import (
 
 
 def optimize_xor_predicate[T](predicate: XorPredicate[T]) -> Predicate[T]:
-    from predicate.optimizer.predicate_optimizer import optimize, optimize_predicate
+    from predicate.optimizer.predicate_optimizer import optimize
 
     if optimized := optimize_xor_not(left=predicate.left, right=predicate.right):
         return optimized

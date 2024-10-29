@@ -1,4 +1,4 @@
-from helpers import is_false_p, is_not_p, is_true_p, is_xor_p
+from helpers import is_false_p, is_true_p, is_xor_p
 
 from predicate import always_false_p, always_true_p, can_optimize, ge_p, gt_p, le_p, optimize
 from predicate.standard_predicates import all_p, lt_p
