@@ -23,8 +23,8 @@ def optimize_any_predicate[T](predicate: AnyPredicate[T]) -> Predicate[T]:
         case NePredicate(v):
             return NotPredicate(predicate=AllPredicate(predicate=EqPredicate(v)))
         case NotPredicate(not_predicate):
-            return NotPredicate(predicate=AllPredicate(predicate=not_predicate))
+            return NotPredicate(predicate=AllPredicate(predicate=optimize(not_predicate)))
         case _:
             pass
 
-    return predicate
+    return AnyPredicate(predicate=optimized)

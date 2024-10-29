@@ -183,6 +183,9 @@ class IsInstancePredicate[T](Predicate[T]):
         return self.klass == other.klass if isinstance(other, IsInstancePredicate) else False
 
 
+# TODO: remove next 2 functions, replaced by match/case
+
+
 def get_as_not_predicate[T](predicate: Predicate[T]) -> NotPredicate[T] | None:
     return cast(NotPredicate, predicate) if isinstance(predicate, NotPredicate) else None
 

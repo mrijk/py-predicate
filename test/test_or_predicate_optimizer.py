@@ -124,10 +124,10 @@ def test_or_optimize_left_not_same():
 
 def test_or_optimize_not_not_same():
     # p | ~q with p != q
-    p_1 = gt_p(2)
-    p_2 = gt_p(3)
+    p = gt_p(2)
+    q = gt_p(3)
 
-    predicate = p_1 | ~p_2
+    predicate = p | q
 
     assert is_or_p(predicate)
     assert not can_optimize(predicate)

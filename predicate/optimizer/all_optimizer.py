@@ -12,10 +12,6 @@ from predicate.predicate import (
 def optimize_all_predicate[T](predicate: AllPredicate[T]) -> Predicate[T]:
     from predicate.optimizer.predicate_optimizer import optimize
 
-    match predicate.predicate:
-        case NotPredicate(not_predicate):
-            return NotPredicate(predicate=AnyPredicate(predicate=not_predicate))
-
     optimized = optimize(predicate.predicate)
 
     match optimized:
@@ -28,4 +24,4 @@ def optimize_all_predicate[T](predicate: AllPredicate[T]) -> Predicate[T]:
         case _:
             pass
 
-    return predicate
+    return AllPredicate(predicate=optimized)
