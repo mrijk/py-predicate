@@ -1,12 +1,11 @@
 from predicate.predicate import (
     AlwaysFalsePredicate,
     AlwaysTruePredicate,
+    AndPredicate,
     NotPredicate,
     OrPredicate,
     Predicate,
     XorPredicate,
-    get_as_and_predicate,
-    get_as_not_predicate,
 )
 
 
@@ -38,25 +37,19 @@ def optimize_xor_predicate[T](predicate: XorPredicate[T]) -> Predicate[T]:
     if optimized := optimize_xor_not(left=left, right=right):
         return optimized
 
-    if and_predicate := get_as_and_predicate(right):
-        # p ^ (^p & q) == ~(p | q)
-        if not_predicate := get_as_not_predicate(and_predicate.left):
-            if left == not_predicate.predicate:
-                return NotPredicate(OrPredicate(left=left, right=and_predicate.right))
-        # p ^ (q & ^p) == ~(p | q)
-        if not_predicate := get_as_not_predicate(and_predicate.right):
-            if left == not_predicate.predicate:
-                return NotPredicate(OrPredicate(left=predicate.left, right=and_predicate.left))
-
-    if and_predicate := get_as_and_predicate(left):
-        # (^p & q) ^ p == ~(p | q)
-        if not_predicate := get_as_not_predicate(and_predicate.left):
-            if right == not_predicate.predicate:
-                return NotPredicate(OrPredicate(left=right, right=and_predicate.right))
-        # (q & ^p) ^ p == ~(p | q)
-        if not_predicate := get_as_not_predicate(and_predicate.right):
-            if right == not_predicate.predicate:
-                return NotPredicate(OrPredicate(left=right, right=and_predicate.left))
+    match left, right:
+        case Predicate(), AndPredicate(and_left, and_right):
+            match and_left, and_right:
+                case NotPredicate(not_predicate), _ if left == not_predicate:
+                    return NotPredicate(OrPredicate(left=left, right=and_right))  # p ^ (^p & q) == ~(p | q)
+                case _, NotPredicate(not_predicate) if left == not_predicate:
+                    return NotPredicate(OrPredicate(left=left, right=and_left))  # p ^ (q & ^p) == ~(p | q)
+        case AndPredicate(and_left, and_right), Predicate():
+            match and_left, and_right:
+                case NotPredicate(not_predicate), _ if right == not_predicate:
+                    return NotPredicate(OrPredicate(left=right, right=and_right))  # (^p & q) ^ p == ~(p | q)
+                case _, NotPredicate(not_predicate) if right == not_predicate:
+                    return NotPredicate(OrPredicate(left=right, right=and_left))  # (q & ^p) ^ p == ~(p | q)
 
     return predicate
 

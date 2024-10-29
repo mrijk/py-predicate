@@ -183,17 +183,6 @@ class IsInstancePredicate[T](Predicate[T]):
         return self.klass == other.klass if isinstance(other, IsInstancePredicate) else False
 
 
-# TODO: remove next 2 functions, replaced by match/case
-
-
-def get_as_not_predicate[T](predicate: Predicate[T]) -> NotPredicate[T] | None:
-    return cast(NotPredicate, predicate) if isinstance(predicate, NotPredicate) else None
-
-
-def get_as_and_predicate[T](predicate: Predicate[T]) -> AndPredicate[T] | None:
-    return cast(AndPredicate, predicate) if isinstance(predicate, AndPredicate) else None
-
-
 @dataclass
 class AlwaysTruePredicate(Predicate):
     def __call__(self, *args, **kwargs):
