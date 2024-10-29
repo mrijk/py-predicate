@@ -1,13 +1,12 @@
 from predicate.predicate import (
     AlwaysFalsePredicate,
     AlwaysTruePredicate,
+    AndPredicate,
     AnyPredicate,
     GePredicate,
     NotPredicate,
     OrPredicate,
     Predicate,
-    get_as_and_predicate,
-    get_as_not_predicate,
 )
 
 
@@ -29,12 +28,6 @@ def optimize_or_predicate[T](predicate: OrPredicate[T]) -> Predicate[T]:
     if optimized := optimize_or_not(left=left, right=right):
         return optimized
 
-    # p | (~p & q) == p | q
-    if and_predicate := get_as_and_predicate(right):
-        if not_predicate := get_as_not_predicate(and_predicate.left):
-            if not_predicate.predicate == left:
-                return OrPredicate(left=left, right=and_predicate.right)
-
     match left, right:
         case _, AlwaysFalsePredicate():
             # p | False == p
@@ -48,6 +41,30 @@ def optimize_or_predicate[T](predicate: OrPredicate[T]) -> Predicate[T]:
         case AlwaysTruePredicate(), _:
             # True | p == True
             return AlwaysTruePredicate()
+
+        case AndPredicate(and_left_left, and_left_right), AndPredicate(and_right_left, and_right_right):
+            match and_left_left, and_left_right, and_right_left, and_right_right:
+                case (
+                    NotPredicate(left_not),
+                    Predicate() as q,
+                    Predicate() as p,
+                    NotPredicate(right_not),
+                ) if left_not == p and right_not == q:
+                    # (~p & q) | (p & ~q) == p ^ q
+                    return p ^ q
+                case (
+                    Predicate() as p,
+                    NotPredicate(left_not),
+                    NotPredicate(right_not),
+                    Predicate() as q,
+                ) if left_not == q and right_not == p:
+                    # (p & ~q) | (~p & q) == p ^ q
+                    return p ^ q
+
+        case _, AndPredicate(and_left, and_right):
+            match and_left:
+                case NotPredicate(not_predicate) if not_predicate == left:  # p | (~p & q) == p | q
+                    return OrPredicate(left=left, right=and_right)
 
         case GePredicate(v1), GePredicate(v2):
             # x >= v1 | x >= v2 => x >= min(v1, v2)

@@ -12,7 +12,7 @@ def test_any():
 
 
 def test_optimize_any_ne():
-    """Any(~p) => ~All(p)"""
+    # Any(~p) => ~All(p)
     eq_2 = eq_p(2)
 
     predicate = any_p(~eq_2)
