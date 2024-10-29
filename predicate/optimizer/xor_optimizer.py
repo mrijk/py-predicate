@@ -19,35 +19,21 @@ def optimize_xor_predicate[T](predicate: XorPredicate[T]) -> Predicate[T]:
     left = optimize(predicate.left)
     right = optimize(predicate.right)
 
-    # False ^ False = False
-
-    if isinstance(left, AlwaysFalsePredicate) and isinstance(right, AlwaysFalsePredicate):
-        return AlwaysFalsePredicate()
-
-    # True ^ True = False
-
-    if isinstance(left, AlwaysTruePredicate) and isinstance(right, AlwaysTruePredicate):
-        return AlwaysFalsePredicate()
-
-    # p ^ False = p
-    if isinstance(right, AlwaysFalsePredicate):
-        return left
-
-    # False ^ p = p
-    if isinstance(left, AlwaysFalsePredicate):
-        return right
-
-    # p ^ True = ~p
-    if isinstance(right, AlwaysTruePredicate):
-        return optimize_predicate(NotPredicate(predicate=left))
-
-    # True ^ p = ~p
-    if isinstance(left, AlwaysTruePredicate):
-        return optimize_predicate(NotPredicate(predicate=right))
-
-    # p ^ p == False
-    if left == right:
-        return AlwaysFalsePredicate()
+    match left, right:
+        case AlwaysFalsePredicate(), AlwaysFalsePredicate():  # False ^ False = False
+            return AlwaysFalsePredicate()
+        case AlwaysTruePredicate(), AlwaysTruePredicate():  # True ^ True = False
+            return AlwaysFalsePredicate()
+        case _, AlwaysFalsePredicate():  # p ^ False = p
+            return left
+        case AlwaysFalsePredicate(), _:  # False ^ p = p
+            return right
+        case _, AlwaysTruePredicate():  # p ^ True = ~p
+            return optimize(NotPredicate(predicate=left))
+        case AlwaysTruePredicate(), _:  # True ^ p = ~p
+            return optimize(NotPredicate(predicate=right))
+        case _, _ if left == right:  # p ^ p == False
+            return AlwaysFalsePredicate()
 
     if optimized := optimize_xor_not(left=left, right=right):
         return optimized
@@ -77,7 +63,7 @@ def optimize_xor_predicate[T](predicate: XorPredicate[T]) -> Predicate[T]:
 
 def optimize_xor_not[T](left: Predicate[T], right: Predicate[T]) -> Predicate[T] | None:
     match left, right:
-        case NotPredicate(left_p), NotPredicate(right_p):
+        case NotPredicate(left_p), NotPredicate(right_p):  # ~p ^ ~q == p ^ q
             return XorPredicate(left=left_p, right=right_p)
         case NotPredicate(left_p), _ if right == left_p:  # ~p ^ p == True
             return AlwaysTruePredicate()
