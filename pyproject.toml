@@ -6,7 +6,7 @@ author-email = "maurits.rijk@gmail.com"
 home-page = "https://github.com/mrijk/py-predicate"
 classifiers = [
     "Intended Audience :: Information Technology",
-    "Intended Audience :: System Administrators",
+    "Intended Audience :: Developers",
     "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python",
@@ -17,9 +17,7 @@ classifiers = [
     "Typing :: Typed",
     "Development Status :: 3 - Alpha",
     "Environment :: Web Environment",
-    "Intended Audience :: Developers",
-    "Intended Audience :: Telecommunications Industry",
-    "License :: OSI Approved :: Apache Software License",
+    "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3 :: Only",
     "Programming Language :: Python :: 3.13",
     "Programming Language :: Python :: 3.12",

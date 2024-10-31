@@ -18,7 +18,7 @@ from predicate.predicate import (
 )
 
 
-def to_dot(predicate: Predicate, predicate_string: str, show_optimized: bool = False):
+def to_dot(predicate: Predicate, predicate_string: str = "", show_optimized: bool = False):
     dot = graphviz.Digraph(graph_attr={"label": predicate_string, "labelloc": "t"}, node_attr={"shape": "rectangle"})
 
     node_nr = count()
