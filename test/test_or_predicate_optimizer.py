@@ -12,7 +12,7 @@ from predicate import (
     optimize,
 )
 from predicate.predicate import FnPredicate
-from predicate.standard_predicates import any_p, eq_p, in_p, not_in_p, ne_p
+from predicate.standard_predicates import any_p, eq_p, in_p, ne_p, not_in_p
 
 
 def test_or_optimize_true_left():
