@@ -12,7 +12,7 @@ from predicate import (
     optimize,
 )
 from predicate.predicate import FnPredicate
-from predicate.standard_predicates import any_p, eq_p, in_p
+from predicate.standard_predicates import any_p, eq_p, in_p, not_in_p, ne_p
 
 
 def test_or_optimize_true_left():
@@ -188,3 +188,16 @@ def test_optimize_multiple_eq():
     optimized = optimize(predicate)
 
     assert optimized == in_p(2, 3)
+
+
+def test_optimize_in_and_not_in():
+    p1 = in_p(2, 3, 4)
+    p2 = not_in_p(3, 5)
+
+    predicate = p1 | p2
+
+    assert can_optimize(predicate)
+
+    optimized = optimize(predicate)
+
+    assert optimized == ne_p(5)

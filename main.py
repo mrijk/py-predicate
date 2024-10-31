@@ -1,7 +1,7 @@
 import click
 
 from predicate.formatter.format_dot import to_dot
-from predicate.standard_predicates import eq_p
+from predicate.standard_predicates import in_p
 
 
 @click.command()
@@ -11,15 +11,18 @@ from predicate.standard_predicates import eq_p
 def cli(predicate: str, filename, optimize: bool) -> None:
     # predicate_string = "true | false & true ^ ~false"
 
+    # predicate_string = "x in {2, 3, 4} | x not in {4, 5}"
+
     # parsed = parse_string(predicate)
 
-    parsed = eq_p(13) | eq_p(14) | eq_p(15)
+    parsed = in_p(3, 4) ^ in_p(4, 5)
 
     dot = to_dot(parsed, predicate, show_optimized=optimize)
 
-    dot.render('/tmp/predicate.gv', view=True)  # noqa [S108]
+    dot.render("/tmp/predicate.gv", view=True)  # noqa [S108]
 
     # print(json.dumps(to_json(predicate)))
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     cli()

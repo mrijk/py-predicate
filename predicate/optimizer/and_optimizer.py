@@ -5,8 +5,10 @@ from predicate.predicate import (
     AndPredicate,
     EqPredicate,
     GePredicate,
+    InPredicate,
     IsNonePredicate,
     IsNotNonePredicate,
+    NotInPredicate,
     NotPredicate,
     OrPredicate,
     Predicate,
@@ -63,6 +65,31 @@ def optimize_and_predicate[T](predicate: AndPredicate[T]) -> Predicate[T]:
         case GePredicate(v1), GePredicate(v2):
             # x >= v1 & x >= v2 => x >= max(v1, v2)
             return GePredicate(v=max(v1, v2))
+
+        case InPredicate(v1), InPredicate(v2):
+            v = v1 & v2
+            if not v:
+                return AlwaysFalsePredicate()
+            if len(v) == 1:
+                return EqPredicate(v=v.pop())
+            return InPredicate(v=v)
+
+        case InPredicate(v1), NotInPredicate(v2):
+            v = v1 - v2
+            if not v:
+                return AlwaysFalsePredicate()
+            if len(v) == 1:
+                return EqPredicate(v=v.pop())
+            return InPredicate(v=v)
+
+        case NotInPredicate(v1), NotInPredicate(v2):
+            v = v1 | v2
+            if not v:
+                return AlwaysTruePredicate()
+            if len(v) == 1:
+                return EqPredicate(v=v.pop())
+            return NotInPredicate(v=v)
+
         case AllPredicate(left_all), AllPredicate(right_all):
             # All(p1) & All(p2) => All(p1 & p2)
             return optimize(AllPredicate(predicate=optimize(AndPredicate(left=left_all, right=right_all))))

@@ -2,7 +2,6 @@ from itertools import count
 
 import graphviz  # type: ignore
 
-from predicate import NotPredicate
 from predicate.optimizer.predicate_optimizer import optimize
 from predicate.predicate import (
     AlwaysFalsePredicate,
@@ -11,6 +10,8 @@ from predicate.predicate import (
     EqPredicate,
     InPredicate,
     NePredicate,
+    NotInPredicate,
+    NotPredicate,
     OrPredicate,
     Predicate,
     XorPredicate,
@@ -55,6 +56,9 @@ def render(dot, predicate: Predicate, node_nr):
             case InPredicate(v):
                 items = ", ".join(str(item) for item in v)
                 return add_node("in", label=f"x ∈ {{{items}}}")
+            case NotInPredicate(v):
+                items = ", ".join(str(item) for item in v)
+                return add_node("in", label=f"x ∉ {{{items}}}")
             case NePredicate(v):
                 return add_node("ne", label=f"x ≠ {v}")
             case NotPredicate(not_predicate):

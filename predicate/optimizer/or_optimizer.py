@@ -6,6 +6,8 @@ from predicate.predicate import (
     EqPredicate,
     GePredicate,
     InPredicate,
+    NePredicate,
+    NotInPredicate,
     NotPredicate,
     OrPredicate,
     Predicate,
@@ -76,6 +78,14 @@ def optimize_or_predicate[T](predicate: OrPredicate[T]) -> Predicate[T]:
             return left
         case EqPredicate(v1), EqPredicate(v2) if v1 != v2:
             return InPredicate((v1, v2))
+
+        case InPredicate(v1), NotInPredicate(v2):
+            v = v2 - (v1 & v2)
+            if not v:
+                return AlwaysTruePredicate()
+            if len(v) == 1:
+                return NePredicate(v=v.pop())
+            return NotInPredicate(v=v)
 
         case GePredicate(v1), GePredicate(v2):
             # x >= v1 | x >= v2 => x >= min(v1, v2)

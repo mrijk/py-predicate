@@ -66,7 +66,10 @@ class XorPredicate[T](Predicate[T]):
 
 @dataclass
 class InPredicate[T](Predicate[T]):
-    v: Iterable[T]
+    v: set[T]
+
+    def __init__(self, v: Iterable[T]):
+        self.v = set(v)
 
     def __call__(self, x: T) -> bool:
         return x in self.v
@@ -77,7 +80,10 @@ class InPredicate[T](Predicate[T]):
 
 @dataclass
 class NotInPredicate[T](Predicate[T]):
-    v: Iterable[T]
+    v: set[T]
+
+    def __init__(self, v: Iterable[T]):
+        self.v = set(v)
 
     def __call__(self, x: T) -> bool:
         return x not in self.v
