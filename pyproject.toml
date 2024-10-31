@@ -25,6 +25,7 @@ classifiers = [
     "Programming Language :: Python :: 3.12",
 ]
 requires = [
+    "graphviz",
     "more-itertools"
 ]
 description-file = "README.md"
