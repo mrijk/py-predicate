@@ -15,6 +15,7 @@ from predicate.standard_predicates import (
     is_str_p,
     is_uuid_p,
     ne_p,
+    not_in_p,
 )
 
 
@@ -45,6 +46,13 @@ def test_in_p_ne():
     q = in_p("1", "2")
 
     assert p != q
+
+
+def test_not_in_p():
+    in_123 = not_in_p("1", "2", "3")
+
+    assert in_123("1") is False
+    assert in_123("0") is True
 
 
 def test_ge_p():

@@ -13,6 +13,7 @@ from predicate.predicate import (
     LePredicate,
     LtPredicate,
     NePredicate,
+    NotInPredicate,
     Predicate,
 )
 
@@ -22,6 +23,10 @@ is_none_p: IsNonePredicate = IsNonePredicate()
 
 def in_p[T](*v: T) -> InPredicate[T]:
     return InPredicate(v=v)
+
+
+def not_in_p[T](*v: T) -> NotInPredicate[T]:
+    return NotInPredicate(v=v)
 
 
 def eq_p[T](v: T) -> EqPredicate[T]:

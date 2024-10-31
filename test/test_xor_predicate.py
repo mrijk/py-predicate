@@ -210,3 +210,31 @@ def test_xor_optimize_not_not():
     optimized = optimize(predicate)
 
     assert optimized == p ^ q
+
+
+def test_xor_optimize_xor_left():
+    # p ^ q ^ p = q
+    p = all_p(ge_p(2))
+    q = all_p(le_p(3))
+
+    predicate = p ^ q ^ p
+
+    assert can_optimize(predicate)
+
+    optimized = optimize(predicate)
+
+    assert optimized == q
+
+
+def test_xor_optimize_xor_right():
+    # p ^ q ^ q = p
+    p = all_p(ge_p(2))
+    q = all_p(le_p(3))
+
+    predicate = p ^ q ^ q
+
+    assert can_optimize(predicate)
+
+    optimized = optimize(predicate)
+
+    assert optimized == p

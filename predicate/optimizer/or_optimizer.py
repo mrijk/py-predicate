@@ -3,7 +3,9 @@ from predicate.predicate import (
     AlwaysTruePredicate,
     AndPredicate,
     AnyPredicate,
+    EqPredicate,
     GePredicate,
+    InPredicate,
     NotPredicate,
     OrPredicate,
     Predicate,
@@ -66,13 +68,22 @@ def optimize_or_predicate[T](predicate: OrPredicate[T]) -> Predicate[T]:
                 case NotPredicate(not_predicate) if not_predicate == left:  # p | (~p & q) == p | q
                     return OrPredicate(left=left, right=and_right)
 
+        case InPredicate(v1), EqPredicate(v2) if v2 not in v1:
+            return InPredicate((*v1, v2))
+        case EqPredicate(v1), InPredicate(v2) if v1 not in v2:
+            return InPredicate((*v2, v1))
+        case EqPredicate(v1), EqPredicate(v2) if v1 == v2:
+            return left
+        case EqPredicate(v1), EqPredicate(v2) if v1 != v2:
+            return InPredicate((v1, v2))
+
         case GePredicate(v1), GePredicate(v2):
             # x >= v1 | x >= v2 => x >= min(v1, v2)
             return GePredicate(v=min(v1, v2))
         case AnyPredicate(left_any), AnyPredicate(right_any):
             return AnyPredicate(optimize(OrPredicate(left=left_any, right=right_any)))
 
-    return predicate
+    return OrPredicate(left=left, right=right)
 
 
 def optimize_or_not[T](left: Predicate[T], right: Predicate[T]) -> Predicate[T] | None:

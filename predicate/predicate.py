@@ -76,6 +76,17 @@ class InPredicate[T](Predicate[T]):
 
 
 @dataclass
+class NotInPredicate[T](Predicate[T]):
+    v: Iterable[T]
+
+    def __call__(self, x: T) -> bool:
+        return x not in self.v
+
+    def __eq__(self, other: object) -> bool:
+        return self.v == other.v if isinstance(other, NotInPredicate) else False
+
+
+@dataclass
 class EqPredicate[T](Predicate[T]):
     v: T
 

@@ -12,20 +12,20 @@ from predicate import (
     optimize,
 )
 from predicate.predicate import FnPredicate
-from predicate.standard_predicates import any_p
+from predicate.standard_predicates import any_p, eq_p, in_p
 
 
 def test_or_optimize_true_left():
     # True | p == True
     lt_2 = lt_p(2)
-    always_true = always_true_p | lt_2
+    predicate = always_true_p | lt_2
 
-    assert is_or_p(always_true)
-    assert can_optimize(always_true)
+    assert is_or_p(predicate)
+    assert can_optimize(predicate)
 
-    optimized = optimize(always_true)
+    optimized = optimize(predicate)
 
-    assert isinstance(optimized, AlwaysTruePredicate)
+    assert optimized == always_true_p
 
 
 def test_or_optimize_right_false():
@@ -174,3 +174,17 @@ def test_optimize_to_xor_right():
     optimized = optimize(predicate)
 
     assert optimized == p ^ q
+
+
+def test_optimize_multiple_eq():
+    # x == 2 or x == 3 => x in (2, 3)
+    eq_2 = eq_p(2)
+    eq_3 = eq_p(3)
+
+    predicate = eq_2 | eq_3
+
+    assert can_optimize(predicate)
+
+    optimized = optimize(predicate)
+
+    assert optimized == in_p(2, 3)
