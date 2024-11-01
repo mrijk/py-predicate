@@ -1,7 +1,6 @@
 from predicate import always_false_p, always_true_p
 from predicate.formatter.format_dot import to_dot
-from predicate.predicate import FnPredicate
-from predicate.standard_predicates import all_p, any_p, eq_p, ge_p, gt_p, in_p, le_p, lt_p, ne_p, not_in_p
+from predicate.standard_predicates import all_p, any_p, eq_p, fn_p, ge_p, gt_p, in_p, le_p, lt_p, ne_p, not_in_p
 
 
 def test_format_dot_false():
@@ -141,7 +140,7 @@ def test_format_dot_show_optimized():
 
 
 def test_format_dot_fn():
-    predicate = FnPredicate(predicate_fn=lambda x: x)
+    predicate = fn_p(lambda x: x)
 
     dot = to_dot(predicate)
 

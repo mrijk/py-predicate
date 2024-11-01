@@ -1,9 +1,12 @@
 from typing import Any
 
-from predicate import AlwaysFalsePredicate, AlwaysTruePredicate, AndPredicate
-from predicate.predicate import (
+from predicate import (
     AllPredicate,
+    AlwaysFalsePredicate,
+    AlwaysTruePredicate,
+    AndPredicate,
     AnyPredicate,
+    FnPredicate,
     NePredicate,
     NotPredicate,
     OrPredicate,
@@ -25,6 +28,9 @@ def to_json(predicate: Predicate) -> dict[str, Any]:
                 return "and", {"left": to_json(left), "right": to_json(right)}
             case AnyPredicate(any_predicate):
                 return "any", {"predicate": to_json(any_predicate)}
+            case FnPredicate(predicate_fn):
+                name = predicate_fn.__code__.co_name
+                return "fn", {"name": name}
             case NePredicate(v):
                 return "ne", {"v": v}
             case NotPredicate(not_predicate):

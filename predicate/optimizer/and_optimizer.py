@@ -4,6 +4,7 @@ from predicate.predicate import (
     AlwaysTruePredicate,
     AndPredicate,
     EqPredicate,
+    FnPredicate,
     GePredicate,
     InPredicate,
     IsNonePredicate,
@@ -74,6 +75,9 @@ def optimize_and_predicate[T](predicate: AndPredicate[T]) -> Predicate[T]:
         case GePredicate(v1), LtPredicate(v2) if v1 == v2:
             # x >=v & x < v => False
             return AlwaysFalsePredicate()
+
+        case FnPredicate(predicate_fn), EqPredicate(v):
+            return AlwaysTruePredicate() if predicate_fn(v) else AlwaysFalsePredicate()
 
         case InPredicate(v1), InPredicate(v2):
             v = v1 & v2

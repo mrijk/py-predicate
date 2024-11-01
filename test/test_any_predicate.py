@@ -1,6 +1,5 @@
 from predicate import always_false_p, always_true_p, can_optimize, optimize
-from predicate.predicate import FnPredicate
-from predicate.standard_predicates import all_p, any_p, eq_p, is_int_p
+from predicate.standard_predicates import all_p, any_p, eq_p, fn_p, is_int_p
 
 
 def test_any():
@@ -47,7 +46,7 @@ def test_optimize_any_always_true():
 
 def test_optimize_any_not():
     # Any(~p) == ~All(p)
-    p = FnPredicate(lambda x: x == 2)
+    p = fn_p(lambda x: x == 2)
 
     predicate = any_p(~p)
 

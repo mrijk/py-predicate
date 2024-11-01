@@ -1,9 +1,8 @@
 from helpers import is_all_p
 
 from predicate import can_optimize, optimize
-from predicate.predicate import FnPredicate, always_false_p, always_true_p
-from predicate.predicate import FnPredicate as Predicate
-from predicate.standard_predicates import all_p, any_p, eq_p, is_int_p, is_str_p, ne_p
+from predicate.predicate import always_false_p, always_true_p
+from predicate.standard_predicates import all_p, any_p, eq_p, fn_p, is_int_p, is_str_p, ne_p
 
 
 def test_all():
@@ -21,7 +20,7 @@ def test_all_combined_1():
 
 
 def test_all_combined_2():
-    str_len_3_p = Predicate[str](lambda x: len(x) == 3)
+    str_len_3_p = fn_p(lambda x: len(x) == 3)
     all_len_3_p = all_p(is_str_p & str_len_3_p)
 
     assert all_len_3_p(["aaa", "bbb", "ccc"]) is True
@@ -75,7 +74,7 @@ def test_optimize_all_any():
 
 def test_optimize_all_not():
     # All(~p) == ~Any(p)
-    p = FnPredicate(lambda x: x == 2)
+    p = fn_p(lambda x: x == 2)
 
     predicate = all_p(~p)
 

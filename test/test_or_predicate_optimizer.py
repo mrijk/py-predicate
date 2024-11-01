@@ -1,8 +1,6 @@
 from helpers import is_or_p
 
 from predicate import (
-    AlwaysTruePredicate,
-    OrPredicate,
     always_false_p,
     always_true_p,
     can_optimize,
@@ -11,8 +9,7 @@ from predicate import (
     lt_p,
     optimize,
 )
-from predicate.predicate import FnPredicate
-from predicate.standard_predicates import any_p, eq_p, in_p, ne_p, not_in_p
+from predicate.standard_predicates import any_p, eq_p, fn_p, in_p, ne_p, not_in_p
 
 
 def test_or_optimize_true_left():
@@ -33,12 +30,12 @@ def test_or_optimize_right_false():
     lt_2 = lt_p(2)
     lt_2_or_false = lt_2 | always_false_p
 
-    assert isinstance(lt_2_or_false, OrPredicate)
+    assert is_or_p(lt_2_or_false)
     assert can_optimize(lt_2_or_false) is True
 
     optimized = optimize(lt_2_or_false)
 
-    assert isinstance(optimized, type(lt_2))
+    assert optimized == lt_2
 
 
 def test_or_optimize_left_false():
@@ -51,7 +48,7 @@ def test_or_optimize_left_false():
 
     optimized = optimize(false_or_lt_2)
 
-    assert isinstance(optimized, type(lt_2))
+    assert optimized == lt_2
 
 
 def test_or_optimize_true_right():
@@ -64,7 +61,7 @@ def test_or_optimize_true_right():
 
     optimized = optimize(always_true)
 
-    assert isinstance(optimized, AlwaysTruePredicate)
+    assert optimized == always_true_p
 
 
 def test_or_optimize_eq():
@@ -84,12 +81,12 @@ def test_or_optimize_eq():
 
     not_same = p_1 | p_3
 
-    assert isinstance(not_same, OrPredicate)
+    assert is_or_p(not_same)
     assert not can_optimize(not_same)
 
     not_optimized = optimize(not_same)
 
-    assert isinstance(not_optimized, OrPredicate)
+    assert not_optimized == not_same
 
 
 def test_or_optimize_right_not_same():
@@ -150,8 +147,8 @@ def test_optimize_or_any():
 
 def test_optimize_to_xor_left():
     # (~p & q) | (p & ~q) == p ^ q
-    p = FnPredicate(lambda x: x == 2)
-    q = FnPredicate(lambda x: x in (2, 3))
+    p = fn_p(lambda x: x == 2)
+    q = fn_p(lambda x: x in (2, 3))
 
     predicate = (~p & q) | (p & ~q)
 
@@ -164,8 +161,8 @@ def test_optimize_to_xor_left():
 
 def test_optimize_to_xor_right():
     # (p & ~q) | (~p & q) == p ^ q
-    p = FnPredicate(lambda x: x == 2)
-    q = FnPredicate(lambda x: x in (2, 3))
+    p = fn_p(lambda x: x == 2)
+    q = fn_p(lambda x: x in (2, 3))
 
     predicate = (p & ~q) | (~p & q)
 

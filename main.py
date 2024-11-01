@@ -1,8 +1,8 @@
 import click
 
-from predicate import always_true_p
+from predicate import FnPredicate
 from predicate.formatter.format_dot import to_dot
-from predicate.standard_predicates import in_p
+from predicate.standard_predicates import eq_p, fn_p
 
 
 @click.command()
@@ -16,7 +16,7 @@ def cli(predicate: str, filename, optimize: bool) -> None:
 
     # parsed = parse_string(predicate)
 
-    parsed = in_p(2, 3, 4) & ~in_p(3) & always_true_p
+    parsed = fn_p(lambda x: x * 2 > 5) & eq_p(3)
 
     dot = to_dot(parsed, predicate, show_optimized=optimize)
 

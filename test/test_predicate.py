@@ -3,11 +3,12 @@ from uuid import uuid4
 import pytest
 
 from predicate import ge_p, gt_p, le_p, lt_p
-from predicate.predicate import FnPredicate, Predicate, always_false_p, always_true_p
+from predicate.predicate import Predicate, always_false_p, always_true_p
 from predicate.standard_predicates import (
     eq_false_p,
     eq_p,
     eq_true_p,
+    fn_p,
     in_p,
     is_dict_p,
     is_instance_p,
@@ -200,7 +201,7 @@ def test_base_predicate():
 
 
 def test_lambda():
-    in_123 = FnPredicate(lambda x: str(x) in ["1", "2", "3"])
+    in_123 = fn_p(lambda x: str(x) in ["1", "2", "3"])
     exists_p = is_not_none_p & in_123
 
     assert not exists_p(None)

@@ -1,5 +1,7 @@
+from collections.abc import Callable
 from uuid import UUID
 
+from predicate import FnPredicate
 from predicate.predicate import (
     AllPredicate,
     AnyPredicate,
@@ -51,6 +53,10 @@ def le_p[T: (int, str)](v: T) -> LePredicate[T]:
 
 def lt_p[T: (int, str)](v: T) -> LtPredicate[T]:
     return LtPredicate(v=v)
+
+
+def fn_p[T](fn: Callable[[T], bool]) -> FnPredicate[T]:
+    return FnPredicate(predicate_fn=fn)
 
 
 neg_p = lt_p(0)

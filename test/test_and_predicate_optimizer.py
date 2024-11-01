@@ -3,7 +3,7 @@ from helpers import is_and_p, is_eq_p, is_false_p, is_true_p
 from predicate import always_false_p, always_true_p, ge_p, gt_p
 from predicate.optimizer.predicate_optimizer import can_optimize, optimize
 from predicate.predicate import is_empty_p
-from predicate.standard_predicates import all_p, eq_p, in_p, is_none_p, is_not_none_p, ne_p, not_in_p
+from predicate.standard_predicates import all_p, eq_p, fn_p, in_p, is_none_p, is_not_none_p, ne_p, not_in_p
 
 
 def test_and_optimize_right_false():
@@ -391,3 +391,29 @@ def test_optimize_nested_and():
     optimized = optimize(predicate)
 
     assert optimized == always_false_p
+
+
+def test_optimize_fn_and_eq_false():
+    p = fn_p(lambda x: x * x > 5)
+    q = eq_p(2)
+
+    predicate = p & q
+
+    assert can_optimize(predicate)
+
+    optimized = optimize(predicate)
+
+    assert optimized == always_false_p
+
+
+def test_optimize_fn_and_eq_true():
+    p = fn_p(lambda x: x * x > 5)
+    q = eq_p(3)
+
+    predicate = p & q
+
+    assert can_optimize(predicate)
+
+    optimized = optimize(predicate)
+
+    assert optimized == always_true_p
