@@ -15,7 +15,7 @@ def cli(predicate: str, filename, optimize: bool) -> None:
 
     # parsed = parse_string(predicate)
 
-    parsed = in_p(3, 4) ^ in_p(4, 5)
+    parsed = in_p(2, 3, 4) & ~in_p(3)
 
     dot = to_dot(parsed, predicate, show_optimized=optimize)
 

@@ -1,18 +1,30 @@
 from typing import Any
 
 from predicate import AlwaysFalsePredicate, AlwaysTruePredicate, AndPredicate
-from predicate.predicate import NePredicate, NotPredicate, OrPredicate, Predicate, XorPredicate
+from predicate.predicate import (
+    AllPredicate,
+    AnyPredicate,
+    NePredicate,
+    NotPredicate,
+    OrPredicate,
+    Predicate,
+    XorPredicate,
+)
 
 
 def to_json(predicate: Predicate) -> dict[str, Any]:
     def to_value(predicate) -> tuple[str, Any]:
         match predicate:
+            case AllPredicate(all_predicate):
+                return "all", {"predicate": to_json(all_predicate)}
             case AlwaysFalsePredicate():
                 return "false", False
             case AlwaysTruePredicate():
                 return "true", True
             case AndPredicate(left, right):
                 return "and", {"left": to_json(left), "right": to_json(right)}
+            case AnyPredicate(any_predicate):
+                return "any", {"predicate": to_json(any_predicate)}
             case NePredicate(v):
                 return "ne", {"v": v}
             case NotPredicate(not_predicate):

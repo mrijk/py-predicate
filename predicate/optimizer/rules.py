@@ -1,9 +1,18 @@
+from dataclasses import dataclass
+
 from predicate.predicate import (
     AlwaysFalsePredicate,
     AlwaysTruePredicate,
+    Predicate,
     always_false_p,
     always_true_p,
 )
+
+
+@dataclass
+class WildcardPredicate[T](Predicate[T]):
+    pass
+
 
 p = AlwaysTruePredicate()
 q = AlwaysFalsePredicate()
@@ -44,6 +53,16 @@ optimization_rules = [
     {
         "title": "True and True is True",
         "from": always_true_p | always_true_p,
+        "to": always_true_p,
+    },
+    {
+        "title": "p and False is False",
+        "from": WildcardPredicate() & always_false_p,
+        "to": always_false_p,
+    },
+    {
+        "title": "p & true = true",
+        "from": WildcardPredicate() & always_true_p,
         "to": always_true_p,
     },
 ]

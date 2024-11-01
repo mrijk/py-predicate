@@ -31,6 +31,7 @@ def test_match_not_false():
     rule = match(predicate)
 
     assert rule is not None
+    assert rule["to"] == always_true_p
 
 
 def test_match_not_true():
@@ -39,6 +40,7 @@ def test_match_not_true():
     rule = match(predicate)
 
     assert rule is not None
+    assert rule["to"] == always_false_p
 
 
 def test_match_true_false():
@@ -47,3 +49,23 @@ def test_match_true_false():
     rule = match(predicate)
 
     assert rule is not None
+    assert rule["to"] == always_true_p
+
+
+def test_match_and_predicate_false():
+    predicate = ge_p(2) & always_false_p
+
+    rule = match(predicate)
+
+    assert rule
+    assert rule["to"] == always_false_p
+
+
+def test_match_and_predicate_true():
+    p = ge_p(2)
+    predicate = p & always_true_p
+
+    rule = match(predicate)
+
+    assert rule
+    # assert rule["to"] == p

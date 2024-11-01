@@ -2,13 +2,20 @@ from itertools import count
 
 import graphviz  # type: ignore
 
+from predicate import AllPredicate
 from predicate.optimizer.predicate_optimizer import optimize
 from predicate.predicate import (
     AlwaysFalsePredicate,
     AlwaysTruePredicate,
     AndPredicate,
+    AnyPredicate,
     EqPredicate,
+    FnPredicate,
+    GePredicate,
+    GtPredicate,
     InPredicate,
+    LePredicate,
+    LtPredicate,
     NePredicate,
     NotInPredicate,
     NotPredicate,
@@ -40,22 +47,43 @@ def render(dot, predicate: Predicate, node_nr):
 
     def to_value(predicate: Predicate):
         match predicate:
+            case AllPredicate(all_predicate):
+                node = add_node("all", label="∀")
+                child = to_value(all_predicate)
+                dot.edge(node, child)
+                return node
             case AlwaysFalsePredicate():
                 return add_node("F", label="False")
             case AlwaysTruePredicate():
                 return add_node("T", label="True")
             case AndPredicate(left, right):
+                node = add_node("and", label="&")
                 left_node = to_value(left)
                 right_node = to_value(right)
-                node = add_node("and", label="&")
                 dot.edge(node, left_node)
                 dot.edge(node, right_node)
                 return node
+            case AnyPredicate(any_predicate):
+                node = add_node("any", label="∃")
+                child = to_value(any_predicate)
+                dot.edge(node, child)
+                return node
             case EqPredicate(v):
                 return add_node("eq", label=f"x = {v}")
+            case FnPredicate(predicate_fn):
+                name = predicate_fn.__code__.co_name
+                return add_node("fn", label=f"{name}")
+            case GePredicate(v):
+                return add_node("ge", label=f"x ≥ {v}")
+            case GtPredicate(v):
+                return add_node("gt", label=f"x > {v}")
             case InPredicate(v):
                 items = ", ".join(str(item) for item in v)
                 return add_node("in", label=f"x ∈ {{{items}}}")
+            case LePredicate(v):
+                return add_node("le", label=f"x ≤ {v}")
+            case LtPredicate(v):
+                return add_node("lt", label=f"x < {v}")
             case NotInPredicate(v):
                 items = ", ".join(str(item) for item in v)
                 return add_node("in", label=f"x ∉ {{{items}}}")

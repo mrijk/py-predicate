@@ -3,7 +3,7 @@ from predicate.optimizer.and_optimizer import optimize_and_predicate
 from predicate.optimizer.any_optimizer import optimize_any_predicate
 from predicate.optimizer.not_optimizer import optimize_not_predicate
 from predicate.optimizer.or_optimizer import optimize_or_predicate
-from predicate.optimizer.rules import optimization_rules
+from predicate.optimizer.rules import WildcardPredicate, optimization_rules
 from predicate.optimizer.xor_optimizer import optimize_xor_predicate
 from predicate.predicate import (
     AllPredicate,
@@ -36,13 +36,17 @@ def optimize[T](predicate: Predicate[T]) -> Predicate[T]:
 
 def predicate_matches_rule(predicate: Predicate | None, rule: Predicate | None) -> bool:
     match predicate, rule:
+        case AndPredicate(and_left, and_right), AndPredicate(rule_left, rule_right):
+            return predicate_matches_rule(and_left, rule_left) and predicate_matches_rule(and_right, rule_right)
         case NotPredicate(not_predicate), NotPredicate(rule_predicate):
             return predicate_matches_rule(not_predicate, rule_predicate)
         case OrPredicate() as predicate_child, OrPredicate() as rule_child:
             return predicate_matches_rule(predicate_child.left, rule_child.left) and predicate_matches_rule(
                 predicate_child.right, rule_child.right
             )
-        case Predicate() as p1, Predicate() as p2 if type(p1) is type(p2):
+        case _, WildcardPredicate():
+            return True
+        case Predicate() as p1, Predicate() as p2 if p1 == p2:
             return True
     return False
 

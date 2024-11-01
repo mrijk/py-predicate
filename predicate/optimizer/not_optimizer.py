@@ -4,11 +4,13 @@ from predicate.predicate import (
     EqPredicate,
     GePredicate,
     GtPredicate,
+    InPredicate,
     IsNonePredicate,
     IsNotNonePredicate,
     LePredicate,
     LtPredicate,
     NePredicate,
+    NotInPredicate,
     NotPredicate,
     Predicate,
     XorPredicate,
@@ -54,5 +56,10 @@ def optimize_not_predicate[T](predicate: NotPredicate[T]) -> Predicate[T]:
             return IsNotNonePredicate()
         case IsNotNonePredicate():
             return IsNonePredicate()
+
+        case InPredicate(v):
+            return NotInPredicate(v=v)
+        case NotPredicate(v):
+            return InPredicate(v=v)
 
     return NotPredicate(predicate=optimized)

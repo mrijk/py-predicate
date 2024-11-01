@@ -8,6 +8,7 @@ from predicate.predicate import (
     InPredicate,
     IsNonePredicate,
     IsNotNonePredicate,
+    LtPredicate,
     NotInPredicate,
     NotPredicate,
     OrPredicate,
@@ -49,6 +50,9 @@ def optimize_and_predicate[T](predicate: AndPredicate[T]) -> Predicate[T]:
         case _, _ if left == right:  # p & p == p
             return optimize(left)
 
+    left = optimize(left)
+    right = optimize(right)
+
     match left, right:
         case EqPredicate(v1), EqPredicate(v2) if v1 == v2:
             # x = v1 & x = v2 & v1 == v2 => x = v1
@@ -65,6 +69,10 @@ def optimize_and_predicate[T](predicate: AndPredicate[T]) -> Predicate[T]:
         case GePredicate(v1), GePredicate(v2):
             # x >= v1 & x >= v2 => x >= max(v1, v2)
             return GePredicate(v=max(v1, v2))
+
+        case GePredicate(v1), LtPredicate(v2) if v1 == v2:
+            # x >=v & x < v => False
+            return AlwaysFalsePredicate()
 
         case InPredicate(v1), InPredicate(v2):
             v = v1 & v2
@@ -99,8 +107,7 @@ def optimize_and_predicate[T](predicate: AndPredicate[T]) -> Predicate[T]:
         case IsNotNonePredicate(), IsNonePredicate():
             # ~None & None => False
             return AlwaysFalsePredicate()
-        case _, _:
-            # TODO: complete all cases
-            pass
 
     return predicate
+
+    # return AndPredicate(left=left, right=right)
