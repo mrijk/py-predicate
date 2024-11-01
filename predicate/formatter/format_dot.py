@@ -53,11 +53,11 @@ def render(dot, predicate: Predicate, node_nr):
                 dot.edge(node, child)
                 return node
             case AlwaysFalsePredicate():
-                return add_node("F", label="False")
+                return add_node("F", label="false")
             case AlwaysTruePredicate():
-                return add_node("T", label="True")
+                return add_node("T", label="true")
             case AndPredicate(left, right):
-                node = add_node("and", label="&")
+                node = add_node("and", label="∧")
                 left_node = to_value(left)
                 right_node = to_value(right)
                 dot.edge(node, left_node)
@@ -91,20 +91,20 @@ def render(dot, predicate: Predicate, node_nr):
                 return add_node("ne", label=f"x ≠ {v}")
             case NotPredicate(not_predicate):
                 child = to_value(not_predicate)
-                node = add_node("not", label="~")
+                node = add_node("not", label="¬")
                 dot.edge(node, child)
                 return node
             case OrPredicate(left, right):
+                node = add_node("or", label="∨")
                 left_node = to_value(left)
                 right_node = to_value(right)
-                node = add_node("or", label="|")
                 dot.edge(node, left_node)
                 dot.edge(node, right_node)
                 return node
             case XorPredicate(left, right):
+                node = add_node("xor", label="⊻")
                 left_node = to_value(left)
                 right_node = to_value(right)
-                node = add_node("xor", label="^")
                 dot.edge(node, left_node)
                 dot.edge(node, right_node)
                 return node

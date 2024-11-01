@@ -6,7 +6,8 @@ from typing import Callable, Iterable, Self, cast
 @dataclass
 class Predicate[T]:
     @abstractmethod
-    def __call__(self, *args, **kwargs) -> bool: ...
+    def __call__(self, *args, **kwargs) -> bool:
+        raise NotImplementedError
 
     def __and__(self, predicate: "Predicate") -> "Predicate":
         return cast(Self, AndPredicate(left=self, right=predicate))
@@ -15,7 +16,7 @@ class Predicate[T]:
         return cast(Self, OrPredicate(left=self, right=predicate))
 
     def __xor__(self, predicate: "Predicate") -> "Predicate":
-        return cast(Self, XorPredicate[T](left=self, right=predicate))
+        return cast(Self, XorPredicate(left=self, right=predicate))
 
     def __invert__(self) -> "Predicate":
         return cast(Self, NotPredicate(predicate=self))

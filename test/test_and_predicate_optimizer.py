@@ -3,7 +3,7 @@ from helpers import is_and_p, is_eq_p, is_false_p, is_true_p
 from predicate import always_false_p, always_true_p, ge_p, gt_p
 from predicate.optimizer.predicate_optimizer import can_optimize, optimize
 from predicate.predicate import is_empty_p
-from predicate.standard_predicates import all_p, eq_p, in_p, is_none_p, is_not_none_p, not_in_p
+from predicate.standard_predicates import all_p, eq_p, in_p, is_none_p, is_not_none_p, not_in_p, ne_p
 
 
 def test_and_optimize_right_false():
@@ -315,6 +315,32 @@ def test_optimize_in_and_not_in():
     assert optimized == in_p(2, 4)
 
 
+def test_optimize_in_and_not_in_single():
+    p1 = in_p(2, 3, 4)
+    p2 = not_in_p(2, 3)
+
+    predicate = p1 & p2
+
+    assert can_optimize(predicate)
+
+    optimized = optimize(predicate)
+
+    assert optimized == eq_p(4)
+
+
+def test_optimize_in_and_not_in_empty():
+    p1 = in_p(2, 3, 4)
+    p2 = not_in_p(2, 3, 4)
+
+    predicate = p1 & p2
+
+    assert can_optimize(predicate)
+
+    optimized = optimize(predicate)
+
+    assert optimized == always_false_p
+
+
 def test_optimize_not_in_and_not_in():
     p1 = not_in_p(2, 3, 4)
     p2 = not_in_p(3, 5)
@@ -326,3 +352,42 @@ def test_optimize_not_in_and_not_in():
     optimized = optimize(predicate)
 
     assert optimized == not_in_p(2, 3, 4, 5)
+
+
+def test_optimize_not_in_and_not_in_single():
+    p1 = not_in_p(2)
+    p2 = not_in_p(2)
+
+    predicate = p1 & p2
+
+    assert can_optimize(predicate)
+
+    optimized = optimize(predicate)
+
+    assert optimized == ne_p(2)
+
+
+def test_optimize_not_in_and_not_in_empty():
+    p1 = not_in_p()
+    p2 = not_in_p()
+
+    predicate = p1 & p2
+
+    assert can_optimize(predicate)
+
+    optimized = optimize(predicate)
+
+    assert optimized == always_true_p
+
+
+def test_optimize_nested_and():
+    p1 = in_p(2, 3, 4)
+    p2 = not_in_p(3)
+
+    predicate = always_false_p & p1 & p2
+
+    assert can_optimize(predicate)
+
+    optimized = optimize(predicate)
+
+    assert optimized == always_false_p

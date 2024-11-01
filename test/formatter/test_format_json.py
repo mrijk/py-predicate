@@ -1,7 +1,7 @@
 from predicate import always_false_p, always_true_p
 from predicate.formatter.format_json import to_json
 from predicate.predicate import FnPredicate
-from predicate.standard_predicates import ne_p
+from predicate.standard_predicates import ne_p, all_p, any_p
 
 
 def test_format_json_false():
@@ -47,6 +47,22 @@ def test_format_json_xor():
             "right": {"false": False},
         }
     }
+
+
+def test_format_json_all():
+    predicate = all_p(predicate=always_true_p)
+
+    json = to_json(predicate)
+
+    assert json == {"all": {"predicate": {"true": True}}}
+
+
+def test_format_json_any():
+    predicate = any_p(predicate=always_true_p)
+
+    json = to_json(predicate)
+
+    assert json == {"any": {"predicate": {"true": True}}}
 
 
 def test_format_json_not():

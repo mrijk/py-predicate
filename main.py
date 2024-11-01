@@ -1,5 +1,6 @@
 import click
 
+from predicate import always_false_p, always_true_p
 from predicate.formatter.format_dot import to_dot
 from predicate.standard_predicates import in_p
 
@@ -15,7 +16,7 @@ def cli(predicate: str, filename, optimize: bool) -> None:
 
     # parsed = parse_string(predicate)
 
-    parsed = in_p(2, 3, 4) & ~in_p(3)
+    parsed = in_p(2, 3, 4) & ~in_p(3) & always_true_p
 
     dot = to_dot(parsed, predicate, show_optimized=optimize)
 

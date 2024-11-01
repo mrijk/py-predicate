@@ -1,7 +1,9 @@
 from uuid import uuid4
 
+import pytest
+
 from predicate import ge_p, gt_p, le_p, lt_p
-from predicate.predicate import FnPredicate, always_false_p, always_true_p
+from predicate.predicate import FnPredicate, always_false_p, always_true_p, Predicate
 from predicate.standard_predicates import (
     eq_false_p,
     eq_p,
@@ -189,6 +191,12 @@ def test_eq():
     assert eq_1 == eq_1
     assert eq_1 == eq_2
     assert eq_1 != eq_3
+
+
+def test_base_predicate():
+    p = Predicate()
+    with pytest.raises(NotImplementedError):
+        p(1)
 
 
 def test_lambda():
