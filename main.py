@@ -1,6 +1,5 @@
 import click
 
-from predicate import FnPredicate
 from predicate.formatter.format_dot import to_dot
 from predicate.standard_predicates import eq_p, fn_p
 
