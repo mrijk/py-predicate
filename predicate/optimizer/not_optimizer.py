@@ -59,7 +59,7 @@ def optimize_not_predicate[T](predicate: NotPredicate[T]) -> Predicate[T]:
 
         case InPredicate(v):
             return NotInPredicate(v=v)
-        case NotPredicate(v):
+        case NotInPredicate(v):
             return InPredicate(v=v)
 
     return NotPredicate(predicate=optimized)

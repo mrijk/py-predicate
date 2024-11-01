@@ -11,7 +11,8 @@ from predicate.predicate import (
 
 @dataclass
 class WildcardPredicate[T](Predicate[T]):
-    pass
+    def __call__(self, *args, **kwargs) -> bool:
+        return False
 
 
 p = AlwaysTruePredicate()
