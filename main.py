@@ -1,6 +1,6 @@
 import click
 
-from predicate import always_false_p, always_true_p
+from predicate import always_true_p
 from predicate.formatter.format_dot import to_dot
 from predicate.standard_predicates import in_p
 

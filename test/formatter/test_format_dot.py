@@ -1,7 +1,7 @@
 from predicate import always_false_p, always_true_p
 from predicate.formatter.format_dot import to_dot
 from predicate.predicate import FnPredicate
-from predicate.standard_predicates import ne_p, all_p, any_p, ge_p, gt_p, le_p, lt_p, in_p, not_in_p, eq_p
+from predicate.standard_predicates import all_p, any_p, eq_p, ge_p, gt_p, in_p, le_p, lt_p, ne_p, not_in_p
 
 
 def test_format_dot_false():

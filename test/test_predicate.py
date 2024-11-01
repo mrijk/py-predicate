@@ -3,7 +3,7 @@ from uuid import uuid4
 import pytest
 
 from predicate import ge_p, gt_p, le_p, lt_p
-from predicate.predicate import FnPredicate, always_false_p, always_true_p, Predicate
+from predicate.predicate import FnPredicate, Predicate, always_false_p, always_true_p
 from predicate.standard_predicates import (
     eq_false_p,
     eq_p,

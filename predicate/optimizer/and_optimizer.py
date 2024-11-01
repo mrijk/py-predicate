@@ -9,10 +9,11 @@ from predicate.predicate import (
     IsNonePredicate,
     IsNotNonePredicate,
     LtPredicate,
+    NePredicate,
     NotInPredicate,
     NotPredicate,
     OrPredicate,
-    Predicate, NePredicate,
+    Predicate,
 )
 
 

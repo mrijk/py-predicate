@@ -1,7 +1,7 @@
 from predicate import always_false_p, always_true_p
 from predicate.formatter.format_json import to_json
 from predicate.predicate import FnPredicate
-from predicate.standard_predicates import ne_p, all_p, any_p
+from predicate.standard_predicates import all_p, any_p, ne_p
 
 
 def test_format_json_false():
