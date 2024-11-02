@@ -4,6 +4,9 @@ __pycache__/
 .venv/
 .idea/
 
+# Sphinx documentation
+docs/_build/
+
 # Unit test / coverage reports
 .tox/
 .coverage
