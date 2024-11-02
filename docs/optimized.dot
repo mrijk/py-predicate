@@ -1,0 +1,20 @@
+digraph {
+	graph [label="" labelloc=t]
+	node [shape=rectangle]
+	subgraph cluster_original {
+		color=lightgrey style=filled
+		label="Original predicate"
+		and_0 [label="∧"]
+		ge_1 [label="x ≥ 2"]
+		ge_2 [label="x ≥ 2"]
+		not_3 [label="¬"]
+		not_3 -> ge_2
+		and_0 -> ge_1
+		and_0 -> not_3
+	}
+	subgraph cluster_optimized {
+		color=lightgrey style=filled
+		label="Optimized predicate"
+		F_4 [label=false]
+	}
+}

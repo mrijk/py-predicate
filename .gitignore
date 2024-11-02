@@ -4,6 +4,10 @@ __pycache__/
 .venv/
 .idea/
 
+dist/
+*.egg-info/
+
+
 # Sphinx documentation
 docs/_build/
 

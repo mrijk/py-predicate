@@ -1,6 +1,8 @@
 black
 coverage
-graphviz
 mypy
 ruff
+
+click
+graphviz
 

@@ -1,7 +1,7 @@
 import click
 
 from predicate.formatter.format_dot import to_dot
-from predicate.standard_predicates import eq_p, fn_p
+from predicate.standard_predicates import ge_p
 
 
 @click.command()
@@ -15,7 +15,10 @@ def cli(predicate: str, filename, optimize: bool) -> None:
 
     # parsed = parse_string(predicate)
 
-    parsed = fn_p(lambda x: x * 2 > 5) & eq_p(3)
+    ge_2 = ge_p(2)
+    lt_2 = ~ge_2
+
+    parsed = ge_2 & lt_2
 
     dot = to_dot(parsed, predicate, show_optimized=optimize)
 
