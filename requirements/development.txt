@@ -3,5 +3,4 @@ coverage
 graphviz
 mypy
 ruff
-sphinx
-sphinx_rtd_theme
+
