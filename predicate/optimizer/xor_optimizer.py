@@ -54,12 +54,16 @@ def optimize_xor_predicate[T](predicate: XorPredicate[T]) -> Predicate[T]:
                     return NotPredicate(OrPredicate(left=left, right=and_right))  # p ^ (^p & q) == ~(p | q)
                 case _, NotPredicate(not_predicate) if left == not_predicate:
                     return NotPredicate(OrPredicate(left=left, right=and_left))  # p ^ (q & ^p) == ~(p | q)
+                case _:
+                    pass
         case AndPredicate(and_left, and_right), Predicate():
             match and_left, and_right:
                 case NotPredicate(not_predicate), _ if right == not_predicate:
                     return NotPredicate(OrPredicate(left=right, right=and_right))  # (^p & q) ^ p == ~(p | q)
                 case _, NotPredicate(not_predicate) if right == not_predicate:
                     return NotPredicate(OrPredicate(left=right, right=and_left))  # (q & ^p) ^ p == ~(p | q)
+                case _:
+                    pass
         case XorPredicate(xor_left, xor_right), Predicate() if right == xor_left:
             return xor_right  # p ^ q ^ p = q
         case XorPredicate(xor_left, xor_right), Predicate() if right == xor_right:
