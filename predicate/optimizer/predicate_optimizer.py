@@ -61,7 +61,3 @@ def match(predicate: Predicate) -> dict | None:
 
 def can_optimize[T](predicate: Predicate[T]) -> bool:
     return optimize(predicate) != predicate
-
-
-def optimize_predicate[T](predicate: Predicate[T]) -> Predicate[T]:
-    return predicate
