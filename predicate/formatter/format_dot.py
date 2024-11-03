@@ -110,6 +110,8 @@ def render(dot, predicate: Predicate, node_nr):
                 dot.edge(node, left_node)
                 dot.edge(node, right_node)
                 return node
+            case _:
+                raise ValueError(f"Unknown predicate type {predicate}")
 
     to_value(predicate)
 

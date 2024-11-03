@@ -1,4 +1,8 @@
-from predicate import always_false_p, always_true_p
+from dataclasses import dataclass
+
+import pytest
+
+from predicate import Predicate, always_false_p, always_true_p
 from predicate.formatter.format_dot import to_dot
 from predicate.standard_predicates import all_p, any_p, eq_p, fn_p, ge_p, gt_p, in_p, le_p, lt_p, ne_p, not_in_p
 
@@ -145,3 +149,15 @@ def test_format_dot_fn():
     dot = to_dot(predicate)
 
     assert dot
+
+
+def test_format_dot_unknown():
+    @dataclass
+    class UnknownPredicate[T](Predicate[T]):
+        def __call__(self, *args, **kwargs) -> bool:
+            return False
+
+    predicate = UnknownPredicate()
+
+    with pytest.raises(ValueError):
+        to_dot(predicate)
