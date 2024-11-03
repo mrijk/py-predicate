@@ -198,3 +198,55 @@ def test_optimize_in_and_not_in():
     optimized = optimize(predicate)
 
     assert optimized == ne_p(5)
+
+
+def test_optimize_in_and_not_in_single():
+    p1 = in_p(2)
+    p2 = not_in_p(2, 3)
+
+    predicate = p1 | p2
+
+    assert can_optimize(predicate)
+
+    optimized = optimize(predicate)
+
+    assert optimized == ne_p(3)
+
+
+def test_optimize_in_and_not_in_empty():
+    p1 = in_p(2)
+    p2 = not_in_p(2)
+
+    predicate = p1 | p2
+
+    assert can_optimize(predicate)
+
+    optimized = optimize(predicate)
+
+    assert optimized == always_true_p
+
+
+def test_or_optimize_eq_or_in():
+    p1 = eq_p(5)
+    p2 = in_p(2, 3, 4)
+
+    predicate = p1 | p2
+
+    assert can_optimize(predicate)
+
+    optimized = optimize(predicate)
+
+    assert optimized == in_p(2, 3, 4, 5)
+
+
+def test_or_optimize_in_or_eq():
+    p1 = in_p(2, 3, 4)
+    p2 = eq_p(5)
+
+    predicate = p1 | p2
+
+    assert can_optimize(predicate)
+
+    optimized = optimize(predicate)
+
+    assert optimized == in_p(2, 3, 4, 5)

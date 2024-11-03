@@ -74,8 +74,6 @@ def optimize_or_predicate[T](predicate: OrPredicate[T]) -> Predicate[T]:
             return InPredicate((*v1, v2))
         case EqPredicate(v1), InPredicate(v2) if v1 not in v2:
             return InPredicate((*v2, v1))
-        case EqPredicate(v1), EqPredicate(v2) if v1 == v2:
-            return left
         case EqPredicate(v1), EqPredicate(v2) if v1 != v2:
             return InPredicate((v1, v2))
 
