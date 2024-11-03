@@ -38,7 +38,7 @@ def optimize_not_predicate[T](predicate: NotPredicate[T]) -> Predicate[T]:
                     return XorPredicate(left=not_predicate, right=right)
                 case _, NotPredicate(not_predicate):  # ~(p ^ ~q) == p ^ q
                     return XorPredicate(left=left, right=not_predicate)
-                case _, _:  # ~(p ^ q) == ~p ^ q
+                case _:  # ~(p ^ q) == ~p ^ q
                     return XorPredicate(left=NotPredicate(predicate=left), right=right)
         case EqPredicate(v):
             return NePredicate(v=v)
