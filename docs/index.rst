@@ -13,6 +13,7 @@ This library makes it easy to define composable predicates.
    :maxdepth: 2
    :caption: Contents:
 
+   predicates
    formatters
    optimization
 

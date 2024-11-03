@@ -1,4 +1,6 @@
-from predicate import always_false_p, always_true_p
+from dataclasses import dataclass
+
+from predicate import Predicate, always_false_p, always_true_p
 from predicate.formatter.format_json import to_json
 from predicate.standard_predicates import all_p, any_p, fn_p, ne_p
 
@@ -86,3 +88,16 @@ def test_format_json_fn():
     json = to_json(predicate)
 
     assert json == {"fn": {"name": "<lambda>"}}
+
+
+def test_format_unknown():
+    @dataclass
+    class UnknownPredicate[T](Predicate[T]):
+        def __call__(self, *args, **kwargs) -> bool:
+            return False
+
+    predicate = UnknownPredicate()
+
+    json = to_json(predicate)
+
+    assert json == {"unknown": {}}

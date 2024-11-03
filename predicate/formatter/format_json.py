@@ -39,6 +39,7 @@ def to_json(predicate: Predicate) -> dict[str, Any]:
                 return "or", {"left": to_json(left), "right": to_json(right)}
             case XorPredicate(left, right):
                 return "xor", {"left": to_json(left), "right": to_json(right)}
-        return "unknown", {}
+            case _:
+                return "unknown", {}
 
     return dict([to_value(predicate)])
