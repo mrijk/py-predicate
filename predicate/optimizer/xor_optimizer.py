@@ -61,6 +61,8 @@ def optimize_xor_predicate[T](predicate: XorPredicate[T]) -> Predicate[T]:
 
     return predicate
 
+    # return XorPredicate(left=left, right=right)
+
 
 def optimize_xor_not[T](left: Predicate[T], right: Predicate[T]) -> Predicate[T] | None:
     from predicate.negate import negate

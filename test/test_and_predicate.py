@@ -33,6 +33,14 @@ def test_and_commutative():
     assert p_2(3) is True
 
 
+def test_and_eq():
+    # p & q == q & p
+    p = gt_p(2)
+    q = lt_p(4)
+
+    assert p & q == q & p
+
+
 def test_and_associative():
     # TODO
     pass

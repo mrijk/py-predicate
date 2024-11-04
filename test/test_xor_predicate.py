@@ -29,3 +29,10 @@ def test_xor_commutative():
     assert ge_4_xor_ge_4(1) is False
     assert ge_4_xor_ge_4(2) is True
     assert ge_4_xor_ge_4(4) is False
+
+
+def test_or_eq():
+    p = ge_p(2)
+    q = ge_p(4)
+
+    assert p ^ q == q ^ p

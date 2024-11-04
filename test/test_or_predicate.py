@@ -33,6 +33,14 @@ def test_or_commutative():
     assert p_2(5) is True
 
 
+def test_or_eq():
+    # p | q == q | p
+    p = gt_p(2)
+    q = lt_p(4)
+
+    assert p | q == q | p
+
+
 def test_or_always_true():
     always_true = is_none_p | is_not_none_p
     assert always_true(13) is True
