@@ -37,8 +37,6 @@ def optimize_xor_predicate[T](predicate: XorPredicate[T]) -> Predicate[T]:
 
         case InPredicate(v1), InPredicate(v2):
             v = v1 ^ v2
-            if not v:
-                return AlwaysFalsePredicate()
             if len(v) == 1:
                 return EqPredicate(v=v.pop())
             return InPredicate(v=v)
@@ -49,7 +47,7 @@ def optimize_xor_predicate[T](predicate: XorPredicate[T]) -> Predicate[T]:
                     return NotPredicate(OrPredicate(left=left, right=and_right))  # p ^ (^p & q) == ~(p | q)
                 case _, NotPredicate(not_predicate) if left == not_predicate:
                     return NotPredicate(OrPredicate(left=left, right=and_left))  # p ^ (q & ^p) == ~(p | q)
-                case _:
+                case _, _:
                     pass
         case AndPredicate(), Predicate():
             return optimize_xor_predicate(XorPredicate(left=right, right=left))

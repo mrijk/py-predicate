@@ -4,8 +4,8 @@ from predicate.standard_predicates import all_p, eq_p, fn_p, is_int_p, is_str_p
 def test_all():
     all_int = all_p(is_int_p)
 
-    assert all_int([1, 2, 3]) is True
-    assert all_int([None, 2, 3]) is False
+    assert all_int([1, 2, 3])
+    assert not all_int([None, 2, 3])
 
 
 def test_all_combined_1():

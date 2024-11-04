@@ -139,7 +139,7 @@ def test_xor_optimize_false_left():
     assert optimized == p
 
 
-def test_xor_optimize__true_right():
+def test_xor_optimize_true_right():
     # p ^ True = ~p
     p = ge_p(2)
 
@@ -221,6 +221,19 @@ def test_optimize_in_xor_in():
     optimized = optimize(predicate)
 
     assert optimized == in_p(2, 3, 4, 5)
+
+
+def test_optimize_in_xor__in_empty():
+    p1 = in_p(2, 3, 4)
+    p2 = in_p(2, 3, 4)
+
+    predicate = p1 ^ p2
+
+    assert can_optimize(predicate)
+
+    optimized = optimize(predicate)
+
+    assert optimized == always_false_p
 
 
 def test_optimize_in_xor_in_single():
