@@ -2,7 +2,7 @@ from helpers import is_all_p
 
 from predicate import can_optimize, optimize
 from predicate.predicate import always_false_p, always_true_p
-from predicate.standard_predicates import all_p, any_p, eq_p, fn_p, ne_p, is_not_none_p, is_none_p
+from predicate.standard_predicates import all_p, any_p, eq_p, fn_p, is_none_p, is_not_none_p, ne_p
 
 
 def test_optimize_all_true():
