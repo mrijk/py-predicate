@@ -400,11 +400,11 @@ def test_optimize_nested_and():
 #
 #     predicate = p1 & p2 & p3
 
-    # assert can_optimize(predicate)
-    #
-    # optimized = optimize(predicate)
-    #
-    # assert optimized == always_false_p
+# assert can_optimize(predicate)
+#
+# optimized = optimize(predicate)
+#
+# assert optimized == always_false_p
 
 
 def test_optimize_ge_and_lt():
