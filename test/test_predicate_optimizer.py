@@ -93,12 +93,12 @@ def test_optimize_or_1():
     p = gt_p(2)
     q = le_p(0)
 
-    le_0_or_gt_2 = p | (~p & q)
+    predicate = p | (~p & q)
 
-    assert is_or_p(le_0_or_gt_2)
-    assert can_optimize(le_0_or_gt_2)
+    assert is_or_p(predicate)
+    assert can_optimize(predicate)
 
-    optimized = optimize(le_0_or_gt_2)
+    optimized = optimize(predicate)
 
     assert optimized == p | q
 
@@ -108,12 +108,12 @@ def test_optimize_and_1():
     p = gt_p(2)
     q = le_p(0)
 
-    le_0_and_gt_2 = p & (~p | q)
+    predicate = p & (~p | q)
 
-    assert is_and_p(le_0_and_gt_2)
-    assert can_optimize(le_0_and_gt_2)
+    assert is_and_p(predicate)
+    assert can_optimize(predicate)
 
-    optimized = optimize(le_0_and_gt_2)
+    optimized = optimize(predicate)
 
     assert optimized == p & q
 
@@ -123,12 +123,12 @@ def test_optimize_and_2():
     p = gt_p(2)
     q = le_p(0)
 
-    le_0_and_gt_2 = p & (q | ~p)
+    predicate = p & (q | ~p)
 
-    assert is_and_p(le_0_and_gt_2)
-    assert can_optimize(le_0_and_gt_2)
+    assert is_and_p(predicate)
+    assert can_optimize(predicate)
 
-    optimized = optimize(le_0_and_gt_2)
+    optimized = optimize(predicate)
 
     assert optimized == p & q
 

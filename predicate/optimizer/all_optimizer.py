@@ -4,6 +4,8 @@ from predicate.predicate import (
     AlwaysTruePredicate,
     AnyPredicate,
     IsEmptyPredicate,
+    IsNonePredicate,
+    IsNotNonePredicate,
     NotPredicate,
     Predicate,
 )
@@ -21,6 +23,8 @@ def optimize_all_predicate[T](predicate: AllPredicate[T]) -> Predicate[T]:
             return IsEmptyPredicate()
         case NotPredicate(not_predicate):
             return NotPredicate(predicate=AnyPredicate(predicate=not_predicate))
+        case IsNotNonePredicate():
+            return NotPredicate(predicate=AnyPredicate(predicate=IsNonePredicate()))
         case _:
             pass
 

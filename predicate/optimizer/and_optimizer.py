@@ -31,12 +31,8 @@ def optimize_and_predicate[T](predicate: AndPredicate[T]) -> Predicate[T]:
                 case _, NotPredicate(not_predicate) if not_predicate == right:  # (q | ~p) & p == q & p
                     return AndPredicate(left=or_left, right=right)
 
-        case _, OrPredicate(or_left, or_right):
-            match or_left, or_right:
-                case NotPredicate(not_predicate), _ if not_predicate == left:  # p & (~p | q) == p & q
-                    return AndPredicate(left=left, right=or_right)
-                case _, NotPredicate(not_predicate) if not_predicate == left:  # p & (q | ~p) == p & q
-                    return AndPredicate(left=left, right=or_left)
+        case _, OrPredicate():
+            return optimize_and_predicate(AndPredicate(left=right, right=left))
 
         case _, _ if left == negate(right):
             return AlwaysFalsePredicate()  # p & ~p == False

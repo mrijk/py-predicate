@@ -38,6 +38,13 @@ class AndPredicate[T](Predicate[T]):
     def __call__(self, x: T) -> bool:
         return self.left(x) and self.right(x)
 
+    def __eq__(self, other: object) -> bool:
+        match other:
+            case AndPredicate(left, right):
+                return (left == self.left and right == self.right) or (right == self.left and left == self.right)
+            case _:
+                return False
+
 
 @dataclass
 class NotPredicate[T](Predicate[T]):
