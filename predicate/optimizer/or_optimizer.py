@@ -95,10 +95,10 @@ def optimize_or_predicate[T](predicate: OrPredicate[T]) -> Predicate[T]:
 
 
 def optimize_or_not[T](left: Predicate[T], right: Predicate[T]) -> Predicate[T] | None:
+    from predicate.negate import negate
+
     match left, right:
-        case NotPredicate(left_p), _ if right == left_p:  # ~p | p == True
-            return AlwaysTruePredicate()
-        case _, NotPredicate(right_p) if left == right_p:  # p | ~p == True
-            return AlwaysTruePredicate()
+        case _, _ if left == negate(right):
+            return AlwaysTruePredicate()  # p | ~p == true
 
     return None

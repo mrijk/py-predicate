@@ -20,11 +20,10 @@ def optimize_xor_predicate[T](predicate: XorPredicate[T]) -> Predicate[T]:
     left = optimize(predicate.left)
     right = optimize(predicate.right)
 
+    if optimized := optimize_xor_not(left=left, right=right):
+        return optimized
+
     match left, right:
-        case AlwaysFalsePredicate(), AlwaysFalsePredicate():  # False ^ False = False
-            return AlwaysFalsePredicate()
-        case AlwaysTruePredicate(), AlwaysTruePredicate():  # True ^ True = False
-            return AlwaysFalsePredicate()
         case _, AlwaysFalsePredicate():  # p ^ False = p
             return left
         case AlwaysFalsePredicate(), _:  # False ^ p = p
@@ -36,10 +35,6 @@ def optimize_xor_predicate[T](predicate: XorPredicate[T]) -> Predicate[T]:
         case _, _ if left == right:  # p ^ p == False
             return AlwaysFalsePredicate()
 
-    if optimized := optimize_xor_not(left=left, right=right):
-        return optimized
-
-    match left, right:
         case InPredicate(v1), InPredicate(v2):
             v = v1 ^ v2
             if not v:
@@ -73,12 +68,12 @@ def optimize_xor_predicate[T](predicate: XorPredicate[T]) -> Predicate[T]:
 
 
 def optimize_xor_not[T](left: Predicate[T], right: Predicate[T]) -> Predicate[T] | None:
+    from predicate.negate import negate
+
     match left, right:
         case NotPredicate(left_p), NotPredicate(right_p):  # ~p ^ ~q == p ^ q
             return XorPredicate(left=left_p, right=right_p)
-        case NotPredicate(left_p), _ if right == left_p:  # ~p ^ p == True
-            return AlwaysTruePredicate()
-        case _, NotPredicate(right_p) if left == right_p:  # p ^ ~p == True
+        case _, _ if left == negate(right):  # ~p ^ p == True
             return AlwaysTruePredicate()
 
     return None

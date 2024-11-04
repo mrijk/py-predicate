@@ -188,8 +188,8 @@ def test_optimize_multiple_eq():
 
 
 def test_optimize_in_and_not_in():
-    p1 = in_p(2, 3, 4)
-    p2 = not_in_p(3, 5)
+    p1 = in_p(2, 3)
+    p2 = not_in_p(2, 3, 4, 5)
 
     predicate = p1 | p2
 
@@ -197,7 +197,7 @@ def test_optimize_in_and_not_in():
 
     optimized = optimize(predicate)
 
-    assert optimized == ne_p(5)
+    assert optimized == not_in_p(4, 5)
 
 
 def test_optimize_in_and_not_in_single():

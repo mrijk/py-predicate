@@ -7,8 +7,6 @@ from predicate.predicate import (
     FnPredicate,
     GePredicate,
     InPredicate,
-    IsNonePredicate,
-    IsNotNonePredicate,
     LtPredicate,
     NePredicate,
     NotInPredicate,
@@ -19,24 +17,19 @@ from predicate.predicate import (
 
 
 def optimize_and_predicate[T](predicate: AndPredicate[T]) -> Predicate[T]:
+    from predicate.negate import negate
     from predicate.optimizer.predicate_optimizer import optimize
 
     left = predicate.left
     right = predicate.right
 
     match left, right:
-        case NotPredicate(not_predicate), _ if right == not_predicate:  # ~p & p == False
-            return AlwaysFalsePredicate()
-        case _, NotPredicate(not_predicate) if left == not_predicate:  # p & ~p == False
-            return AlwaysFalsePredicate()
         case OrPredicate(or_left, or_right), _:
             match or_left, or_right:
                 case NotPredicate(not_predicate), _ if not_predicate == right:  # (~p | q) & p == q & p
                     return AndPredicate(left=or_right, right=right)
                 case _, NotPredicate(not_predicate) if not_predicate == right:  # (q | ~p) & p == q & p
                     return AndPredicate(left=or_left, right=right)
-                case _:
-                    pass
 
         case _, OrPredicate(or_left, or_right):
             match or_left, or_right:
@@ -44,8 +37,9 @@ def optimize_and_predicate[T](predicate: AndPredicate[T]) -> Predicate[T]:
                     return AndPredicate(left=left, right=or_right)
                 case _, NotPredicate(not_predicate) if not_predicate == left:  # p & (q | ~p) == p & q
                     return AndPredicate(left=left, right=or_left)
-                case _:
-                    pass
+
+        case _, _ if left == negate(right):
+            return AlwaysFalsePredicate()  # p & ~p == False
 
     left = optimize(left)
     right = optimize(right)
@@ -110,12 +104,9 @@ def optimize_and_predicate[T](predicate: AndPredicate[T]) -> Predicate[T]:
         case AllPredicate(left_all), AllPredicate(right_all):
             # All(p1) & All(p2) => All(p1 & p2)
             return optimize(AllPredicate(predicate=optimize(AndPredicate(left=left_all, right=right_all))))
-        case IsNonePredicate(), IsNotNonePredicate():
-            # None & ~None => False
-            return AlwaysFalsePredicate()
-        case IsNotNonePredicate(), IsNonePredicate():
-            # ~None & None => False
-            return AlwaysFalsePredicate()
+
+        case _, _ if left == negate(right):
+            return AlwaysFalsePredicate()  # p & ~p == False
 
         case _, _ if left == right:  # p & p == p
             return left
