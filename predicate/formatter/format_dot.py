@@ -30,7 +30,7 @@ def to_dot(predicate: Predicate, predicate_string: str = "", show_optimized: boo
 
     node_attr = {"shape": "rectangle", "style": "filled", "fillcolor": "#B7D7A8"}
 
-    edge_attr = {}
+    edge_attr: dict = {}
 
     dot = graphviz.Digraph(graph_attr=graph_attr, node_attr=node_attr, edge_attr=edge_attr)
 
