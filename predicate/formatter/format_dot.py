@@ -2,9 +2,8 @@ from itertools import count
 
 import graphviz  # type: ignore
 
-from predicate import AllPredicate
-from predicate.optimizer.predicate_optimizer import optimize
-from predicate.predicate import (
+from predicate import (
+    AllPredicate,
     AlwaysFalsePredicate,
     AlwaysTruePredicate,
     AndPredicate,
@@ -23,10 +22,17 @@ from predicate.predicate import (
     Predicate,
     XorPredicate,
 )
+from predicate.optimizer.predicate_optimizer import optimize
 
 
 def to_dot(predicate: Predicate, predicate_string: str = "", show_optimized: bool = False):
-    dot = graphviz.Digraph(graph_attr={"label": predicate_string, "labelloc": "t"}, node_attr={"shape": "rectangle"})
+    graph_attr = {"label": predicate_string, "labelloc": "t"}
+
+    node_attr = {"shape": "rectangle", "style": "filled", "fillcolor": "#B7D7A8"}
+
+    edge_attr = {}
+
+    dot = graphviz.Digraph(graph_attr=graph_attr, node_attr=node_attr, edge_attr=edge_attr)
 
     node_nr = count()
 
@@ -39,10 +45,10 @@ def to_dot(predicate: Predicate, predicate_string: str = "", show_optimized: boo
 
 
 def render(dot, predicate: Predicate, node_nr):
-    def add_node(name: str, label: str):
+    def add_node(name: str, *, label: str):
         node = next(node_nr)
         unique_name = f"{name}_{node}"
-        dot.node(unique_name, label)
+        dot.node(unique_name, label=label)
         return unique_name
 
     def to_value(predicate: Predicate):

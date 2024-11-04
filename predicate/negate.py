@@ -1,14 +1,18 @@
 from functools import singledispatch
 
-from predicate import AlwaysTruePredicate, EqPredicate, NePredicate, NotPredicate, Predicate
-from predicate.predicate import (
+from predicate import (
     AlwaysFalsePredicate,
+    AlwaysTruePredicate,
+    EqPredicate,
     GePredicate,
     GtPredicate,
     IsNonePredicate,
     IsNotNonePredicate,
     LePredicate,
     LtPredicate,
+    NePredicate,
+    NotPredicate,
+    Predicate,
 )
 
 
