@@ -19,10 +19,7 @@ def optimize_and_predicate[T](predicate: AndPredicate[T]) -> Predicate[T]:
     from predicate.negate import negate
     from predicate.optimizer.predicate_optimizer import optimize
 
-    left = predicate.left
-    right = predicate.right
-
-    match left, right:
+    match left := predicate.left, right := predicate.right:
         case OrPredicate(or_left, or_right), _:
             match or_left, or_right:
                 case NotPredicate(not_predicate), _ if not_predicate == right:  # (~p | q) & p == q & p
@@ -36,10 +33,7 @@ def optimize_and_predicate[T](predicate: AndPredicate[T]) -> Predicate[T]:
         case _, _ if left == negate(right):
             return AlwaysFalsePredicate()  # p & ~p == False
 
-    left = optimize(left)
-    right = optimize(right)
-
-    match left, right:
+    match left := optimize(left), right := optimize(right):
         case _, AlwaysFalsePredicate():  # p & False = False
             return AlwaysFalsePredicate()
         case AlwaysFalsePredicate(), _:  # False & p = False
@@ -96,12 +90,32 @@ def optimize_and_predicate[T](predicate: AndPredicate[T]) -> Predicate[T]:
             # All(p1) & All(p2) => All(p1 & p2)
             return optimize(AllPredicate(predicate=optimize(AndPredicate(left=left_all, right=right_all))))
 
+        case AndPredicate() as and_predicate, _ if and_contains_negate(and_predicate, right):
+            return AlwaysFalsePredicate()  # p & q & ... & ~p == False
+
+        case _, AndPredicate() as and_predicate if and_contains_negate(and_predicate, left):
+            return AlwaysFalsePredicate()  # q & p & ... & ~p == False
+
         case _, _ if left == negate(right):
             return AlwaysFalsePredicate()  # p & ~p == False
 
         case _, _ if left == right:  # p & p == p
             return left
 
-    return predicate
+        case _:
+            # return AndPredicate(left=left, right=right)
+            return predicate
 
-    # return AndPredicate(left=left, right=right)
+
+def and_contains_negate(predicate: AndPredicate, sub_predicate: Predicate) -> bool:
+    from predicate.negate import negate
+
+    match left := predicate.left, right := predicate.right:
+        case AndPredicate() as and_left, _:
+            return and_contains_negate(and_left, sub_predicate)
+        case _, AndPredicate() as and_right:
+            return and_contains_negate(and_right, sub_predicate)
+        case AndPredicate() as and_left, AndPredicate() as and_right:
+            return and_contains_negate(and_left, sub_predicate) or and_contains_negate(and_right, sub_predicate)
+        case _:
+            return negate(sub_predicate) in (left, right)

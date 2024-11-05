@@ -6,11 +6,13 @@ from predicate import (
     EqPredicate,
     GePredicate,
     GtPredicate,
+    InPredicate,
     IsNonePredicate,
     IsNotNonePredicate,
     LePredicate,
     LtPredicate,
     NePredicate,
+    NotInPredicate,
     NotPredicate,
     Predicate,
 )
@@ -19,6 +21,11 @@ from predicate import (
 @singledispatch
 def negate[T](predicate: Predicate[T]) -> Predicate[T]:
     return NotPredicate(predicate=predicate)
+
+
+@negate.register
+def negate_is_not(predicate: NotPredicate) -> Predicate:
+    return predicate.predicate
 
 
 @negate.register
@@ -33,12 +40,12 @@ def negate_is_true(_predicate: AlwaysTruePredicate) -> Predicate:
 
 @negate.register
 def negate_eq(predicate: EqPredicate) -> Predicate:
-    return NotPredicate(predicate=NePredicate(v=predicate.v))
+    return NePredicate(v=predicate.v)
 
 
 @negate.register
 def negate_ne(predicate: NePredicate) -> Predicate:
-    return NotPredicate(predicate=EqPredicate(v=predicate.v))
+    return EqPredicate(v=predicate.v)
 
 
 @negate.register
@@ -49,6 +56,16 @@ def negate_gt(predicate: GtPredicate) -> Predicate:
 @negate.register
 def negate_ge(predicate: GePredicate) -> Predicate:
     return LtPredicate(v=predicate.v)
+
+
+@negate.register
+def negate_in(predicate: InPredicate) -> Predicate:
+    return NotInPredicate(v=predicate.v)
+
+
+@negate.register
+def negate_not_in(predicate: NotInPredicate) -> Predicate:
+    return InPredicate(v=predicate.v)
 
 
 @negate.register

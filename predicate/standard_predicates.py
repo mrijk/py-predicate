@@ -1,11 +1,12 @@
 from collections.abc import Callable
+from datetime import datetime
 from uuid import UUID
 
-from predicate import FnPredicate
 from predicate.predicate import (
     AllPredicate,
     AnyPredicate,
     EqPredicate,
+    FnPredicate,
     GePredicate,
     GtPredicate,
     InPredicate,
@@ -76,10 +77,12 @@ def is_instance_p(*klass: type) -> IsInstancePredicate:
     return IsInstancePredicate(klass=klass)
 
 
-is_int_p = is_instance_p(int)
-is_str_p = is_instance_p(str)
+is_datetime_p = is_instance_p(datetime)
 is_dict_p = is_instance_p(dict)
+is_float_p = is_instance_p(float)
+is_int_p = is_instance_p(int)
 is_list_p = is_instance_p(list)
+is_str_p = is_instance_p(str)
 is_uuid_p = is_instance_p(UUID)
 
 eq_true_p = eq_p(True)

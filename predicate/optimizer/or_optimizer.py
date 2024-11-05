@@ -88,8 +88,15 @@ def optimize_or_predicate[T](predicate: OrPredicate[T]) -> Predicate[T]:
         case GePredicate(v1), GePredicate(v2):
             # x >= v1 | x >= v2 => x >= min(v1, v2)
             return GePredicate(v=min(v1, v2))
+
         case AnyPredicate(left_any), AnyPredicate(right_any):
             return AnyPredicate(optimize(OrPredicate(left=left_any, right=right_any)))
+
+        case OrPredicate() as or_predicate, _ if or_contains_negate(or_predicate, right):
+            return AlwaysTruePredicate()  # p | q | ... | ~p == False
+
+        case _, OrPredicate() as or_predicate if or_contains_negate(or_predicate, left):
+            return AlwaysTruePredicate()  # q | p | ... | ~p == False
 
     return OrPredicate(left=left, right=right)
 
@@ -102,3 +109,17 @@ def optimize_or_not[T](left: Predicate[T], right: Predicate[T]) -> Predicate[T] 
             return AlwaysTruePredicate()  # p | ~p == true
 
     return None
+
+
+def or_contains_negate(predicate: OrPredicate, sub_predicate: Predicate) -> bool:
+    from predicate.negate import negate
+
+    match left := predicate.left, right := predicate.right:
+        case OrPredicate() as or_left, _:
+            return or_contains_negate(or_left, sub_predicate)
+        case _, OrPredicate() as or_right:
+            return or_contains_negate(or_right, sub_predicate)
+        case OrPredicate() as or_left, OrPredicate() as or_right:
+            return or_contains_negate(or_left, sub_predicate) or or_contains_negate(or_right, sub_predicate)
+        case _:
+            return negate(sub_predicate) in (left, right)

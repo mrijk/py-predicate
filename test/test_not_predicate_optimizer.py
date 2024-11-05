@@ -2,7 +2,20 @@ from helpers import is_not_p
 
 from predicate import always_false_p, always_true_p, ge_p
 from predicate.optimizer.predicate_optimizer import can_optimize, optimize
-from predicate.standard_predicates import all_p, eq_p, gt_p, in_p, is_none_p, is_not_none_p, le_p, lt_p, ne_p, not_in_p
+from predicate.standard_predicates import (
+    all_p,
+    any_p,
+    eq_p,
+    fn_p,
+    gt_p,
+    in_p,
+    is_none_p,
+    is_not_none_p,
+    le_p,
+    lt_p,
+    ne_p,
+    not_in_p,
+)
 
 
 def test_optimize_not_not():
@@ -135,9 +148,34 @@ def test_not_optimize_not_none():
 
 
 def test_not_optimize_all():
-    predicate = ~all_p(is_none_p)
+    predicate = ~all_p(ge_p(2))
 
-    assert not can_optimize(predicate)
+    assert can_optimize(predicate)
+
+    optimized = optimize(predicate)
+
+    assert optimized == any_p(lt_p(2))
+
+
+def test_not_optimize_all_skip():
+    p = fn_p(lambda x: x > 2)
+    predicate = ~all_p(~p)
+
+    assert can_optimize(predicate)
+
+    optimized = optimize(predicate)
+
+    assert optimized == any_p(p)
+
+
+def test_not_optimize_any():
+    predicate = ~any_p(ge_p(2))
+
+    assert can_optimize(predicate)
+
+    optimized = optimize(predicate)
+
+    assert optimized == all_p(lt_p(2))
 
 
 def test_not_in():
@@ -160,3 +198,63 @@ def test_not_not_in():
     optimized = optimize(predicate)
 
     assert optimized == not_in_p(2, 3, 4)
+
+
+def test_not_optimize_or_left_not():
+    # ~(~p | q) => p & ~q
+
+    p = fn_p(lambda x: x > 2)
+    q = fn_p(lambda x: x > 3)
+
+    predicate = ~(~p | q)
+
+    assert can_optimize(predicate)
+
+    optimized = optimize(predicate)
+
+    assert optimized == p & ~q
+
+
+def test_not_optimize_or_right_not():
+    # ~(p | ~q) => ~p & q
+
+    p = fn_p(lambda x: x > 2)
+    q = fn_p(lambda x: x > 3)
+
+    predicate = ~(p | ~q)
+
+    assert can_optimize(predicate)
+
+    optimized = optimize(predicate)
+
+    assert optimized == ~p & q
+
+
+def test_not_optimize_and_left_not():
+    # ~(~p & q) => p | ~q
+
+    p = fn_p(lambda x: x > 2)
+    q = fn_p(lambda x: x > 3)
+
+    predicate = ~(~p & q)
+
+    assert can_optimize(predicate)
+
+    optimized = optimize(predicate)
+
+    assert optimized == p | ~q
+
+
+def test_not_optimize_and_right_not():
+    # ~(p & ~q) => ~p | q
+
+    p = fn_p(lambda x: x > 2)
+    q = fn_p(lambda x: x > 3)
+
+    predicate = ~(p & ~q)
+
+    assert can_optimize(predicate)
+
+    optimized = optimize(predicate)
+
+    assert optimized == ~p | q

@@ -7,7 +7,7 @@ def test_negate_eq():
 
     negated = negate(eq_2)
 
-    assert negated == ~ne_p(2)
+    assert negated == ne_p(2)
 
 
 def test_negate_ne():
@@ -15,7 +15,7 @@ def test_negate_ne():
 
     negated = negate(ne_2)
 
-    assert negated == ~eq_p(2)
+    assert negated == eq_p(2)
 
 
 def test_negate_lt():

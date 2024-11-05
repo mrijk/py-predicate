@@ -265,3 +265,17 @@ def test_or_optimize_in_or_eq():
     optimized = optimize(predicate)
 
     assert optimized == in_p(2, 3, 4, 5)
+
+
+def test_optimize_nested_or():
+    p = fn_p(lambda x: x * x > 2)
+    q = fn_p(lambda x: x * x > 1)
+    r = ~p
+
+    predicate = p | q | r
+
+    assert can_optimize(predicate)
+
+    optimized = optimize(predicate)
+
+    assert optimized == always_true_p

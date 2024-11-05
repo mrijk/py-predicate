@@ -46,7 +46,7 @@ def test_optimize_all_any():
 
     optimized = optimize(predicate)
 
-    assert optimized == ~any_p(predicate=any_p(eq_2))
+    assert optimized == all_p(predicate=all_p(ne_p(2)))
 
 
 def test_optimize_all_not():

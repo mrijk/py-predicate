@@ -58,6 +58,7 @@ def optimize_xor_predicate[T](predicate: XorPredicate[T]) -> Predicate[T]:
             return xor_left  # p ^ q ^ q = p
 
     return predicate
+    # return XorPredicate(left=left, right=right)
 
     # return XorPredicate(left=left, right=right)
 

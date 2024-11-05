@@ -87,7 +87,7 @@ def test_and_optimize_true_and_false():
     always_false = always_true_p & always_false_p
 
     assert is_and_p(always_false)
-    assert can_optimize(always_false) is True
+    assert can_optimize(always_false)
 
     optimized = optimize(always_false)
 
@@ -99,7 +99,7 @@ def test_and_optimize_false_and_true():
     always_false = always_false_p & always_true_p
 
     assert is_and_p(always_false)
-    assert can_optimize(always_false) is True
+    assert can_optimize(always_false)
 
     optimized = optimize(always_false)
 
@@ -115,7 +115,7 @@ def test_and_optimize_eq():
     same = p_1 & p_2
 
     assert is_and_p(same)
-    assert can_optimize(same) is True
+    assert can_optimize(same)
 
     optimized = optimize(same)
 
@@ -124,7 +124,7 @@ def test_and_optimize_eq():
     not_same = p_1 & p_3
 
     assert is_and_p(not_same)
-    assert can_optimize(not_same) is False
+    assert not can_optimize(not_same)
 
     not_optimized = optimize(not_same)
 
@@ -140,7 +140,7 @@ def test_and_optimize_not_right():
     same = p_1 & ~p_2
 
     assert is_and_p(same)
-    assert can_optimize(same) is True
+    assert can_optimize(same)
 
     optimized = optimize(same)
 
@@ -149,7 +149,7 @@ def test_and_optimize_not_right():
     not_same = p_1 & ~p_3
 
     assert is_and_p(not_same)
-    assert can_optimize(not_same) is False
+    assert not can_optimize(not_same)
 
     not_optimized = optimize(not_same)
 
@@ -165,7 +165,7 @@ def test_and_optimize_not_left():
     same = ~p_1 & p_2
 
     assert is_and_p(same)
-    assert can_optimize(same) is True
+    assert can_optimize(same)
 
     optimized = optimize(same)
 
@@ -174,7 +174,7 @@ def test_and_optimize_not_left():
     not_same = p_1 & ~p_3
 
     assert is_and_p(not_same)
-    assert can_optimize(not_same) is False
+    assert not can_optimize(not_same)
 
     not_optimized = optimize(not_same)
 
@@ -188,7 +188,7 @@ def test_optimize_eq_v1_eq_v2():
 
     predicate = p1 & p2
 
-    assert can_optimize(predicate) is True
+    assert can_optimize(predicate)
 
     optimized = optimize(predicate)
 
@@ -202,7 +202,7 @@ def test_optimize_eq_v1_eq_v1():
 
     predicate = p1 & p2
 
-    assert can_optimize(predicate) is True
+    assert can_optimize(predicate)
 
     optimized = optimize(predicate)
 
@@ -216,7 +216,7 @@ def test_optimize_eq_v1_ge_v1():
 
     predicate = p1 & p2
 
-    assert can_optimize(predicate) is True
+    assert can_optimize(predicate)
 
     optimized = optimize(predicate)
 
@@ -231,7 +231,7 @@ def test_optimize_eq_v1_ge_v2():
 
     predicate = p1 & p2
 
-    assert can_optimize(predicate) is True
+    assert can_optimize(predicate)
 
     optimized = optimize(predicate)
 
@@ -393,18 +393,18 @@ def test_optimize_nested_and():
     assert optimized == always_false_p
 
 
-# def test_optimize_nested_and_2():
-#     p1 = ge_p(2)
-#     p2 = ge_p(3)
-#     p3 = lt_p(2)
-#
-#     predicate = p1 & p2 & p3
+def test_optimize_nested_and_2():
+    p = fn_p(lambda x: x * x > 2)
+    q = fn_p(lambda x: x * x > 1)
+    r = ~p
 
-# assert can_optimize(predicate)
-#
-# optimized = optimize(predicate)
-#
-# assert optimized == always_false_p
+    predicate = p & q & r
+
+    assert can_optimize(predicate)
+
+    optimized = optimize(predicate)
+
+    assert optimized == always_false_p
 
 
 def test_optimize_ge_and_lt():

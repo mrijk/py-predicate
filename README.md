@@ -1,4 +1,5 @@
-![example workflow](https://github.com/mrijk/py-predicate/actions/workflows/test.yaml/badge.svg)
+![Documentation](https://github.com/mrijk/py-predicate/actions/workflows/pages.yaml/badge.svg)
+![Test](https://github.com/mrijk/py-predicate/actions/workflows/test.yaml/badge.svg)
 [![codecov](https://codecov.io/gh/mrijk/py-predicate/graph/badge.svg?token=KMBDJNC3W9)](https://codecov.io/gh/mrijk/py-predicate)
 
 # Introduction
