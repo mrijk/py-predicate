@@ -90,10 +90,10 @@ def optimize_and_predicate[T](predicate: AndPredicate[T]) -> Predicate[T]:
             # All(p1) & All(p2) => All(p1 & p2)
             return optimize(AllPredicate(predicate=optimize(AndPredicate(left=left_all, right=right_all))))
 
-        case AndPredicate() as and_predicate, _ if and_contains_negate(and_predicate, right):
+        case _, _ if and_contains_negate(predicate, right):
             return AlwaysFalsePredicate()  # p & q & ... & ~p == False
 
-        case _, AndPredicate() as and_predicate if and_contains_negate(and_predicate, left):
+        case _, _ if and_contains_negate(predicate, left):
             return AlwaysFalsePredicate()  # q & p & ... & ~p == False
 
         case _, _ if left == negate(right):

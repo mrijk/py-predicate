@@ -92,11 +92,11 @@ def optimize_or_predicate[T](predicate: OrPredicate[T]) -> Predicate[T]:
         case AnyPredicate(left_any), AnyPredicate(right_any):
             return AnyPredicate(optimize(OrPredicate(left=left_any, right=right_any)))
 
-        case OrPredicate() as or_predicate, _ if or_contains_negate(or_predicate, right):
-            return AlwaysTruePredicate()  # p | q | ... | ~p == False
+        case _, _ if or_contains_negate(predicate, right):
+            return AlwaysTruePredicate()  # p | q | ... | ~p == True
 
-        case _, OrPredicate() as or_predicate if or_contains_negate(or_predicate, left):
-            return AlwaysTruePredicate()  # q | p | ... | ~p == False
+        case _, _ if or_contains_negate(predicate, left):
+            return AlwaysTruePredicate()  # q | p | ... | ~p == True
 
     return OrPredicate(left=left, right=right)
 

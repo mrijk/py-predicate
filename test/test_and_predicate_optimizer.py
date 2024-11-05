@@ -398,7 +398,7 @@ def test_optimize_nested_and_2():
     q = fn_p(lambda x: x * x > 1)
     r = ~p
 
-    predicate = p & q & r
+    predicate = p & (q & r)
 
     assert can_optimize(predicate)
 
