@@ -1,7 +1,7 @@
 import click
 
 from predicate.formatter.format_dot import to_dot
-from predicate.standard_predicates import ge_p, lt_p, le_p
+from predicate.standard_predicates import ge_p, le_p, lt_p
 
 
 @click.command()
@@ -14,11 +14,6 @@ def cli(predicate: str, filename, optimize: bool) -> None:
     # predicate_string = "x in {2, 3, 4} | x not in {4, 5}"
 
     # parsed = parse_string(predicate)
-
-    ge_2 = ge_p(2)
-    lt_2 = ~ge_2
-
-    # parsed = ge_2 & lt_2
 
     p1 = ge_p(2)
     p3 = lt_p(2)
