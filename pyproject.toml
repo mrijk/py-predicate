@@ -1,9 +1,12 @@
-[tool.flit.metadata]
-module = "predicate"
-dist-name = "py-predicate"
-author = "Maurits Rijk"
-author-email = "maurits.rijk@gmail.com"
-home-page = "https://github.com/mrijk/py-predicate"
+[build-system]
+requires = ["flit_core>=3.4"]
+build-backend = "flit_core.buildapi"
+
+[project]
+name = "py_predicate"
+description = "Module to create composable predicates"
+version = "0.1"
+authors = [{name = "Maurits Rijk", email = "maurits.rijk@gmail.com"}]
 classifiers = [
     "Intended Audience :: Information Technology",
     "Intended Audience :: Developers",
@@ -22,21 +25,23 @@ classifiers = [
     "Programming Language :: Python :: 3.13",
     "Programming Language :: Python :: 3.12",
 ]
-requires = [
+dependencies = [
     "graphviz",
     "more-itertools"
 ]
-description-file = "README.md"
+readme = "README.md"
 requires-python = ">=3.12"
 
-[tool.flit.metadata.requires-extra]
+[project.urls]
+Source = "https://github.com/mrijk/py-predicate"
+
+[project.optional-dependencies]
 test = [
     "black",
     "mypy",
     "mypy_extensions",
     "pytest",
     "pytest-cov",
-    "pytest-asyncio",
     "ruff",
 ]
 dev = [
@@ -44,6 +49,9 @@ dev = [
     "jsonschema",
     "pre-commit",
 ]
+
+[tool.flit.module]
+name = "predicate"
 
 [tool.black]
 line-length = 120

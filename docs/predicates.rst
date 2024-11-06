@@ -20,7 +20,7 @@ The equivalent code without using predicates could be something like:
 
 .. code-block:: python
 
-    def all_int(iter: Iterable) -> bool
+    def all_int(iter: Iterable) -> bool:
         return all(isinstance(ele, int) for ele in iter)
 
 
@@ -68,7 +68,14 @@ This predicates tests for greater or equal a value.
 gt_p
 ----
 
+This predicates tests for greater than a value.
 
+.. code-block:: python
+
+    gt_2 = gt_p(2)
+
+    assert not gt_2(2)
+    assert gt_2(3)
 
 le_p
 ----
