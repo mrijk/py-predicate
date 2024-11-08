@@ -5,7 +5,7 @@ build-backend = "flit_core.buildapi"
 [project]
 name = "py_predicate"
 description = "Module to create composable predicates"
-version = "0.1"
+version = "0.2"
 authors = [{name = "Maurits Rijk", email = "maurits.rijk@gmail.com"}]
 classifiers = [
     "Intended Audience :: Information Technology",
@@ -30,7 +30,6 @@ dependencies = [
     "more-itertools"
 ]
 readme = "README.md"
-#requires-python = ">=3.12"
 
 [project.urls]
 Source = "https://github.com/mrijk/py-predicate"
@@ -60,7 +59,6 @@ line-length = 120
 lint.ignore = [
     "C901",
     "D100",
-    "D101",
     "D102",
     "D103",
     "D104",

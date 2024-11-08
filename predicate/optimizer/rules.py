@@ -11,6 +11,8 @@ from predicate.predicate import (
 
 @dataclass
 class WildcardPredicate[T](Predicate[T]):
+    """A class to represent a wildcard predicate."""
+
     def __call__(self, *args, **kwargs) -> bool:
         return False
 

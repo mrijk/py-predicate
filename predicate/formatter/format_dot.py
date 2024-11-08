@@ -78,8 +78,6 @@ def render(dot, predicate: Predicate, node_nr):
                 return add_node("eq", label=f"x = {v}")
             case FnPredicate(predicate_fn):
                 name = predicate_fn.__code__.co_name
-                # code = inspect.getsource(predicate_fn)
-                # m = re.match(r".*\(predicate_fn=(.*)\)", code)
                 return add_node("fn", label=f"fn: {name}")
             case GePredicate(v):
                 return add_node("ge", label=f"x ≥ {v}")

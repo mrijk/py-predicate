@@ -1,10 +1,14 @@
 from abc import abstractmethod
 from dataclasses import dataclass
-from typing import Callable, Iterable, Self, cast
+from datetime import datetime
+from typing import Callable, Final, Iterable, Self, cast
+from uuid import UUID
 
 
 @dataclass
 class Predicate[T]:
+    """An abstract class to represent a predicate."""
+
     @abstractmethod
     def __call__(self, *args, **kwargs) -> bool:
         raise NotImplementedError
@@ -24,6 +28,8 @@ class Predicate[T]:
 
 @dataclass
 class FnPredicate[T](Predicate[T]):
+    """A predicate class that can hold a function."""
+
     predicate_fn: Callable[[T], bool]
 
     def __call__(self, x: T) -> bool:
@@ -32,6 +38,19 @@ class FnPredicate[T](Predicate[T]):
 
 @dataclass
 class AndPredicate[T](Predicate[T]):
+    """A predicate class that models the 'and' predicate.
+
+    ```
+
+    Attributes
+    ----------
+    left: Predicate[T]
+        left predicate of the AndPredicate
+    right: Predicate[T]
+        right predicate of the AndPredicate
+
+    """
+
     left: Predicate[T]
     right: Predicate[T]
 
@@ -48,6 +67,18 @@ class AndPredicate[T](Predicate[T]):
 
 @dataclass
 class NotPredicate[T](Predicate[T]):
+    """A predicate class that models the 'not' predicate.
+
+    ```
+
+    Attributes
+    ----------
+    predicate: Predicate[T]
+        predicate that will be negated
+
+
+    """
+
     predicate: Predicate[T]
 
     def __call__(self, x: T) -> bool:
@@ -56,6 +87,19 @@ class NotPredicate[T](Predicate[T]):
 
 @dataclass
 class OrPredicate[T](Predicate[T]):
+    """A predicate class that models the 'or' predicate.
+
+    ```
+
+    Attributes
+    ----------
+    left: Predicate[T]
+        left predicate of the OrPredicate
+    right: Predicate[T]
+        right predicate of the OrPredicate
+
+    """
+
     left: Predicate[T]
     right: Predicate[T]
 
@@ -72,6 +116,19 @@ class OrPredicate[T](Predicate[T]):
 
 @dataclass
 class XorPredicate[T](Predicate[T]):
+    """A predicate class that models the 'xor' predicate.
+
+    ```
+
+    Attributes
+    ----------
+    left: Predicate[T]
+        left predicate of the XorPredicate
+    right: Predicate[T]
+        right predicate of the XorPredicate
+
+    """
+
     left: Predicate[T]
     right: Predicate[T]
 
@@ -88,6 +145,8 @@ class XorPredicate[T](Predicate[T]):
 
 @dataclass
 class InPredicate[T](Predicate[T]):
+    """A predicate class that models the 'in' predicate."""
+
     v: set[T]
 
     def __init__(self, v: Iterable[T]):
@@ -102,6 +161,8 @@ class InPredicate[T](Predicate[T]):
 
 @dataclass
 class NotInPredicate[T](Predicate[T]):
+    """A predicate class that models the 'not in' predicate."""
+
     v: set[T]
 
     def __init__(self, v: Iterable[T]):
@@ -116,6 +177,8 @@ class NotInPredicate[T](Predicate[T]):
 
 @dataclass
 class EqPredicate[T](Predicate[T]):
+    """A predicate class that models the 'eq' (=) predicate."""
+
     v: T
 
     def __call__(self, x: T) -> bool:
@@ -127,6 +190,8 @@ class EqPredicate[T](Predicate[T]):
 
 @dataclass
 class NePredicate[T](Predicate[T]):
+    """A predicate class that models the 'ne' (!=) predicate."""
+
     v: T
 
     def __call__(self, x: T) -> bool:
@@ -137,7 +202,9 @@ class NePredicate[T](Predicate[T]):
 
 
 @dataclass
-class GePredicate[T: (int, str)](Predicate[T]):
+class GePredicate[T: (int, str, datetime, UUID)](Predicate[T]):
+    """A predicate class that models the 'ge' (>=) predicate."""
+
     v: T
 
     def __call__(self, x: T) -> bool:
@@ -148,7 +215,9 @@ class GePredicate[T: (int, str)](Predicate[T]):
 
 
 @dataclass
-class GtPredicate[T: (int, str)](Predicate[T]):
+class GtPredicate[T: (int, str, datetime, UUID)](Predicate[T]):
+    """A predicate class that models the 'gt' (>) predicate."""
+
     v: T
 
     def __call__(self, x: T) -> bool:
@@ -159,7 +228,9 @@ class GtPredicate[T: (int, str)](Predicate[T]):
 
 
 @dataclass
-class LePredicate[T: (int, str)](Predicate[T]):
+class LePredicate[T: (int, str, datetime, UUID)](Predicate[T]):
+    """A predicate class that models the 'le' (<=) predicate."""
+
     v: T
 
     def __call__(self, x: T) -> bool:
@@ -170,29 +241,35 @@ class LePredicate[T: (int, str)](Predicate[T]):
 
 
 @dataclass
-class LtPredicate[T: (int, str)](Predicate[T]):
+class LtPredicate[T: (int, str, datetime, UUID)](Predicate[T]):
+    """A predicate class that models the 'lt' (<) predicate."""
+
     v: T
 
     def __call__(self, x: T) -> bool:
         return x < self.v
 
     def __eq__(self, other: object) -> bool:
-        return self.v == other.v if isinstance(other, LtPredicate) else False
+        return isinstance(other, LtPredicate) and self.v == other.v
 
 
 @dataclass
 class AllPredicate[T](Predicate[T]):
+    """A predicate class that models the 'all' predicate."""
+
     predicate: Predicate[T]
 
     def __call__(self, iter: Iterable[T]) -> bool:
         return all(self.predicate(x) for x in iter)
 
     def __eq__(self, other: object) -> bool:
-        return self.predicate == other.predicate if isinstance(other, AllPredicate) else False
+        return isinstance(other, AllPredicate) and self.predicate == other.predicate
 
 
 @dataclass
 class AnyPredicate[T](Predicate[T]):
+    """A predicate class that models the 'any' predicate."""
+
     predicate: Predicate[T]
 
     def __call__(self, iter: Iterable[T]) -> bool:
@@ -204,6 +281,8 @@ class AnyPredicate[T](Predicate[T]):
 
 @dataclass
 class IsEmptyPredicate[T](Predicate[T]):
+    """A predicate class that models the 'empty' predicate."""
+
     def __call__(self, iter: Iterable[T]) -> bool:
         return len(list(iter)) == 0
 
@@ -213,17 +292,21 @@ class IsEmptyPredicate[T](Predicate[T]):
 
 @dataclass
 class IsInstancePredicate[T](Predicate[T]):
+    """A predicate class that models the 'isinstance' predicate."""
+
     klass: type | tuple
 
     def __call__(self, x: object) -> bool:
         return isinstance(x, self.klass)
 
     def __eq__(self, other: object) -> bool:
-        return self.klass == other.klass if isinstance(other, IsInstancePredicate) else False
+        return isinstance(other, IsInstancePredicate) and self.klass == other.klass
 
 
 @dataclass
 class AlwaysTruePredicate(Predicate):
+    """A predicate class that models the 'True' predicate."""
+
     def __call__(self, *args, **kwargs):
         return True
 
@@ -233,6 +316,8 @@ class AlwaysTruePredicate(Predicate):
 
 @dataclass
 class AlwaysFalsePredicate(Predicate):
+    """A predicate class that models the 'False' predicate."""
+
     def __call__(self, *args, **kwargs):
         return False
 
@@ -242,6 +327,8 @@ class AlwaysFalsePredicate(Predicate):
 
 @dataclass
 class IsNonePredicate[T](Predicate[T]):
+    """A predicate class that models the 'is none' predicate."""
+
     def __call__(self, x: T) -> bool:
         return x is None
 
@@ -251,6 +338,8 @@ class IsNonePredicate[T](Predicate[T]):
 
 @dataclass
 class IsNotNonePredicate[T](Predicate[T]):
+    """A predicate class that models the 'is not none' predicate."""
+
     def __call__(self, x: T) -> bool:
         return x is not None
 
@@ -258,6 +347,11 @@ class IsNotNonePredicate[T](Predicate[T]):
         return isinstance(other, IsNotNonePredicate)
 
 
-always_true_p: AlwaysTruePredicate = AlwaysTruePredicate()
-always_false_p: AlwaysFalsePredicate = AlwaysFalsePredicate()
-is_empty_p: IsEmptyPredicate = IsEmptyPredicate()
+always_true_p: Final[AlwaysTruePredicate] = AlwaysTruePredicate()
+"""Predicate that always evaluates to True."""
+
+always_false_p: Final[AlwaysFalsePredicate] = AlwaysFalsePredicate()
+"""Predicate that always evaluates to False."""
+
+is_empty_p: Final[IsEmptyPredicate] = IsEmptyPredicate()
+"""Predicate that returns True if the iterable is empty, otherwise False."""
