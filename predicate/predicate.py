@@ -355,3 +355,17 @@ always_false_p: Final[AlwaysFalsePredicate] = AlwaysFalsePredicate()
 
 is_empty_p: Final[IsEmptyPredicate] = IsEmptyPredicate()
 """Predicate that returns True if the iterable is empty, otherwise False."""
+
+
+@dataclass
+class NamedPredicate(Predicate):
+    """A predicate class to generate truth tables."""
+
+    name: str
+    v: bool = False
+
+    def __call__(self, *args) -> bool:
+        return self.v
+
+    def __eq__(self, other: object) -> bool:
+        return isinstance(other, IsNotNonePredicate)

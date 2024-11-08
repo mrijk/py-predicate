@@ -4,6 +4,7 @@ from uuid import UUID, uuid4
 import pytest
 
 from predicate import Predicate, always_false_p, always_true_p, ge_p, gt_p, le_p, lt_p
+from predicate.predicate import NamedPredicate
 from predicate.standard_predicates import (
     eq_false_p,
     eq_p,
@@ -247,6 +248,14 @@ def test_base_predicate():
     p = Predicate()
     with pytest.raises(NotImplementedError):
         p(1)
+
+
+def test_named_predicate():
+    p = NamedPredicate(name="p")
+    q = NamedPredicate(name="q")
+
+    assert not p(False)
+    assert p != q
 
 
 def test_lambda():

@@ -223,7 +223,7 @@ def test_optimize_in_xor_in():
     assert optimized == in_p(2, 3, 4, 5)
 
 
-def test_optimize_in_xor__in_empty():
+def test_optimize_in_xor_in_empty():
     p1 = in_p(2, 3, 4)
     p2 = in_p(2, 3, 4)
 
