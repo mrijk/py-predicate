@@ -9,7 +9,7 @@ from predicate import (
     lt_p,
     optimize,
 )
-from predicate.standard_predicates import any_p, eq_p, fn_p, in_p, le_p, ne_p, not_in_p
+from predicate.standard_predicates import any_p, eq_p, in_p, le_p, ne_p, not_in_p
 
 
 def test_or_optimize_true_left():
@@ -160,10 +160,8 @@ def test_optimize_or_any():
     assert optimized == any_p(ge_2)
 
 
-def test_optimize_to_xor_left():
+def test_optimize_to_xor_left(p, q):
     # (~p & q) | (p & ~q) == p ^ q
-    p = fn_p(lambda x: x == 2)
-    q = fn_p(lambda x: x in (2, 3))
 
     predicate = (~p & q) | (p & ~q)
 
@@ -174,10 +172,8 @@ def test_optimize_to_xor_left():
     assert optimized == p ^ q
 
 
-def test_optimize_to_xor_right():
+def test_optimize_to_xor_right(p, q):
     # (p & ~q) | (~p & q) == p ^ q
-    p = fn_p(lambda x: x == 2)
-    q = fn_p(lambda x: x in (2, 3))
 
     predicate = (p & ~q) | (~p & q)
 
@@ -186,6 +182,14 @@ def test_optimize_to_xor_right():
     optimized = optimize(predicate)
 
     assert optimized == p ^ q
+
+
+def test_or_optimize_not_optimize(p, q, r, s):
+    # (p & q) | (r & s)
+
+    predicate = (p & q) | (r & s)
+
+    assert not can_optimize(predicate)
 
 
 def test_optimize_multiple_eq():
@@ -267,9 +271,7 @@ def test_or_optimize_in_or_eq():
     assert optimized == in_p(2, 3, 4, 5)
 
 
-def test_optimize_nested_or():
-    p = fn_p(lambda x: x * x > 2)
-    q = fn_p(lambda x: x * x > 1)
+def test_optimize_nested_or(p, q):
     r = ~p
 
     predicate = p | q | r

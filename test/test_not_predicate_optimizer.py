@@ -6,7 +6,6 @@ from predicate.standard_predicates import (
     all_p,
     any_p,
     eq_p,
-    fn_p,
     gt_p,
     in_p,
     is_none_p,
@@ -157,8 +156,7 @@ def test_not_optimize_all():
     assert optimized == any_p(lt_p(2))
 
 
-def test_not_optimize_all_skip():
-    p = fn_p(lambda x: x > 2)
+def test_not_optimize_all_skip(p):
     predicate = ~all_p(~p)
 
     assert can_optimize(predicate)
@@ -200,11 +198,8 @@ def test_not_not_in():
     assert optimized == not_in_p(2, 3, 4)
 
 
-def test_not_optimize_or_left_not():
+def test_not_optimize_or_left_not(p, q):
     # ~(~p | q) => p & ~q
-
-    p = fn_p(lambda x: x > 2)
-    q = fn_p(lambda x: x > 3)
 
     predicate = ~(~p | q)
 
@@ -215,11 +210,8 @@ def test_not_optimize_or_left_not():
     assert optimized == p & ~q
 
 
-def test_not_optimize_or_right_not():
+def test_not_optimize_or_right_not(p, q):
     # ~(p | ~q) => ~p & q
-
-    p = fn_p(lambda x: x > 2)
-    q = fn_p(lambda x: x > 3)
 
     predicate = ~(p | ~q)
 
@@ -230,11 +222,16 @@ def test_not_optimize_or_right_not():
     assert optimized == ~p & q
 
 
-def test_not_optimize_and_left_not():
-    # ~(~p & q) => p | ~q
+def test_not_optimize_or_cant_optimize(p, q):
+    # ~(p | q) => ~(p | q)
 
-    p = fn_p(lambda x: x > 2)
-    q = fn_p(lambda x: x > 3)
+    predicate = ~(p | q)
+
+    assert not can_optimize(predicate)
+
+
+def test_not_optimize_and_left_not(p, q):
+    # ~(~p & q) => p | ~q
 
     predicate = ~(~p & q)
 
@@ -245,11 +242,8 @@ def test_not_optimize_and_left_not():
     assert optimized == p | ~q
 
 
-def test_not_optimize_and_right_not():
+def test_not_optimize_and_right_not(p, q):
     # ~(p & ~q) => ~p | q
-
-    p = fn_p(lambda x: x > 2)
-    q = fn_p(lambda x: x > 3)
 
     predicate = ~(p & ~q)
 
@@ -260,11 +254,8 @@ def test_not_optimize_and_right_not():
     assert optimized == ~p | q
 
 
-def test_not_optimize_and_cant_optimize():
+def test_not_optimize_and_cant_optimize(p, q):
     # ~(p & q) => ~(p & q)
-
-    p = fn_p(lambda x: x > 2)
-    q = fn_p(lambda x: x > 3)
 
     predicate = ~(p & q)
 

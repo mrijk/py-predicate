@@ -64,6 +64,8 @@ def optimize_or_predicate[T](predicate: OrPredicate[T]) -> Predicate[T]:
                 ) if left_not == q and right_not == p:
                     # (p & ~q) | (~p & q) == p ^ q
                     return p ^ q
+                case _:
+                    return OrPredicate(left=left, right=right)
 
         case _, AndPredicate(and_left, and_right):
             match and_left:

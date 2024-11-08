@@ -96,9 +96,6 @@ def optimize_and_predicate[T](predicate: AndPredicate[T]) -> Predicate[T]:
         case _, _ if and_contains_negate(predicate, left):
             return AlwaysFalsePredicate()  # q & p & ... & ~p == False
 
-        case _, _ if left == negate(right):
-            return AlwaysFalsePredicate()  # p & ~p == False
-
         case _, _ if left == right:  # p & p == p
             return left
 

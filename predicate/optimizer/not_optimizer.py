@@ -32,7 +32,7 @@ def optimize_not_predicate[T](predicate: NotPredicate[T]) -> Predicate[T]:
                     return OrPredicate(left=negate(left), right=not_predicate)  # ~(p & ~q) => ~p | q
                 case NotPredicate(not_predicate), _:
                     return OrPredicate(left=not_predicate, right=negate(right))  # ~(~p & q) => p | ~q
-                case _, _:
+                case _:
                     return negate(optimized)
 
         case AnyPredicate(any_predicate):
@@ -46,6 +46,8 @@ def optimize_not_predicate[T](predicate: NotPredicate[T]) -> Predicate[T]:
                     return AndPredicate(left=negate(left), right=not_predicate)  # ~(p | ~q) => ~p & q
                 case NotPredicate(not_predicate), _:
                     return AndPredicate(left=not_predicate, right=negate(right))  # ~(~p | q) => p & ~q
+                case _:
+                    return negate(optimized)
 
         case XorPredicate(left, right):
             match left, right:

@@ -221,3 +221,17 @@ def test_optimize_xor_4():
     optimized = optimize(predicate)
 
     assert optimized == ~(p | q)
+
+
+def test_optimize_xor_5(p, q):
+    # p ^ (p & q) = p & ~q
+
+    predicate = p ^ (p & q)
+
+    assert is_xor_p(predicate)
+
+    assert can_optimize(predicate)
+
+    optimized = optimize(predicate)
+
+    assert optimized == p & ~q

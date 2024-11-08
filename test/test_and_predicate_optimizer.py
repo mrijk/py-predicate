@@ -291,6 +291,19 @@ def test_optimize_not_none_and_none():
 
 def test_optimize_in_and_in():
     p1 = in_p(2, 3)
+    p2 = in_p(2, 3, 4)
+
+    predicate = p1 & p2
+
+    assert can_optimize(predicate)
+
+    optimized = optimize(predicate)
+
+    assert optimized == in_p(2, 3)
+
+
+def test_optimize_in_and_in_single():
+    p1 = in_p(2, 3)
     p2 = in_p(3, 4)
 
     predicate = p1 & p2
@@ -300,6 +313,19 @@ def test_optimize_in_and_in():
     optimized = optimize(predicate)
 
     assert optimized == eq_p(3)
+
+
+def test_optimize_in_and_in_empty():
+    p1 = in_p(2, 3)
+    p2 = in_p(4, 5)
+
+    predicate = p1 & p2
+
+    assert can_optimize(predicate)
+
+    optimized = optimize(predicate)
+
+    assert optimized == always_false_p
 
 
 def test_optimize_in_and_not_in():
@@ -329,7 +355,7 @@ def test_optimize_in_and_not_in_single():
 
 
 def test_optimize_in_and_not_in_empty():
-    p1 = in_p(2, 3, 4)
+    p1 = in_p(2, 3)
     p2 = not_in_p(2, 3, 4)
 
     predicate = p1 & p2
