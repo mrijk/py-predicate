@@ -1,21 +1,12 @@
 from helpers import is_or_p
 
-from predicate import (
-    always_false_p,
-    always_true_p,
-    can_optimize,
-    ge_p,
-    gt_p,
-    lt_p,
-    optimize,
-)
-from predicate.standard_predicates import any_p, eq_p, in_p, le_p, ne_p, not_in_p
+from predicate import always_false_p, always_true_p, can_optimize, ge_p, gt_p, optimize
+from predicate.standard_predicates import any_p, eq_p, in_p, ne_p, not_in_p
 
 
-def test_or_optimize_true_left():
+def test_or_optimize_true_left(p):
     # True | p == True
-    lt_2 = lt_p(2)
-    predicate = always_true_p | lt_2
+    predicate = always_true_p | p
 
     assert is_or_p(predicate)
     assert can_optimize(predicate)
@@ -25,41 +16,38 @@ def test_or_optimize_true_left():
     assert optimized == always_true_p
 
 
-def test_or_optimize_right_false():
+def test_or_optimize_right_false(p):
     # p | False == p
-    lt_2 = lt_p(2)
-    predicate = lt_2 | always_false_p
+    predicate = p | always_false_p
 
     assert is_or_p(predicate)
     assert can_optimize(predicate)
 
     optimized = optimize(predicate)
 
-    assert optimized == lt_2
+    assert optimized == p
 
 
-def test_or_optimize_left_false():
+def test_or_optimize_left_false(p):
     # False | p == p
-    lt_2 = lt_p(2)
-    false_or_lt_2 = always_false_p | lt_2
+    predicate = always_false_p | p
 
-    assert is_or_p(false_or_lt_2)
-    assert can_optimize(false_or_lt_2)
+    assert is_or_p(predicate)
+    assert can_optimize(predicate)
 
-    optimized = optimize(false_or_lt_2)
+    optimized = optimize(predicate)
 
-    assert optimized == lt_2
+    assert optimized == p
 
 
-def test_or_optimize_true_right():
+def test_or_optimize_true_right(p):
     # p | True == True
-    lt_2 = lt_p(2)
-    always_true = lt_2 | always_true_p
+    predicate = p | always_true_p
 
-    assert is_or_p(always_true)
-    assert can_optimize(always_true)
+    assert is_or_p(predicate)
+    assert can_optimize(predicate)
 
-    optimized = optimize(always_true)
+    optimized = optimize(predicate)
 
     assert optimized == always_true_p
 
@@ -89,12 +77,10 @@ def test_or_optimize_eq():
     assert not_optimized == not_same
 
 
-def test_or_optimize_right_not_same():
+def test_or_optimize_right_not_same(p):
     # p | ~p == True
-    p_1 = gt_p(2)
-    p_2 = gt_p(2)
 
-    predicate = p_1 | ~p_2
+    predicate = p | ~p
 
     assert is_or_p(predicate)
     assert can_optimize(predicate)
@@ -104,12 +90,9 @@ def test_or_optimize_right_not_same():
     assert optimized == always_true_p
 
 
-def test_or_optimize_negate():
+def test_or_optimize_negate(p):
     # p | ~p == True
-    p_1 = gt_p(2)
-    p_2 = le_p(2)
-
-    predicate = p_1 | p_2
+    predicate = p | ~p
 
     assert is_or_p(predicate)
     assert can_optimize(predicate)
@@ -119,12 +102,9 @@ def test_or_optimize_negate():
     assert optimized == always_true_p
 
 
-def test_or_optimize_left_not_same():
+def test_or_optimize_left_not_same(p):
     # ~p | p == True
-    p_1 = gt_p(2)
-    p_2 = gt_p(2)
-
-    predicate = ~p_1 | p_2
+    predicate = ~p | p
 
     assert is_or_p(predicate)
     assert can_optimize(predicate)
@@ -134,11 +114,8 @@ def test_or_optimize_left_not_same():
     assert optimized == always_true_p
 
 
-def test_or_optimize_not_not_same():
+def test_or_optimize_not_not_same(p, q):
     # p | ~q with p != q
-    p = gt_p(2)
-    q = gt_p(3)
-
     predicate = p | q
 
     assert is_or_p(predicate)
@@ -207,10 +184,10 @@ def test_optimize_multiple_eq():
 
 
 def test_optimize_in_and_not_in():
-    p1 = in_p(2, 3)
-    p2 = not_in_p(2, 3, 4, 5)
+    p = in_p(2, 3)
+    q = not_in_p(2, 3, 4, 5)
 
-    predicate = p1 | p2
+    predicate = p | q
 
     assert can_optimize(predicate)
 
@@ -220,10 +197,10 @@ def test_optimize_in_and_not_in():
 
 
 def test_optimize_in_and_not_in_single():
-    p1 = in_p(2)
-    p2 = not_in_p(2, 3)
+    p = in_p(2)
+    q = not_in_p(2, 3)
 
-    predicate = p1 | p2
+    predicate = p | q
 
     assert can_optimize(predicate)
 
@@ -233,8 +210,8 @@ def test_optimize_in_and_not_in_single():
 
 
 def test_optimize_in_and_not_in_empty():
-    p1 = in_p(2)
-    p2 = not_in_p(2)
+    p1 = in_p(3, 4, 5)
+    p2 = not_in_p(4, 5)
 
     predicate = p1 | p2
 
@@ -259,10 +236,10 @@ def test_or_optimize_eq_or_in():
 
 
 def test_or_optimize_in_or_eq():
-    p1 = in_p(2, 3, 4)
-    p2 = eq_p(5)
+    p = in_p(2, 3, 4)
+    q = eq_p(5)
 
-    predicate = p1 | p2
+    predicate = p | q
 
     assert can_optimize(predicate)
 
@@ -272,9 +249,17 @@ def test_or_optimize_in_or_eq():
 
 
 def test_optimize_nested_or(p, q):
-    r = ~p
+    predicate = p | q | ~p
 
-    predicate = p | q | r
+    assert can_optimize(predicate)
+
+    optimized = optimize(predicate)
+
+    assert optimized == always_true_p
+
+
+def test_optimize_nested_or_1(p, q, r, s):
+    predicate = p | q | r | s | ~q
 
     assert can_optimize(predicate)
 

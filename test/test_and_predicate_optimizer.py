@@ -6,10 +6,9 @@ from predicate.predicate import is_empty_p
 from predicate.standard_predicates import all_p, eq_p, fn_p, in_p, is_none_p, is_not_none_p, lt_p, ne_p, not_in_p
 
 
-def test_and_optimize_right_false():
+def test_and_optimize_right_false(p):
     # p & False == False
-    ge_4 = ge_p(4)
-    predicate = ge_4 & always_false_p
+    predicate = p & always_false_p
 
     assert is_and_p(predicate)
     assert can_optimize(predicate)
@@ -19,10 +18,9 @@ def test_and_optimize_right_false():
     assert is_false_p(optimized)
 
 
-def test_and_optimize_right_true():
+def test_and_optimize_right_true(p):
     # p & True == p
-    ge_4 = ge_p(4)
-    predicate = ge_4 & always_true_p
+    predicate = p & always_true_p
 
     assert is_and_p(predicate)
     assert can_optimize(predicate)
@@ -32,10 +30,9 @@ def test_and_optimize_right_true():
     assert not is_and_p(optimized)
 
 
-def test_and_optimize_left_false():
+def test_and_optimize_left_false(p):
     # False & p == False
-    ge_4 = ge_p(4)
-    predicate = always_false_p & ge_4
+    predicate = always_false_p & p
 
     assert is_and_p(predicate)
     assert can_optimize(predicate)
@@ -45,10 +42,9 @@ def test_and_optimize_left_false():
     assert is_false_p(optimized)
 
 
-def test_and_optimize_left_true():
+def test_and_optimize_left_true(p):
     # True & p == p
-    ge_4 = ge_p(4)
-    predicate = always_true_p & ge_4
+    predicate = always_true_p & p
 
     assert is_and_p(predicate)
     assert can_optimize(predicate)
@@ -419,12 +415,18 @@ def test_optimize_nested_and():
     assert optimized == always_false_p
 
 
-def test_optimize_nested_and_2():
-    p = fn_p(lambda x: x * x > 2)
-    q = fn_p(lambda x: x * x > 1)
-    r = ~p
+def test_optimize_nested_and_2(p, q):
+    predicate = p & (q & ~p)
 
-    predicate = p & (q & r)
+    assert can_optimize(predicate)
+
+    optimized = optimize(predicate)
+
+    assert optimized == always_false_p
+
+
+def test_optimize_nested_and_3(p, q, r, s):
+    predicate = p & q & r & s & ~p
 
     assert can_optimize(predicate)
 

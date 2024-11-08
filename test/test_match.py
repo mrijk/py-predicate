@@ -2,6 +2,7 @@ import pytest
 
 from predicate import always_false_p, always_true_p, ge_p
 from predicate.optimizer.predicate_optimizer import match
+from predicate.optimizer.rules import WildcardPredicate
 
 
 @pytest.mark.skip()
@@ -69,3 +70,9 @@ def test_match_and_predicate_true():
 
     assert rule
     # assert rule["to"] == p
+
+
+def test_wildcard():
+    wildcard = WildcardPredicate()
+
+    assert not wildcard()

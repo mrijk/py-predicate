@@ -34,17 +34,13 @@ def optimize_or_predicate[T](predicate: OrPredicate[T]) -> Predicate[T]:
 
     match left, right:
         case _, AlwaysFalsePredicate():
-            # p | False == p
-            return left
+            return left  # p | False == p
         case AlwaysFalsePredicate(), _:
-            # False | p == p
-            return right
+            return right  # False | p == p
         case _, AlwaysTruePredicate():
-            # p | True == True
-            return AlwaysTruePredicate()
+            return AlwaysTruePredicate()  # p | True == True
         case AlwaysTruePredicate(), _:
-            # True | p == True
-            return AlwaysTruePredicate()
+            return AlwaysTruePredicate()  # True | p == True
 
         case AndPredicate(and_left_left, and_left_right), AndPredicate(and_right_left, and_right_right):
             match and_left_left, and_left_right, and_right_left, and_right_right:
@@ -54,16 +50,14 @@ def optimize_or_predicate[T](predicate: OrPredicate[T]) -> Predicate[T]:
                     Predicate() as p,
                     NotPredicate(right_not),
                 ) if left_not == p and right_not == q:
-                    # (~p & q) | (p & ~q) == p ^ q
-                    return p ^ q
+                    return p ^ q  # (~p & q) | (p & ~q) == p ^ q
                 case (
                     Predicate() as p,
                     NotPredicate(left_not),
                     NotPredicate(right_not),
                     Predicate() as q,
                 ) if left_not == q and right_not == p:
-                    # (p & ~q) | (~p & q) == p ^ q
-                    return p ^ q
+                    return p ^ q  # (p & ~q) | (~p & q) == p ^ q
                 case _:
                     return OrPredicate(left=left, right=right)
 
