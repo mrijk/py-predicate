@@ -435,6 +435,16 @@ def test_optimize_nested_and_3(p, q, r, s):
     assert optimized == always_false_p
 
 
+def test_optimize_nested_and_4(p, q, r):
+    predicate = p & (q & r) & ~p
+
+    assert can_optimize(predicate)
+
+    optimized = optimize(predicate)
+
+    assert optimized == always_false_p
+
+
 def test_optimize_ge_and_lt():
     ge_4 = ge_p(4)
     lt_4 = lt_p(4)

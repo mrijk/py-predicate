@@ -108,11 +108,13 @@ def and_contains_negate(predicate: AndPredicate, sub_predicate: Predicate) -> bo
     from predicate.negate import negate
 
     match left := predicate.left, right := predicate.right:
+        # case AndPredicate() as and_left, AndPredicate() as and_right:
+        #     return and_contains_negate(and_left, sub_predicate) or and_contains_negate(and_right, sub_predicate)
+        case _ if negate(sub_predicate) in (left, right):
+            return True
         case AndPredicate() as and_left, _:
             return and_contains_negate(and_left, sub_predicate)
         case _, AndPredicate() as and_right:
             return and_contains_negate(and_right, sub_predicate)
-        case AndPredicate() as and_left, AndPredicate() as and_right:
-            return and_contains_negate(and_left, sub_predicate) or and_contains_negate(and_right, sub_predicate)
         case _:
             return negate(sub_predicate) in (left, right)

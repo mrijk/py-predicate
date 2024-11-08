@@ -113,9 +113,9 @@ def or_contains_negate(predicate: OrPredicate, sub_predicate: Predicate) -> bool
     match left := predicate.left, right := predicate.right:
         case OrPredicate() as or_left, _:
             return or_contains_negate(or_left, sub_predicate)
-        case _, OrPredicate() as or_right:
-            return or_contains_negate(or_right, sub_predicate)
-        case OrPredicate() as or_left, OrPredicate() as or_right:
-            return or_contains_negate(or_left, sub_predicate) or or_contains_negate(or_right, sub_predicate)
+        # case _, OrPredicate() as or_right:
+        #     return or_contains_negate(or_right, sub_predicate)
+        # case OrPredicate() as or_left, OrPredicate() as or_right:
+        #     return or_contains_negate(or_left, sub_predicate) or or_contains_negate(or_right, sub_predicate)
         case _:
             return negate(sub_predicate) in (left, right)

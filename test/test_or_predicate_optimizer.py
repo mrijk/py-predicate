@@ -1,7 +1,7 @@
 from helpers import is_or_p
 
 from predicate import always_false_p, always_true_p, can_optimize, ge_p, gt_p, optimize
-from predicate.standard_predicates import any_p, eq_p, in_p, ne_p, not_in_p
+from predicate.standard_predicates import all_p, any_p, eq_p, in_p, ne_p, not_in_p
 
 
 def test_or_optimize_true_left(p):
@@ -81,6 +81,22 @@ def test_or_optimize_right_not_same(p):
     # p | ~p == True
 
     predicate = p | ~p
+
+    assert is_or_p(predicate)
+    assert can_optimize(predicate)
+
+    optimized = optimize(predicate)
+
+    assert optimized == always_true_p
+
+
+def test_or_optimize_right_not_same_after_optimization(p):
+    # p | ~p == True
+
+    q = all_p(p)
+    r = any_p(~p)
+
+    predicate = q | r
 
     assert is_or_p(predicate)
     assert can_optimize(predicate)
