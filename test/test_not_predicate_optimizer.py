@@ -258,3 +258,14 @@ def test_not_optimize_and_right_not():
     optimized = optimize(predicate)
 
     assert optimized == ~p | q
+
+
+def test_not_optimize_and_cant_optimize():
+    # ~(p & q) => ~(p & q)
+
+    p = fn_p(lambda x: x > 2)
+    q = fn_p(lambda x: x > 3)
+
+    predicate = ~(p & q)
+
+    assert not can_optimize(predicate)
