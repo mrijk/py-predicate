@@ -1,5 +1,6 @@
 import click
 
+from predicate import FnPredicate
 from predicate.formatter.format_dot import to_dot
 from predicate.standard_predicates import fn_p
 
@@ -15,9 +16,9 @@ def cli(predicate: str, filename, optimize: bool) -> None:
 
     # parsed = parse_string(predicate)
 
-    p = fn_p(lambda x: x > 2)
-    q = fn_p(lambda x: x > 3)
-    r = fn_p(lambda x: x > 4)
+    p: FnPredicate = fn_p(lambda x: x > 2)
+    q: FnPredicate = fn_p(lambda x: x > 3)
+    r: FnPredicate = fn_p(lambda x: x > 4)
 
     parsed = p | (q | r | ~p)
 
