@@ -4,17 +4,21 @@ from uuid import UUID, uuid4
 import pytest
 
 from predicate import Predicate, always_false_p, always_true_p, ge_p, gt_p, le_p, lt_p
-from predicate.predicate import NamedPredicate
+from predicate.predicate import NamedPredicate, is_empty_p
 from predicate.standard_predicates import (
+    all_p,
     eq_false_p,
     eq_p,
     eq_true_p,
     fn_p,
+    has_length_p,
     in_p,
+    is_bool_p,
     is_datetime_p,
     is_dict_p,
     is_instance_p,
     is_int_p,
+    is_iterable_p,
     is_list_p,
     is_not_none_p,
     is_str_p,
@@ -103,31 +107,33 @@ def test_uuid_ge_p():
 def test_gt_p():
     gt_2 = gt_p(2)
 
-    assert gt_2(2) is False
-    assert gt_2(3) is True
+    assert not gt_2(2)
+    assert gt_2(3)
 
 
 def test_le_p():
     le_2 = le_p(2)
 
-    assert le_2(1) is True
-    assert le_2(2) is True
-    assert le_2(3) is False
+    assert not le_2(3)
+    assert le_2(1)
+    assert le_2(2)
 
 
 def test_lt_p():
     lt_2 = lt_p(2)
 
-    assert lt_2(1) is True
-    assert lt_2(2) is False
+    assert not lt_2(2)
+    assert lt_2(1)
 
 
-def test_eq_p():
+def test_eq_p_int():
     eq_2 = eq_p(2)
 
     assert eq_2(1) is False
     assert eq_2(2) is True
 
+
+def test_eq_p_str():
     eq_foo = eq_p("foo")
 
     assert eq_foo("bar") is False
@@ -154,8 +160,16 @@ def test_eq_true_p():
 
 
 def test_eq_false_p():
-    assert eq_false_p(True) is False
-    assert eq_false_p(False) is True
+    assert not eq_false_p(True)
+    assert eq_false_p(False)
+
+
+def test_is_bool_p():
+    assert not is_bool_p(0)
+    assert not is_bool_p("1")
+
+    assert is_bool_p(False)
+    assert is_bool_p(True)
 
 
 def test_is_datetime_p():
@@ -174,10 +188,10 @@ def test_is_int_p():
 
 
 def test_is_str_p():
-    assert is_str_p(None) is False
-    assert is_str_p(3) is False
+    assert not is_str_p(None)
+    assert not is_str_p(3)
 
-    assert is_str_p("3") is True
+    assert is_str_p("3")
 
 
 def test_is_list_p():
@@ -195,6 +209,15 @@ def test_is_dict_p():
 
     assert is_dict_p({})
     assert is_dict_p({"x": 3})
+
+
+def test_is_iterable_p():
+    assert not is_iterable_p(1)
+
+    assert is_iterable_p([])
+    assert is_iterable_p(())
+    assert is_iterable_p("foobar")
+    assert is_iterable_p({1, 2, 3})
 
 
 def test_is_tuple_p():
@@ -267,6 +290,19 @@ def test_named_predicate():
     assert p != q
 
 
+def test_is_empty():
+    assert not is_empty_p([1])
+    assert is_empty_p([])
+    assert is_empty_p(())
+
+
+def test_has_length():
+    of_length_1 = has_length_p(1)
+
+    assert not of_length_1([])
+    assert of_length_1([1])
+
+
 def test_lambda():
     in_123 = fn_p(lambda x: str(x) in ["1", "2", "3"])
     exists_p = is_not_none_p & in_123
@@ -274,3 +310,16 @@ def test_lambda():
     assert not exists_p(None)
     assert not exists_p(4)
     assert exists_p(3)
+
+
+def test_is_json():
+    valid_keys = all_p(is_str_p)
+    valid_value = is_str_p | is_int_p | is_list_p
+    valid_values_p = all_p(valid_value)
+    valid_values = fn_p(lambda x: valid_values_p(x.values()))
+
+    is_json_p = is_dict_p & valid_keys & valid_values
+
+    assert not is_json_p({1: "one"})
+    assert is_json_p({})
+    assert is_json_p({"one": 1})

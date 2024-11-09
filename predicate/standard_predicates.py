@@ -1,4 +1,4 @@
-from collections.abc import Callable
+from collections.abc import Callable, Iterable
 from datetime import datetime
 from typing import Final
 from uuid import UUID
@@ -73,6 +73,11 @@ def fn_p[T](fn: Callable[[T], bool]) -> FnPredicate[T]:
     return FnPredicate(predicate_fn=fn)
 
 
+def has_length_p(length: int) -> Predicate[Iterable]:
+    """Return True if length of iterable is equal to value, otherwise False."""
+    return fn_p(lambda x: len(x) == length)
+
+
 neg_p = lt_p(0)
 """Returns True of the value is negative, otherwise False."""
 
@@ -98,6 +103,9 @@ def is_instance_p(*klass: type) -> IsInstancePredicate:
     return IsInstancePredicate(klass=klass)
 
 
+is_bool_p = is_instance_p(bool)
+"""Returns True if the value is a bool, otherwise False."""
+
 is_datetime_p = is_instance_p(datetime)
 """Returns True if the value is a datetime, otherwise False."""
 
@@ -106,6 +114,9 @@ is_dict_p = is_instance_p(dict)
 
 is_float_p = is_instance_p(float)
 """Returns True if the value is a float, otherwise False."""
+
+is_iterable_p = is_instance_p(Iterable)
+"""Returns True if the value is an Iterable, otherwise False."""
 
 is_int_p = is_instance_p(int)
 """Returns True if the value is an integer, otherwise False."""
@@ -123,4 +134,7 @@ is_uuid_p = is_instance_p(UUID)
 """Returns True if the value is a UUID, otherwise False."""
 
 eq_true_p = eq_p(True)
+"""Returns True if the value is True, otherwise False."""
+
 eq_false_p = eq_p(False)
+"""Returns True if the value is False, otherwise False."""
