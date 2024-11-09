@@ -3,6 +3,8 @@ from datetime import datetime
 from typing import Final
 from uuid import UUID
 
+from more_itertools import ilen
+
 from predicate.predicate import (
     AllPredicate,
     AnyPredicate,
@@ -75,7 +77,7 @@ def fn_p[T](fn: Callable[[T], bool]) -> FnPredicate[T]:
 
 def has_length_p(length: int) -> Predicate[Iterable]:
     """Return True if length of iterable is equal to value, otherwise False."""
-    return fn_p(lambda x: len(x) == length)
+    return fn_p(lambda x: ilen(x) == length)
 
 
 neg_p = lt_p(0)
