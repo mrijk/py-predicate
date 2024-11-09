@@ -20,6 +20,7 @@ from predicate import (
 
 @singledispatch
 def negate[T](predicate: Predicate[T]) -> Predicate[T]:
+    """Return the negation of a predicate."""
     return NotPredicate(predicate=predicate)
 
 

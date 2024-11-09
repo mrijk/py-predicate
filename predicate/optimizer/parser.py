@@ -52,6 +52,7 @@ def _parse_string(predicate_string: str, stack: list) -> tuple[str, Predicate]:
 
 
 def parse_string(predicate_string: str) -> Predicate:
+    """Parse the given string and return a Predicate."""
     stack: list = []
     _, predicate = _parse_string(predicate_string, stack)
 

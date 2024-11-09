@@ -84,10 +84,12 @@ pos_p = gt_p(0)
 
 
 def any_p[T](predicate: Predicate[T]) -> AnyPredicate[T]:
+    """Return True if the predicate holds for any item in the iterable, otherwise False."""
     return AnyPredicate(predicate=predicate)
 
 
 def all_p[T](predicate: Predicate[T]) -> AllPredicate[T]:
+    """Return True if the predicate holds for each item in the iterable, otherwise False."""
     return AllPredicate(predicate=predicate)
 
 
@@ -113,6 +115,9 @@ is_list_p = is_instance_p(list)
 
 is_str_p = is_instance_p(str)
 """Returns True if the value is a str, otherwise False."""
+
+is_tuple_p = is_instance_p(tuple)
+"""Returns True if the value is a tuple, otherwise False."""
 
 is_uuid_p = is_instance_p(UUID)
 """Returns True if the value is a UUID, otherwise False."""

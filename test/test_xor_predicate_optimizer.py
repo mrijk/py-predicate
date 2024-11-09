@@ -111,9 +111,8 @@ def test_xor_optimize_not():
     assert is_xor_p(not_optimized)
 
 
-def test_xor_optimize_false_right():
+def test_xor_optimize_false_right(p):
     # p ^ False == p
-    p = ge_p(2)
 
     predicate = p ^ always_false_p
 
@@ -125,9 +124,8 @@ def test_xor_optimize_false_right():
     assert optimized == p
 
 
-def test_xor_optimize_false_left():
+def test_xor_optimize_false_left(p):
     # False ^ p = p
-    p = ge_p(2)
 
     predicate = always_false_p ^ p
 
@@ -139,7 +137,7 @@ def test_xor_optimize_false_left():
     assert optimized == p
 
 
-def test_xor_optimize_true_right():
+def test_xor_optimize_true_right(p):
     # p ^ True = ~p
     p = ge_p(2)
 

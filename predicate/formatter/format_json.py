@@ -16,6 +16,8 @@ from predicate import (
 
 
 def to_json(predicate: Predicate) -> dict[str, Any]:
+    """Format predicate as json."""
+
     def to_value(predicate) -> tuple[str, Any]:
         match predicate:
             case AllPredicate(all_predicate):

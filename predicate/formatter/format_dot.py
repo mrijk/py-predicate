@@ -26,6 +26,7 @@ from predicate.optimizer.predicate_optimizer import optimize
 
 
 def to_dot(predicate: Predicate, predicate_string: str = "", show_optimized: bool = False):
+    """Format predicate as a .dot file."""
     graph_attr = {"label": predicate_string, "labelloc": "t"}
 
     node_attr = {"shape": "rectangle", "style": "filled", "fillcolor": "#B7D7A8"}

@@ -18,6 +18,7 @@ from predicate.standard_predicates import (
     is_list_p,
     is_not_none_p,
     is_str_p,
+    is_tuple_p,
     is_uuid_p,
     ne_p,
     not_in_p,
@@ -133,16 +134,18 @@ def test_eq_p():
     assert eq_foo("foo") is True
 
 
-def test_ne_p():
+def test_ne_p_int():
     ne_2 = ne_p(2)
 
-    assert ne_2(1) is True
-    assert ne_2(2) is False
+    assert not ne_2(2)
+    assert ne_2(1)
 
+
+def test_ne_p_str():
     ne_foo = ne_p("foo")
 
-    assert ne_foo("bar") is True
-    assert ne_foo("foo") is False
+    assert not ne_foo("foo")
+    assert ne_foo("bar")
 
 
 def test_eq_true_p():
@@ -192,6 +195,12 @@ def test_is_dict_p():
 
     assert is_dict_p({})
     assert is_dict_p({"x": 3})
+
+
+def test_is_tuple_p():
+    assert not is_tuple_p(None)
+
+    assert is_tuple_p((3,))
 
 
 def test_is_uuid_p():

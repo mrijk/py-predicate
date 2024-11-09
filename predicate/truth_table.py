@@ -8,6 +8,7 @@ from predicate.predicate import NamedPredicate, OrPredicate, XorPredicate
 
 
 def truth_table(predicate: Predicate) -> Iterable[tuple]:
+    """Generate a truth table."""
     named_predicates = get_named_predicates(predicate)
 
     tuples = repeat((False, True), len(named_predicates))
@@ -20,6 +21,8 @@ def truth_table(predicate: Predicate) -> Iterable[tuple]:
 
 
 def get_named_predicates(predicate: Predicate) -> list[str]:
+    """Return the names used in the predicate."""
+
     def get_names() -> Iterator[str]:
         match predicate:
             case AndPredicate(left, right) | OrPredicate(left, right) | XorPredicate(left, right):
@@ -43,6 +46,7 @@ def execute_predicate(predicate: Predicate, values: dict) -> bool:
 
 
 def set_named_values(predicate: Predicate, values: dict) -> None:
+    """Set the named predicate values."""
     match predicate:
         case AndPredicate(left, right) | OrPredicate(left, right) | XorPredicate(left, right):
             set_named_values(left, values)

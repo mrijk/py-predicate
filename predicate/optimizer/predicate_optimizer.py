@@ -17,6 +17,7 @@ from predicate.predicate import (
 
 
 def optimize[T](predicate: Predicate[T]) -> Predicate[T]:
+    """Optimize the given predicate."""
     match predicate:
         case AllPredicate() as all_predicate:
             return optimize_all_predicate(all_predicate)
@@ -60,4 +61,5 @@ def match(predicate: Predicate) -> dict | None:
 
 
 def can_optimize[T](predicate: Predicate[T]) -> bool:
+    """Return True if the predicate can be optimized, otherwise False."""
     return optimize(predicate) != predicate

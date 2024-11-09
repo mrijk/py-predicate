@@ -9,8 +9,8 @@ def test_not():
 
     assert is_not_p(lt_2)
 
-    assert lt_2(2) is False
-    assert lt_2(1) is True
+    assert not lt_2(2)
+    assert lt_2(1)
 
 
 def test_not_not():
@@ -19,5 +19,5 @@ def test_not_not():
 
     assert is_not_p(ge_2_to)
 
-    assert ge_2_to(2) is True
-    assert ge_2_to(1) is False
+    assert not ge_2_to(1)
+    assert ge_2_to(2)

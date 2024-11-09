@@ -14,15 +14,19 @@ class Predicate[T]:
         raise NotImplementedError
 
     def __and__(self, predicate: "Predicate") -> "Predicate":
+        """Return the and predicate."""
         return cast(Self, AndPredicate(left=self, right=predicate))
 
     def __or__(self, predicate: "Predicate") -> "Predicate":
+        """Return the or predicate."""
         return cast(Self, OrPredicate(left=self, right=predicate))
 
     def __xor__(self, predicate: "Predicate") -> "Predicate":
+        """Return the xor predicate."""
         return cast(Self, XorPredicate(left=self, right=predicate))
 
     def __invert__(self) -> "Predicate":
+        """Return the negated predicate."""
         return cast(Self, NotPredicate(predicate=self))
 
 
