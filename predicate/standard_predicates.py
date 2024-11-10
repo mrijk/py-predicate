@@ -16,6 +16,7 @@ from predicate.predicate import (
     IsInstancePredicate,
     IsNonePredicate,
     IsNotNonePredicate,
+    LazyPredicate,
     LePredicate,
     LtPredicate,
     NePredicate,
@@ -98,6 +99,11 @@ def any_p[T](predicate: Predicate[T]) -> AnyPredicate[T]:
 def all_p[T](predicate: Predicate[T]) -> AllPredicate[T]:
     """Return True if the predicate holds for each item in the iterable, otherwise False."""
     return AllPredicate(predicate=predicate)
+
+
+def lazy_p[T](ref: str) -> LazyPredicate[T]:
+    """Return True if the predicate holds for each item in the iterable, otherwise False."""
+    return LazyPredicate(ref=ref)
 
 
 def is_instance_p(*klass: type) -> IsInstancePredicate:

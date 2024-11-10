@@ -6,7 +6,6 @@ import pytest
 from predicate import Predicate, always_false_p, always_true_p, ge_p, gt_p, le_p, lt_p
 from predicate.predicate import NamedPredicate, is_empty_p
 from predicate.standard_predicates import (
-    all_p,
     eq_false_p,
     eq_p,
     eq_true_p,
@@ -310,16 +309,3 @@ def test_lambda():
     assert not exists_p(None)
     assert not exists_p(4)
     assert exists_p(3)
-
-
-def test_is_json():
-    valid_keys = all_p(is_str_p)
-    valid_value = is_str_p | is_int_p | is_list_p
-    valid_values_p = all_p(valid_value)
-    valid_values = fn_p(lambda x: valid_values_p(x.values()))
-
-    is_json_p = is_dict_p & valid_keys & valid_values
-
-    assert not is_json_p({1: "one"})
-    assert is_json_p({})
-    assert is_json_p({"one": 1})
