@@ -1,5 +1,7 @@
 from datetime import datetime
 
+import pytest
+
 from predicate.standard_predicates import (
     all_p,
     fn_p,
@@ -23,6 +25,13 @@ def test_lazy_predicate():
     assert str_or_list_of_str([])
     assert str_or_list_of_str(["foo"])
     assert str_or_list_of_str(["foo", ["foo", ["foo"], "bar"]])
+
+
+def test_lazy_predicate_ref_not_found():
+    str_or_list_of_str = is_str_p | (is_list_p & all_p(lazy_p("str_or_list_of_str_no_ref")))
+
+    with pytest.raises(ValueError):
+        assert str_or_list_of_str(["foo"])
 
 
 def test_is_json():

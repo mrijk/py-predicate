@@ -169,8 +169,9 @@ class LazyPredicate[T](Predicate[T]):
 
     def __call__(self, x: T) -> bool:
         self.frame = inspect.currentframe()
-        # TODO: add error handling
-        return self.predicate(x)
+        if self.predicate:
+            return self.predicate(x)
+        raise ValueError(f"Could not find predicate with reference {self.ref}")
 
 
 @dataclass
