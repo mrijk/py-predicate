@@ -4,15 +4,15 @@
 
 # Introduction
 
-py-predicate is a Python library to create composable predicates
+py-predicate is a typed Python library to create composable predicates
 
-# Example
+# Example 1
 
 ```python
 filtered = [x for x in range(10) if x >= 2 and x <= 3]
 ```
 
-Version with predicates:
+## Version with predicates:
 
 ```python
 from predicate import ge_p, le_p
@@ -25,4 +25,23 @@ filtered = [x for x in range(10) if between_2_and_3(x)]
 ```
 
 Of course this example looks way more complicated than the original version. The point here is that you can build
-reusable predicates that can be used in multiple locations
+reusable predicates that can be used in multiple locations.
+
+# Example 2
+
+An uniq (?) py-predicate feature is that you can define self referencing predicates.
+This makes it easy to apply predicates to arbitrarily nested structures, like JSON data.
+
+In the next example we define a predicate, that tests is a given data structure is
+either a string, or a list of data that can again either be a string or a list of
+data. Ad infinitum.
+
+```python
+from predicate import all_p, is_list_p, is_str_p, lazy_p
+
+str_or_list_of_str = is_str_p | (is_list_p & all_p(lazy_p("str_or_list_of_str")))
+```
+
+Using plain Python, the above single one-liner would have to be coded as a (recursive) function.
+
+The full documentation can be found [here](https://mrijk.github.io/py-predicate/)
