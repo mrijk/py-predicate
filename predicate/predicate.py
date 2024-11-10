@@ -1,6 +1,8 @@
+import inspect
 from abc import abstractmethod
 from dataclasses import dataclass
 from datetime import datetime
+from functools import cached_property
 from typing import Callable, Final, Iterable, Self, cast
 from uuid import UUID
 
@@ -145,6 +147,31 @@ class XorPredicate[T](Predicate[T]):
                 return (left == self.left and right == self.right) or (right == self.left and left == self.right)
             case _:
                 return False
+
+
+@dataclass
+class LazyPredicate[T](Predicate[T]):
+    """A predicate class that lazily references another predicate."""
+
+    ref: str
+
+    def find_predicate(self, frame) -> Predicate | None:
+        for key, value in frame.f_locals.items():
+            if key == self.ref:
+                return value
+        if next_frame := frame.f_back:
+            return self.find_predicate(next_frame)
+        return None
+
+    @cached_property
+    def predicate(self) -> Predicate | None:
+        return self.find_predicate(self.frame)
+
+    def __call__(self, x: T) -> bool:
+        self.frame = inspect.currentframe()
+        if self.predicate:
+            return self.predicate(x)
+        raise ValueError(f"Could not find predicate with reference {self.ref}")
 
 
 @dataclass
