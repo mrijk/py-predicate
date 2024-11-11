@@ -29,7 +29,7 @@ reusable predicates that can be used in multiple locations.
 
 # Example 2
 
-An uniq (?) py-predicate feature is that you can define self referencing predicates.
+A unique (?) py-predicate feature is that you can define self referencing predicates.
 This makes it easy to apply predicates to arbitrarily nested structures, like JSON data.
 
 In the next example we define a predicate, that tests is a given data structure is
@@ -42,6 +42,6 @@ from predicate import all_p, is_list_p, is_str_p, lazy_p
 str_or_list_of_str = is_str_p | (is_list_p & all_p(lazy_p("str_or_list_of_str")))
 ```
 
-Using plain Python, the above single one-liner would have to be coded as a (recursive) function.
+Using plain Python, the above one-liner would have to be coded as a (recursive) function.
 
 The full documentation can be found [here](https://mrijk.github.io/py-predicate/)

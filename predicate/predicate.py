@@ -70,6 +70,9 @@ class AndPredicate[T](Predicate[T]):
             case _:
                 return False
 
+    def __repr__(self) -> str:
+        return f"{repr(self.left)} & {repr(self.right)}"
+
 
 @dataclass
 class NotPredicate[T](Predicate[T]):
@@ -89,6 +92,9 @@ class NotPredicate[T](Predicate[T]):
 
     def __call__(self, x: T) -> bool:
         return not self.predicate(x)
+
+    def __repr__(self) -> str:
+        return f"~{repr(self.predicate)}"
 
 
 @dataclass
@@ -119,6 +125,9 @@ class OrPredicate[T](Predicate[T]):
             case _:
                 return False
 
+    def __repr__(self) -> str:
+        return f"{repr(self.left)} | {repr(self.right)}"
+
 
 @dataclass
 class XorPredicate[T](Predicate[T]):
@@ -147,6 +156,9 @@ class XorPredicate[T](Predicate[T]):
                 return (left == self.left and right == self.right) or (right == self.left and left == self.right)
             case _:
                 return False
+
+    def __repr__(self) -> str:
+        return f"{repr(self.left)} ^ {repr(self.right)}"
 
 
 @dataclass
@@ -187,7 +199,7 @@ class InPredicate[T](Predicate[T]):
         return x in self.v
 
     def __eq__(self, other: object) -> bool:
-        return self.v == other.v if isinstance(other, InPredicate) else False
+        return isinstance(other, InPredicate) and self.v == other.v
 
 
 @dataclass
@@ -203,7 +215,7 @@ class NotInPredicate[T](Predicate[T]):
         return x not in self.v
 
     def __eq__(self, other: object) -> bool:
-        return self.v == other.v if isinstance(other, NotInPredicate) else False
+        return isinstance(other, NotInPredicate) and self.v == other.v
 
 
 @dataclass
@@ -216,7 +228,10 @@ class EqPredicate[T](Predicate[T]):
         return x == self.v
 
     def __eq__(self, other: object) -> bool:
-        return self.v == other.v if isinstance(other, EqPredicate) else False
+        return isinstance(other, EqPredicate) and self.v == other.v
+
+    def __repr__(self) -> str:
+        return f"eq_p({self.v})"
 
 
 @dataclass
@@ -229,7 +244,10 @@ class NePredicate[T](Predicate[T]):
         return x != self.v
 
     def __eq__(self, other: object) -> bool:
-        return self.v == other.v if isinstance(other, NePredicate) else False
+        return isinstance(other, NePredicate) and self.v == other.v
+
+    def __repr__(self) -> str:
+        return f"ne_p({self.v})"
 
 
 @dataclass
@@ -242,7 +260,10 @@ class GePredicate[T: (int, str, datetime, UUID)](Predicate[T]):
         return x >= self.v
 
     def __eq__(self, other: object) -> bool:
-        return self.v == other.v if isinstance(other, GePredicate) else False
+        return isinstance(other, GePredicate) and self.v == other.v
+
+    def __repr__(self) -> str:
+        return f"ge_p({self.v})"
 
 
 @dataclass
@@ -255,7 +276,10 @@ class GtPredicate[T: (int, str, datetime, UUID)](Predicate[T]):
         return x > self.v
 
     def __eq__(self, other: object) -> bool:
-        return self.v == other.v if isinstance(other, GtPredicate) else False
+        return isinstance(other, GtPredicate) and self.v == other.v
+
+    def __repr__(self) -> str:
+        return f"gt_p({self.v})"
 
 
 @dataclass
@@ -268,7 +292,10 @@ class LePredicate[T: (int, str, datetime, UUID)](Predicate[T]):
         return x <= self.v
 
     def __eq__(self, other: object) -> bool:
-        return self.v == other.v if isinstance(other, LePredicate) else False
+        return isinstance(other, LePredicate) and self.v == other.v
+
+    def __repr__(self) -> str:
+        return f"le_p({self.v})"
 
 
 @dataclass
@@ -282,6 +309,9 @@ class LtPredicate[T: (int, str, datetime, UUID)](Predicate[T]):
 
     def __eq__(self, other: object) -> bool:
         return isinstance(other, LtPredicate) and self.v == other.v
+
+    def __repr__(self) -> str:
+        return f"lt_p({self.v})"
 
 
 @dataclass
@@ -307,7 +337,7 @@ class AnyPredicate[T](Predicate[T]):
         return any(self.predicate(x) for x in iter)
 
     def __eq__(self, other: object) -> bool:
-        return self.predicate == other.predicate if isinstance(other, AnyPredicate) else False
+        return isinstance(other, AnyPredicate) and self.predicate == other.predicate
 
 
 @dataclass
@@ -344,6 +374,9 @@ class AlwaysTruePredicate(Predicate):
     def __eq__(self, other: object) -> bool:
         return isinstance(other, AlwaysTruePredicate)
 
+    def __repr__(self) -> str:
+        return "always_true_p"
+
 
 @dataclass
 class AlwaysFalsePredicate(Predicate):
@@ -354,6 +387,9 @@ class AlwaysFalsePredicate(Predicate):
 
     def __eq__(self, other: object) -> bool:
         return isinstance(other, AlwaysFalsePredicate)
+
+    def __repr__(self) -> str:
+        return "always_false_p"
 
 
 @dataclass

@@ -114,6 +114,12 @@ def is_instance_p(*klass: type) -> IsInstancePredicate:
 is_bool_p = is_instance_p(bool)
 """Returns True if the value is a bool, otherwise False."""
 
+is_callable_p = is_instance_p(Callable)
+"""Returns True if the value is a callable, otherwise False."""
+
+is_complex_p = is_instance_p(complex)
+"""Returns True if the value is a complex, otherwise False."""
+
 is_datetime_p = is_instance_p(datetime)
 """Returns True if the value is a datetime, otherwise False."""
 
@@ -131,6 +137,12 @@ is_int_p = is_instance_p(int)
 
 is_list_p = is_instance_p(list)
 """Returns True if the value is a list, otherwise False."""
+
+is_predicate_p = is_instance_p(Predicate)
+"""Returns True if the value is a predicate, otherwise False."""
+
+is_set_p = is_instance_p(set)
+"""Returns True if the value is a set, otherwise False."""
 
 is_str_p = is_instance_p(str)
 """Returns True if the value is a str, otherwise False."""

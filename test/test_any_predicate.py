@@ -1,4 +1,4 @@
-from predicate.standard_predicates import any_p, is_int_p
+from predicate import any_p, is_int_p
 
 
 def test_any():

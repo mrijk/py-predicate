@@ -1,4 +1,4 @@
-from predicate.standard_predicates import is_none_p, is_not_none_p
+from predicate import is_none_p, is_not_none_p
 
 
 def test_is_not_none_p():

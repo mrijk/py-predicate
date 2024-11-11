@@ -3,16 +3,20 @@ from uuid import UUID, uuid4
 
 import pytest
 
-from predicate import Predicate, always_false_p, always_true_p, ge_p, gt_p, le_p, lt_p
-from predicate.predicate import NamedPredicate, is_empty_p
-from predicate.standard_predicates import (
+from predicate import (
+    Predicate,
+    always_false_p,
+    always_true_p,
     eq_false_p,
     eq_p,
     eq_true_p,
     fn_p,
-    has_length_p,
+    ge_p,
+    gt_p,
     in_p,
     is_bool_p,
+    is_callable_p,
+    is_complex_p,
     is_datetime_p,
     is_dict_p,
     is_instance_p,
@@ -20,12 +24,18 @@ from predicate.standard_predicates import (
     is_iterable_p,
     is_list_p,
     is_not_none_p,
+    is_predicate_p,
+    is_set_p,
     is_str_p,
     is_tuple_p,
     is_uuid_p,
+    le_p,
+    lt_p,
     ne_p,
     not_in_p,
 )
+from predicate.predicate import NamedPredicate, is_empty_p
+from predicate.standard_predicates import has_length_p
 
 
 def test_always_true_p():
@@ -171,6 +181,26 @@ def test_is_bool_p():
     assert is_bool_p(True)
 
 
+def test_is_callable_p():
+    assert not is_callable_p(None)
+
+    def foo():
+        pass
+
+    assert is_callable_p(foo)
+
+    assert is_callable_p(lambda x: x)
+
+    predicate = always_false_p
+    assert is_callable_p(predicate)
+
+
+def test_is_complex():
+    assert not is_complex_p(1)
+
+    assert is_complex_p(complex(2, 1))
+
+
 def test_is_datetime_p():
     now = datetime.now()
 
@@ -186,20 +216,16 @@ def test_is_int_p():
     assert is_int_p(3)
 
 
+def test_is_predicate_p():
+    assert not is_predicate_p(None)
+    assert is_predicate_p(always_false_p)
+
+
 def test_is_str_p():
     assert not is_str_p(None)
     assert not is_str_p(3)
 
     assert is_str_p("3")
-
-
-def test_is_list_p():
-    assert is_list_p(None) is False
-    assert is_list_p((3,)) is False
-    assert is_list_p(3) is False
-
-    assert is_list_p([]) is True
-    assert is_list_p([3]) is True
 
 
 def test_is_dict_p():
@@ -217,6 +243,22 @@ def test_is_iterable_p():
     assert is_iterable_p(())
     assert is_iterable_p("foobar")
     assert is_iterable_p({1, 2, 3})
+
+
+def test_is_list_p():
+    assert not is_list_p(None)
+    assert not is_list_p((3,))
+    assert not is_list_p(3)
+
+    assert is_list_p([])
+    assert is_list_p([3])
+
+
+def test_is_set_p():
+    assert not is_set_p(None)
+
+    assert is_set_p(set())
+    assert is_set_p({3})
 
 
 def test_is_tuple_p():

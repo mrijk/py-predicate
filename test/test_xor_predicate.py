@@ -26,9 +26,9 @@ def test_xor_commutative():
 
     ge_4_xor_ge_4 = ge_4 ^ ge_2
 
-    assert ge_4_xor_ge_4(1) is False
-    assert ge_4_xor_ge_4(2) is True
-    assert ge_4_xor_ge_4(4) is False
+    assert not ge_4_xor_ge_4(1)
+    assert not ge_4_xor_ge_4(4)
+    assert ge_4_xor_ge_4(2)
 
 
 def test_xor_eq(p, q):

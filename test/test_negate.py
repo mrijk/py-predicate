@@ -1,5 +1,5 @@
+from predicate import eq_p, ge_p, gt_p, is_none_p, is_not_none_p, le_p, lt_p, ne_p
 from predicate.negate import negate
-from predicate.standard_predicates import eq_p, ge_p, gt_p, is_none_p, is_not_none_p, le_p, lt_p, ne_p
 
 
 def test_negate_eq():
