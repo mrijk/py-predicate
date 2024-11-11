@@ -25,6 +25,8 @@ def optimize[T](predicate: Predicate[T]) -> Predicate[T]:
             return optimize_and_predicate(and_predicate)
         case AnyPredicate() as any_predicate:
             return optimize_any_predicate(any_predicate)
+        # case InPredicate() as in_predicate:
+        #     return optimize_in_predicate(in_predicate)
         case NotPredicate() as not_predicate:
             return optimize_not_predicate(not_predicate)
         case OrPredicate() as or_predicate:

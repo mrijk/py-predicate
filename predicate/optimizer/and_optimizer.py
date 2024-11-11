@@ -1,3 +1,4 @@
+from predicate.optimizer.in_optimizer import optimize_in_predicate, optimize_not_in_predicate
 from predicate.predicate import (
     AllPredicate,
     AlwaysFalsePredicate,
@@ -7,7 +8,6 @@ from predicate.predicate import (
     FnPredicate,
     GePredicate,
     InPredicate,
-    NePredicate,
     NotInPredicate,
     NotPredicate,
     OrPredicate,
@@ -63,28 +63,19 @@ def optimize_and_predicate[T](predicate: AndPredicate[T]) -> Predicate[T]:
             return AlwaysTruePredicate() if predicate_fn(v) else AlwaysFalsePredicate()
 
         case InPredicate(v1), InPredicate(v2):
-            v = v1 & v2
-            if not v:
-                return AlwaysFalsePredicate()
-            if len(v) == 1:
-                return EqPredicate(v=v.pop())
-            return InPredicate(v=v)
+            if v := v1 & v2:
+                return optimize_in_predicate(InPredicate(v=v))
+            return AlwaysFalsePredicate()
 
         case InPredicate(v1), NotInPredicate(v2):
-            v = v1 - v2
-            if not v:
-                return AlwaysFalsePredicate()
-            if len(v) == 1:
-                return EqPredicate(v=v.pop())
-            return InPredicate(v=v)
+            if v := v1 - v2:
+                return optimize_in_predicate(InPredicate(v=v))
+            return AlwaysFalsePredicate()
 
         case NotInPredicate(v1), NotInPredicate(v2):
-            v = v1 | v2
-            if not v:
-                return AlwaysTruePredicate()
-            if len(v) == 1:
-                return NePredicate(v=v.pop())
-            return NotInPredicate(v=v)
+            if v := v1 | v2:
+                return optimize_not_in_predicate(NotInPredicate(v=v))
+            return AlwaysTruePredicate()
 
         case AllPredicate(left_all), AllPredicate(right_all):
             # All(p1) & All(p2) => All(p1 & p2)

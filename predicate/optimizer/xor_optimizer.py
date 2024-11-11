@@ -1,8 +1,8 @@
+from predicate.optimizer.in_optimizer import optimize_in_predicate
 from predicate.predicate import (
     AlwaysFalsePredicate,
     AlwaysTruePredicate,
     AndPredicate,
-    EqPredicate,
     InPredicate,
     NotPredicate,
     OrPredicate,
@@ -36,12 +36,9 @@ def optimize_xor_predicate[T](predicate: XorPredicate[T]) -> Predicate[T]:
             return AlwaysFalsePredicate()
 
         case InPredicate(v1), InPredicate(v2):
-            v = v1 ^ v2
-            if len(v) == 1:
-                return EqPredicate(v=v.pop())
-            return InPredicate(v=v)
+            return optimize_in_predicate(InPredicate(v=v1 ^ v2))
 
-        case Predicate(), AndPredicate(and_left, and_right):
+        case _, AndPredicate(and_left, and_right):
             match and_left, and_right:
                 case NotPredicate(not_predicate), _ if left == not_predicate:
                     return NotPredicate(OrPredicate(left=left, right=and_right))  # p ^ (^p & q) == ~(p | q)
@@ -49,10 +46,11 @@ def optimize_xor_predicate[T](predicate: XorPredicate[T]) -> Predicate[T]:
                     return NotPredicate(OrPredicate(left=left, right=and_left))  # p ^ (q & ^p) == ~(p | q)
                 case _:
                     return AndPredicate(left=left, right=NotPredicate(and_right))  # p ^ (p & q) = p & ~q
-        case AndPredicate(), Predicate():
+        case AndPredicate(), _:
             return optimize_xor_predicate(XorPredicate(left=right, right=left))
 
         case _, OrPredicate(or_left, or_right) if left == or_left:
+            # TODO: this is not correct!
             return or_right
         case _, OrPredicate(or_left, or_right) if left == or_right:
             return or_left
@@ -61,9 +59,9 @@ def optimize_xor_predicate[T](predicate: XorPredicate[T]) -> Predicate[T]:
         case OrPredicate(or_left, or_right), _ if right == or_right:
             return or_left
 
-        case XorPredicate(xor_left, xor_right), Predicate() if right == xor_left:
+        case XorPredicate(xor_left, xor_right), _ if right == xor_left:
             return xor_right  # p ^ q ^ p = q
-        case XorPredicate(xor_left, xor_right), Predicate() if right == xor_right:
+        case XorPredicate(xor_left, xor_right), _ if right == xor_right:
             return xor_left  # p ^ q ^ q = p
 
     return predicate

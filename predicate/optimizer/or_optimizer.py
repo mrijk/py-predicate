@@ -1,10 +1,8 @@
 from predicate.predicate import (
-    AlwaysFalsePredicate,
     AlwaysTruePredicate,
     AndPredicate,
     AnyPredicate,
     EqPredicate,
-    GePredicate,
     InPredicate,
     NePredicate,
     NotInPredicate,
@@ -32,11 +30,9 @@ def optimize_or_predicate[T](predicate: OrPredicate[T]) -> Predicate[T]:
     if optimized := optimize_or_not(left=left, right=right):
         return optimized
 
+    from predicate.implies import implies
+
     match left, right:
-        case _, AlwaysFalsePredicate():
-            return left  # p | False == p
-        case AlwaysFalsePredicate(), _:
-            return right  # False | p == p
         case _, AlwaysTruePredicate():
             return AlwaysTruePredicate()  # p | True == True
         case AlwaysTruePredicate(), _:
@@ -73,6 +69,15 @@ def optimize_or_predicate[T](predicate: OrPredicate[T]) -> Predicate[T]:
         case EqPredicate(v1), EqPredicate(v2) if v1 != v2:
             return InPredicate((v1, v2))
 
+        case InPredicate(v1), InPredicate(v2):
+            match v := v1 | v2:
+                case set():
+                    return AlwaysTruePredicate()
+                case _ if len(v) == 1:
+                    return EqPredicate(v=v1)
+                case _:
+                    return InPredicate(v=v)
+
         case InPredicate(v1), NotInPredicate(v2):
             v = v2 - (v1 & v2)
             if not v:
@@ -81,12 +86,14 @@ def optimize_or_predicate[T](predicate: OrPredicate[T]) -> Predicate[T]:
                 return NePredicate(v=v.pop())
             return NotInPredicate(v=v)
 
-        case GePredicate(v1), GePredicate(v2):
-            # x >= v1 | x >= v2 => x >= min(v1, v2)
-            return GePredicate(v=min(v1, v2))
-
         case AnyPredicate(left_any), AnyPredicate(right_any):
             return AnyPredicate(optimize(OrPredicate(left=left_any, right=right_any)))
+
+        case _, _ if implies(left, right):
+            return right
+
+        case _, _ if implies(right, left):
+            return left
 
         case _, _ if or_contains_negate(predicate, right):
             return AlwaysTruePredicate()  # p | q | ... | ~p == True

@@ -199,6 +199,15 @@ def test_optimize_multiple_eq():
     assert optimized == in_p(2, 3)
 
 
+def test_optimize_in_and_in():
+    p = in_p(2, 3)
+    q = in_p(4, 5)
+
+    predicate = p | q
+
+    assert can_optimize(predicate)
+
+
 def test_optimize_in_and_not_in():
     p = in_p(2, 3)
     q = not_in_p(2, 3, 4, 5)
