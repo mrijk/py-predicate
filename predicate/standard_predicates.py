@@ -114,7 +114,7 @@ def is_instance_p(*klass: type) -> IsInstancePredicate:
 is_bool_p = is_instance_p(bool)
 """Returns True if the value is a bool, otherwise False."""
 
-is_callable_p = is_instance_p(Callable)
+is_callable_p = is_instance_p(Callable)  # type: ignore
 """Returns True if the value is a callable, otherwise False."""
 
 is_complex_p = is_instance_p(complex)
