@@ -1,6 +1,14 @@
 from functools import singledispatch
 
-from predicate import AlwaysFalsePredicate, AlwaysTruePredicate, EqPredicate, GePredicate, GtPredicate, Predicate
+from predicate.predicate import (
+    AlwaysFalsePredicate,
+    AlwaysTruePredicate,
+    EqPredicate,
+    GePredicate,
+    GtPredicate,
+    InPredicate,
+    Predicate,
+)
 
 
 @singledispatch
@@ -39,5 +47,7 @@ def _(predicate: EqPredicate, other: Predicate) -> bool:
             return predicate.v >= v
         case GtPredicate(v):
             return predicate.v > v
+        case InPredicate(v):
+            return predicate.v in v
         case _:
             return False

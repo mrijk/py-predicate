@@ -223,7 +223,7 @@ def test_optimize_eq_v1_ge_v1():
 def test_optimize_eq_v1_ge_v2():
     # x = v & x >= w & w > v => False
     p1 = eq_p(2)
-    p2 = ge_p(3)
+    p2 = ge_p(1)
 
     predicate = p1 & p2
 
@@ -364,10 +364,10 @@ def test_optimize_in_and_not_in_empty():
 
 
 def test_optimize_not_in_and_not_in():
-    p1 = not_in_p(2, 3, 4)
-    p2 = not_in_p(3, 5)
+    p = not_in_p(2, 3, 4)
+    q = not_in_p(3, 5)
 
-    predicate = p1 & p2
+    predicate = p & q
 
     assert can_optimize(predicate)
 
@@ -390,16 +390,29 @@ def test_optimize_not_in_and_not_in_single():
 
 
 def test_optimize_not_in_and_not_in_empty():
-    p1 = not_in_p()
-    p2 = not_in_p()
+    p = not_in_p()
+    q = not_in_p()
 
-    predicate = p1 & p2
+    predicate = p & q
 
     assert can_optimize(predicate)
 
     optimized = optimize(predicate)
 
     assert optimized == always_true_p
+
+
+def test_optimize_in_and_eq():
+    p = in_p(2, 3, 4)
+    q = eq_p(2)
+
+    predicate = p & q
+
+    assert can_optimize(predicate)
+
+    optimized = optimize(predicate)
+
+    assert optimized == q
 
 
 def test_optimize_nested_and():

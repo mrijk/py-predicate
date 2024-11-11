@@ -3,7 +3,7 @@ from abc import abstractmethod
 from dataclasses import dataclass
 from datetime import datetime
 from functools import cached_property
-from typing import Callable, Final, Iterable, Self, cast
+from typing import Callable, Final, Iterable
 from uuid import UUID
 
 
@@ -17,19 +17,19 @@ class Predicate[T]:
 
     def __and__(self, predicate: "Predicate") -> "Predicate":
         """Return the and predicate."""
-        return cast(Self, AndPredicate(left=self, right=predicate))
+        return AndPredicate(left=self, right=predicate)
 
     def __or__(self, predicate: "Predicate") -> "Predicate":
         """Return the or predicate."""
-        return cast(Self, OrPredicate(left=self, right=predicate))
+        return OrPredicate(left=self, right=predicate)
 
     def __xor__(self, predicate: "Predicate") -> "Predicate":
         """Return the xor predicate."""
-        return cast(Self, XorPredicate(left=self, right=predicate))
+        return XorPredicate(left=self, right=predicate)
 
     def __invert__(self) -> "Predicate":
         """Return the negated predicate."""
-        return cast(Self, NotPredicate(predicate=self))
+        return NotPredicate(predicate=self)
 
 
 @dataclass
