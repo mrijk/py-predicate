@@ -24,7 +24,7 @@ def implies_false(_predicate: AlwaysFalsePredicate, _other: Predicate) -> bool:
 
 @implies.register
 def implies_true(_predicate: AlwaysTruePredicate, other: Predicate) -> bool:
-    return other == AlwaysTruePredicate
+    return other == AlwaysTruePredicate()
 
 
 @implies.register

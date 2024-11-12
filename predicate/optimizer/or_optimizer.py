@@ -1,10 +1,10 @@
+from predicate.optimizer.in_optimizer import optimize_in_predicate, optimize_not_in_predicate
 from predicate.predicate import (
     AlwaysTruePredicate,
     AndPredicate,
     AnyPredicate,
     EqPredicate,
     InPredicate,
-    NePredicate,
     NotInPredicate,
     NotPredicate,
     OrPredicate,
@@ -70,21 +70,14 @@ def optimize_or_predicate[T](predicate: OrPredicate[T]) -> Predicate[T]:
             return InPredicate((v1, v2))
 
         case InPredicate(v1), InPredicate(v2):
-            match v := v1 | v2:
-                case set():
-                    return AlwaysTruePredicate()
-                case _ if len(v) == 1:
-                    return EqPredicate(v=v1)
-                case _:
-                    return InPredicate(v=v)
+            if v := v1 | v2:
+                return optimize_in_predicate(InPredicate(v=v))
+            return AlwaysTruePredicate()
 
         case InPredicate(v1), NotInPredicate(v2):
-            v = v2 - (v1 & v2)
-            if not v:
-                return AlwaysTruePredicate()
-            if len(v) == 1:
-                return NePredicate(v=v.pop())
-            return NotInPredicate(v=v)
+            if v := v2 - (v1 & v2):
+                return optimize_not_in_predicate(NotInPredicate(v=v))
+            return AlwaysTruePredicate()
 
         case AnyPredicate(left_any), AnyPredicate(right_any):
             return AnyPredicate(optimize(OrPredicate(left=left_any, right=right_any)))
