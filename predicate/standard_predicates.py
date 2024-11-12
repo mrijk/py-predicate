@@ -1,6 +1,6 @@
 from collections.abc import Callable, Iterable
 from datetime import datetime
-from typing import Final
+from typing import Any, Final
 from uuid import UUID
 
 from more_itertools import ilen
@@ -72,7 +72,7 @@ def lt_p[T: (int, str, datetime, UUID)](v: T) -> LtPredicate[T]:
     return LtPredicate(v=v)
 
 
-def comp_p[S, T](fn: Callable[[S], T], predicate: Predicate[T]) -> CompPredicate:
+def comp_p[T](fn: Callable[[Any], T], predicate: Predicate[T]) -> CompPredicate:
     return CompPredicate(fn=fn, predicate=predicate)
 
 
@@ -106,7 +106,7 @@ def all_p[T](predicate: Predicate[T]) -> AllPredicate[T]:
     return AllPredicate(predicate=predicate)
 
 
-def lazy_p[T](ref: str) -> LazyPredicate[T]:
+def lazy_p(ref: str) -> LazyPredicate:
     """Return True if the predicate holds for each item in the iterable, otherwise False."""
     return LazyPredicate(ref=ref)
 

@@ -7,6 +7,7 @@ from predicate.formatter.format_dot import to_dot
 from predicate.standard_predicates import (
     all_p,
     any_p,
+    comp_p,
     eq_p,
     fn_p,
     ge_p,
@@ -159,6 +160,14 @@ def test_format_dot_show_optimized():
 
 def test_format_dot_fn():
     predicate = fn_p(lambda x: x)
+
+    dot = to_dot(predicate)
+
+    assert dot
+
+
+def test_format_comp_p():
+    predicate = comp_p(lambda x: 2 * x, predicate=ge_p(2))
 
     dot = to_dot(predicate)
 

@@ -105,7 +105,7 @@ def render(dot, predicate: Predicate, node_nr):
                 items = ", ".join(str(item) for item in v)
                 return add_node("in", label=f"x ∈ {{{items}}}")
             case IsInstancePredicate(klass):
-                name = klass[0].__name__
+                name = klass[0].__name__  # type: ignore
                 return add_node("instance", label=f"is_{name}_p")
             case IsNonePredicate():
                 return add_node("none", label="x = None")
