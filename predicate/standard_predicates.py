@@ -5,6 +5,8 @@ from uuid import UUID
 
 from more_itertools import ilen
 
+from predicate.comp_predicate import CompPredicate
+from predicate.lazy_predicate import LazyPredicate
 from predicate.predicate import (
     AllPredicate,
     AnyPredicate,
@@ -16,7 +18,6 @@ from predicate.predicate import (
     IsInstancePredicate,
     IsNonePredicate,
     IsNotNonePredicate,
-    LazyPredicate,
     LePredicate,
     LtPredicate,
     NePredicate,
@@ -69,6 +70,10 @@ def le_p[T: (int, str, datetime, UUID)](v: T) -> LePredicate[T]:
 def lt_p[T: (int, str, datetime, UUID)](v: T) -> LtPredicate[T]:
     """Return True if the value is less than the constant, otherwise False."""
     return LtPredicate(v=v)
+
+
+def comp_p[S, T](fn: Callable[[S], T], predicate: Predicate[T]) -> CompPredicate:
+    return CompPredicate(fn=fn, predicate=predicate)
 
 
 def fn_p[T](fn: Callable[[T], bool]) -> FnPredicate[T]:
@@ -158,3 +163,16 @@ eq_true_p = eq_p(True)
 
 eq_false_p = eq_p(False)
 """Returns True if the value is False, otherwise False."""
+
+# Construction of a lazy predicate to check for valid json
+
+_valid_json_p = lazy_p("is_json_p")
+json_list_p = is_list_p & lazy_p("json_values")
+
+json_keys_p = all_p(is_str_p)
+
+json_values = all_p(is_str_p | is_int_p | is_float_p | json_list_p | _valid_json_p | is_none_p)
+json_values_p = comp_p(lambda x: x.values(), json_values)
+
+is_json_p = (is_dict_p & json_keys_p & json_values_p) | json_list_p
+"""Returns True if the value is a valid json structure, otherwise False."""

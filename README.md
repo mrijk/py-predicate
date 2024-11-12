@@ -32,7 +32,7 @@ reusable predicates that can be used in multiple locations.
 A unique (?) py-predicate feature is that you can define self referencing predicates.
 This makes it easy to apply predicates to arbitrarily nested structures, like JSON data.
 
-In the next example we define a predicate, that tests is a given data structure is
+In the next example we define a predicate, that tests if a given data structure is
 either a string, or a list of data that can again either be a string or a list of
 data. Ad infinitum.
 

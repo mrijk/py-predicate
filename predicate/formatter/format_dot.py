@@ -1,6 +1,9 @@
+import inspect
+from functools import partial
 from itertools import count
 
 import graphviz  # type: ignore
+from more_itertools import first
 
 from predicate import (
     AllPredicate,
@@ -13,6 +16,8 @@ from predicate import (
     GePredicate,
     GtPredicate,
     InPredicate,
+    IsInstancePredicate,
+    IsNonePredicate,
     LePredicate,
     LtPredicate,
     NePredicate,
@@ -22,6 +27,8 @@ from predicate import (
     Predicate,
     XorPredicate,
 )
+from predicate.comp_predicate import CompPredicate
+from predicate.lazy_predicate import LazyPredicate, find_predicate
 from predicate.optimizer.predicate_optimizer import optimize
 
 
@@ -46,13 +53,18 @@ def to_dot(predicate: Predicate, predicate_string: str = "", show_optimized: boo
 
 
 def render(dot, predicate: Predicate, node_nr):
-    def add_node(name: str, *, label: str):
+    node_predicate_mapping: dict[str, Predicate] = {}
+
+    def _add_node(name: str, *, label: str, predicate: Predicate):
         node = next(node_nr)
         unique_name = f"{name}_{node}"
         dot.node(unique_name, label=label)
+        node_predicate_mapping[unique_name] = predicate
         return unique_name
 
     def to_value(predicate: Predicate):
+        add_node = partial(_add_node, predicate=predicate)
+
         match predicate:
             case AllPredicate(all_predicate):
                 node = add_node("all", label="∀")
@@ -75,6 +87,11 @@ def render(dot, predicate: Predicate, node_nr):
                 child = to_value(any_predicate)
                 dot.edge(node, child)
                 return node
+            case CompPredicate(_fn, comp_predicate):
+                node = add_node("comp", label="f")
+                child = to_value(comp_predicate)
+                dot.edge(node, child)
+                return node
             case EqPredicate(v):
                 return add_node("eq", label=f"x = {v}")
             case FnPredicate(predicate_fn):
@@ -87,6 +104,13 @@ def render(dot, predicate: Predicate, node_nr):
             case InPredicate(v):
                 items = ", ".join(str(item) for item in v)
                 return add_node("in", label=f"x ∈ {{{items}}}")
+            case IsInstancePredicate(klass):
+                name = klass[0].__name__
+                return add_node("instance", label=f"is_{name}_p")
+            case IsNonePredicate():
+                return add_node("none", label="x = None")
+            case LazyPredicate(ref):
+                return add_node("lazy", label=f"{ref}")
             case LePredicate(v):
                 return add_node("le", label=f"x ≤ {v}")
             case LtPredicate(v):
@@ -119,6 +143,17 @@ def render(dot, predicate: Predicate, node_nr):
                 raise ValueError(f"Unknown predicate type {predicate}")
 
     to_value(predicate)
+
+    render_lazy_references(dot, node_predicate_mapping)
+
+
+def render_lazy_references(dot, node_predicate_mapping):
+    for node, predicate in node_predicate_mapping.items():
+        if isinstance(predicate, LazyPredicate):
+            frame = inspect.currentframe()
+            if reference := find_predicate(frame, predicate.ref):
+                if found := first(node for node, predicate in node_predicate_mapping.items() if predicate == reference):
+                    dot.edge(node, found, style="dotted")
 
 
 def render_original(dot, predicate: Predicate, node_nr):

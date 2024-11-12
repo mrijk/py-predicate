@@ -1,9 +1,9 @@
 import click
 
-from predicate import FnPredicate
+from predicate import all_p, is_float_p, is_int_p, is_list_p, is_none_p, is_str_p, lazy_p
 from predicate.formatter.format_dot import to_dot
 from predicate.predicate import NamedPredicate
-from predicate.standard_predicates import fn_p
+from predicate.standard_predicates import comp_p, is_dict_p
 from predicate.truth_table import get_named_predicates, truth_table
 
 
@@ -24,13 +24,21 @@ def cli(predicate: str, filename, optimize: bool, truth: bool) -> None:
 
     # parsed = parse_string(predicate)
 
-    p: FnPredicate = fn_p(lambda x: x > 2)
-    q: FnPredicate = fn_p(lambda x: x > 3)
-    # r: FnPredicate = fn_p(lambda x: x > 4)
+    # str_or_list_of_str = is_str_p | (is_list_p & all_p(lazy_p("str_or_list_of_str")))
+    #
+    # dot = to_dot(str_or_list_of_str, predicate, show_optimized=optimize)
 
-    parsed = p ^ (p | q)
+    _valid_json_p = lazy_p("is_json_p")
+    json_list_p = is_list_p & lazy_p("json_values")
 
-    dot = to_dot(parsed, predicate, show_optimized=optimize)
+    json_keys_p = all_p(is_str_p)
+
+    json_values = all_p(is_str_p | is_int_p | is_float_p | json_list_p | _valid_json_p | is_none_p)
+    json_values_p = comp_p(lambda x: x.values(), json_values)
+
+    is_json_p = (is_dict_p & json_keys_p & json_values_p) | json_list_p
+
+    dot = to_dot(is_json_p, predicate, show_optimized=optimize)
 
     dot.render("/tmp/predicate.gv", view=True)  # noqa: S108
 
