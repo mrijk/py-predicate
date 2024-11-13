@@ -14,19 +14,19 @@ class Predicate[T]:
         raise NotImplementedError
 
     def __and__(self, predicate: "Predicate") -> "Predicate":
-        """Return the and predicate."""
+        """Return the 'and' predicate."""
         return AndPredicate(left=self, right=predicate)
 
     def __or__(self, predicate: "Predicate") -> "Predicate":
-        """Return the or predicate."""
+        """Return the 'or' predicate."""
         return OrPredicate(left=self, right=predicate)
 
     def __xor__(self, predicate: "Predicate") -> "Predicate":
-        """Return the xor predicate."""
+        """Return the 'xor' predicate."""
         return XorPredicate(left=self, right=predicate)
 
     def __invert__(self) -> "Predicate":
-        """Return the negated predicate."""
+        """Return the 'negated' predicate."""
         return NotPredicate(predicate=self)
 
 
@@ -342,6 +342,20 @@ class IsEmptyPredicate[T](Predicate[T]):
 
 
 @dataclass
+class IsNotEmptyPredicate[T](Predicate[T]):
+    """A predicate class that models the 'not empty' predicate."""
+
+    def __call__(self, iter: Iterable[T]) -> bool:
+        return len(list(iter)) > 0
+
+    def __eq__(self, other: object) -> bool:
+        return isinstance(other, IsNotEmptyPredicate)
+
+    def __repr__(self) -> str:
+        return "is_not_empty_p"
+
+
+@dataclass
 class IsInstancePredicate[T](Predicate[T]):
     """A predicate class that models the 'isinstance' predicate."""
 
@@ -414,6 +428,28 @@ class IsNotNonePredicate[T](Predicate[T]):
         return "is_not_none_p"
 
 
+@dataclass
+class IsFalsyPredicate[T](Predicate[T]):
+    """A predicate class that the falsy (0, False, [], "", etc.) predicate."""
+
+    def __call__(self, x: T) -> bool:
+        return not bool(x)
+
+    def __repr__(self) -> str:
+        return "is_falsy_p"
+
+
+@dataclass
+class IsTruthyPredicate[T](Predicate[T]):
+    """A predicate class that the truthy (13, True, [1], "foo", etc.) predicate."""
+
+    def __call__(self, x: T) -> bool:
+        return bool(x)
+
+    def __repr__(self) -> str:
+        return "is_truthy_p"
+
+
 always_true_p: Final[AlwaysTruePredicate] = AlwaysTruePredicate()
 """Predicate that always evaluates to True."""
 
@@ -422,6 +458,9 @@ always_false_p: Final[AlwaysFalsePredicate] = AlwaysFalsePredicate()
 
 is_empty_p: Final[IsEmptyPredicate] = IsEmptyPredicate()
 """Predicate that returns True if the iterable is empty, otherwise False."""
+
+is_not_empty_p: Final[IsNotEmptyPredicate] = IsNotEmptyPredicate()
+"""Predicate that returns True if the iterable is not empty, otherwise False."""
 
 
 @dataclass

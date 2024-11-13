@@ -1,6 +1,6 @@
 from helpers import is_not_p
 
-from predicate import always_false_p, always_true_p, ge_p
+from predicate import always_false_p, always_true_p, ge_p, is_empty_p
 from predicate.optimizer.predicate_optimizer import can_optimize, optimize
 from predicate.standard_predicates import (
     all_p,
@@ -176,7 +176,7 @@ def test_not_optimize_any():
     assert optimized == all_p(lt_p(2))
 
 
-def test_not_in():
+def test_not_optimize_not_in():
     not_in_234 = not_in_p(2, 3, 4)
     predicate = ~not_in_234
 
@@ -187,7 +187,7 @@ def test_not_in():
     assert optimized == in_p(2, 3, 4)
 
 
-def test_not_not_in():
+def test_not_optimize_in():
     in_234 = in_p(2, 3, 4)
     predicate = ~in_234
 
@@ -196,6 +196,12 @@ def test_not_not_in():
     optimized = optimize(predicate)
 
     assert optimized == not_in_p(2, 3, 4)
+
+
+def test_not_optimize_empty():
+    predicate = ~is_empty_p
+
+    assert can_optimize(predicate)
 
 
 def test_not_optimize_or_left_not(p, q):

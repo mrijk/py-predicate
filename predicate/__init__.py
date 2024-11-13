@@ -104,6 +104,7 @@ __all__ = [
     "eq_false_p",
     "eq_p",
     "eq_true_p",
+    "falsy_p",
     "fn_p",
     "ge_p",
     "gt_p",

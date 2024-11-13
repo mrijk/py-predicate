@@ -21,6 +21,8 @@ from predicate import (
     not_in_p,
     regex_p,
 )
+from predicate.predicate import is_not_empty_p
+from predicate.standard_predicates import is_falsy_p, is_truthy_p
 
 
 @pytest.mark.parametrize(
@@ -40,9 +42,12 @@ from predicate import (
         (gt_p(2), "gt_p(2)"),
         (in_p(2, 3, 4), "in_p(2, 3, 4)"),
         (is_empty_p, "is_empty_p"),
+        (is_not_empty_p, "is_not_empty_p"),
         (is_none_p, "is_none_p"),
         (is_not_none_p, "is_not_none_p"),
         (is_str_p, "is_str_p"),
+        (is_falsy_p, "is_falsy_p"),
+        (is_truthy_p, "is_truthy_p"),
         (lazy_p("ref"), 'lazy_p("ref")'),
         (le_p(2), "le_p(2)"),
         (lt_p(2), "lt_p(2)"),

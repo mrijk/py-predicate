@@ -15,9 +15,11 @@ from predicate.predicate import (
     GePredicate,
     GtPredicate,
     InPredicate,
+    IsFalsyPredicate,
     IsInstancePredicate,
     IsNonePredicate,
     IsNotNonePredicate,
+    IsTruthyPredicate,
     LePredicate,
     LtPredicate,
     NePredicate,
@@ -74,6 +76,7 @@ def lt_p[T: (int, str, datetime, UUID)](v: T) -> LtPredicate[T]:
 
 
 def comp_p[T](fn: Callable[[Any], T], predicate: Predicate[T]) -> CompPredicate:
+    """Return a predicate, composed of a function and another predicate."""
     return CompPredicate(fn=fn, predicate=predicate)
 
 
@@ -192,6 +195,9 @@ eq_true_p = eq_p(True)
 
 eq_false_p = eq_p(False)
 """Returns True if the value is False, otherwise False."""
+
+is_falsy_p = IsFalsyPredicate()
+is_truthy_p = IsTruthyPredicate()
 
 # Construction of a lazy predicate to check for valid json
 

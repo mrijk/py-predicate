@@ -34,8 +34,16 @@ from predicate import (
     ne_p,
     not_in_p,
 )
-from predicate.predicate import NamedPredicate, is_empty_p
-from predicate.standard_predicates import has_length_p, is_iterable_of_p, is_list_of_p, is_set_of_p, is_tuple_of_p
+from predicate.predicate import NamedPredicate, is_empty_p, is_not_empty_p
+from predicate.standard_predicates import (
+    has_length_p,
+    is_falsy_p,
+    is_iterable_of_p,
+    is_list_of_p,
+    is_set_of_p,
+    is_truthy_p,
+    is_tuple_of_p,
+)
 
 
 def test_always_true_p():
@@ -44,6 +52,16 @@ def test_always_true_p():
 
 def test_always_false_p():
     assert not always_false_p(13)
+
+
+@pytest.mark.parametrize("value", [False, None, 0, {}, "", (), []])
+def test_is_falsy_p(value):
+    assert is_falsy_p(value)
+
+
+@pytest.mark.parametrize("value", [True, not None, 13, {1}, "foo", (1,), [1]])
+def test_is_truthy_p(value):
+    assert is_truthy_p(value)
 
 
 def test_in_p():
@@ -377,6 +395,12 @@ def test_is_empty():
     assert not is_empty_p([1])
     assert is_empty_p([])
     assert is_empty_p(())
+
+
+def test_is_not_empty():
+    assert not is_not_empty_p([])
+    assert not is_not_empty_p(())
+    assert is_not_empty_p([1])
 
 
 def test_has_length():
