@@ -1,8 +1,6 @@
 from dataclasses import dataclass
 
-from predicate import Predicate, always_false_p, always_true_p
-from predicate.formatter.format_json import to_json
-from predicate.standard_predicates import all_p, any_p, fn_p, ne_p
+from predicate import Predicate, all_p, always_false_p, always_true_p, any_p, fn_p, ne_p, to_json
 
 
 def test_format_json_false():

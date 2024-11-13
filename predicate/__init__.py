@@ -2,6 +2,8 @@
 
 __version__ = "0.0.1"
 
+from predicate.formatter.format_dot import to_dot
+from predicate.formatter.format_json import to_json
 from predicate.optimizer.predicate_optimizer import can_optimize, optimize
 from predicate.predicate import (
     AllPredicate,
@@ -32,6 +34,7 @@ from predicate.predicate import (
 from predicate.standard_predicates import (
     all_p,
     any_p,
+    comp_p,
     eq_false_p,
     eq_p,
     eq_true_p,
@@ -91,6 +94,7 @@ __all__ = [
     "always_true_p",
     "any_p",
     "can_optimize",
+    "comp_p",
     "eq_false_p",
     "eq_p",
     "eq_true_p",
@@ -121,4 +125,6 @@ __all__ = [
     "ne_p",
     "not_in_p",
     "optimize",
+    "to_dot",
+    "to_json",
 ]

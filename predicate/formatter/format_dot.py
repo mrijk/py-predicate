@@ -5,11 +5,20 @@ from itertools import count
 import graphviz  # type: ignore
 from more_itertools import first
 
-from predicate import (
-    AllPredicate,
+from predicate.comp_predicate import CompPredicate
+from predicate.lazy_predicate import LazyPredicate, find_predicate
+from predicate.optimizer.predicate_optimizer import optimize
+from predicate.predicate import (
     AlwaysFalsePredicate,
     AlwaysTruePredicate,
     AndPredicate,
+    NotPredicate,
+    OrPredicate,
+    Predicate,
+    XorPredicate,
+)
+from predicate.standard_predicates import (
+    AllPredicate,
     AnyPredicate,
     EqPredicate,
     FnPredicate,
@@ -22,14 +31,7 @@ from predicate import (
     LtPredicate,
     NePredicate,
     NotInPredicate,
-    NotPredicate,
-    OrPredicate,
-    Predicate,
-    XorPredicate,
 )
-from predicate.comp_predicate import CompPredicate
-from predicate.lazy_predicate import LazyPredicate, find_predicate
-from predicate.optimizer.predicate_optimizer import optimize
 
 
 def to_dot(predicate: Predicate, predicate_string: str = "", show_optimized: bool = False):

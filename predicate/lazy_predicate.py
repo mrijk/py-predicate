@@ -2,7 +2,7 @@ import inspect
 from dataclasses import dataclass
 from functools import cached_property
 
-from predicate import Predicate
+from predicate.predicate import Predicate
 
 
 @dataclass

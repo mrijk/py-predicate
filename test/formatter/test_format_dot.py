@@ -2,10 +2,11 @@ from dataclasses import dataclass
 
 import pytest
 
-from predicate import Predicate, always_false_p, always_true_p, is_instance_p, is_none_p, lazy_p
-from predicate.formatter.format_dot import to_dot
-from predicate.standard_predicates import (
+from predicate import (
+    Predicate,
     all_p,
+    always_false_p,
+    always_true_p,
     any_p,
     comp_p,
     eq_p,
@@ -13,12 +14,16 @@ from predicate.standard_predicates import (
     ge_p,
     gt_p,
     in_p,
+    is_instance_p,
     is_list_p,
+    is_none_p,
     is_str_p,
+    lazy_p,
     le_p,
     lt_p,
     ne_p,
     not_in_p,
+    to_dot,
 )
 
 

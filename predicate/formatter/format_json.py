@@ -1,6 +1,6 @@
 from typing import Any
 
-from predicate import (
+from predicate.predicate import (
     AllPredicate,
     AlwaysFalsePredicate,
     AlwaysTruePredicate,
