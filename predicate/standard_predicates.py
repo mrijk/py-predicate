@@ -111,9 +111,33 @@ def lazy_p(ref: str) -> LazyPredicate:
     return LazyPredicate(ref=ref)
 
 
-def is_instance_p(*klass: type) -> IsInstancePredicate:
+def is_instance_p(*klass: type) -> Predicate:
     """Return True if value is an instance of one of the classes, otherwise False."""
     return IsInstancePredicate(klass=klass)
+
+
+def is_iterable_of_p[T](predicate: Predicate[T]) -> Predicate:
+    """Return True if value is an iterable, and for all elements the predicate is True, otherwise False."""
+    return is_iterable_p & all_p(predicate)
+
+
+def is_list_of_p[T](predicate: Predicate[T]) -> Predicate:
+    """Return True if value is a list, and for all elements in the list the predicate is True, otherwise False."""
+    return is_list_p & all_p(predicate)
+
+
+def is_tuple_of(*predicates: Predicate) -> Predicate:
+    """Return True if value is a tuple, and for all elements in the tuple the predicate is True, otherwise False."""
+    return (
+        is_tuple_p
+        & has_length_p(length=len(predicates))
+        & fn_p(lambda x: all(p(v) for p, v in zip(predicates, x, strict=False)))
+    )
+
+
+def is_set_of_p[T](predicate: Predicate[T]) -> Predicate:
+    """Return True if value is a set, and for all elements in the set the predicate is True, otherwise False."""
+    return is_set_p & all_p(predicate)
 
 
 is_bool_p = is_instance_p(bool)
