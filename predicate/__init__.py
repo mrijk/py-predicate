@@ -64,6 +64,7 @@ from predicate.standard_predicates import (
     lt_p,
     ne_p,
     not_in_p,
+    regex_p,
 )
 
 __all__ = [
@@ -125,6 +126,7 @@ __all__ = [
     "ne_p",
     "not_in_p",
     "optimize",
+    "regex_p",
     "to_dot",
     "to_json",
 ]

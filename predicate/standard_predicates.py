@@ -24,6 +24,7 @@ from predicate.predicate import (
     NotInPredicate,
     Predicate,
 )
+from predicate.regex_predicate import RegexPredicate
 
 is_not_none_p: Final[IsNotNonePredicate] = IsNotNonePredicate()
 """Return True if value is not None, otherwise False."""
@@ -138,6 +139,10 @@ def is_tuple_of(*predicates: Predicate) -> Predicate:
 def is_set_of_p[T](predicate: Predicate[T]) -> Predicate:
     """Return True if value is a set, and for all elements in the set the predicate is True, otherwise False."""
     return is_set_p & all_p(predicate)
+
+
+def regex_p(pattern: str) -> Predicate[str]:
+    return RegexPredicate(pattern=pattern)
 
 
 is_bool_p = is_instance_p(bool)
