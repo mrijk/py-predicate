@@ -4,7 +4,18 @@
 
 # Introduction
 
-py-predicate is a typed Python library to create composable predicates
+py-predicate is a typed Python library to create composable predicates.
+
+# Getting started
+
+To get started, install the library with [pip](https://pip.pypa.io/en/stable/)
+
+```
+pip install py-predicate
+```
+
+The full documentation can be found [here](https://mrijk.github.io/py-predicate/). We give 2 small examples
+to show what the library can do.
 
 # Example 1
 
@@ -43,5 +54,3 @@ str_or_list_of_str = is_str_p | (is_list_p & all_p(lazy_p("str_or_list_of_str"))
 ```
 
 Using plain Python, the above one-liner would have to be coded as a (recursive) function.
-
-The full documentation can be found [here](https://mrijk.github.io/py-predicate/)

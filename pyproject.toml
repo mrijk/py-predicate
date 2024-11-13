@@ -30,9 +30,11 @@ dependencies = [
     "more-itertools"
 ]
 readme = "README.md"
+requires-python = ">=3.10"
 
 [project.urls]
 Source = "https://github.com/mrijk/py-predicate"
+Documentation = "https://mrijk.github.io/py-predicate/"
 
 [project.optional-dependencies]
 test = [
