@@ -2,7 +2,7 @@ from dataclasses import dataclass
 
 import pytest
 
-from predicate import Predicate, always_false_p, always_true_p, is_instance_p, lazy_p
+from predicate import Predicate, always_false_p, always_true_p, is_instance_p, is_none_p, lazy_p
 from predicate.formatter.format_dot import to_dot
 from predicate.standard_predicates import (
     all_p,
@@ -150,6 +150,14 @@ def test_format_dot_not_in():
     assert dot
 
 
+def test_format_dot_is_none():
+    predicate = is_none_p
+
+    dot = to_dot(predicate)
+
+    assert dot
+
+
 def test_format_dot_show_optimized():
     predicate = always_true_p & always_false_p
 
@@ -184,6 +192,14 @@ def test_format_dot_is_instance():
 
 def test_format_dot_lazy():
     str_or_list_of_str = is_str_p | (is_list_p & all_p(lazy_p("str_or_list_of_str")))
+
+    dot = to_dot(str_or_list_of_str)
+
+    assert dot
+
+
+def test_format_dot_laz_unknown():
+    str_or_list_of_str = is_str_p | (is_list_p & all_p(lazy_p("str_or_list_of_str_unknown_ref")))
 
     dot = to_dot(str_or_list_of_str)
 

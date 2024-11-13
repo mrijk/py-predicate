@@ -7,6 +7,8 @@ For example:
 
 .. code-block:: python
 
+    from predicate import always_false_p, ge_p, optimize
+
     ge_2 = ge_p(2)
     lt_2 = ~ge_2
 
