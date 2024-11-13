@@ -38,7 +38,7 @@ def cli(predicate: str, filename, optimize: bool, truth: bool) -> None:
 
     is_json_p = (is_dict_p & json_keys_p & json_values_p) | json_list_p
 
-    dot = to_dot(is_json_p, predicate, show_optimized=optimize)
+    dot = to_dot(is_json_p, repr(is_json_p), show_optimized=optimize)
 
     dot.render("/tmp/predicate.gv", view=True)  # noqa: S108
 

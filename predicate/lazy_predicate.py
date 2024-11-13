@@ -21,6 +21,9 @@ class LazyPredicate[T](Predicate[T]):
             return self.predicate(x)
         raise ValueError(f"Could not find predicate with reference {self.ref}")
 
+    def __repr__(self) -> str:
+        return f'lazy_p("{self.ref}")'
+
 
 def find_predicate(frame, ref) -> Predicate | None:
     for key, value in frame.f_locals.items():

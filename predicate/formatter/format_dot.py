@@ -112,7 +112,7 @@ def render(dot, predicate: Predicate, node_nr):
             case IsNonePredicate():
                 return add_node("none", label="x = None")
             case LazyPredicate(ref):
-                return add_node("lazy", label=f"{ref}")
+                return add_node("lazy", label=ref)
             case LePredicate(v):
                 return add_node("le", label=f"x ≤ {v}")
             case LtPredicate(v):

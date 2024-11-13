@@ -174,6 +174,10 @@ class InPredicate[T](Predicate[T]):
     def __eq__(self, other: object) -> bool:
         return isinstance(other, InPredicate) and self.v == other.v
 
+    def __repr__(self) -> str:
+        items = ", ".join(str(item) for item in self.v)
+        return f"in_p({items})"
+
 
 @dataclass
 class NotInPredicate[T](Predicate[T]):
@@ -189,6 +193,10 @@ class NotInPredicate[T](Predicate[T]):
 
     def __eq__(self, other: object) -> bool:
         return isinstance(other, NotInPredicate) and self.v == other.v
+
+    def __repr__(self) -> str:
+        items = ", ".join(str(item) for item in self.v)
+        return f"not_in_p({items})"
 
 
 @dataclass
@@ -299,6 +307,9 @@ class AllPredicate[T](Predicate[T]):
     def __eq__(self, other: object) -> bool:
         return isinstance(other, AllPredicate) and self.predicate == other.predicate
 
+    def __repr__(self) -> str:
+        return f"all({repr(self.predicate)})"
+
 
 @dataclass
 class AnyPredicate[T](Predicate[T]):
@@ -312,6 +323,9 @@ class AnyPredicate[T](Predicate[T]):
     def __eq__(self, other: object) -> bool:
         return isinstance(other, AnyPredicate) and self.predicate == other.predicate
 
+    def __repr__(self) -> str:
+        return f"any({repr(self.predicate)})"
+
 
 @dataclass
 class IsEmptyPredicate[T](Predicate[T]):
@@ -322,6 +336,9 @@ class IsEmptyPredicate[T](Predicate[T]):
 
     def __eq__(self, other: object) -> bool:
         return isinstance(other, IsEmptyPredicate)
+
+    def __repr__(self) -> str:
+        return "is_empty_p"
 
 
 @dataclass
@@ -335,6 +352,10 @@ class IsInstancePredicate[T](Predicate[T]):
 
     def __eq__(self, other: object) -> bool:
         return isinstance(other, IsInstancePredicate) and self.klass == other.klass
+
+    def __repr__(self) -> str:
+        name = self.klass[0].__name__  # type: ignore
+        return f"is_{name}_p"
 
 
 @dataclass
@@ -375,6 +396,9 @@ class IsNonePredicate[T](Predicate[T]):
     def __eq__(self, other: object) -> bool:
         return isinstance(other, IsNonePredicate)
 
+    def __repr__(self) -> str:
+        return "is_none_p"
+
 
 @dataclass
 class IsNotNonePredicate[T](Predicate[T]):
@@ -385,6 +409,9 @@ class IsNotNonePredicate[T](Predicate[T]):
 
     def __eq__(self, other: object) -> bool:
         return isinstance(other, IsNotNonePredicate)
+
+    def __repr__(self) -> str:
+        return "is_not_none_p"
 
 
 always_true_p: Final[AlwaysTruePredicate] = AlwaysTruePredicate()
