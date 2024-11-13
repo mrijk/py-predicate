@@ -10,6 +10,7 @@ from predicate import (
     ge_p,
     gt_p,
     in_p,
+    is_empty_p,
     is_none_p,
     is_not_none_p,
     is_str_p,
@@ -20,7 +21,6 @@ from predicate import (
     not_in_p,
     regex_p,
 )
-from predicate.predicate import is_empty_p
 
 
 @pytest.mark.parametrize(

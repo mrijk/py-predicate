@@ -35,7 +35,7 @@ from predicate import (
     not_in_p,
 )
 from predicate.predicate import NamedPredicate, is_empty_p
-from predicate.standard_predicates import has_length_p, is_iterable_of_p, is_list_of_p, is_set_of_p, is_tuple_of
+from predicate.standard_predicates import has_length_p, is_iterable_of_p, is_list_of_p, is_set_of_p, is_tuple_of_p
 
 
 def test_always_true_p():
@@ -298,7 +298,7 @@ def test_is_tuple_p():
 
 
 def test_is_tuple_of_p():
-    predicate = is_tuple_of(is_str_p, is_int_p & ge_p(2), is_bool_p)
+    predicate = is_tuple_of_p(is_str_p, is_int_p & ge_p(2), is_bool_p)
 
     assert not predicate(None)
     assert not predicate(("foo",))

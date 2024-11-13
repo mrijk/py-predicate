@@ -127,7 +127,7 @@ def is_list_of_p[T](predicate: Predicate[T]) -> Predicate:
     return is_list_p & all_p(predicate)
 
 
-def is_tuple_of(*predicates: Predicate) -> Predicate:
+def is_tuple_of_p(*predicates: Predicate) -> Predicate:
     """Return True if value is a tuple, and for all elements in the tuple the predicate is True, otherwise False."""
     return (
         is_tuple_p
