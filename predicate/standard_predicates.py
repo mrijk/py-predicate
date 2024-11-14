@@ -219,7 +219,8 @@ class PredicateFactory[T](Predicate[T]):
         return predicate(x)
 
 
-root_p = PredicateFactory(factory=lambda: RootPredicate())
+# root_p = PredicateFactory(factory=lambda: RootPredicate())
+root_p = RootPredicate()
 this_p = ThisPredicate()
 
 # Construction of a lazy predicate to check for valid json
