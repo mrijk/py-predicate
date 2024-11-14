@@ -6,12 +6,14 @@ import graphviz  # type: ignore
 from more_itertools import first
 
 from predicate.comp_predicate import CompPredicate
-from predicate.lazy_predicate import LazyPredicate, find_predicate
+from predicate.lazy_predicate import LazyPredicate, find_predicate_by_ref
 from predicate.optimizer.predicate_optimizer import optimize
 from predicate.predicate import (
     AlwaysFalsePredicate,
     AlwaysTruePredicate,
     AndPredicate,
+    IsFalsyPredicate,
+    IsTruthyPredicate,
     NotPredicate,
     OrPredicate,
     Predicate,
@@ -96,6 +98,10 @@ def render(dot, predicate: Predicate, node_nr):
                 return node
             case EqPredicate(v):
                 return add_node("eq", label=f"x = {v}")
+            case IsFalsyPredicate():
+                return add_node("falsy", label="falsy")
+            case IsTruthyPredicate():
+                return add_node("truthy", label="truthy")
             case FnPredicate(predicate_fn):
                 name = predicate_fn.__code__.co_name
                 return add_node("fn", label=f"fn: {name}")
@@ -153,7 +159,7 @@ def render_lazy_references(dot, node_predicate_mapping):
     for node, predicate in node_predicate_mapping.items():
         if isinstance(predicate, LazyPredicate):
             frame = inspect.currentframe()
-            if reference := find_predicate(frame, predicate.ref):
+            if reference := find_predicate_by_ref(frame, predicate.ref):
                 if found := first(node for node, predicate in node_predicate_mapping.items() if predicate == reference):
                     dot.edge(node, found, style="dotted")
 

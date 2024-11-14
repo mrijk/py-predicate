@@ -48,6 +48,7 @@ from predicate.standard_predicates import (
     is_complex_p,
     is_datetime_p,
     is_dict_p,
+    is_falsy_p,
     is_float_p,
     is_instance_p,
     is_int_p,
@@ -70,6 +71,7 @@ from predicate.standard_predicates import (
     ne_p,
     not_in_p,
     regex_p,
+    this_p,
 )
 
 __all__ = [
@@ -104,7 +106,7 @@ __all__ = [
     "eq_false_p",
     "eq_p",
     "eq_true_p",
-    "falsy_p",
+    "is_falsy_p",
     "fn_p",
     "ge_p",
     "gt_p",
@@ -138,6 +140,7 @@ __all__ = [
     "not_in_p",
     "optimize",
     "regex_p",
+    "this_p",
     "to_dot",
     "to_json",
 ]

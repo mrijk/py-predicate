@@ -77,6 +77,30 @@ This predicates tests for greater than a value.
     assert not gt_2(2)
     assert gt_2(3)
 
+is_falsy_p
+----------
+
+This predicate tests for falsy values, for example False, "", {}, [], 0, etc.
+
+.. code-block:: python
+
+    from predicate import is_falsy_p
+
+    assert is_falsy_p(0)
+    assert is_falsy_p({})
+
+is_truthy_p
+-----------
+
+This predicate tests for truthy values, for example True, "foo", {"foo"}, [1], 13, etc.
+
+.. code-block:: python
+
+    from predicate import is_truthy_p
+
+    assert is_truthy_p(1)
+    assert is_truthy_p({"foo"})
+
 le_p
 ----
 

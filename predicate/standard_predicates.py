@@ -27,6 +27,7 @@ from predicate.predicate import (
     Predicate,
 )
 from predicate.regex_predicate import RegexPredicate
+from predicate.this_predicate import ThisPredicate
 
 is_not_none_p: Final[IsNotNonePredicate] = IsNotNonePredicate()
 """Return True if value is not None, otherwise False."""
@@ -198,6 +199,8 @@ eq_false_p = eq_p(False)
 
 is_falsy_p = IsFalsyPredicate()
 is_truthy_p = IsTruthyPredicate()
+
+this_p = ThisPredicate()
 
 # Construction of a lazy predicate to check for valid json
 

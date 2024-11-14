@@ -14,6 +14,7 @@ from predicate import (
     ge_p,
     gt_p,
     in_p,
+    is_falsy_p,
     is_instance_p,
     is_list_p,
     is_none_p,
@@ -25,6 +26,7 @@ from predicate import (
     not_in_p,
     to_dot,
 )
+from predicate.standard_predicates import is_truthy_p
 
 
 def test_format_dot_false():
@@ -37,6 +39,22 @@ def test_format_dot_false():
 
 def test_format_dot_true():
     predicate = always_true_p
+
+    dot = to_dot(predicate)
+
+    assert dot
+
+
+def test_format_dot_falsy():
+    predicate = is_falsy_p
+
+    dot = to_dot(predicate, "test")
+
+    assert dot
+
+
+def test_format_dot_truthy():
+    predicate = is_truthy_p
 
     dot = to_dot(predicate)
 

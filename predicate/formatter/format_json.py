@@ -7,6 +7,8 @@ from predicate.predicate import (
     AndPredicate,
     AnyPredicate,
     FnPredicate,
+    IsFalsyPredicate,
+    IsTruthyPredicate,
     NePredicate,
     NotPredicate,
     OrPredicate,
@@ -33,6 +35,10 @@ def to_json(predicate: Predicate) -> dict[str, Any]:
             case FnPredicate(predicate_fn):
                 name = predicate_fn.__code__.co_name
                 return "fn", {"name": name}
+            case IsFalsyPredicate():
+                return "is_falsy", None
+            case IsTruthyPredicate():
+                return "is_truthy", None
             case NePredicate(v):
                 return "ne", {"v": v}
             case NotPredicate(not_predicate):
