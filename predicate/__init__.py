@@ -71,6 +71,7 @@ from predicate.standard_predicates import (
     ne_p,
     not_in_p,
     regex_p,
+    root_p,
     this_p,
 )
 
@@ -140,6 +141,7 @@ __all__ = [
     "not_in_p",
     "optimize",
     "regex_p",
+    "root_p",
     "this_p",
     "to_dot",
     "to_json",

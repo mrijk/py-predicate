@@ -40,6 +40,7 @@ from predicate.standard_predicates import (
     is_falsy_p,
     is_iterable_of_p,
     is_list_of_p,
+    is_range_p,
     is_set_of_p,
     is_truthy_p,
     is_tuple_of_p,
@@ -239,6 +240,11 @@ def test_is_predicate_p():
     assert is_predicate_p(always_false_p)
 
 
+def test_is_range_p():
+    assert not is_range_p(None)
+    assert is_range_p(range(10))
+
+
 def test_is_str_p():
     assert not is_str_p(None)
     assert not is_str_p(3)
@@ -261,6 +267,7 @@ def test_is_iterable_p():
     assert is_iterable_p(())
     assert is_iterable_p("foobar")
     assert is_iterable_p({1, 2, 3})
+    assert is_iterable_p(range(5))
 
 
 def test_is_iterable_of_p():

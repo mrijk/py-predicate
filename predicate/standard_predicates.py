@@ -1,4 +1,5 @@
 from collections.abc import Callable, Iterable
+from dataclasses import dataclass
 from datetime import datetime
 from typing import Any, Final
 from uuid import UUID
@@ -27,6 +28,7 @@ from predicate.predicate import (
     Predicate,
 )
 from predicate.regex_predicate import RegexPredicate
+from predicate.root_predicate import RootPredicate
 from predicate.this_predicate import ThisPredicate
 
 is_not_none_p: Final[IsNotNonePredicate] = IsNotNonePredicate()
@@ -179,6 +181,9 @@ is_list_p = is_instance_p(list)
 is_predicate_p = is_instance_p(Predicate)
 """Returns True if the value is a predicate, otherwise False."""
 
+is_range_p = is_instance_p(range)
+"""Returns True if the value is a range, otherwise False."""
+
 is_set_p = is_instance_p(set)
 """Returns True if the value is a set, otherwise False."""
 
@@ -200,6 +205,21 @@ eq_false_p = eq_p(False)
 is_falsy_p = IsFalsyPredicate()
 is_truthy_p = IsTruthyPredicate()
 
+# TODO: fix me, these can't be initialised once!
+
+
+@dataclass
+class PredicateFactory[T](Predicate[T]):
+    """Test."""
+
+    factory: Callable[[], Predicate]
+
+    def __call__(self, x: T) -> bool:
+        predicate = self.factory()
+        return predicate(x)
+
+
+root_p = PredicateFactory(factory=lambda: RootPredicate())
 this_p = ThisPredicate()
 
 # Construction of a lazy predicate to check for valid json
