@@ -89,6 +89,18 @@ This predicate tests for falsy values, for example False, "", {}, [], 0, etc.
     assert is_falsy_p(0)
     assert is_falsy_p({})
 
+is_range_p
+----------
+
+This predicate tests if value is a range.
+
+.. code-block:: python
+
+    from predicate import is_range_p
+
+    assert not is_range_p(0)
+    assert is_range_p(range(5))
+
 is_truthy_p
 -----------
 

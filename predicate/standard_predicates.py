@@ -135,11 +135,11 @@ def is_list_of_p[T](predicate: Predicate[T]) -> Predicate:
 
 def is_tuple_of_p(*predicates: Predicate) -> Predicate:
     """Return True if value is a tuple, and for all elements in the tuple the predicate is True, otherwise False."""
-    return (
-        is_tuple_p
-        & has_length_p(length=len(predicates))
-        & fn_p(lambda x: all(p(v) for p, v in zip(predicates, x, strict=False)))
-    )
+
+    def valid_tuple_values(x: Iterable) -> bool:
+        return all(p(v) for p, v in zip(predicates, x, strict=False))
+
+    return is_tuple_p & has_length_p(length=len(predicates)) & fn_p(fn=valid_tuple_values)
 
 
 def is_set_of_p[T](predicate: Predicate[T]) -> Predicate:
@@ -202,10 +202,8 @@ eq_true_p = eq_p(True)
 eq_false_p = eq_p(False)
 """Returns True if the value is False, otherwise False."""
 
-is_falsy_p = IsFalsyPredicate()
-is_truthy_p = IsTruthyPredicate()
-
-# TODO: fix me, these can't be initialised once!
+is_falsy_p: Final[IsFalsyPredicate] = IsFalsyPredicate()
+is_truthy_p: Final[IsTruthyPredicate] = IsTruthyPredicate()
 
 
 @dataclass
@@ -214,14 +212,19 @@ class PredicateFactory[T](Predicate[T]):
 
     factory: Callable[[], Predicate]
 
+    @property
+    def predicate(self) -> Predicate:
+        return self.factory()
+
     def __call__(self, x: T) -> bool:
-        predicate = self.factory()
-        return predicate(x)
+        return self.predicate(x)
+
+    def __repr__(self) -> str:
+        return repr(self.predicate)
 
 
-# root_p = PredicateFactory(factory=lambda: RootPredicate())
-root_p = RootPredicate()
-this_p = ThisPredicate()
+root_p: PredicateFactory = PredicateFactory(factory=lambda: RootPredicate())
+this_p: PredicateFactory = PredicateFactory(factory=lambda: ThisPredicate())
 
 # Construction of a lazy predicate to check for valid json
 

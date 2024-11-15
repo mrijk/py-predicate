@@ -14,6 +14,7 @@ from predicate.predicate import (
     AndPredicate,
     IsFalsyPredicate,
     IsTruthyPredicate,
+    NamedPredicate,
     NotPredicate,
     OrPredicate,
     Predicate,
@@ -123,6 +124,8 @@ def render(dot, predicate: Predicate, node_nr):
                 return add_node("le", label=f"x ≤ {v}")
             case LtPredicate(v):
                 return add_node("lt", label=f"x < {v}")
+            case NamedPredicate(name):
+                return add_node("named", label=name)
             case NotInPredicate(v):
                 items = ", ".join(str(item) for item in v)
                 return add_node("in", label=f"x ∉ {{{items}}}")

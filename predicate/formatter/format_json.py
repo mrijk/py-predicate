@@ -9,6 +9,7 @@ from predicate.predicate import (
     FnPredicate,
     IsFalsyPredicate,
     IsTruthyPredicate,
+    NamedPredicate,
     NePredicate,
     NotPredicate,
     OrPredicate,
@@ -37,6 +38,8 @@ def to_json(predicate: Predicate) -> dict[str, Any]:
                 return "fn", {"name": name}
             case IsFalsyPredicate():
                 return "is_falsy", None
+            case NamedPredicate(name):
+                return "variable", name
             case IsTruthyPredicate():
                 return "is_truthy", None
             case NePredicate(v):

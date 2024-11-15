@@ -474,4 +474,7 @@ class NamedPredicate(Predicate):
         return self.v
 
     def __eq__(self, other: object) -> bool:
-        return isinstance(other, IsNotNonePredicate)
+        return isinstance(other, NamedPredicate) and self.name == other.name
+
+    def __repr__(self) -> str:
+        return self.name

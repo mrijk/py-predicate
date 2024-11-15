@@ -27,7 +27,8 @@ classifiers = [
 ]
 dependencies = [
     "graphviz",
-    "more-itertools"
+    "more-itertools",
+    "typer",
 ]
 readme = "README.md"
 requires-python = ">=3.10"

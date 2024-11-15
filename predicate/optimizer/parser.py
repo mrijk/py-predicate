@@ -1,7 +1,8 @@
+import re
 from functools import partial
 
 from predicate import AlwaysTruePredicate, NotPredicate
-from predicate.predicate import AlwaysFalsePredicate, AndPredicate, OrPredicate, Predicate, XorPredicate
+from predicate.predicate import AlwaysFalsePredicate, AndPredicate, NamedPredicate, OrPredicate, Predicate, XorPredicate
 
 # Tokens
 FALSE = "false"
@@ -48,6 +49,10 @@ def _parse_string(predicate_string: str, stack: list) -> tuple[str, Predicate]:
             predicate_string, right = _parse_string(predicate_string, stack)
             push(XorPredicate(left=pop(), right=right))
 
+        if variable := lookahead_variable(predicate_string):
+            predicate_string = skip_variable(predicate_string, variable)
+            push(NamedPredicate(name=variable))
+
     return predicate_string, pop()
 
 
@@ -59,12 +64,20 @@ def parse_string(predicate_string: str) -> Predicate:
     return predicate
 
 
-def skip_token(predicate_str: str, token: str) -> str:
-    return predicate_str[len(token) :].lstrip(" ")
+def skip_token(expression: str, token: str) -> str:
+    return expression[len(token) :].lstrip(" ")
 
 
-def lookahead(predicate_str: str, token: str) -> bool:
-    return predicate_str.startswith(token)
+def skip_variable(expression: str, variable: str) -> str:
+    return skip_token(expression, variable)
+
+
+def lookahead_variable(expression: str) -> str | None:
+    return m[0] if (m := re.match(r"\w+", expression)) else None
+
+
+def lookahead(expression: str, token: str) -> bool:
+    return expression.startswith(token)
 
 
 lookahead_false = partial(lookahead, token=FALSE)

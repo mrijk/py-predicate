@@ -34,6 +34,8 @@ def find_this_predicate(frame, predicate: Predicate) -> Predicate | None:
 
 
 def predicate_in_predicate_tree(tree: Predicate, predicate: Predicate) -> bool:
+    from predicate.standard_predicates import PredicateFactory
+
     match tree:
         case AllPredicate(all_predicate):
             return predicate_in_predicate_tree(all_predicate, predicate)
@@ -41,6 +43,8 @@ def predicate_in_predicate_tree(tree: Predicate, predicate: Predicate) -> bool:
             return predicate_in_predicate_tree(and_left, predicate) or predicate_in_predicate_tree(and_right, predicate)
         case OrPredicate(or_left, or_right):
             return predicate_in_predicate_tree(or_left, predicate) or predicate_in_predicate_tree(or_right, predicate)
+        case PredicateFactory() as factory:
+            return factory.predicate == predicate
         case _ if tree == predicate:
             return True
         case _:
