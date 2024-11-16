@@ -26,7 +26,8 @@ from predicate import (
     not_in_p,
     to_dot,
 )
-from predicate.standard_predicates import is_truthy_p
+from predicate.predicate import NamedPredicate
+from predicate.standard_predicates import is_truthy_p, root_p, this_p
 
 
 def test_format_dot_false():
@@ -197,8 +198,16 @@ def test_format_dot_fn():
     assert dot
 
 
-def test_format_comp_p():
+def test_format_dot_comp_p():
     predicate = comp_p(lambda x: 2 * x, predicate=ge_p(2))
+
+    dot = to_dot(predicate)
+
+    assert dot
+
+
+def test_format_dot_named():
+    predicate = NamedPredicate(name="p")
 
     dot = to_dot(predicate)
 
@@ -215,6 +224,22 @@ def test_format_dot_is_instance():
 
 def test_format_dot_lazy():
     str_or_list_of_str = is_str_p | (is_list_p & all_p(lazy_p("str_or_list_of_str")))
+
+    dot = to_dot(str_or_list_of_str)
+
+    assert dot
+
+
+def test_format_dot_root():
+    str_or_list_of_str = is_str_p | (is_list_p & all_p(root_p))
+
+    dot = to_dot(str_or_list_of_str)
+
+    assert dot
+
+
+def test_format_dot_this():
+    str_or_list_of_str = is_str_p | (is_list_p & all_p(this_p))
 
     dot = to_dot(str_or_list_of_str)
 

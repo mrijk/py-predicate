@@ -3,7 +3,7 @@ from itertools import repeat
 
 from more_itertools import gray_product
 
-from predicate import AndPredicate, NotPredicate, Predicate
+from predicate import AlwaysFalsePredicate, AlwaysTruePredicate, AndPredicate, NotPredicate, Predicate
 from predicate.predicate import NamedPredicate, OrPredicate, XorPredicate
 
 
@@ -32,6 +32,8 @@ def get_named_predicates(predicate: Predicate) -> list[str]:
                 yield from get_named_predicates(not_predicate)
             case NamedPredicate() as named:
                 yield named.name
+            case AlwaysFalsePredicate() | AlwaysTruePredicate():
+                pass
             case _:
                 raise ValueError(f"Type not allowed: {predicate}")
 
@@ -55,5 +57,7 @@ def set_named_values(predicate: Predicate, values: dict) -> None:
             set_named_values(not_predicate, values)
         case NamedPredicate() as named:
             named.v = values[named.name]
+        case AlwaysFalsePredicate() | AlwaysTruePredicate():
+            pass
         case _:
             raise ValueError(f"Type not allowed: {predicate}")

@@ -27,6 +27,7 @@ classifiers = [
 ]
 dependencies = [
     "graphviz",
+    "lark",
     "more-itertools",
     "typer",
 ]

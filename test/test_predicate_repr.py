@@ -21,7 +21,7 @@ from predicate import (
     not_in_p,
     regex_p,
 )
-from predicate.predicate import is_not_empty_p
+from predicate.predicate import NamedPredicate, is_not_empty_p
 from predicate.standard_predicates import is_falsy_p, is_truthy_p, this_p
 
 
@@ -55,6 +55,7 @@ from predicate.standard_predicates import is_falsy_p, is_truthy_p, this_p
         (not_in_p(2, 3, 4), "not_in_p(2, 3, 4)"),
         (regex_p("^foo.*bar$"), 'regex_p("^foo.*bar$")'),
         (this_p, "this_p"),
+        (NamedPredicate(name="foo"), "foo"),
     ],
 )
 def test_repr_standard(predicate, representation):
