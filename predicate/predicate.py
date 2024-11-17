@@ -19,7 +19,7 @@ class Predicate[T]:
 
     def __or__(self, predicate: "Predicate") -> "Predicate":
         """Return the 'or' predicate."""
-        return OrPredicate(left=self, right=predicate)
+        return OrPredicate(left=resolve_predicate(self), right=resolve_predicate(predicate))
 
     def __xor__(self, predicate: "Predicate") -> "Predicate":
         """Return the 'xor' predicate."""
@@ -28,6 +28,16 @@ class Predicate[T]:
     def __invert__(self) -> "Predicate":
         """Return the 'negated' predicate."""
         return NotPredicate(predicate=self)
+
+
+def resolve_predicate[T](predicate: Predicate[T]) -> Predicate[T]:
+    from predicate.standard_predicates import PredicateFactory
+
+    match predicate:
+        case PredicateFactory() as factory:
+            return factory.predicate
+        case _:
+            return predicate
 
 
 @dataclass

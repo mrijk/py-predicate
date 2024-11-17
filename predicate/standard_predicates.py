@@ -26,6 +26,7 @@ from predicate.predicate import (
     NePredicate,
     NotInPredicate,
     Predicate,
+    resolve_predicate,
 )
 from predicate.regex_predicate import RegexPredicate
 from predicate.root_predicate import RootPredicate
@@ -105,12 +106,12 @@ pos_p = gt_p(0)
 
 def any_p[T](predicate: Predicate[T]) -> AnyPredicate[T]:
     """Return True if the predicate holds for any item in the iterable, otherwise False."""
-    return AnyPredicate(predicate=predicate)
+    return AnyPredicate(predicate=resolve_predicate(predicate))
 
 
 def all_p[T](predicate: Predicate[T]) -> AllPredicate[T]:
     """Return True if the predicate holds for each item in the iterable, otherwise False."""
-    return AllPredicate(predicate=predicate)
+    return AllPredicate(predicate=resolve_predicate(predicate))
 
 
 def lazy_p(ref: str) -> LazyPredicate:
@@ -216,15 +217,15 @@ class PredicateFactory[T](Predicate[T]):
     def predicate(self) -> Predicate:
         return self.factory()
 
-    def __call__(self, x: T) -> bool:
-        return self.predicate(x)
+    def __call__(self, *args, **kwargs) -> bool:
+        raise ValueError("Don't call PredicateFactory")
 
     def __repr__(self) -> str:
         return repr(self.predicate)
 
 
-root_p: PredicateFactory = PredicateFactory(factory=lambda: RootPredicate())
-this_p: PredicateFactory = PredicateFactory(factory=lambda: ThisPredicate())
+root_p: PredicateFactory = PredicateFactory(factory=RootPredicate)
+this_p: PredicateFactory = PredicateFactory(factory=ThisPredicate)
 
 # Construction of a lazy predicate to check for valid json
 
