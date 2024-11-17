@@ -25,7 +25,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install sphinx sphinx-notes sphinx.ext.graphviz
+          pip install sphinx sphinx.ext.graphviz
 
       - name: Install Graphviz
         run: sudo apt-get install -y graphviz
