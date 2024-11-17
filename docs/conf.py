@@ -16,6 +16,8 @@ release = "0.1"
 
 extensions: list = ["sphinx.ext.graphviz"]
 
+graphviz_output_format = "svg"
+
 templates_path = ["_templates"]
 exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 
