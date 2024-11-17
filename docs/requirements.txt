@@ -1,2 +1,3 @@
+phinx.ext.graphviz
 sphinx
 sphinx_rtd_theme
