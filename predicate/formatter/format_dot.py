@@ -5,11 +5,24 @@ from itertools import count
 import graphviz  # type: ignore
 from more_itertools import first
 
-from predicate import (
-    AllPredicate,
+from predicate.comp_predicate import CompPredicate
+from predicate.lazy_predicate import LazyPredicate, find_predicate_by_ref
+from predicate.optimizer.predicate_optimizer import optimize
+from predicate.predicate import (
     AlwaysFalsePredicate,
     AlwaysTruePredicate,
     AndPredicate,
+    IsFalsyPredicate,
+    IsTruthyPredicate,
+    NamedPredicate,
+    NotPredicate,
+    OrPredicate,
+    Predicate,
+    XorPredicate,
+)
+from predicate.root_predicate import RootPredicate, find_root_predicate
+from predicate.standard_predicates import (
+    AllPredicate,
     AnyPredicate,
     EqPredicate,
     FnPredicate,
@@ -22,14 +35,9 @@ from predicate import (
     LtPredicate,
     NePredicate,
     NotInPredicate,
-    NotPredicate,
-    OrPredicate,
-    Predicate,
-    XorPredicate,
+    PredicateFactory,
 )
-from predicate.comp_predicate import CompPredicate
-from predicate.lazy_predicate import LazyPredicate, find_predicate
-from predicate.optimizer.predicate_optimizer import optimize
+from predicate.this_predicate import ThisPredicate, find_this_predicate
 
 
 def to_dot(predicate: Predicate, predicate_string: str = "", show_optimized: bool = False):
@@ -94,6 +102,10 @@ def render(dot, predicate: Predicate, node_nr):
                 return node
             case EqPredicate(v):
                 return add_node("eq", label=f"x = {v}")
+            case IsFalsyPredicate():
+                return add_node("falsy", label="falsy")
+            case IsTruthyPredicate():
+                return add_node("truthy", label="truthy")
             case FnPredicate(predicate_fn):
                 name = predicate_fn.__code__.co_name
                 return add_node("fn", label=f"fn: {name}")
@@ -110,11 +122,13 @@ def render(dot, predicate: Predicate, node_nr):
             case IsNonePredicate():
                 return add_node("none", label="x = None")
             case LazyPredicate(ref):
-                return add_node("lazy", label=f"{ref}")
+                return add_node("lazy", label=ref)
             case LePredicate(v):
                 return add_node("le", label=f"x ≤ {v}")
             case LtPredicate(v):
                 return add_node("lt", label=f"x < {v}")
+            case NamedPredicate(name):
+                return add_node("named", label=name)
             case NotInPredicate(v):
                 items = ", ".join(str(item) for item in v)
                 return add_node("in", label=f"x ∉ {{{items}}}")
@@ -132,6 +146,12 @@ def render(dot, predicate: Predicate, node_nr):
                 dot.edge(node, left_node)
                 dot.edge(node, right_node)
                 return node
+            case PredicateFactory() as factory:
+                return to_value(factory.predicate)
+            case RootPredicate():
+                return add_node("root", label="root")
+            case ThisPredicate():
+                return add_node("this", label="this")
             case XorPredicate(left, right):
                 node = add_node("xor", label="⊻")
                 left_node = to_value(left)
@@ -148,12 +168,26 @@ def render(dot, predicate: Predicate, node_nr):
 
 
 def render_lazy_references(dot, node_predicate_mapping):
+    def find_in_mapping(lookup: Predicate) -> str:
+        return first(node for node, predicate in node_predicate_mapping.items() if predicate == lookup)
+
+    def add_dashed_line(node: str, lookup: Predicate) -> None:
+        found = find_in_mapping(lookup)
+        dot.edge(node, found, style="dashed")
+
+    frame = inspect.currentframe()
+
     for node, predicate in node_predicate_mapping.items():
-        if isinstance(predicate, LazyPredicate):
-            frame = inspect.currentframe()
-            if reference := find_predicate(frame, predicate.ref):
-                if found := first(node for node, predicate in node_predicate_mapping.items() if predicate == reference):
-                    dot.edge(node, found, style="dotted")
+        match predicate:
+            case LazyPredicate():
+                if reference := find_predicate_by_ref(frame, predicate.ref):
+                    add_dashed_line(node, reference)
+            case RootPredicate():
+                if root := find_root_predicate(frame, predicate):
+                    add_dashed_line(node, root)
+            case ThisPredicate():
+                if this := find_this_predicate(frame, predicate):
+                    add_dashed_line(node, this)
 
 
 def render_original(dot, predicate: Predicate, node_nr):

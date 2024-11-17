@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import Callable
 
-from predicate import Predicate
+from predicate.predicate import Predicate
 
 
 @dataclass
@@ -13,3 +13,6 @@ class CompPredicate[S, T](Predicate[T]):
 
     def __call__(self, x: S) -> bool:
         return self.predicate(self.fn(x))
+
+    def __repr__(self) -> str:
+        return f"comp_p({repr(self.predicate)})"

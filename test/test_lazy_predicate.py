@@ -5,11 +5,10 @@ import pytest
 from predicate.standard_predicates import (
     all_p,
     comp_p,
-    fn_p,
     is_dict_p,
     is_float_p,
     is_int_p,
-    is_list_p,
+    is_list_of_p,
     is_none_p,
     is_str_p,
     lazy_p,
@@ -17,7 +16,7 @@ from predicate.standard_predicates import (
 
 
 def test_lazy_predicate():
-    str_or_list_of_str = is_str_p | (is_list_p & all_p(lazy_p("str_or_list_of_str")))
+    str_or_list_of_str = is_str_p | is_list_of_p(lazy_p("str_or_list_of_str"))
 
     assert not str_or_list_of_str(1)
     assert not str_or_list_of_str([1])
@@ -29,32 +28,20 @@ def test_lazy_predicate():
 
 
 def test_lazy_predicate_ref_not_found():
-    str_or_list_of_str = is_str_p | (is_list_p & all_p(lazy_p("str_or_list_of_str_no_ref")))
+    str_or_list_of_str = is_str_p | is_list_of_p(lazy_p("str_or_list_of_str_no_ref"))
 
     with pytest.raises(ValueError):
         assert str_or_list_of_str(["foo"])
 
 
-def create_json_p():
-    _valid_json_p = lazy_p("is_json_p")
-    json_list_p = is_list_p & lazy_p("valid_values")
-
-    json_keys_p = all_p(is_str_p)
-
-    valid_values = all_p(is_str_p | is_int_p | is_float_p | json_list_p | _valid_json_p | is_none_p)
-    json_values_p = fn_p(lambda x: valid_values(x.values()))
-
-    return (is_dict_p & json_keys_p & json_values_p) | json_list_p
-
-
 def test_is_json():
     _valid_json_p = lazy_p("is_json_p")
-    json_list_p = is_list_p & lazy_p("_valid_values")
+    json_list_p = is_list_of_p(lazy_p("_valid_value"))
 
     json_keys_p = all_p(is_str_p)
 
-    _valid_values = all_p(is_str_p | is_int_p | is_float_p | json_list_p | _valid_json_p | is_none_p)
-    json_values_p = comp_p(lambda x: x.values(), _valid_values)
+    _valid_value = is_str_p | is_int_p | is_float_p | json_list_p | _valid_json_p | is_none_p
+    json_values_p = comp_p(lambda x: x.values(), all_p(_valid_value))
 
     is_json_p = (is_dict_p & json_keys_p & json_values_p) | json_list_p
 

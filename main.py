@@ -1,62 +1,44 @@
-import click
+import json as json_lib
+import sys
+from typing import Annotated
 
-from predicate import all_p, is_float_p, is_int_p, is_list_p, is_none_p, is_str_p, lazy_p
+import typer
+
+from predicate import Predicate, to_json
+from predicate import optimize as optimize_predicate
 from predicate.formatter.format_dot import to_dot
-from predicate.predicate import NamedPredicate
-from predicate.standard_predicates import comp_p, is_dict_p
+from predicate.parser import parse_expression
 from predicate.truth_table import get_named_predicates, truth_table
 
+app = typer.Typer()
 
-@click.command()
-@click.option("-f", "--filename", help="Output file")
-@click.option("-o", "--optimize", is_flag=True, help="Optimize predicate")
-@click.option("-p", "--predicate", required=True, help="Predicate to parse")
-@click.option("-t", "--truth", is_flag=True, help="Generate truth table")
-def cli(predicate: str, filename, optimize: bool, truth: bool) -> None:
-
-    if truth:
-        show_truth_table(optimize)
-        return
-
-    # predicate_string = "true | false & true ^ ~false"
-
-    # predicate_string = "x in {2, 3, 4} | x not in {4, 5}"
-
-    # parsed = parse_string(predicate)
-
-    # str_or_list_of_str = is_str_p | (is_list_p & all_p(lazy_p("str_or_list_of_str")))
-    #
-    # dot = to_dot(str_or_list_of_str, predicate, show_optimized=optimize)
-
-    _valid_json_p = lazy_p("is_json_p")
-    json_list_p = is_list_p & lazy_p("json_values")
-
-    json_keys_p = all_p(is_str_p)
-
-    json_values = all_p(is_str_p | is_int_p | is_float_p | json_list_p | _valid_json_p | is_none_p)
-    json_values_p = comp_p(lambda x: x.values(), json_values)
-
-    is_json_p = (is_dict_p & json_keys_p & json_values_p) | json_list_p
-
-    dot = to_dot(is_json_p, predicate, show_optimized=optimize)
-
-    dot.render("/tmp/predicate.gv", view=True)  # noqa: S108
-
-    # print(json.dumps(to_json(predicate)))
+Expression = Annotated[str, typer.Argument(help="Predicate expression")]
+Optimize = Annotated[bool, typer.Option("--optimize", "-o", help="Enable predicate optimization")]
 
 
-def show_truth_table(optimize: bool) -> None:
-    p = NamedPredicate(name="p")
-    q = NamedPredicate(name="q")
-    r = NamedPredicate(name="r")
-    s = NamedPredicate(name="s")
+@app.command("dot", help="Output predicate as a dot (Graphviz) file")
+def dot(expression: str, optimize: Optimize = False) -> None:
+    if predicate := predicate_to_expression(expression):
+        graph = to_dot(predicate, repr(predicate), show_optimized=optimize)
+        graph.render("/tmp/predicate.gv", view=True)  # noqa: S108
+    else:
+        failed_to_pass(expression)
 
-    predicate = (p & q) ^ (r & s)
 
+@app.command("json", help="Output predicate as json")
+def json(expression: Expression, optimize: Optimize = False) -> None:
+    if predicate := predicate_to_expression(expression, optimize):
+        sys.stdout.write(json_lib.dumps(to_json(predicate)))
+    else:
+        failed_to_pass(expression)
+
+
+@app.command("table", help="Output predicate as a truth table")
+def table(expression: Expression, optimize: Optimize = False) -> None:
     def as_bit(value: bool) -> int:
         return 1 if value else 0
 
-    def format_header() -> str:
+    def format_header(predicate: Predicate) -> str:
         named_predicates = get_named_predicates(predicate)
         return " ".join(named_predicates)
 
@@ -64,10 +46,23 @@ def show_truth_table(optimize: bool) -> None:
         bits = [str(as_bit(value)) for value in values]
         return " ".join(bits)
 
-    print(format_header())  # noqa: T201
-    for row in truth_table(predicate):
-        print(f"{format_values(row[0])}:   {as_bit(row[1])}")  # noqa: T201
+    if predicate := predicate_to_expression(expression, optimize):
+        sys.stdout.write(f"{format_header(predicate)}\n")
+        for row in truth_table(predicate):
+            sys.stdout.write(f"{format_values(row[0])}:   {as_bit(row[1])}\n")
+    else:
+        failed_to_pass(expression)
+
+
+def failed_to_pass(expression: str) -> None:
+    sys.stderr.write(f'Could not parse expression: "{expression}"\n')
+
+
+def predicate_to_expression(expression: str, optimize: bool = False) -> Predicate | None:
+    if predicate := parse_expression(expression):
+        return optimize_predicate(predicate) if optimize else predicate
+    return None
 
 
 if __name__ == "__main__":
-    cli()
+    app()

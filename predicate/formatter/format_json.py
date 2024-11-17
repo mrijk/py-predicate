@@ -1,12 +1,15 @@
 from typing import Any
 
-from predicate import (
+from predicate.predicate import (
     AllPredicate,
     AlwaysFalsePredicate,
     AlwaysTruePredicate,
     AndPredicate,
     AnyPredicate,
     FnPredicate,
+    IsFalsyPredicate,
+    IsTruthyPredicate,
+    NamedPredicate,
     NePredicate,
     NotPredicate,
     OrPredicate,
@@ -33,6 +36,12 @@ def to_json(predicate: Predicate) -> dict[str, Any]:
             case FnPredicate(predicate_fn):
                 name = predicate_fn.__code__.co_name
                 return "fn", {"name": name}
+            case IsFalsyPredicate():
+                return "is_falsy", None
+            case NamedPredicate(name):
+                return "variable", name
+            case IsTruthyPredicate():
+                return "is_truthy", None
             case NePredicate(v):
                 return "ne", {"v": v}
             case NotPredicate(not_predicate):

@@ -1,8 +1,8 @@
 from dataclasses import dataclass
 
-from predicate import Predicate, always_false_p, always_true_p
-from predicate.formatter.format_json import to_json
-from predicate.standard_predicates import all_p, any_p, fn_p, ne_p
+from predicate import Predicate, all_p, always_false_p, always_true_p, any_p, fn_p, is_falsy_p, ne_p, to_json
+from predicate.predicate import NamedPredicate
+from predicate.standard_predicates import is_truthy_p
 
 
 def test_format_json_false():
@@ -88,6 +88,30 @@ def test_format_json_fn():
     json = to_json(predicate)
 
     assert json == {"fn": {"name": "<lambda>"}}
+
+
+def test_format_json_is_falsy():
+    predicate = is_falsy_p
+
+    json = to_json(predicate)
+
+    assert json == {"is_falsy": None}
+
+
+def test_format_json_is_truthy():
+    predicate = is_truthy_p
+
+    json = to_json(predicate)
+
+    assert json == {"is_truthy": None}
+
+
+def test_format_json_named():
+    predicate = NamedPredicate(name="foo")
+
+    json = to_json(predicate)
+
+    assert json == {"variable": "foo"}
 
 
 def test_format_unknown():

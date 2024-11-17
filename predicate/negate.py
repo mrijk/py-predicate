@@ -7,6 +7,7 @@ from predicate import (
     GePredicate,
     GtPredicate,
     InPredicate,
+    IsEmptyPredicate,
     IsNonePredicate,
     IsNotNonePredicate,
     LePredicate,
@@ -15,7 +16,14 @@ from predicate import (
     NotInPredicate,
     NotPredicate,
     Predicate,
+    always_false_p,
+    always_true_p,
+    is_empty_p,
+    is_none_p,
+    is_not_none_p,
 )
+from predicate.predicate import IsFalsyPredicate, IsNotEmptyPredicate, IsTruthyPredicate, is_not_empty_p
+from predicate.standard_predicates import is_falsy_p, is_truthy_p
 
 
 @singledispatch
@@ -31,12 +39,22 @@ def negate_is_not(predicate: NotPredicate) -> Predicate:
 
 @negate.register
 def negate_is_false(_predicate: AlwaysFalsePredicate) -> Predicate:
-    return AlwaysTruePredicate()
+    return always_true_p
 
 
 @negate.register
 def negate_is_true(_predicate: AlwaysTruePredicate) -> Predicate:
-    return AlwaysFalsePredicate()
+    return always_false_p
+
+
+@negate.register
+def negate_is_falsy(_predicate: IsFalsyPredicate) -> Predicate:
+    return is_truthy_p
+
+
+@negate.register
+def negate_is_truthy(_predicate: IsTruthyPredicate) -> Predicate:
+    return is_falsy_p
 
 
 @negate.register
@@ -81,9 +99,19 @@ def negate_le(predicate: LePredicate) -> Predicate:
 
 @negate.register
 def negate_is_none(_predicate: IsNonePredicate) -> Predicate:
-    return IsNotNonePredicate()
+    return is_not_none_p
 
 
 @negate.register
 def negate_is_not_none(_predicate: IsNotNonePredicate) -> Predicate:
-    return IsNonePredicate()
+    return is_none_p
+
+
+@negate.register
+def negate_is_empty(_predicate: IsEmptyPredicate) -> Predicate:
+    return is_not_empty_p
+
+
+@negate.register
+def negate_is_not_empty(_predicate: IsNotEmptyPredicate) -> Predicate:
+    return is_empty_p

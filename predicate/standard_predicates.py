@@ -1,4 +1,5 @@
 from collections.abc import Callable, Iterable
+from dataclasses import dataclass
 from datetime import datetime
 from typing import Any, Final
 from uuid import UUID
@@ -15,15 +16,21 @@ from predicate.predicate import (
     GePredicate,
     GtPredicate,
     InPredicate,
+    IsFalsyPredicate,
     IsInstancePredicate,
     IsNonePredicate,
     IsNotNonePredicate,
+    IsTruthyPredicate,
     LePredicate,
     LtPredicate,
     NePredicate,
     NotInPredicate,
     Predicate,
+    resolve_predicate,
 )
+from predicate.regex_predicate import RegexPredicate
+from predicate.root_predicate import RootPredicate
+from predicate.this_predicate import ThisPredicate
 
 is_not_none_p: Final[IsNotNonePredicate] = IsNotNonePredicate()
 """Return True if value is not None, otherwise False."""
@@ -73,6 +80,7 @@ def lt_p[T: (int, str, datetime, UUID)](v: T) -> LtPredicate[T]:
 
 
 def comp_p[T](fn: Callable[[Any], T], predicate: Predicate[T]) -> CompPredicate:
+    """Return a predicate, composed of a function and another predicate."""
     return CompPredicate(fn=fn, predicate=predicate)
 
 
@@ -98,12 +106,12 @@ pos_p = gt_p(0)
 
 def any_p[T](predicate: Predicate[T]) -> AnyPredicate[T]:
     """Return True if the predicate holds for any item in the iterable, otherwise False."""
-    return AnyPredicate(predicate=predicate)
+    return AnyPredicate(predicate=resolve_predicate(predicate))
 
 
 def all_p[T](predicate: Predicate[T]) -> AllPredicate[T]:
     """Return True if the predicate holds for each item in the iterable, otherwise False."""
-    return AllPredicate(predicate=predicate)
+    return AllPredicate(predicate=resolve_predicate(predicate))
 
 
 def lazy_p(ref: str) -> LazyPredicate:
@@ -111,9 +119,37 @@ def lazy_p(ref: str) -> LazyPredicate:
     return LazyPredicate(ref=ref)
 
 
-def is_instance_p(*klass: type) -> IsInstancePredicate:
+def is_instance_p(*klass: type) -> Predicate:
     """Return True if value is an instance of one of the classes, otherwise False."""
     return IsInstancePredicate(klass=klass)
+
+
+def is_iterable_of_p[T](predicate: Predicate[T]) -> Predicate:
+    """Return True if value is an iterable, and for all elements the predicate is True, otherwise False."""
+    return is_iterable_p & all_p(predicate)
+
+
+def is_list_of_p[T](predicate: Predicate[T]) -> Predicate:
+    """Return True if value is a list, and for all elements in the list the predicate is True, otherwise False."""
+    return is_list_p & all_p(predicate)
+
+
+def is_tuple_of_p(*predicates: Predicate) -> Predicate:
+    """Return True if value is a tuple, and for all elements in the tuple the predicate is True, otherwise False."""
+
+    def valid_tuple_values(x: Iterable) -> bool:
+        return all(p(v) for p, v in zip(predicates, x, strict=False))
+
+    return is_tuple_p & has_length_p(length=len(predicates)) & fn_p(fn=valid_tuple_values)
+
+
+def is_set_of_p[T](predicate: Predicate[T]) -> Predicate:
+    """Return True if value is a set, and for all elements in the set the predicate is True, otherwise False."""
+    return is_set_p & all_p(predicate)
+
+
+def regex_p(pattern: str) -> Predicate[str]:
+    return RegexPredicate(pattern=pattern)
 
 
 is_bool_p = is_instance_p(bool)
@@ -146,6 +182,9 @@ is_list_p = is_instance_p(list)
 is_predicate_p = is_instance_p(Predicate)
 """Returns True if the value is a predicate, otherwise False."""
 
+is_range_p = is_instance_p(range)
+"""Returns True if the value is a range, otherwise False."""
+
 is_set_p = is_instance_p(set)
 """Returns True if the value is a set, otherwise False."""
 
@@ -163,6 +202,30 @@ eq_true_p = eq_p(True)
 
 eq_false_p = eq_p(False)
 """Returns True if the value is False, otherwise False."""
+
+is_falsy_p: Final[IsFalsyPredicate] = IsFalsyPredicate()
+is_truthy_p: Final[IsTruthyPredicate] = IsTruthyPredicate()
+
+
+@dataclass
+class PredicateFactory[T](Predicate[T]):
+    """Test."""
+
+    factory: Callable[[], Predicate]
+
+    @property
+    def predicate(self) -> Predicate:
+        return self.factory()
+
+    def __call__(self, *args, **kwargs) -> bool:
+        raise ValueError("Don't call PredicateFactory")
+
+    def __repr__(self) -> str:
+        return repr(self.predicate)
+
+
+root_p: PredicateFactory = PredicateFactory(factory=RootPredicate)
+this_p: PredicateFactory = PredicateFactory(factory=ThisPredicate)
 
 # Construction of a lazy predicate to check for valid json
 

@@ -34,8 +34,17 @@ from predicate import (
     ne_p,
     not_in_p,
 )
-from predicate.predicate import NamedPredicate, is_empty_p
-from predicate.standard_predicates import has_length_p
+from predicate.predicate import NamedPredicate, is_empty_p, is_not_empty_p
+from predicate.standard_predicates import (
+    has_length_p,
+    is_falsy_p,
+    is_iterable_of_p,
+    is_list_of_p,
+    is_range_p,
+    is_set_of_p,
+    is_truthy_p,
+    is_tuple_of_p,
+)
 
 
 def test_always_true_p():
@@ -44,6 +53,16 @@ def test_always_true_p():
 
 def test_always_false_p():
     assert not always_false_p(13)
+
+
+@pytest.mark.parametrize("value", [False, None, 0, {}, "", (), []])
+def test_is_falsy_p(value):
+    assert is_falsy_p(value)
+
+
+@pytest.mark.parametrize("value", [True, not None, 13, {1}, "foo", (1,), [1]])
+def test_is_truthy_p(value):
+    assert is_truthy_p(value)
 
 
 def test_in_p():
@@ -221,6 +240,11 @@ def test_is_predicate_p():
     assert is_predicate_p(always_false_p)
 
 
+def test_is_range_p():
+    assert not is_range_p(None)
+    assert is_range_p(range(10))
+
+
 def test_is_str_p():
     assert not is_str_p(None)
     assert not is_str_p(3)
@@ -243,6 +267,17 @@ def test_is_iterable_p():
     assert is_iterable_p(())
     assert is_iterable_p("foobar")
     assert is_iterable_p({1, 2, 3})
+    assert is_iterable_p(range(5))
+
+
+def test_is_iterable_of_p():
+    is_iterable_of_str = is_iterable_of_p(is_str_p)
+
+    assert not is_iterable_of_str(None)
+    assert not is_iterable_of_str([1])
+
+    assert is_iterable_of_str([])
+    assert is_iterable_of_str(["foo"])
 
 
 def test_is_list_p():
@@ -254,6 +289,16 @@ def test_is_list_p():
     assert is_list_p([3])
 
 
+def test_is_list_of_p():
+    is_list_of_str = is_list_of_p(is_str_p)
+
+    assert not is_list_of_str(None)
+    assert not is_list_of_str([1])
+
+    assert is_list_of_str([])
+    assert is_list_of_str(["foo"])
+
+
 def test_is_set_p():
     assert not is_set_p(None)
 
@@ -261,10 +306,32 @@ def test_is_set_p():
     assert is_set_p({3})
 
 
+def test_is_set_of_p():
+    is_set_of_str = is_set_of_p(is_str_p)
+
+    assert not is_set_of_str(None)
+    assert not is_set_of_str({1})
+
+    assert is_set_of_str(set())
+    assert is_set_of_str({"foo"})
+
+
 def test_is_tuple_p():
     assert not is_tuple_p(None)
 
     assert is_tuple_p((3,))
+
+
+def test_is_tuple_of_p():
+    predicate = is_tuple_of_p(is_str_p, is_int_p & ge_p(2), is_bool_p)
+
+    assert not predicate(None)
+    assert not predicate(("foo",))
+    assert not predicate(("foo", 13))
+    assert not predicate(("foo", 13, None))
+    assert not predicate(("foo", 1, False))
+
+    assert predicate(("foo", 2, False))
 
 
 def test_is_uuid_p():
@@ -335,6 +402,12 @@ def test_is_empty():
     assert not is_empty_p([1])
     assert is_empty_p([])
     assert is_empty_p(())
+
+
+def test_is_not_empty():
+    assert not is_not_empty_p([])
+    assert not is_not_empty_p(())
+    assert is_not_empty_p([1])
 
 
 def test_has_length():
