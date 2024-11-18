@@ -22,7 +22,7 @@ from predicate import (
     regex_p,
 )
 from predicate.predicate import NamedPredicate, is_not_empty_p
-from predicate.standard_predicates import is_falsy_p, is_truthy_p, this_p
+from predicate.standard_predicates import is_falsy_p, is_truthy_p, tee_p, this_p
 
 
 @pytest.mark.parametrize(
@@ -54,6 +54,7 @@ from predicate.standard_predicates import is_falsy_p, is_truthy_p, this_p
         (ne_p(2), "ne_p(2)"),
         (not_in_p(2, 3, 4), "not_in_p(2, 3, 4)"),
         (regex_p("^foo.*bar$"), 'regex_p("^foo.*bar$")'),
+        (tee_p, "tee_p"),
         (this_p, "this_p"),
         (NamedPredicate(name="foo"), "foo"),
     ],

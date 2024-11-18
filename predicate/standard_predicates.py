@@ -30,6 +30,7 @@ from predicate.predicate import (
 )
 from predicate.regex_predicate import RegexPredicate
 from predicate.root_predicate import RootPredicate
+from predicate.tee_predicate import TeePredicate
 from predicate.this_predicate import ThisPredicate
 
 is_not_none_p: Final[IsNotNonePredicate] = IsNotNonePredicate()
@@ -87,6 +88,11 @@ def comp_p[T](fn: Callable[[Any], T], predicate: Predicate[T]) -> CompPredicate:
 def fn_p[T](fn: Callable[[T], bool]) -> FnPredicate[T]:
     """Return the boolean value of the function call."""
     return FnPredicate(predicate_fn=fn)
+
+
+def tee_p[T](fn: Callable[[T], None]) -> Predicate[T]:
+    """Return the boolean value of the function call."""
+    return TeePredicate(fn=fn)
 
 
 def has_length_p(length: int) -> Predicate[Iterable]:

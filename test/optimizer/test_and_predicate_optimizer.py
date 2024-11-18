@@ -458,7 +458,7 @@ def test_optimize_nested_and_4(p, q, r):
     assert optimized == always_false_p
 
 
-def test_optimize_ge_and_lt():
+def test_optimize_ge_and_lt_false():
     ge_4 = ge_p(4)
     lt_4 = lt_p(4)
 

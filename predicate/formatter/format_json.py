@@ -16,6 +16,7 @@ from predicate.predicate import (
     Predicate,
     XorPredicate,
 )
+from predicate.tee_predicate import TeePredicate
 
 
 def to_json(predicate: Predicate) -> dict[str, Any]:
@@ -48,6 +49,8 @@ def to_json(predicate: Predicate) -> dict[str, Any]:
                 return "not", {"predicate": to_json(not_predicate)}
             case OrPredicate(left, right):
                 return "or", {"left": to_json(left), "right": to_json(right)}
+            case TeePredicate():
+                return "tee", None
             case XorPredicate(left, right):
                 return "xor", {"left": to_json(left), "right": to_json(right)}
             case _:

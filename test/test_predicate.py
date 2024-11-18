@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+from unittest.mock import Mock
 from uuid import UUID, uuid4
 
 import pytest
@@ -36,6 +37,7 @@ from predicate import (
 )
 from predicate.predicate import NamedPredicate, is_empty_p, is_not_empty_p
 from predicate.standard_predicates import (
+    all_p,
     has_length_p,
     is_falsy_p,
     is_iterable_of_p,
@@ -44,6 +46,7 @@ from predicate.standard_predicates import (
     is_set_of_p,
     is_truthy_p,
     is_tuple_of_p,
+    tee_p,
 )
 
 
@@ -424,3 +427,16 @@ def test_lambda():
     assert not exists_p(None)
     assert not exists_p(4)
     assert exists_p(3)
+
+
+def test_tee():
+    log_fn = Mock()
+    log = tee_p(fn=log_fn)
+
+    ge_2 = ge_p(2)
+
+    predicate = all_p(log & ge_2)
+
+    assert predicate(range(2, 5))
+
+    assert log_fn.call_count == 3

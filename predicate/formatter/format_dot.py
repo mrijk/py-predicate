@@ -37,6 +37,7 @@ from predicate.standard_predicates import (
     NotInPredicate,
     PredicateFactory,
 )
+from predicate.tee_predicate import TeePredicate
 from predicate.this_predicate import ThisPredicate, find_this_predicate
 
 
@@ -150,6 +151,8 @@ def render(dot, predicate: Predicate, node_nr):
                 return to_value(factory.predicate)
             case RootPredicate():
                 return add_node("root", label="root")
+            case TeePredicate():
+                return add_node("tee", label="tee")
             case ThisPredicate():
                 return add_node("this", label="this")
             case XorPredicate(left, right):
