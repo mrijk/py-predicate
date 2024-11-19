@@ -1,5 +1,6 @@
 from typing import Any
 
+from predicate.named_predicate import NamedPredicate
 from predicate.predicate import (
     AllPredicate,
     AlwaysFalsePredicate,
@@ -9,7 +10,6 @@ from predicate.predicate import (
     FnPredicate,
     IsFalsyPredicate,
     IsTruthyPredicate,
-    NamedPredicate,
     NePredicate,
     NotPredicate,
     OrPredicate,

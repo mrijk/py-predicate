@@ -7,6 +7,7 @@ from more_itertools import first
 
 from predicate.comp_predicate import CompPredicate
 from predicate.lazy_predicate import LazyPredicate, find_predicate_by_ref
+from predicate.named_predicate import NamedPredicate
 from predicate.optimizer.predicate_optimizer import optimize
 from predicate.predicate import (
     AlwaysFalsePredicate,
@@ -14,7 +15,6 @@ from predicate.predicate import (
     AndPredicate,
     IsFalsyPredicate,
     IsTruthyPredicate,
-    NamedPredicate,
     NotPredicate,
     OrPredicate,
     Predicate,
@@ -35,7 +35,6 @@ from predicate.standard_predicates import (
     LtPredicate,
     NePredicate,
     NotInPredicate,
-    PredicateFactory,
 )
 from predicate.tee_predicate import TeePredicate
 from predicate.this_predicate import ThisPredicate, find_this_predicate
@@ -147,8 +146,6 @@ def render(dot, predicate: Predicate, node_nr):
                 dot.edge(node, left_node)
                 dot.edge(node, right_node)
                 return node
-            case PredicateFactory() as factory:
-                return to_value(factory.predicate)
             case RootPredicate():
                 return add_node("root", label="root")
             case TeePredicate():

@@ -4,7 +4,8 @@ from itertools import repeat
 from more_itertools import gray_product
 
 from predicate import AlwaysFalsePredicate, AlwaysTruePredicate, AndPredicate, NotPredicate, Predicate
-from predicate.predicate import NamedPredicate, OrPredicate, XorPredicate
+from predicate.named_predicate import NamedPredicate
+from predicate.predicate import OrPredicate, XorPredicate
 
 
 def truth_table(predicate: Predicate) -> Iterable[tuple]:

@@ -35,7 +35,8 @@ from predicate import (
     ne_p,
     not_in_p,
 )
-from predicate.predicate import NamedPredicate, is_empty_p, is_not_empty_p
+from predicate.named_predicate import NamedPredicate
+from predicate.predicate import is_empty_p, is_not_empty_p
 from predicate.standard_predicates import (
     all_p,
     has_length_p,

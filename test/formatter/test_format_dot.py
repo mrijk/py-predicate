@@ -26,8 +26,8 @@ from predicate import (
     not_in_p,
     to_dot,
 )
-from predicate.predicate import NamedPredicate
-from predicate.standard_predicates import is_truthy_p, root_p, this_p
+from predicate.named_predicate import NamedPredicate
+from predicate.standard_predicates import is_truthy_p, root_p, tee_p, this_p
 
 
 def test_format_dot_false():
@@ -242,6 +242,14 @@ def test_format_dot_this():
     str_or_list_of_str = is_str_p | (is_list_p & all_p(this_p))
 
     dot = to_dot(str_or_list_of_str)
+
+    assert dot
+
+
+def test_format_dot_tee():
+    predicate = tee_p(fn=lambda _: None)
+
+    dot = to_dot(predicate)
 
     assert dot
 
