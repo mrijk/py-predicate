@@ -1,6 +1,7 @@
 from collections.abc import Callable, Iterable
 from dataclasses import dataclass
 from datetime import datetime
+from functools import partial
 from typing import Any, Final
 from uuid import UUID
 
@@ -15,6 +16,7 @@ from predicate.predicate import (
     FnPredicate,
     GePredicate,
     GtPredicate,
+    HasKeyPredicate,
     InPredicate,
     IsFalsyPredicate,
     IsInstancePredicate,
@@ -28,6 +30,7 @@ from predicate.predicate import (
     Predicate,
     resolve_predicate,
 )
+from predicate.range_predicate import GeLePredicate, GeLtPredicate, GtLePredicate, GtLtPredicate
 from predicate.regex_predicate import RegexPredicate
 from predicate.root_predicate import RootPredicate
 from predicate.tee_predicate import TeePredicate
@@ -63,6 +66,26 @@ def ne_p[T](v: T) -> NePredicate[T]:
 def ge_p[T: (int, str, datetime, UUID)](v: T) -> GePredicate[T]:
     """Return True if the value is greater or equal than the constant, otherwise False."""
     return GePredicate(v=v)
+
+
+def ge_le_p[T: (int, str, datetime, UUID)](lower: T, upper: T) -> GeLePredicate[T]:
+    """Return True if the value is greater or equal than the constant, otherwise False."""
+    return GeLePredicate(lower=lower, upper=upper)
+
+
+def ge_lt_p[T: (int, str, datetime, UUID)](lower: T, upper: T) -> GeLtPredicate[T]:
+    """Return True if the value is greater or equal than the constant, otherwise False."""
+    return GeLtPredicate(lower=lower, upper=upper)
+
+
+def gt_le_p[T: (int, str, datetime, UUID)](lower: T, upper: T) -> GtLePredicate[T]:
+    """Return True if the value is greater or equal than the constant, otherwise False."""
+    return GtLePredicate(lower=lower, upper=upper)
+
+
+def gt_lt_p[T: (int, str, datetime, UUID)](lower: T, upper: T) -> GtLtPredicate[T]:
+    """Return True if the value is greater or equal than the constant, otherwise False."""
+    return GtLtPredicate(lower=lower, upper=upper)
 
 
 def gt_p[T: (int, str, datetime, UUID)](v: T) -> GtPredicate[T]:
@@ -232,6 +255,45 @@ class PredicateFactory[T](Predicate[T]):
 
 root_p: PredicateFactory = PredicateFactory(factory=RootPredicate)
 this_p: PredicateFactory = PredicateFactory(factory=ThisPredicate)
+
+
+def dict_depth(value: dict) -> int:
+    match value:
+        case list() as l:
+            return 1 + max(dict_depth(item) for item in l)
+        case dict() as d if d:
+            return 1 + max(dict_depth(item) for item in d.values())
+        case _:
+            return 1
+
+
+def has_key_p[T](key: T) -> HasKeyPredicate:
+    """Return True if dict contains key, otherwise False."""
+    return HasKeyPredicate(key=key)
+
+
+def depth_op_p(depth: int, predicate: Callable[[int], Predicate]) -> Predicate[dict]:
+    return comp_p(dict_depth, predicate(depth))
+
+
+depth_eq_p = partial(depth_op_p, predicate=eq_p)
+"""Returns if dict depth is equal to given depth, otherwise False."""
+
+depth_ne_p = partial(depth_op_p, predicate=ne_p)
+"""Returns if dict depth is not equal to given depth, otherwise False."""
+
+depth_le_p = partial(depth_op_p, predicate=le_p)
+"""Returns if dict depth is less or equal to given depth, otherwise False."""
+
+depth_lt_p = partial(depth_op_p, predicate=lt_p)
+"""Returns if dict depth is less than given depth, otherwise False."""
+
+depth_ge_p = partial(depth_op_p, predicate=ge_p)
+"""Returns if dict depth is greater or equal to given depth, otherwise False."""
+
+depth_gt_p = partial(depth_op_p, predicate=gt_p)
+"""Returns if dict depth is greater than given depth, otherwise False."""
+
 
 # Construction of a lazy predicate to check for valid json
 

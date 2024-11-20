@@ -39,6 +39,10 @@ from predicate.named_predicate import NamedPredicate
 from predicate.predicate import is_empty_p, is_not_empty_p
 from predicate.standard_predicates import (
     all_p,
+    ge_le_p,
+    ge_lt_p,
+    gt_le_p,
+    gt_lt_p,
     has_length_p,
     is_falsy_p,
     is_iterable_of_p,
@@ -103,6 +107,39 @@ def test_ge_p():
     assert not ge_2(1)
     assert ge_2(2)
     assert ge_2(3)
+
+
+def test_ge_le_p():
+    ge_2_le_3 = ge_le_p(2, 3)
+
+    assert not ge_2_le_3(1)
+    assert not ge_2_le_3(4)
+    assert ge_2_le_3(2)
+    assert ge_2_le_3(3)
+
+
+def test_ge_lt_p():
+    ge_2_lt_3 = ge_lt_p(2, 3)
+
+    assert not ge_2_lt_3(1)
+    assert not ge_2_lt_3(3)
+    assert ge_2_lt_3(2)
+
+
+def test_gt_le_p():
+    gt_2_le_3 = gt_le_p(2, 3)
+
+    assert not gt_2_le_3(2)
+    assert not gt_2_le_3(4)
+    assert gt_2_le_3(3)
+
+
+def test_gt_lt_p():
+    gt_2_lt_3 = gt_lt_p(2, 4)
+
+    assert not gt_2_lt_3(2)
+    assert not gt_2_lt_3(4)
+    assert gt_2_lt_3(3)
 
 
 def test_str_ge_p():

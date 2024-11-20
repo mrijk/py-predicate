@@ -44,6 +44,7 @@ test = [
     "mypy",
     "mypy_extensions",
     "pytest",
+    "pytest-benchmark",
     "pytest-cov",
     "ruff",
 ]

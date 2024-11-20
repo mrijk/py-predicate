@@ -23,7 +23,7 @@ from predicate import (
 )
 from predicate.named_predicate import NamedPredicate
 from predicate.predicate import is_not_empty_p
-from predicate.standard_predicates import is_falsy_p, is_truthy_p, tee_p, this_p
+from predicate.standard_predicates import ge_le_p, ge_lt_p, gt_le_p, gt_lt_p, is_falsy_p, is_truthy_p, tee_p, this_p
 
 
 @pytest.mark.parametrize(
@@ -41,6 +41,10 @@ from predicate.standard_predicates import is_falsy_p, is_truthy_p, tee_p, this_p
         (eq_p(2), "eq_p(2)"),
         (ge_p(2), "ge_p(2)"),
         (gt_p(2), "gt_p(2)"),
+        (ge_le_p(2, 3), "ge_le_p(2, 3)"),
+        (gt_le_p(2, 3), "gt_le_p(2, 3)"),
+        (ge_lt_p(2, 3), "ge_lt_p(2, 3)"),
+        (gt_lt_p(2, 3), "gt_lt_p(2, 3)"),
         (in_p(2, 3, 4), "in_p(2, 3, 4)"),
         (is_empty_p, "is_empty_p"),
         (is_not_empty_p, "is_not_empty_p"),

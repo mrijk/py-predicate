@@ -20,6 +20,7 @@ from predicate.predicate import (
     Predicate,
     XorPredicate,
 )
+from predicate.range_predicate import GeLePredicate, GeLtPredicate, GtLePredicate, GtLtPredicate
 from predicate.root_predicate import RootPredicate, find_root_predicate
 from predicate.standard_predicates import (
     AllPredicate,
@@ -111,8 +112,16 @@ def render(dot, predicate: Predicate, node_nr):
                 return add_node("fn", label=f"fn: {name}")
             case GePredicate(v):
                 return add_node("ge", label=f"x ≥ {v}")
+            case GeLePredicate(upper, lower):
+                return add_node("gele", label=f"{lower} ≤ x ≤ {upper}")
+            case GeLtPredicate(upper, lower):
+                return add_node("gelt", label=f"{lower} ≤ x < {upper}")
             case GtPredicate(v):
                 return add_node("gt", label=f"x > {v}")
+            case GtLePredicate(upper, lower):
+                return add_node("gele", label=f"{lower} ≤ x ≤ {upper}")
+            case GtLtPredicate(upper, lower):
+                return add_node("gelt", label=f"{lower} ≤ x < {upper}")
             case InPredicate(v):
                 items = ", ".join(str(item) for item in v)
                 return add_node("in", label=f"x ∈ {{{items}}}")

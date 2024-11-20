@@ -4,5 +4,7 @@ coverage
 graphviz
 lark
 mypy
+pytest
+pytest-benchmark
 ruff
 typer
