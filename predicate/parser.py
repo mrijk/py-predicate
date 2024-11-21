@@ -1,4 +1,4 @@
-from lark import Lark, Transformer, UnexpectedEOF
+from lark import Lark, Transformer, UnexpectedEOF  # type: ignore
 
 from predicate import NotPredicate, Predicate, XorPredicate, always_false_p
 from predicate.named_predicate import NamedPredicate
