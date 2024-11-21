@@ -49,6 +49,8 @@ from predicate.standard_predicates import (
     is_list_of_p,
     is_range_p,
     is_set_of_p,
+    is_single_or_iterable_of_p,
+    is_single_or_list_of_p,
     is_truthy_p,
     is_tuple_of_p,
     tee_p,
@@ -321,6 +323,17 @@ def test_is_iterable_of_p():
     assert is_iterable_of_str(["foo"])
 
 
+def test_is_single_or_iterable_of_p():
+    is_single_or_iterable_of_str = is_single_or_iterable_of_p(is_str_p)
+
+    assert not is_single_or_iterable_of_str(None)
+    assert not is_single_or_iterable_of_str([1])
+
+    assert is_single_or_iterable_of_str("foo")
+    assert is_single_or_iterable_of_str([])
+    assert is_single_or_iterable_of_str(["foo"])
+
+
 def test_is_list_p():
     assert not is_list_p(None)
     assert not is_list_p((3,))
@@ -335,9 +348,21 @@ def test_is_list_of_p():
 
     assert not is_list_of_str(None)
     assert not is_list_of_str([1])
+    assert not is_list_of_str("foo")
 
     assert is_list_of_str([])
     assert is_list_of_str(["foo"])
+
+
+def test_is_single_or_list_of_p():
+    is_single_or_list_of_str = is_single_or_list_of_p(is_str_p)
+
+    assert not is_single_or_list_of_str(None)
+    assert not is_single_or_list_of_str([1])
+
+    assert is_single_or_list_of_str("foo")
+    assert is_single_or_list_of_str([])
+    assert is_single_or_list_of_str(["foo"])
 
 
 def test_is_set_p():

@@ -158,9 +158,19 @@ def is_iterable_of_p[T](predicate: Predicate[T]) -> Predicate:
     return is_iterable_p & all_p(predicate)
 
 
+def is_single_or_iterable_of_p[T](predicate: Predicate[T]) -> Predicate:
+    """Return True if value is an iterable or a single value, and for all elements the predicate is True, otherwise False."""
+    return is_iterable_of_p(predicate) | predicate
+
+
 def is_list_of_p[T](predicate: Predicate[T]) -> Predicate:
     """Return True if value is a list, and for all elements in the list the predicate is True, otherwise False."""
     return is_list_p & all_p(predicate)
+
+
+def is_single_or_list_of_p[T](predicate: Predicate[T]) -> Predicate:
+    """Return True if value is a list or a single value, and for all elements in the list the predicate is True, otherwise False."""
+    return is_list_of_p(predicate) | predicate
 
 
 def is_tuple_of_p(*predicates: Predicate) -> Predicate:

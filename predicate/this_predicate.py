@@ -2,6 +2,7 @@ import inspect
 from dataclasses import dataclass
 from functools import cached_property
 
+from predicate.comp_predicate import CompPredicate
 from predicate.predicate import AllPredicate, AndPredicate, OrPredicate, Predicate
 
 
@@ -41,6 +42,8 @@ def predicate_in_predicate_tree(tree: Predicate, predicate: Predicate) -> bool:
             return predicate_in_predicate_tree(all_predicate, predicate)
         case AndPredicate(and_left, and_right):
             return predicate_in_predicate_tree(and_left, predicate) or predicate_in_predicate_tree(and_right, predicate)
+        case CompPredicate(_, comp_predicate):
+            return predicate_in_predicate_tree(comp_predicate, predicate)
         case OrPredicate(or_left, or_right):
             return predicate_in_predicate_tree(or_left, predicate) or predicate_in_predicate_tree(or_right, predicate)
         case PredicateFactory() as factory:
