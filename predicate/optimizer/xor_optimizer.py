@@ -8,6 +8,8 @@ from predicate.predicate import (
     OrPredicate,
     Predicate,
     XorPredicate,
+    always_false_p,
+    always_true_p,
 )
 
 
@@ -33,7 +35,7 @@ def optimize_xor_predicate[T](predicate: XorPredicate[T]) -> Predicate[T]:
         case AlwaysTruePredicate(), _:  # True ^ p = ~p
             return optimize(NotPredicate(predicate=right))
         case _, _ if left == right:  # p ^ p == False
-            return AlwaysFalsePredicate()
+            return always_false_p
 
         case InPredicate(v1), InPredicate(v2):
             return optimize_in_predicate(InPredicate(v=v1 ^ v2))
@@ -74,6 +76,6 @@ def optimize_xor_not[T](left: Predicate[T], right: Predicate[T]) -> Predicate[T]
         case NotPredicate(left_p), NotPredicate(right_p):  # ~p ^ ~q == p ^ q
             return XorPredicate(left=left_p, right=right_p)
         case _, _ if left == negate(right):  # ~p ^ p == True
-            return AlwaysTruePredicate()
+            return always_true_p
 
     return None

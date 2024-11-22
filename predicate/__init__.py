@@ -2,11 +2,11 @@
 
 __version__ = "0.0.1"
 
+from predicate.all_predicate import AllPredicate
 from predicate.formatter.format_dot import to_dot
 from predicate.formatter.format_json import to_json
 from predicate.optimizer.predicate_optimizer import can_optimize, optimize
 from predicate.predicate import (
-    AllPredicate,
     AlwaysFalsePredicate,
     AlwaysTruePredicate,
     AndPredicate,
@@ -80,9 +80,9 @@ from predicate.standard_predicates import (
 )
 
 __all__ = [
-    "AllPredicate",
     "AlwaysFalsePredicate",
     "AlwaysTruePredicate",
+    "AllPredicate",
     "AndPredicate",
     "AnyPredicate",
     "EqPredicate",

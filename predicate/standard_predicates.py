@@ -7,16 +7,16 @@ from uuid import UUID
 
 from more_itertools import ilen
 
+from predicate.all_predicate import AllPredicate
 from predicate.comp_predicate import CompPredicate
+from predicate.has_key_predicate import HasKeyPredicate
 from predicate.lazy_predicate import LazyPredicate
 from predicate.predicate import (
-    AllPredicate,
     AnyPredicate,
     EqPredicate,
     FnPredicate,
     GePredicate,
     GtPredicate,
-    HasKeyPredicate,
     InPredicate,
     IsFalsyPredicate,
     IsInstancePredicate,

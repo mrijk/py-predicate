@@ -23,6 +23,13 @@ def test_has_key_p():
     assert has_key_x({"x": 13})
 
 
+def test_has_keq_eq_p():
+    has_key_1 = has_key_p("x")
+    has_key_2 = has_key_p("x")
+
+    assert has_key_1 == has_key_2
+
+
 def test_depth_eq_p():
     depth_eq_3 = depth_eq_p(3)
 

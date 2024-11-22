@@ -1,5 +1,5 @@
+from predicate.all_predicate import AllPredicate
 from predicate.predicate import (
-    AllPredicate,
     AlwaysFalsePredicate,
     AlwaysTruePredicate,
     AnyPredicate,

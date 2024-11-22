@@ -2,8 +2,9 @@ import inspect
 from dataclasses import dataclass
 from functools import cached_property
 
+from predicate.all_predicate import AllPredicate
 from predicate.comp_predicate import CompPredicate
-from predicate.predicate import AllPredicate, AndPredicate, OrPredicate, Predicate
+from predicate.predicate import AndPredicate, OrPredicate, Predicate
 
 
 @dataclass

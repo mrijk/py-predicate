@@ -9,6 +9,7 @@ from predicate.predicate import (
     NotPredicate,
     OrPredicate,
     Predicate,
+    always_true_p,
 )
 
 
@@ -34,9 +35,9 @@ def optimize_or_predicate[T](predicate: OrPredicate[T]) -> Predicate[T]:
 
     match left, right:
         case _, AlwaysTruePredicate():
-            return AlwaysTruePredicate()  # p | True == True
+            return always_true_p  # p | True == True
         case AlwaysTruePredicate(), _:
-            return AlwaysTruePredicate()  # True | p == True
+            return always_true_p  # True | p == True
 
         case AndPredicate(and_left_left, and_left_right), AndPredicate(and_right_left, and_right_right):
             match and_left_left, and_left_right, and_right_left, and_right_right:
@@ -72,12 +73,12 @@ def optimize_or_predicate[T](predicate: OrPredicate[T]) -> Predicate[T]:
         case InPredicate(v1), InPredicate(v2):
             if v := v1 | v2:
                 return optimize_in_predicate(InPredicate(v=v))
-            return AlwaysTruePredicate()
+            return always_true_p
 
         case InPredicate(v1), NotInPredicate(v2):
             if v := v2 - (v1 & v2):
                 return optimize_not_in_predicate(NotInPredicate(v=v))
-            return AlwaysTruePredicate()
+            return always_true_p
 
         case AnyPredicate(left_any), AnyPredicate(right_any):
             return AnyPredicate(optimize(OrPredicate(left=left_any, right=right_any)))
@@ -89,10 +90,10 @@ def optimize_or_predicate[T](predicate: OrPredicate[T]) -> Predicate[T]:
             return left
 
         case _, _ if or_contains_negate(predicate, right):
-            return AlwaysTruePredicate()  # p | q | ... | ~p == True
+            return always_true_p  # p | q | ... | ~p == True
 
         case _, _ if or_contains_negate(predicate, left):
-            return AlwaysTruePredicate()  # q | p | ... | ~p == True
+            return always_true_p  # q | p | ... | ~p == True
 
     return OrPredicate(left=left, right=right)
 
@@ -102,7 +103,7 @@ def optimize_or_not[T](left: Predicate[T], right: Predicate[T]) -> Predicate[T] 
 
     match left, right:
         case _, _ if left == negate(right):
-            return AlwaysTruePredicate()  # p | ~p == true
+            return always_true_p  # p | ~p == true
 
     return None
 

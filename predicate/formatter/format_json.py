@@ -1,8 +1,8 @@
 from typing import Any
 
+from predicate.all_predicate import AllPredicate
 from predicate.named_predicate import NamedPredicate
 from predicate.predicate import (
-    AllPredicate,
     AlwaysFalsePredicate,
     AlwaysTruePredicate,
     AndPredicate,

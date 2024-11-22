@@ -1,7 +1,7 @@
+from predicate.all_predicate import AllPredicate
 from predicate.implies import implies
 from predicate.optimizer.in_optimizer import optimize_in_predicate, optimize_not_in_predicate
 from predicate.predicate import (
-    AllPredicate,
     AlwaysFalsePredicate,
     AlwaysTruePredicate,
     AndPredicate,
