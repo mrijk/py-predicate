@@ -13,6 +13,7 @@ from predicate.has_key_predicate import HasKeyPredicate
 from predicate.lazy_predicate import LazyPredicate
 from predicate.predicate import (
     AnyPredicate,
+    ConstrainedT,
     EqPredicate,
     FnPredicate,
     GePredicate,
@@ -63,42 +64,42 @@ def ne_p[T](v: T) -> NePredicate[T]:
     return NePredicate(v=v)
 
 
-def ge_p[T: (int, str, datetime, UUID)](v: T) -> GePredicate[T]:
+def ge_p(v: ConstrainedT) -> GePredicate[ConstrainedT]:
     """Return True if the value is greater or equal than the constant, otherwise False."""
     return GePredicate(v=v)
 
 
-def ge_le_p[T: (int, str, datetime, UUID)](lower: T, upper: T) -> GeLePredicate[T]:
+def ge_le_p(lower: ConstrainedT, upper: ConstrainedT) -> GeLePredicate[ConstrainedT]:
     """Return True if the value is greater or equal than the constant, otherwise False."""
     return GeLePredicate(lower=lower, upper=upper)
 
 
-def ge_lt_p[T: (int, str, datetime, UUID)](lower: T, upper: T) -> GeLtPredicate[T]:
+def ge_lt_p(lower: ConstrainedT, upper: ConstrainedT) -> GeLtPredicate[ConstrainedT]:
     """Return True if the value is greater or equal than the constant, otherwise False."""
     return GeLtPredicate(lower=lower, upper=upper)
 
 
-def gt_le_p[T: (int, str, datetime, UUID)](lower: T, upper: T) -> GtLePredicate[T]:
+def gt_le_p(lower: ConstrainedT, upper: ConstrainedT) -> GtLePredicate[ConstrainedT]:
     """Return True if the value is greater or equal than the constant, otherwise False."""
     return GtLePredicate(lower=lower, upper=upper)
 
 
-def gt_lt_p[T: (int, str, datetime, UUID)](lower: T, upper: T) -> GtLtPredicate[T]:
+def gt_lt_p(lower: ConstrainedT, upper: ConstrainedT) -> GtLtPredicate[ConstrainedT]:
     """Return True if the value is greater or equal than the constant, otherwise False."""
     return GtLtPredicate(lower=lower, upper=upper)
 
 
-def gt_p[T: (int, str, datetime, UUID)](v: T) -> GtPredicate[T]:
+def gt_p(v: ConstrainedT) -> GtPredicate[ConstrainedT]:
     """Return True if the value is greater than the constant, otherwise False."""
     return GtPredicate(v=v)
 
 
-def le_p[T: (int, str, datetime, UUID)](v: T) -> LePredicate[T]:
+def le_p(v: ConstrainedT) -> LePredicate[ConstrainedT]:
     """Return True if the value is less than or equal to the constant, otherwise False."""
     return LePredicate(v=v)
 
 
-def lt_p[T: (int, str, datetime, UUID)](v: T) -> LtPredicate[T]:
+def lt_p(v: ConstrainedT) -> LtPredicate[ConstrainedT]:
     """Return True if the value is less than the constant, otherwise False."""
     return LtPredicate(v=v)
 
@@ -188,6 +189,7 @@ def is_set_of_p[T](predicate: Predicate[T]) -> Predicate:
 
 
 def regex_p(pattern: str) -> Predicate[str]:
+    """Return True if value matches regex, otherwise False."""
     return RegexPredicate(pattern=pattern)
 
 

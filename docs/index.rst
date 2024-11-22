@@ -13,3 +13,5 @@ This library makes it easy to define composable predicates.
    lazy_predicates
    formatters
    optimization
+   cli
+   tutorial/tutorial

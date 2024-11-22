@@ -241,11 +241,14 @@ class NePredicate[T](Predicate[T]):
         return f"ne_p({self.v})"
 
 
+type ConstrainedT[T: (int, str, float, datetime, UUID)] = T
+
+
 @dataclass
-class GePredicate[T: (int, str, datetime, UUID)](Predicate[T]):
+class GePredicate[T](Predicate[T]):
     """A predicate class that models the 'ge' (>=) predicate."""
 
-    v: T
+    v: ConstrainedT
 
     def __call__(self, x: T) -> bool:
         return x >= self.v
@@ -258,10 +261,10 @@ class GePredicate[T: (int, str, datetime, UUID)](Predicate[T]):
 
 
 @dataclass
-class GtPredicate[T: (int, str, datetime, UUID)](Predicate[T]):
+class GtPredicate[T](Predicate[T]):
     """A predicate class that models the 'gt' (>) predicate."""
 
-    v: T
+    v: ConstrainedT
 
     def __call__(self, x: T) -> bool:
         return x > self.v
@@ -274,10 +277,10 @@ class GtPredicate[T: (int, str, datetime, UUID)](Predicate[T]):
 
 
 @dataclass
-class LePredicate[T: (int, str, datetime, UUID)](Predicate[T]):
+class LePredicate[T](Predicate[T]):
     """A predicate class that models the 'le' (<=) predicate."""
 
-    v: T
+    v: ConstrainedT
 
     def __call__(self, x: T) -> bool:
         return x <= self.v
@@ -290,10 +293,10 @@ class LePredicate[T: (int, str, datetime, UUID)](Predicate[T]):
 
 
 @dataclass
-class LtPredicate[T: (int, str, datetime, UUID)](Predicate[T]):
+class LtPredicate[T](Predicate[T]):
     """A predicate class that models the 'lt' (<) predicate."""
 
-    v: T
+    v: ConstrainedT
 
     def __call__(self, x: T) -> bool:
         return x < self.v

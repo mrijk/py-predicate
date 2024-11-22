@@ -7,6 +7,8 @@ from predicate.predicate import (
     NePredicate,
     NotPredicate,
     Predicate,
+    always_false_p,
+    always_true_p,
 )
 
 
@@ -17,9 +19,9 @@ def optimize_any_predicate[T](predicate: AnyPredicate[T]) -> Predicate[T]:
 
     match optimized:
         case AlwaysTruePredicate():
-            return AlwaysTruePredicate()
+            return always_true_p
         case AlwaysFalsePredicate():
-            return AlwaysFalsePredicate()
+            return always_false_p
         case NePredicate(v):
             return NotPredicate(predicate=AllPredicate(predicate=EqPredicate(v)))
         case NotPredicate(not_predicate):

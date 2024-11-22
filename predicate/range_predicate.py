@@ -1,16 +1,14 @@
 from dataclasses import dataclass
-from datetime import datetime
-from uuid import UUID
 
-from predicate.predicate import Predicate
+from predicate.predicate import ConstrainedT, Predicate
 
 
 @dataclass
-class GeLePredicate[T: (int, str, datetime, UUID)](Predicate[T]):
+class GeLePredicate[T](Predicate[T]):
     """A predicate class that models the 'lower <= x <= upper' predicate."""
 
-    lower: T
-    upper: T
+    lower: ConstrainedT
+    upper: ConstrainedT
 
     def __call__(self, x: T) -> bool:
         return self.lower <= x <= self.upper
@@ -23,11 +21,11 @@ class GeLePredicate[T: (int, str, datetime, UUID)](Predicate[T]):
 
 
 @dataclass
-class GeLtPredicate[T: (int, str, datetime, UUID)](Predicate[T]):
+class GeLtPredicate[T](Predicate[T]):
     """A predicate class that models the 'lower <= x < upper' predicate."""
 
-    lower: T
-    upper: T
+    lower: ConstrainedT
+    upper: ConstrainedT
 
     def __call__(self, x: T) -> bool:
         return self.lower <= x < self.upper
@@ -40,11 +38,11 @@ class GeLtPredicate[T: (int, str, datetime, UUID)](Predicate[T]):
 
 
 @dataclass
-class GtLePredicate[T: (int, str, datetime, UUID)](Predicate[T]):
+class GtLePredicate[T](Predicate[T]):
     """A predicate class that models the 'lower < x <= upper' predicate."""
 
-    lower: T
-    upper: T
+    lower: ConstrainedT
+    upper: ConstrainedT
 
     def __call__(self, x: T) -> bool:
         return self.lower < x <= self.upper
@@ -57,11 +55,11 @@ class GtLePredicate[T: (int, str, datetime, UUID)](Predicate[T]):
 
 
 @dataclass
-class GtLtPredicate[T: (int, str, datetime, UUID)](Predicate[T]):
+class GtLtPredicate[T](Predicate[T]):
     """A predicate class that models the 'lower < x < upper' predicate."""
 
-    lower: T
-    upper: T
+    lower: ConstrainedT
+    upper: ConstrainedT
 
     def __call__(self, x: T) -> bool:
         return self.lower < x < self.upper

@@ -2,7 +2,6 @@ from predicate.all_predicate import AllPredicate
 from predicate.implies import implies
 from predicate.optimizer.in_optimizer import optimize_in_predicate, optimize_not_in_predicate
 from predicate.predicate import (
-    AlwaysFalsePredicate,
     AlwaysTruePredicate,
     AndPredicate,
     EqPredicate,
@@ -76,7 +75,7 @@ def optimize_and_predicate[T](predicate: AndPredicate[T]) -> Predicate[T]:
             return always_false_p
 
         case FnPredicate(predicate_fn), EqPredicate(v):
-            return AlwaysTruePredicate() if predicate_fn(v) else AlwaysFalsePredicate()
+            return always_true_p if predicate_fn(v) else always_false_p
 
         case InPredicate(v1), InPredicate(v2):
             if v := v1 & v2:
