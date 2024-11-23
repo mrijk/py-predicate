@@ -23,13 +23,17 @@ from predicate import (
     not_in_p,
 )
 from predicate.generator.generate import generate
-from predicate.standard_predicates import zero_p
+from predicate.standard_predicates import ge_p, gt_p, le_p, lt_p, pos_p, zero_p
 
 
 @pytest.mark.parametrize(
     "predicate",
     [
+        all_p(is_int_p),
+        any_p(is_uuid_p),
         eq_p(2),
+        ge_p(2),
+        gt_p(2),
         in_p(2, 3, 4),
         is_bool_p,
         is_complex_p,
@@ -43,8 +47,11 @@ from predicate.standard_predicates import zero_p
         is_uuid_p,
         is_str_p,
         is_int_p | is_str_p,
+        le_p(2),
+        lt_p(2),
         ne_p(2),
         not_in_p(2, "foo", 4),
+        pos_p,
         zero_p,
     ],
 )
@@ -55,7 +62,8 @@ def test_generate(predicate):
 def test_generate_false():
     predicate = always_false_p
 
-    assert generate(predicate) is None
+    with pytest.raises(ValueError):
+        generate(predicate)
 
 
 def test_generate_true():
@@ -69,18 +77,6 @@ def test_generate_fn_p():
 
     with pytest.raises(ValueError):
         generate(predicate)
-
-
-def test_generate_all_p():
-    predicate = all_p(is_int_p)
-
-    assert_generated(predicate)
-
-
-def test_generate_any_p():
-    predicate = any_p(is_uuid_p)
-
-    assert_generated(predicate)
 
 
 def assert_generated(predicate):

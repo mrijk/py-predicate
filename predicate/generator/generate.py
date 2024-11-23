@@ -12,11 +12,15 @@ from predicate.predicate import (
     AlwaysTruePredicate,
     AnyPredicate,
     EqPredicate,
+    GePredicate,
+    GtPredicate,
     InPredicate,
     IsFalsyPredicate,
     IsInstancePredicate,
     IsNotNonePredicate,
     IsTruthyPredicate,
+    LePredicate,
+    LtPredicate,
     NePredicate,
     NotInPredicate,
     OrPredicate,
@@ -27,7 +31,7 @@ from predicate.predicate import (
 @singledispatch
 def generate[T](predicate: Predicate[T]) -> Iterator[T]:
     """Generate values that satisfy this predicate."""
-    raise ValueError("Please register generator for correct predicate type.")
+    raise ValueError("Please register generator for correct predicate type")
 
 
 @generate.register
@@ -37,12 +41,40 @@ def generate_eq(predicate: EqPredicate) -> Iterator:
 
 @generate.register
 def generate_false(_predicate: AlwaysFalsePredicate) -> Iterator:
-    pass
+    raise ValueError("Always false can never generate a true value")
+
+
+@generate.register
+def generate_ge(predicate: GePredicate) -> Iterator:
+    match predicate.v:
+        case int():
+            yield from range(predicate.v, predicate.v + 5)
+
+
+@generate.register
+def generate_gt(predicate: GtPredicate) -> Iterator:
+    match predicate.v:
+        case int():
+            yield from range(predicate.v + 1, predicate.v + 6)
 
 
 @generate.register
 def generate_in(predicate: InPredicate) -> Iterator:
     yield from predicate.v
+
+
+@generate.register
+def generate_le(predicate: LePredicate) -> Iterator:
+    match predicate.v:
+        case int():
+            yield from range(predicate.v, predicate.v - 5, -1)
+
+
+@generate.register
+def generate_lt(predicate: LtPredicate) -> Iterator:
+    match predicate.v:
+        case int():
+            yield from range(predicate.v - 1, predicate.v - 6, -1)
 
 
 @generate.register
