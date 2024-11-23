@@ -124,7 +124,7 @@ def generate_truthy(_predicate: IsTruthyPredicate) -> Iterator:
 
 @generate.register
 def generate_is_instance_p(predicate: IsInstancePredicate) -> Iterator:
-    klass = predicate.klass[0]
+    klass = predicate.klass[0]  # type: ignore
     if klass is str:
         yield from ("", "0", "foobar", "\n")
     elif klass is bool:
