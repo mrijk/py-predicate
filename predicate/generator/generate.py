@@ -5,7 +5,7 @@ from datetime import datetime
 from functools import singledispatch
 from itertools import count
 
-import exrex
+import exrex  # type: ignore
 from more_itertools import interleave, random_combination_with_replacement, repeatfunc, take
 
 from predicate import AllPredicate, IsNonePredicate, is_int_p, is_str_p, is_uuid_p
