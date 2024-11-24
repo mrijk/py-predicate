@@ -1,8 +1,10 @@
 black
 coverage
 
+exrex
 graphviz
 lark
+
 mypy
 pytest
 pytest-benchmark

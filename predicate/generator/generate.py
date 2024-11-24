@@ -3,10 +3,12 @@ import uuid
 from collections.abc import Iterator
 from datetime import datetime
 from functools import singledispatch
+from itertools import count
 
+import exrex
 from more_itertools import interleave, random_combination_with_replacement, repeatfunc, take
 
-from predicate import AllPredicate, IsNonePredicate, is_int_p, is_str_p
+from predicate import AllPredicate, IsNonePredicate, is_int_p, is_str_p, is_uuid_p
 from predicate.predicate import (
     AlwaysFalsePredicate,
     AlwaysTruePredicate,
@@ -26,6 +28,7 @@ from predicate.predicate import (
     OrPredicate,
     Predicate,
 )
+from predicate.regex_predicate import RegexPredicate
 
 
 @singledispatch
@@ -47,8 +50,14 @@ def generate_false(_predicate: AlwaysFalsePredicate) -> Iterator:
 @generate.register
 def generate_ge(predicate: GePredicate) -> Iterator:
     match predicate.v:
+        case float():
+            yield from take(5, count(predicate.v, 0.5))
         case int():
             yield from range(predicate.v, predicate.v + 5)
+        case str():
+            yield from (item for item in generate(is_str_p) if predicate(item))
+        case uuid.UUID():
+            yield from (item for item in generate(is_uuid_p) if predicate(item))
 
 
 @generate.register
@@ -108,6 +117,11 @@ def generate_or(predicate: OrPredicate) -> Iterator:
 
 
 @generate.register
+def generate_regex(predicate: RegexPredicate) -> Iterator:
+    yield from exrex.generate(predicate.pattern)
+
+
+@generate.register
 def generate_true(_predicate: AlwaysTruePredicate) -> Iterator:
     yield True
 
@@ -138,7 +152,7 @@ def generate_is_instance_p(predicate: IsInstancePredicate) -> Iterator:
     elif klass == uuid.UUID:
         yield from repeatfunc(uuid.uuid4, times=10)
     elif klass is int:
-        yield from (-1, 0, 1)
+        yield from generate_random_ints()
 
 
 @generate.register
@@ -163,3 +177,13 @@ def generate_any_p(any_predicate: AnyPredicate) -> Iterator:
     yield random_combination_with_replacement(values, 5)
 
     yield set(random_combination_with_replacement(values, 5))
+
+
+def generate_random_ints() -> Iterator:
+    yield -1
+    yield 0
+    yield 1
+
+
+def generate_ints(predicate: Predicate) -> Iterator:
+    yield from (item for item in generate_random_ints() if predicate(item))

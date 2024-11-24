@@ -1,3 +1,5 @@
+import uuid
+
 import pytest
 
 from predicate import (
@@ -23,7 +25,7 @@ from predicate import (
     not_in_p,
 )
 from predicate.generator.generate import generate
-from predicate.standard_predicates import ge_p, gt_p, le_p, lt_p, pos_p, zero_p
+from predicate.standard_predicates import ge_p, gt_p, le_p, lt_p, pos_p, regex_p, zero_p
 
 
 @pytest.mark.parametrize(
@@ -31,8 +33,6 @@ from predicate.standard_predicates import ge_p, gt_p, le_p, lt_p, pos_p, zero_p
     [
         all_p(is_int_p),
         any_p(is_uuid_p),
-        eq_p(2),
-        ge_p(2),
         gt_p(2),
         in_p(2, 3, 4),
         is_bool_p,
@@ -51,11 +51,34 @@ from predicate.standard_predicates import ge_p, gt_p, le_p, lt_p, pos_p, zero_p
         lt_p(2),
         ne_p(2),
         not_in_p(2, "foo", 4),
+        regex_p("^foo"),
         pos_p,
         zero_p,
     ],
 )
 def test_generate(predicate):
+    assert_generated(predicate)
+
+
+@pytest.mark.parametrize("value", [2, "foo", "3.14", "complex(1, 2)"])
+def test_generate_eq(value):
+    predicate = eq_p(value)
+
+    assert_generated(predicate)
+
+
+@pytest.mark.parametrize(
+    "value",
+    [
+        2,
+        # "foo",
+        3.14,
+        uuid.uuid4(),
+    ],
+)
+def test_generate_ge(value):
+    predicate = ge_p(value)
+
     assert_generated(predicate)
 
 

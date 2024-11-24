@@ -9,6 +9,7 @@ class RegexPredicate[T](Predicate[T]):
     """A predicate class that holds a regular expression."""
 
     def __init__(self, pattern: str, flags: int = 0):
+        self.pattern = pattern
         self.regex = re.compile(pattern, flags)
 
     def __call__(self, x: str) -> bool:
