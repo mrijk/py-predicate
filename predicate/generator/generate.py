@@ -1,17 +1,21 @@
 import math
+import random
+import string
+import sys
 import uuid
 from collections.abc import Iterator
-from datetime import datetime
+from datetime import datetime, timedelta
 from functools import singledispatch
 from itertools import count
+from random import choices
 
 import exrex  # type: ignore
 from more_itertools import interleave, random_combination_with_replacement, repeatfunc, take
 
-from predicate import AllPredicate, IsNonePredicate, is_int_p, is_str_p, is_uuid_p
 from predicate.predicate import (
     AlwaysFalsePredicate,
     AlwaysTruePredicate,
+    AndPredicate,
     AnyPredicate,
     EqPredicate,
     GePredicate,
@@ -19,6 +23,7 @@ from predicate.predicate import (
     InPredicate,
     IsFalsyPredicate,
     IsInstancePredicate,
+    IsNonePredicate,
     IsNotNonePredicate,
     IsTruthyPredicate,
     LePredicate,
@@ -29,12 +34,19 @@ from predicate.predicate import (
     Predicate,
 )
 from predicate.regex_predicate import RegexPredicate
+from predicate.standard_predicates import AllPredicate, is_int_p, is_str_p, is_uuid_p
 
 
 @singledispatch
 def generate[T](predicate: Predicate[T]) -> Iterator[T]:
     """Generate values that satisfy this predicate."""
     raise ValueError("Please register generator for correct predicate type")
+
+
+@generate.register
+def generate_and(predicate: AndPredicate) -> Iterator:
+    yield from (item for item in generate(predicate.left) if predicate.right(item))
+    yield from (item for item in generate(predicate.right) if predicate.left(item))
 
 
 @generate.register
@@ -50,21 +62,31 @@ def generate_false(_predicate: AlwaysFalsePredicate) -> Iterator:
 @generate.register
 def generate_ge(predicate: GePredicate) -> Iterator:
     match predicate.v:
+        case datetime() as dt:
+            yield from (dt + timedelta(days=days) for days in range(0, 5))
         case float():
-            yield from take(5, count(predicate.v, 0.5))
+            yield from count(predicate.v, 0.5)
         case int():
             yield from range(predicate.v, predicate.v + 5)
-        case str():
-            yield from (item for item in generate(is_str_p) if predicate(item))
-        case uuid.UUID():
-            yield from (item for item in generate(is_uuid_p) if predicate(item))
+        case str() as v_str:
+            yield from (item for item in generate(is_str_p) if item >= v_str)
+        case uuid.UUID() as v_uuid:
+            yield from (item for item in generate(is_uuid_p) if item >= v_uuid)
 
 
 @generate.register
 def generate_gt(predicate: GtPredicate) -> Iterator:
     match predicate.v:
+        case datetime() as dt:
+            yield from (dt + timedelta(days=days) for days in range(1, 6))
+        case float():
+            yield from count(predicate.v + 0.1, 0.5)
         case int():
             yield from range(predicate.v + 1, predicate.v + 6)
+        case str() as v_str:
+            yield from (item for item in generate(is_str_p) if item > v_str)
+        case uuid.UUID() as v_uuid:
+            yield from (item for item in generate(is_uuid_p) if item > v_uuid)
 
 
 @generate.register
@@ -153,6 +175,8 @@ def generate_is_instance_p(predicate: IsInstancePredicate) -> Iterator:
         yield from repeatfunc(uuid.uuid4, times=10)
     elif klass is int:
         yield from generate_random_ints()
+    elif klass is set:
+        yield from (set(), {1, 2, 3}, {"foo", "bar"})
 
 
 @generate.register
@@ -179,10 +203,17 @@ def generate_any_p(any_predicate: AnyPredicate) -> Iterator:
     yield set(random_combination_with_replacement(values, 5))
 
 
+def generate_random_strings() -> Iterator:
+    population = string.ascii_letters + string.digits
+    while True:
+        length = random.randint(0, 100)
+        yield "".join(choices(population, k=length))
+
+
 def generate_random_ints() -> Iterator:
-    yield -1
-    yield 0
-    yield 1
+    # TODO: maybe first generate some smaller ints
+    while True:
+        yield random.randint(-sys.maxsize, sys.maxsize)
 
 
 def generate_ints(predicate: Predicate) -> Iterator:

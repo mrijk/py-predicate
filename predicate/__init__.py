@@ -5,6 +5,7 @@ __version__ = "0.0.1"
 from predicate.all_predicate import AllPredicate
 from predicate.formatter.format_dot import to_dot
 from predicate.formatter.format_json import to_json
+from predicate.generator.generate import generate
 from predicate.optimizer.predicate_optimizer import can_optimize, optimize
 from predicate.predicate import (
     AlwaysFalsePredicate,
@@ -52,7 +53,9 @@ from predicate.standard_predicates import (
     is_datetime_p,
     is_dict_p,
     is_falsy_p,
+    is_finite_p,
     is_float_p,
+    is_inf_p,
     is_instance_p,
     is_int_p,
     is_iterable_of_p,
@@ -73,11 +76,14 @@ from predicate.standard_predicates import (
     le_p,
     lt_p,
     ne_p,
+    neg_p,
     not_in_p,
+    pos_p,
     regex_p,
     root_p,
     tee_p,
     this_p,
+    zero_p,
 )
 
 __all__ = [
@@ -116,6 +122,7 @@ __all__ = [
     "ge_le_p",
     "ge_lt_p",
     "ge_p",
+    "generate",
     "gt_le_p",
     "gt_lt_p",
     "gt_p",
@@ -126,8 +133,10 @@ __all__ = [
     "is_datetime_p",
     "is_dict_p",
     "is_empty_p",
+    "is_finite_p",
     "is_float_p",
     "is_instance_p",
+    "is_inf_p",
     "is_int_p",
     "is_iterable_p",
     "is_iterable_of_p",
@@ -147,12 +156,15 @@ __all__ = [
     "le_p",
     "lt_p",
     "ne_p",
+    "neg_p",
     "not_in_p",
     "optimize",
+    "pos_p",
     "regex_p",
     "root_p",
     "tee_p",
     "this_p",
     "to_dot",
     "to_json",
+    "zero_p",
 ]

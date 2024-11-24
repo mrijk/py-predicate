@@ -71,6 +71,7 @@ lint.ignore = [
     "D105",
     "D107",
     "E501",
+    "S311",
 ]
 line-length = 120
 lint.select = ["B", "C", "D", "E", "F", "I", "N", "RET", "S", "T", "W"]

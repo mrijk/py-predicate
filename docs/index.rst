@@ -3,6 +3,9 @@ py-predicate documentation
 
 This library makes it easy to define composable predicates.
 
+On top of that it has features to optimize predicates, generate sample data, output in json or dotty (Graphviz)
+and many more features.
+
 
 .. toctree::
    :maxdepth: 1
@@ -13,5 +16,6 @@ This library makes it easy to define composable predicates.
    lazy_predicates
    formatters
    optimization
+   generation
    cli
    tutorial/tutorial

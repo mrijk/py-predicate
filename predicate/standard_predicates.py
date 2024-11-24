@@ -1,3 +1,4 @@
+import math
 from collections.abc import Callable, Iterable
 from dataclasses import dataclass
 from datetime import datetime
@@ -305,6 +306,16 @@ depth_ge_p = partial(depth_op_p, predicate=ge_p)
 
 depth_gt_p = partial(depth_op_p, predicate=gt_p)
 """Returns if dict depth is greater than given depth, otherwise False."""
+
+
+is_finite_p = fn_p(fn=math.isfinite)
+"""Return True if value is finite, otherwise False."""
+
+is_inf_p = fn_p(fn=math.isinf)
+"""Return True if value is infinite, otherwise False."""
+
+is_nan_p = fn_p(fn=math.isnan)
+"""Return True if value is not a number, otherwise False."""
 
 
 # Construction of a lazy predicate to check for valid json

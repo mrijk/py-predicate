@@ -1,3 +1,4 @@
+import math
 from datetime import datetime, timedelta
 from unittest.mock import Mock
 from uuid import UUID, uuid4
@@ -45,6 +46,8 @@ from predicate.standard_predicates import (
     gt_lt_p,
     has_length_p,
     is_falsy_p,
+    is_finite_p,
+    is_inf_p,
     is_iterable_of_p,
     is_list_of_p,
     is_range_p,
@@ -53,7 +56,10 @@ from predicate.standard_predicates import (
     is_single_or_list_of_p,
     is_truthy_p,
     is_tuple_of_p,
+    neg_p,
+    pos_p,
     tee_p,
+    zero_p,
 )
 
 
@@ -503,3 +509,35 @@ def test_tee():
     assert predicate(range(2, 5))
 
     assert log_fn.call_count == 3
+
+
+def test_zero_p(p):
+    assert not zero_p(1)
+    assert zero_p(0.0)
+
+
+def test_neg_p(p):
+    assert not neg_p(1)
+    assert not neg_p(0)
+    assert neg_p(-1)
+    assert neg_p(-3.14)
+
+
+def test_pos_p(p):
+    assert not pos_p(-1)
+    assert not pos_p(-3.14)
+    assert not pos_p(0)
+    assert pos_p(1)
+
+
+def test_is_finite_p():
+    assert not is_finite_p(math.inf)
+    assert is_finite_p(13)
+    assert is_finite_p(3.14)
+
+
+def test_is_inf_p():
+    assert not is_inf_p(13)
+
+    assert is_inf_p(-math.inf)
+    assert is_inf_p(math.inf)
