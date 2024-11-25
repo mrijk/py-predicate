@@ -45,8 +45,10 @@ from predicate.standard_predicates import (
     gt_le_p,
     gt_lt_p,
     has_length_p,
+    is_container_p,
     is_falsy_p,
     is_finite_p,
+    is_hashable_p,
     is_inf_p,
     is_iterable_of_p,
     is_list_of_p,
@@ -509,6 +511,35 @@ def test_tee():
     assert predicate(range(2, 5))
 
     assert log_fn.call_count == 3
+
+
+@pytest.mark.parametrize(
+    "value",
+    [
+        set(),
+        (),
+        [],
+        {"foo", "bar"},
+    ],
+)
+def test_is_container_p(value):
+    assert is_container_p(value)
+
+
+@pytest.mark.parametrize("value", [1, 3.14, True, "foo", datetime.now()])
+def test_is_hashable_p(value):
+    assert is_hashable_p(value)
+
+
+@pytest.mark.parametrize(
+    "value",
+    [
+        {},
+        {1, 2, 3},
+    ],
+)
+def test_is_not_hashable_p(value):
+    assert not is_hashable_p(value)
 
 
 def test_zero_p(p):

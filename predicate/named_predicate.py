@@ -5,7 +5,7 @@ from predicate.predicate import Predicate
 
 @dataclass
 class NamedPredicate(Predicate):
-    """A predicate class to generate truth tables."""
+    """A predicate class to generate_true truth tables."""
 
     name: str
     v: bool = False

@@ -1,9 +1,9 @@
 import math
-from collections.abc import Callable, Iterable
+from collections.abc import Callable, Container, Iterable
 from dataclasses import dataclass
 from datetime import datetime
 from functools import partial
-from typing import Any, Final
+from typing import Any, Final, Hashable
 from uuid import UUID
 
 from more_itertools import ilen
@@ -203,6 +203,9 @@ is_callable_p = is_instance_p(Callable)  # type: ignore
 is_complex_p = is_instance_p(complex)
 """Returns True if the value is a complex, otherwise False."""
 
+is_container_p = is_instance_p(Container)
+"""Returns True if the value is a container (list, set, tuple, etc.), otherwise False."""
+
 is_datetime_p = is_instance_p(datetime)
 """Returns True if the value is a datetime, otherwise False."""
 
@@ -211,6 +214,9 @@ is_dict_p = is_instance_p(dict)
 
 is_float_p = is_instance_p(float)
 """Returns True if the value is a float, otherwise False."""
+
+is_hashable_p = is_instance_p(Hashable)
+"""Returns True if the value is hashable, otherwise False."""
 
 is_iterable_p = is_instance_p(Iterable)
 """Returns True if the value is an Iterable, otherwise False."""

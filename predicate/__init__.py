@@ -5,7 +5,8 @@ __version__ = "0.0.1"
 from predicate.all_predicate import AllPredicate
 from predicate.formatter.format_dot import to_dot
 from predicate.formatter.format_json import to_json
-from predicate.generator.generate import generate
+from predicate.generator.generate_false import generate_false
+from predicate.generator.generate_true import generate_true
 from predicate.optimizer.predicate_optimizer import can_optimize, optimize
 from predicate.predicate import (
     AlwaysFalsePredicate,
@@ -50,11 +51,13 @@ from predicate.standard_predicates import (
     is_bool_p,
     is_callable_p,
     is_complex_p,
+    is_container_p,
     is_datetime_p,
     is_dict_p,
     is_falsy_p,
     is_finite_p,
     is_float_p,
+    is_hashable_p,
     is_inf_p,
     is_instance_p,
     is_int_p,
@@ -122,7 +125,8 @@ __all__ = [
     "ge_le_p",
     "ge_lt_p",
     "ge_p",
-    "generate",
+    "generate_false",
+    "generate_true",
     "gt_le_p",
     "gt_lt_p",
     "gt_p",
@@ -130,11 +134,13 @@ __all__ = [
     "is_bool_p",
     "is_callable_p",
     "is_complex_p",
+    "is_container_p",
     "is_datetime_p",
     "is_dict_p",
     "is_empty_p",
     "is_finite_p",
     "is_float_p",
+    "is_hashable_p",
     "is_instance_p",
     "is_inf_p",
     "is_int_p",
