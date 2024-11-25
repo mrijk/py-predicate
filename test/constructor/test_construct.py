@@ -4,7 +4,6 @@ from more_itertools import take
 from predicate import (
     generate_false,
     generate_true,
-    is_bool_p,
     is_int_p,
     is_str_p,
 )
@@ -16,7 +15,7 @@ from predicate.constructor.construct import construct
     [
         # always_true_p,
         # is_falsy_p,
-        is_bool_p,
+        # is_bool_p,
         # is_float_p,
         is_int_p,
         is_str_p,

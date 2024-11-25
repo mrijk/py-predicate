@@ -7,6 +7,7 @@ from more_itertools import first
 
 from predicate.all_predicate import AllPredicate
 from predicate.comp_predicate import CompPredicate
+from predicate.is_instance_predicate import IsInstancePredicate
 from predicate.lazy_predicate import LazyPredicate, find_predicate_by_ref
 from predicate.named_predicate import NamedPredicate
 from predicate.optimizer.predicate_optimizer import optimize
@@ -30,7 +31,6 @@ from predicate.standard_predicates import (
     GePredicate,
     GtPredicate,
     InPredicate,
-    IsInstancePredicate,
     IsNonePredicate,
     LePredicate,
     LtPredicate,

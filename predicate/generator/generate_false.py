@@ -11,7 +11,8 @@ from predicate.generator.helpers import (
     random_floats,
     random_ints,
 )
-from predicate.predicate import EqPredicate, GePredicate, IsInstancePredicate, NotPredicate, OrPredicate, Predicate
+from predicate.is_instance_predicate import IsInstancePredicate
+from predicate.predicate import EqPredicate, GePredicate, NotPredicate, OrPredicate, Predicate
 
 
 @singledispatch

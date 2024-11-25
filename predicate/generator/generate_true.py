@@ -17,6 +17,7 @@ from predicate.generator.helpers import (
     random_strings,
     random_uuids,
 )
+from predicate.is_instance_predicate import IsInstancePredicate
 from predicate.predicate import (
     AlwaysFalsePredicate,
     AlwaysTruePredicate,
@@ -27,7 +28,6 @@ from predicate.predicate import (
     GtPredicate,
     InPredicate,
     IsFalsyPredicate,
-    IsInstancePredicate,
     IsNonePredicate,
     IsNotNonePredicate,
     IsTruthyPredicate,
