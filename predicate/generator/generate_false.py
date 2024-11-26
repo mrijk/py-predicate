@@ -1,18 +1,35 @@
+import random
 import sys
 import uuid
 from collections.abc import Iterator
 from datetime import datetime, timedelta
 from functools import singledispatch
 
+from more_itertools import random_combination_with_replacement, take
+
+from predicate import AllPredicate
 from predicate.generator.helpers import (
     generate_anys,
     generate_strings,
     generate_uuids,
+    random_anys,
     random_floats,
     random_ints,
 )
 from predicate.is_instance_predicate import IsInstancePredicate
-from predicate.predicate import EqPredicate, GePredicate, NotPredicate, OrPredicate, Predicate
+from predicate.predicate import (
+    AlwaysFalsePredicate,
+    AlwaysTruePredicate,
+    EqPredicate,
+    GePredicate,
+    IsFalsyPredicate,
+    IsNonePredicate,
+    IsNotNonePredicate,
+    IsTruthyPredicate,
+    NotPredicate,
+    OrPredicate,
+    Predicate,
+)
 
 
 @singledispatch
@@ -22,8 +39,30 @@ def generate_false[T](predicate: Predicate[T]) -> Iterator[T]:
 
 
 @generate_false.register
+def generate_all_p(all_predicate: AllPredicate) -> Iterator:
+    predicate = all_predicate.predicate
+
+    while True:
+        max_length = random.randint(1, 10)
+
+        # TODO: combination of some true values, or just rewrite as any(false)
+        values = take(max_length, generate_false(predicate))
+        yield random_combination_with_replacement(values, max_length)
+
+
+@generate_false.register
+def generate_always_true(_predicate: AlwaysTruePredicate) -> Iterator:
+    yield from []
+
+
+@generate_false.register
 def generate_eq(predicate: EqPredicate) -> Iterator:
     yield from generate_anys(NotPredicate(predicate=predicate))
+
+
+@generate_false.register
+def generate_always_false(_predicate: AlwaysFalsePredicate) -> Iterator:
+    yield from random_anys()
 
 
 @generate_false.register
@@ -42,27 +81,29 @@ def generate_ge(predicate: GePredicate) -> Iterator:
 
 
 @generate_false.register
+def generate_falsy(_predicate: IsFalsyPredicate) -> Iterator:
+    yield from generate_anys(IsTruthyPredicate())
+
+
+@generate_false.register
+def generate_none(_predicate: IsNonePredicate) -> Iterator:
+    yield generate_anys(IsNotNonePredicate())
+
+
+@generate_false.register
+def generate_not_none(_predicate: IsNotNonePredicate) -> Iterator:
+    yield None
+
+
+@generate_false.register
+def generate_truthy(_predicate: IsTruthyPredicate) -> Iterator:
+    yield from (False, 0, (), "", {})
+
+
+@generate_false.register
 def generate_is_instance_p(predicate: IsInstancePredicate) -> Iterator:
-    klass = predicate.klass[0]  # type: ignore
     not_predicate = NotPredicate(predicate=predicate)
-    if klass is str:
-        yield from generate_anys(not_predicate)
-    elif klass is bool:
-        yield from generate_anys(not_predicate)
-    elif klass is complex:
-        yield from (complex(1, 1),)
-    elif klass == datetime:
-        yield from (datetime.now(),)
-    elif klass is dict:
-        yield from ({},)
-    elif klass is float:
-        yield from generate_anys(not_predicate)
-    elif klass == uuid.UUID:
-        yield from generate_anys(not_predicate)
-    elif klass is int:
-        yield from generate_anys(not_predicate)
-    elif klass is set:
-        yield from (set(), {1, 2, 3}, {"foo", "bar"})
+    yield from generate_anys(not_predicate)
 
 
 @generate_false.register

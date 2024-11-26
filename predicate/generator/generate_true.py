@@ -12,6 +12,9 @@ from predicate.generator.helpers import (
     generate_ints,
     generate_strings,
     generate_uuids,
+    random_complex_numbers,
+    random_datetimes,
+    random_dicts,
     random_floats,
     random_ints,
     random_strings,
@@ -49,6 +52,31 @@ def generate_true[T](predicate: Predicate[T]) -> Iterator[T]:
 
 
 @generate_true.register
+def generate_all_p(all_predicate: AllPredicate) -> Iterator:
+    yield []
+
+    predicate = all_predicate.predicate
+
+    while True:
+        max_length = random.randint(1, 10)
+
+        values = take(max_length, generate_true(predicate))
+        yield random_combination_with_replacement(values, max_length)
+
+        values = take(max_length, generate_true(predicate))
+        yield set(random_combination_with_replacement(values, max_length))
+
+        values = take(max_length, generate_true(predicate))
+        yield list(random_combination_with_replacement(values, max_length))
+
+
+@generate_true.register
+def generate_always_true(_predicate: AlwaysTruePredicate) -> Iterator:
+
+    yield True
+
+
+@generate_true.register
 def generate_and(predicate: AndPredicate) -> Iterator:
     yield from (item for item in generate_true(predicate.left) if predicate.right(item))
     yield from (item for item in generate_true(predicate.right) if predicate.left(item))
@@ -61,7 +89,7 @@ def generate_eq(predicate: EqPredicate) -> Iterator:
 
 @generate_true.register
 def generate_false(_predicate: AlwaysFalsePredicate) -> Iterator:
-    raise ValueError("Always false can never generate_true a true value")
+    yield from []
 
 
 @generate_true.register
@@ -165,11 +193,6 @@ def generate_regex(predicate: RegexPredicate) -> Iterator:
 
 
 @generate_true.register
-def generate_always_true(_predicate: AlwaysTruePredicate) -> Iterator:
-    yield True
-
-
-@generate_true.register
 def generate_falsy(_predicate: IsFalsyPredicate) -> Iterator:
     yield from (False, 0, (), "", {})
 
@@ -187,11 +210,11 @@ def generate_is_instance_p(predicate: IsInstancePredicate) -> Iterator:
     elif klass is bool:
         yield from (False, True)
     elif klass is complex:
-        yield from (complex(1, 1),)
+        yield from random_complex_numbers()
     elif klass == datetime:
-        yield from (datetime.now(),)
+        yield from random_datetimes()
     elif klass is dict:
-        yield from ({},)
+        yield from random_dicts()
     elif klass is float:
         yield from random_floats()
     elif klass == uuid.UUID:
@@ -200,25 +223,6 @@ def generate_is_instance_p(predicate: IsInstancePredicate) -> Iterator:
         yield from random_ints()
     elif klass is set:
         yield from (set(), {1, 2, 3}, {"foo", "bar"})
-
-
-@generate_true.register
-def generate_all_p(all_predicate: AllPredicate) -> Iterator:
-    yield []
-
-    predicate = all_predicate.predicate
-
-    while True:
-        max_length = random.randint(1, 10)
-
-        values = take(max_length, generate_true(predicate))
-        yield random_combination_with_replacement(values, max_length)
-
-        values = take(max_length, generate_true(predicate))
-        yield set(random_combination_with_replacement(values, max_length))
-
-        values = take(max_length, generate_true(predicate))
-        yield list(random_combination_with_replacement(values, max_length))
 
 
 @generate_true.register

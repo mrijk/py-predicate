@@ -2,9 +2,9 @@ from typing import Iterator
 
 from more_itertools import gray_product
 
-from predicate import is_falsy_p, is_int_p, is_str_p, is_truthy_p
+from predicate import is_datetime_p, is_falsy_p, is_float_p, is_int_p, is_not_none_p, is_str_p, is_truthy_p
 from predicate.predicate import Predicate, always_false_p, always_true_p
-from predicate.standard_predicates import all_p
+from predicate.standard_predicates import all_p, is_bool_p, is_dict_p, is_none_p
 
 # TODO: this is very much work under construction (pun intended) and not ready for public consumption
 
@@ -34,7 +34,13 @@ def initial_predicates() -> Iterator[Predicate]:
     # TODO: probably import from __init__
     yield always_false_p
     yield always_true_p
+    yield is_bool_p
+    yield is_datetime_p
+    yield is_dict_p
     yield is_falsy_p
+    yield is_float_p
     yield is_int_p
+    yield is_none_p
+    yield is_not_none_p
     yield is_str_p
     yield is_truthy_p

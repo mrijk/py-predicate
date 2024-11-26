@@ -140,8 +140,7 @@ def test_set_of(set_type_p):
 def test_generate_false():
     predicate = always_false_p
 
-    with pytest.raises(ValueError):
-        generate_true(predicate)
+    assert not list(generate_true(predicate))
 
 
 def test_generate_true_p():

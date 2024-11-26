@@ -1,13 +1,31 @@
 import random
 import string
 import sys
+from datetime import datetime
 from random import choices
 from typing import Iterator
 from uuid import UUID, uuid4
 
-from more_itertools import interleave
+from more_itertools import interleave, take
 
 from predicate.predicate import Predicate
+
+
+def random_complex_numbers() -> Iterator:
+    yield complex(1, 1)
+
+
+def random_dicts() -> Iterator:
+    yield {}
+    while True:
+        keys = take(5, random_strings())
+        values = take(5, random_anys())
+        yield dict(zip(keys, values, strict=False))
+
+
+def random_datetimes(lower: datetime | None = None, upper: datetime | None = None) -> Iterator:
+    # TODO
+    yield datetime.now()
 
 
 def random_strings() -> Iterator:
