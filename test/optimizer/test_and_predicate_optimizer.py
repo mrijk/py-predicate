@@ -12,8 +12,10 @@ from predicate.standard_predicates import (
     gt_le_p,
     gt_lt_p,
     in_p,
+    is_int_p,
     is_none_p,
     is_not_none_p,
+    is_str_p,
     le_p,
     lt_p,
     ne_p,
@@ -660,3 +662,16 @@ def test_optimize_fn_and_eq_true():
     optimized = optimize(predicate)
 
     assert optimized == always_true_p
+
+
+def test_optimize_is_instance_different():
+    p = is_int_p
+    q = is_str_p
+
+    predicate = p & q
+
+    assert can_optimize(predicate)
+
+    optimized = optimize(predicate)
+
+    assert optimized == always_false_p

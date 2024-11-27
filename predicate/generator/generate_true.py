@@ -21,6 +21,7 @@ from predicate.generator.helpers import (
     random_uuids,
 )
 from predicate.is_instance_predicate import IsInstancePredicate
+from predicate.optimizer.predicate_optimizer import optimize
 from predicate.predicate import (
     AlwaysFalsePredicate,
     AlwaysTruePredicate,
@@ -40,6 +41,7 @@ from predicate.predicate import (
     NotInPredicate,
     OrPredicate,
     Predicate,
+    always_false_p,
 )
 from predicate.regex_predicate import RegexPredicate
 from predicate.standard_predicates import AllPredicate
@@ -72,14 +74,16 @@ def generate_all_p(all_predicate: AllPredicate) -> Iterator:
 
 @generate_true.register
 def generate_always_true(_predicate: AlwaysTruePredicate) -> Iterator:
-
     yield True
 
 
 @generate_true.register
 def generate_and(predicate: AndPredicate) -> Iterator:
-    yield from (item for item in generate_true(predicate.left) if predicate.right(item))
-    yield from (item for item in generate_true(predicate.right) if predicate.left(item))
+    if optimize(predicate) == always_false_p:
+        yield from []
+    else:
+        yield from (item for item in generate_true(predicate.left) if predicate.right(item))
+        yield from (item for item in generate_true(predicate.right) if predicate.left(item))
 
 
 @generate_true.register

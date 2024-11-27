@@ -7,7 +7,7 @@ from functools import singledispatch
 
 from more_itertools import random_combination_with_replacement, take
 
-from predicate import AllPredicate
+from predicate.all_predicate import AllPredicate
 from predicate.generator.helpers import (
     generate_anys,
     generate_strings,
@@ -17,9 +17,11 @@ from predicate.generator.helpers import (
     random_ints,
 )
 from predicate.is_instance_predicate import IsInstancePredicate
+from predicate.optimizer.predicate_optimizer import optimize
 from predicate.predicate import (
     AlwaysFalsePredicate,
     AlwaysTruePredicate,
+    AndPredicate,
     EqPredicate,
     GePredicate,
     IsFalsyPredicate,
@@ -29,6 +31,7 @@ from predicate.predicate import (
     NotPredicate,
     OrPredicate,
     Predicate,
+    always_true_p,
 )
 
 
@@ -48,6 +51,15 @@ def generate_all_p(all_predicate: AllPredicate) -> Iterator:
         # TODO: combination of some true values, or just rewrite as any(false)
         values = take(max_length, generate_false(predicate))
         yield random_combination_with_replacement(values, max_length)
+
+
+@generate_false.register
+def generate_and(predicate: AndPredicate) -> Iterator:
+    if optimize(predicate) == always_true_p:
+        yield from []
+    else:
+        yield from (item for item in generate_false(predicate.left) if not predicate.right(item))
+        yield from (item for item in generate_false(predicate.right) if not predicate.left(item))
 
 
 @generate_false.register

@@ -1,5 +1,6 @@
 from predicate.all_predicate import AllPredicate
 from predicate.implies import implies
+from predicate.is_instance_predicate import IsInstancePredicate
 from predicate.optimizer.in_optimizer import optimize_in_predicate, optimize_not_in_predicate
 from predicate.predicate import (
     AlwaysTruePredicate,
@@ -72,6 +73,9 @@ def optimize_and_predicate[T](predicate: AndPredicate[T]) -> Predicate[T]:
         case GtPredicate(v1), LtPredicate(v2) if v1 < v2:
             return GtLtPredicate(lower=v1, upper=v2)
         case GtPredicate(v1), LtPredicate(v2) if v1 >= v2:
+            return always_false_p
+
+        case IsInstancePredicate(klass_left), IsInstancePredicate(klass_right) if klass_left != klass_right:
             return always_false_p
 
         case FnPredicate(predicate_fn), EqPredicate(v):
