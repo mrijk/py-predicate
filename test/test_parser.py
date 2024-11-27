@@ -1,8 +1,8 @@
 import pytest
 
 from predicate import always_false_p, always_true_p
+from predicate.named_predicate import NamedPredicate
 from predicate.parser import parse_expression
-from predicate.predicate import NamedPredicate
 
 
 @pytest.fixture
@@ -13,6 +13,11 @@ def p():
 @pytest.fixture
 def q():
     return NamedPredicate(name="q")
+
+
+@pytest.fixture
+def r():
+    return NamedPredicate(name="r")
 
 
 def test_parser_false():
@@ -93,3 +98,26 @@ def test_parser_xor(p, q):
     predicate = parse_expression(expression)
 
     assert predicate == p ^ q
+
+
+def test_parser_grouped(p, q, r):
+    expression = "p & (q | r)"
+
+    predicate = parse_expression(expression)
+
+    assert predicate == p & (q | r)
+
+
+def test_parser_failure(p, q):
+    expression = "p ^"
+
+    predicate = parse_expression(expression)
+
+    assert predicate is None
+
+
+# def test_parser_gt():
+#     expression = "x > 2"
+#
+#     with pytest.raises(Exception):
+#         parse_expression(expression)

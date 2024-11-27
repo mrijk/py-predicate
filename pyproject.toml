@@ -26,6 +26,7 @@ classifiers = [
     "Programming Language :: Python :: 3.12",
 ]
 dependencies = [
+    "exrex",
     "graphviz",
     "lark",
     "more-itertools",
@@ -44,6 +45,7 @@ test = [
     "mypy",
     "mypy_extensions",
     "pytest",
+    "pytest-benchmark",
     "pytest-cov",
     "ruff",
 ]
@@ -68,6 +70,8 @@ lint.ignore = [
     "D104",
     "D105",
     "D107",
+    "E501",
+    "S311",
 ]
 line-length = 120
 lint.select = ["B", "C", "D", "E", "F", "I", "N", "RET", "S", "T", "W"]

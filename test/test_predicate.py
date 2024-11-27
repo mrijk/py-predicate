@@ -1,4 +1,6 @@
+import math
 from datetime import datetime, timedelta
+from unittest.mock import Mock
 from uuid import UUID, uuid4
 
 import pytest
@@ -34,16 +36,32 @@ from predicate import (
     ne_p,
     not_in_p,
 )
-from predicate.predicate import NamedPredicate, is_empty_p, is_not_empty_p
+from predicate.named_predicate import NamedPredicate
+from predicate.predicate import is_empty_p, is_not_empty_p
 from predicate.standard_predicates import (
+    all_p,
+    ge_le_p,
+    ge_lt_p,
+    gt_le_p,
+    gt_lt_p,
     has_length_p,
+    is_container_p,
     is_falsy_p,
+    is_finite_p,
+    is_hashable_p,
+    is_inf_p,
     is_iterable_of_p,
     is_list_of_p,
     is_range_p,
     is_set_of_p,
+    is_single_or_iterable_of_p,
+    is_single_or_list_of_p,
     is_truthy_p,
     is_tuple_of_p,
+    neg_p,
+    pos_p,
+    tee_p,
+    zero_p,
 )
 
 
@@ -99,6 +117,39 @@ def test_ge_p():
     assert not ge_2(1)
     assert ge_2(2)
     assert ge_2(3)
+
+
+def test_ge_le_p():
+    ge_2_le_3 = ge_le_p(2, 3)
+
+    assert not ge_2_le_3(1)
+    assert not ge_2_le_3(4)
+    assert ge_2_le_3(2)
+    assert ge_2_le_3(3)
+
+
+def test_ge_lt_p():
+    ge_2_lt_3 = ge_lt_p(2, 3)
+
+    assert not ge_2_lt_3(1)
+    assert not ge_2_lt_3(3)
+    assert ge_2_lt_3(2)
+
+
+def test_gt_le_p():
+    gt_2_le_3 = gt_le_p(2, 3)
+
+    assert not gt_2_le_3(2)
+    assert not gt_2_le_3(4)
+    assert gt_2_le_3(3)
+
+
+def test_gt_lt_p():
+    gt_2_lt_3 = gt_lt_p(2, 4)
+
+    assert not gt_2_lt_3(2)
+    assert not gt_2_lt_3(4)
+    assert gt_2_lt_3(3)
 
 
 def test_str_ge_p():
@@ -280,6 +331,17 @@ def test_is_iterable_of_p():
     assert is_iterable_of_str(["foo"])
 
 
+def test_is_single_or_iterable_of_p():
+    is_single_or_iterable_of_str = is_single_or_iterable_of_p(is_str_p)
+
+    assert not is_single_or_iterable_of_str(None)
+    assert not is_single_or_iterable_of_str([1])
+
+    assert is_single_or_iterable_of_str("foo")
+    assert is_single_or_iterable_of_str([])
+    assert is_single_or_iterable_of_str(["foo"])
+
+
 def test_is_list_p():
     assert not is_list_p(None)
     assert not is_list_p((3,))
@@ -294,9 +356,21 @@ def test_is_list_of_p():
 
     assert not is_list_of_str(None)
     assert not is_list_of_str([1])
+    assert not is_list_of_str("foo")
 
     assert is_list_of_str([])
     assert is_list_of_str(["foo"])
+
+
+def test_is_single_or_list_of_p():
+    is_single_or_list_of_str = is_single_or_list_of_p(is_str_p)
+
+    assert not is_single_or_list_of_str(None)
+    assert not is_single_or_list_of_str([1])
+
+    assert is_single_or_list_of_str("foo")
+    assert is_single_or_list_of_str([])
+    assert is_single_or_list_of_str(["foo"])
 
 
 def test_is_set_p():
@@ -424,3 +498,77 @@ def test_lambda():
     assert not exists_p(None)
     assert not exists_p(4)
     assert exists_p(3)
+
+
+def test_tee():
+    log_fn = Mock()
+    log = tee_p(fn=log_fn)
+
+    ge_2 = ge_p(2)
+
+    predicate = all_p(log & ge_2)
+
+    assert predicate(range(2, 5))
+
+    assert log_fn.call_count == 3
+
+
+@pytest.mark.parametrize(
+    "value",
+    [
+        set(),
+        (),
+        [],
+        {"foo", "bar"},
+    ],
+)
+def test_is_container_p(value):
+    assert is_container_p(value)
+
+
+@pytest.mark.parametrize("value", [1, 3.14, True, "foo", datetime.now()])
+def test_is_hashable_p(value):
+    assert is_hashable_p(value)
+
+
+@pytest.mark.parametrize(
+    "value",
+    [
+        {},
+        {1, 2, 3},
+    ],
+)
+def test_is_not_hashable_p(value):
+    assert not is_hashable_p(value)
+
+
+def test_zero_p(p):
+    assert not zero_p(1)
+    assert zero_p(0.0)
+
+
+def test_neg_p(p):
+    assert not neg_p(1)
+    assert not neg_p(0)
+    assert neg_p(-1)
+    assert neg_p(-3.14)
+
+
+def test_pos_p(p):
+    assert not pos_p(-1)
+    assert not pos_p(-3.14)
+    assert not pos_p(0)
+    assert pos_p(1)
+
+
+def test_is_finite_p():
+    assert not is_finite_p(math.inf)
+    assert is_finite_p(13)
+    assert is_finite_p(3.14)
+
+
+def test_is_inf_p():
+    assert not is_inf_p(13)
+
+    assert is_inf_p(-math.inf)
+    assert is_inf_p(math.inf)

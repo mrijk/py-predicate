@@ -5,8 +5,12 @@ from itertools import count
 import graphviz  # type: ignore
 from more_itertools import first
 
+from predicate.all_predicate import AllPredicate
+from predicate.any_predicate import AnyPredicate
 from predicate.comp_predicate import CompPredicate
+from predicate.is_instance_predicate import IsInstancePredicate
 from predicate.lazy_predicate import LazyPredicate, find_predicate_by_ref
+from predicate.named_predicate import NamedPredicate
 from predicate.optimizer.predicate_optimizer import optimize
 from predicate.predicate import (
     AlwaysFalsePredicate,
@@ -14,29 +18,26 @@ from predicate.predicate import (
     AndPredicate,
     IsFalsyPredicate,
     IsTruthyPredicate,
-    NamedPredicate,
     NotPredicate,
     OrPredicate,
     Predicate,
     XorPredicate,
 )
+from predicate.range_predicate import GeLePredicate, GeLtPredicate, GtLePredicate, GtLtPredicate
 from predicate.root_predicate import RootPredicate, find_root_predicate
 from predicate.standard_predicates import (
-    AllPredicate,
-    AnyPredicate,
     EqPredicate,
     FnPredicate,
     GePredicate,
     GtPredicate,
     InPredicate,
-    IsInstancePredicate,
     IsNonePredicate,
     LePredicate,
     LtPredicate,
     NePredicate,
     NotInPredicate,
-    PredicateFactory,
 )
+from predicate.tee_predicate import TeePredicate
 from predicate.this_predicate import ThisPredicate, find_this_predicate
 
 
@@ -111,8 +112,16 @@ def render(dot, predicate: Predicate, node_nr):
                 return add_node("fn", label=f"fn: {name}")
             case GePredicate(v):
                 return add_node("ge", label=f"x ≥ {v}")
+            case GeLePredicate(upper, lower):
+                return add_node("gele", label=f"{lower} ≤ x ≤ {upper}")
+            case GeLtPredicate(upper, lower):
+                return add_node("gelt", label=f"{lower} ≤ x < {upper}")
             case GtPredicate(v):
                 return add_node("gt", label=f"x > {v}")
+            case GtLePredicate(upper, lower):
+                return add_node("gele", label=f"{lower} ≤ x ≤ {upper}")
+            case GtLtPredicate(upper, lower):
+                return add_node("gelt", label=f"{lower} ≤ x < {upper}")
             case InPredicate(v):
                 items = ", ".join(str(item) for item in v)
                 return add_node("in", label=f"x ∈ {{{items}}}")
@@ -146,10 +155,10 @@ def render(dot, predicate: Predicate, node_nr):
                 dot.edge(node, left_node)
                 dot.edge(node, right_node)
                 return node
-            case PredicateFactory() as factory:
-                return to_value(factory.predicate)
             case RootPredicate():
                 return add_node("root", label="root")
+            case TeePredicate():
+                return add_node("tee", label="tee")
             case ThisPredicate():
                 return add_node("this", label="this")
             case XorPredicate(left, right):

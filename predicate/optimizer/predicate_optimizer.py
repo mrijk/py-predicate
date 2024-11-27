@@ -1,3 +1,5 @@
+from predicate.all_predicate import AllPredicate
+from predicate.any_predicate import AnyPredicate
 from predicate.optimizer.all_optimizer import optimize_all_predicate
 from predicate.optimizer.and_optimizer import optimize_and_predicate
 from predicate.optimizer.any_optimizer import optimize_any_predicate
@@ -6,9 +8,7 @@ from predicate.optimizer.or_optimizer import optimize_or_predicate
 from predicate.optimizer.rules import WildcardPredicate, optimization_rules
 from predicate.optimizer.xor_optimizer import optimize_xor_predicate
 from predicate.predicate import (
-    AllPredicate,
     AndPredicate,
-    AnyPredicate,
     NotPredicate,
     OrPredicate,
     Predicate,

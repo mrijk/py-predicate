@@ -1,19 +1,25 @@
+from predicate.all_predicate import AllPredicate
 from predicate.implies import implies
+from predicate.is_instance_predicate import IsInstancePredicate
 from predicate.optimizer.in_optimizer import optimize_in_predicate, optimize_not_in_predicate
 from predicate.predicate import (
-    AllPredicate,
-    AlwaysFalsePredicate,
     AlwaysTruePredicate,
     AndPredicate,
     EqPredicate,
     FnPredicate,
     GePredicate,
+    GtPredicate,
     InPredicate,
+    LePredicate,
+    LtPredicate,
     NotInPredicate,
     NotPredicate,
     OrPredicate,
     Predicate,
+    always_false_p,
+    always_true_p,
 )
+from predicate.range_predicate import GeLePredicate, GeLtPredicate, GtLePredicate, GtLtPredicate
 
 
 def optimize_and_predicate[T](predicate: AndPredicate[T]) -> Predicate[T]:
@@ -32,7 +38,7 @@ def optimize_and_predicate[T](predicate: AndPredicate[T]) -> Predicate[T]:
             return optimize_and_predicate(AndPredicate(left=right, right=left))
 
         case _, _ if left == negate(right):
-            return AlwaysFalsePredicate()  # p & ~p == False
+            return always_false_p  # p & ~p == False
 
     match left := optimize(left), right := optimize(right):
         case _, AlwaysTruePredicate():  # p & True == p
@@ -42,28 +48,46 @@ def optimize_and_predicate[T](predicate: AndPredicate[T]) -> Predicate[T]:
 
         case EqPredicate(v1), EqPredicate(v2) if v1 != v2:
             # x = v1 & x = v2 & v1 != v2 => False
-            return AlwaysFalsePredicate()
-        case EqPredicate(v1), GePredicate(v2) if v1 > v2:
-            # x = v1 & x >= v2 & v1 < v2 => False
-            return AlwaysFalsePredicate()
+            return always_false_p
+
+        case GePredicate(v1), LePredicate(v2) if v1 < v2:
+            return GeLePredicate(lower=v1, upper=v2)
+        case GePredicate(v1), LePredicate(v2) if v1 == v2:
+            return EqPredicate(v=v1)
+        case GePredicate(v1), LePredicate(v2) if v1 > v2:
+            return always_false_p
+
+        case GePredicate(v1), LtPredicate(v2) if v1 < v2:
+            return GeLtPredicate(lower=v1, upper=v2)
+
+        case GtPredicate(v1), LePredicate(v2) if v1 < v2:
+            return GtLePredicate(lower=v1, upper=v2)
+
+        case GtPredicate(v1), LtPredicate(v2) if v1 < v2:
+            return GtLtPredicate(lower=v1, upper=v2)
+        case GtPredicate(v1), LtPredicate(v2) if v1 >= v2:
+            return always_false_p
+
+        case IsInstancePredicate(klass_left), IsInstancePredicate(klass_right) if klass_left != klass_right:
+            return always_false_p
 
         case FnPredicate(predicate_fn), EqPredicate(v):
-            return AlwaysTruePredicate() if predicate_fn(v) else AlwaysFalsePredicate()
+            return always_true_p if predicate_fn(v) else always_false_p
 
         case InPredicate(v1), InPredicate(v2):
             if v := v1 & v2:
                 return optimize_in_predicate(InPredicate(v=v))
-            return AlwaysFalsePredicate()
+            return always_false_p
 
         case InPredicate(v1), NotInPredicate(v2):
             if v := v1 - v2:
                 return optimize_in_predicate(InPredicate(v=v))
-            return AlwaysFalsePredicate()
+            return always_false_p
 
         case NotInPredicate(v1), NotInPredicate(v2):
             if v := v1 | v2:
                 return optimize_not_in_predicate(NotInPredicate(v=v))
-            return AlwaysTruePredicate()
+            return always_true_p
 
         case AllPredicate(left_all), AllPredicate(right_all):
             # All(p1) & All(p2) => All(p1 & p2)
@@ -75,11 +99,14 @@ def optimize_and_predicate[T](predicate: AndPredicate[T]) -> Predicate[T]:
         case _, _ if implies(right, left):
             return right  # q => p and (p & q) results in p
 
+        case _, _ if implies(left, negate(right)) or implies(right, negate(left)):
+            return always_false_p
+
         case _, _ if and_contains_negate(predicate, right):
-            return AlwaysFalsePredicate()  # p & q & ... & ~p == False
+            return always_false_p  # p & q & ... & ~p == False
 
         case _, _ if and_contains_negate(predicate, left):
-            return AlwaysFalsePredicate()  # q & p & ... & ~p == False
+            return always_false_p  # q & p & ... & ~p == False
 
         case _, _ if left == right:  # p & p == p
             return left

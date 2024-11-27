@@ -39,6 +39,17 @@ def _(predicate: GePredicate, other: Predicate) -> bool:
 
 
 @implies.register
+def _(predicate: GtPredicate, other: Predicate) -> bool:
+    match other:
+        case GePredicate(v):
+            return predicate.v >= v
+        case GtPredicate(v):
+            return predicate.v >= v
+        case _:
+            return False
+
+
+@implies.register
 def _(predicate: EqPredicate, other: Predicate) -> bool:
     match other:
         case EqPredicate(v):

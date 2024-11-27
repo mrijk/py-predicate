@@ -26,8 +26,8 @@ from predicate import (
     not_in_p,
     to_dot,
 )
-from predicate.predicate import NamedPredicate
-from predicate.standard_predicates import is_truthy_p, root_p, this_p
+from predicate.named_predicate import NamedPredicate
+from predicate.standard_predicates import ge_le_p, ge_lt_p, gt_le_p, gt_lt_p, is_truthy_p, root_p, tee_p, this_p
 
 
 def test_format_dot_false():
@@ -120,6 +120,38 @@ def test_format_dot_eq():
 
 def test_format_dot_ge():
     predicate = ge_p(13)
+
+    dot = to_dot(predicate)
+
+    assert dot
+
+
+def test_format_dot_ge_le():
+    predicate = ge_le_p(13, 42)
+
+    dot = to_dot(predicate)
+
+    assert dot
+
+
+def test_format_dot_ge_lt():
+    predicate = ge_lt_p(13, 42)
+
+    dot = to_dot(predicate)
+
+    assert dot
+
+
+def test_format_dot_gt_le():
+    predicate = gt_le_p(13, 42)
+
+    dot = to_dot(predicate)
+
+    assert dot
+
+
+def test_format_dot_gt_lt():
+    predicate = gt_lt_p(13, 42)
 
     dot = to_dot(predicate)
 
@@ -242,6 +274,14 @@ def test_format_dot_this():
     str_or_list_of_str = is_str_p | (is_list_p & all_p(this_p))
 
     dot = to_dot(str_or_list_of_str)
+
+    assert dot
+
+
+def test_format_dot_tee():
+    predicate = tee_p(fn=lambda _: None)
+
+    dot = to_dot(predicate)
 
     assert dot
 

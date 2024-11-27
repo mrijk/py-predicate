@@ -1,23 +1,27 @@
-from collections.abc import Callable, Iterable
+import math
+from collections.abc import Callable, Container, Iterable
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Any, Final
+from functools import partial
+from typing import Any, Final, Hashable
 from uuid import UUID
 
 from more_itertools import ilen
 
+from predicate.all_predicate import AllPredicate
+from predicate.any_predicate import AnyPredicate
 from predicate.comp_predicate import CompPredicate
+from predicate.has_key_predicate import HasKeyPredicate
+from predicate.is_instance_predicate import IsInstancePredicate
 from predicate.lazy_predicate import LazyPredicate
 from predicate.predicate import (
-    AllPredicate,
-    AnyPredicate,
+    ConstrainedT,
     EqPredicate,
     FnPredicate,
     GePredicate,
     GtPredicate,
     InPredicate,
     IsFalsyPredicate,
-    IsInstancePredicate,
     IsNonePredicate,
     IsNotNonePredicate,
     IsTruthyPredicate,
@@ -28,8 +32,10 @@ from predicate.predicate import (
     Predicate,
     resolve_predicate,
 )
+from predicate.range_predicate import GeLePredicate, GeLtPredicate, GtLePredicate, GtLtPredicate
 from predicate.regex_predicate import RegexPredicate
 from predicate.root_predicate import RootPredicate
+from predicate.tee_predicate import TeePredicate
 from predicate.this_predicate import ThisPredicate
 
 is_not_none_p: Final[IsNotNonePredicate] = IsNotNonePredicate()
@@ -59,22 +65,42 @@ def ne_p[T](v: T) -> NePredicate[T]:
     return NePredicate(v=v)
 
 
-def ge_p[T: (int, str, datetime, UUID)](v: T) -> GePredicate[T]:
+def ge_p(v: ConstrainedT) -> GePredicate[ConstrainedT]:
     """Return True if the value is greater or equal than the constant, otherwise False."""
     return GePredicate(v=v)
 
 
-def gt_p[T: (int, str, datetime, UUID)](v: T) -> GtPredicate[T]:
+def ge_le_p(lower: ConstrainedT, upper: ConstrainedT) -> GeLePredicate[ConstrainedT]:
+    """Return True if the value is greater or equal than the constant, otherwise False."""
+    return GeLePredicate(lower=lower, upper=upper)
+
+
+def ge_lt_p(lower: ConstrainedT, upper: ConstrainedT) -> GeLtPredicate[ConstrainedT]:
+    """Return True if the value is greater or equal than the constant, otherwise False."""
+    return GeLtPredicate(lower=lower, upper=upper)
+
+
+def gt_le_p(lower: ConstrainedT, upper: ConstrainedT) -> GtLePredicate[ConstrainedT]:
+    """Return True if the value is greater or equal than the constant, otherwise False."""
+    return GtLePredicate(lower=lower, upper=upper)
+
+
+def gt_lt_p(lower: ConstrainedT, upper: ConstrainedT) -> GtLtPredicate[ConstrainedT]:
+    """Return True if the value is greater or equal than the constant, otherwise False."""
+    return GtLtPredicate(lower=lower, upper=upper)
+
+
+def gt_p(v: ConstrainedT) -> GtPredicate[ConstrainedT]:
     """Return True if the value is greater than the constant, otherwise False."""
     return GtPredicate(v=v)
 
 
-def le_p[T: (int, str, datetime, UUID)](v: T) -> LePredicate[T]:
+def le_p(v: ConstrainedT) -> LePredicate[ConstrainedT]:
     """Return True if the value is less than or equal to the constant, otherwise False."""
     return LePredicate(v=v)
 
 
-def lt_p[T: (int, str, datetime, UUID)](v: T) -> LtPredicate[T]:
+def lt_p(v: ConstrainedT) -> LtPredicate[ConstrainedT]:
     """Return True if the value is less than the constant, otherwise False."""
     return LtPredicate(v=v)
 
@@ -87,6 +113,11 @@ def comp_p[T](fn: Callable[[Any], T], predicate: Predicate[T]) -> CompPredicate:
 def fn_p[T](fn: Callable[[T], bool]) -> FnPredicate[T]:
     """Return the boolean value of the function call."""
     return FnPredicate(predicate_fn=fn)
+
+
+def tee_p[T](fn: Callable[[T], None]) -> Predicate[T]:
+    """Return the boolean value of the function call."""
+    return TeePredicate(fn=fn)
 
 
 def has_length_p(length: int) -> Predicate[Iterable]:
@@ -129,9 +160,19 @@ def is_iterable_of_p[T](predicate: Predicate[T]) -> Predicate:
     return is_iterable_p & all_p(predicate)
 
 
+def is_single_or_iterable_of_p[T](predicate: Predicate[T]) -> Predicate:
+    """Return True if value is an iterable or a single value, and for all elements the predicate is True, otherwise False."""
+    return is_iterable_of_p(predicate) | predicate
+
+
 def is_list_of_p[T](predicate: Predicate[T]) -> Predicate:
     """Return True if value is a list, and for all elements in the list the predicate is True, otherwise False."""
     return is_list_p & all_p(predicate)
+
+
+def is_single_or_list_of_p[T](predicate: Predicate[T]) -> Predicate:
+    """Return True if value is a list or a single value, and for all elements in the list the predicate is True, otherwise False."""
+    return is_list_of_p(predicate) | predicate
 
 
 def is_tuple_of_p(*predicates: Predicate) -> Predicate:
@@ -149,6 +190,7 @@ def is_set_of_p[T](predicate: Predicate[T]) -> Predicate:
 
 
 def regex_p(pattern: str) -> Predicate[str]:
+    """Return True if value matches regex, otherwise False."""
     return RegexPredicate(pattern=pattern)
 
 
@@ -161,6 +203,9 @@ is_callable_p = is_instance_p(Callable)  # type: ignore
 is_complex_p = is_instance_p(complex)
 """Returns True if the value is a complex, otherwise False."""
 
+is_container_p = is_instance_p(Container)
+"""Returns True if the value is a container (list, set, tuple, etc.), otherwise False."""
+
 is_datetime_p = is_instance_p(datetime)
 """Returns True if the value is a datetime, otherwise False."""
 
@@ -169,6 +214,9 @@ is_dict_p = is_instance_p(dict)
 
 is_float_p = is_instance_p(float)
 """Returns True if the value is a float, otherwise False."""
+
+is_hashable_p = is_instance_p(Hashable)
+"""Returns True if the value is hashable, otherwise False."""
 
 is_iterable_p = is_instance_p(Iterable)
 """Returns True if the value is an Iterable, otherwise False."""
@@ -218,7 +266,7 @@ class PredicateFactory[T](Predicate[T]):
         return self.factory()
 
     def __call__(self, *args, **kwargs) -> bool:
-        raise ValueError("Don't call PredicateFactory")
+        raise ValueError("Don't call PredicateFactory directly")
 
     def __repr__(self) -> str:
         return repr(self.predicate)
@@ -226,6 +274,55 @@ class PredicateFactory[T](Predicate[T]):
 
 root_p: PredicateFactory = PredicateFactory(factory=RootPredicate)
 this_p: PredicateFactory = PredicateFactory(factory=ThisPredicate)
+
+
+def dict_depth(value: dict) -> int:
+    match value:
+        case list() as l:
+            return 1 + max(dict_depth(item) for item in l)
+        case dict() as d if d:
+            return 1 + max(dict_depth(item) for item in d.values())
+        case _:
+            return 1
+
+
+def has_key_p[T](key: T) -> HasKeyPredicate:
+    """Return True if dict contains key, otherwise False."""
+    return HasKeyPredicate(key=key)
+
+
+def depth_op_p(depth: int, predicate: Callable[[int], Predicate]) -> Predicate[dict]:
+    return comp_p(dict_depth, predicate(depth))
+
+
+depth_eq_p = partial(depth_op_p, predicate=eq_p)
+"""Returns if dict depth is equal to given depth, otherwise False."""
+
+depth_ne_p = partial(depth_op_p, predicate=ne_p)
+"""Returns if dict depth is not equal to given depth, otherwise False."""
+
+depth_le_p = partial(depth_op_p, predicate=le_p)
+"""Returns if dict depth is less or equal to given depth, otherwise False."""
+
+depth_lt_p = partial(depth_op_p, predicate=lt_p)
+"""Returns if dict depth is less than given depth, otherwise False."""
+
+depth_ge_p = partial(depth_op_p, predicate=ge_p)
+"""Returns if dict depth is greater or equal to given depth, otherwise False."""
+
+depth_gt_p = partial(depth_op_p, predicate=gt_p)
+"""Returns if dict depth is greater than given depth, otherwise False."""
+
+
+is_finite_p = fn_p(fn=math.isfinite)
+"""Return True if value is finite, otherwise False."""
+
+is_inf_p = fn_p(fn=math.isinf)
+"""Return True if value is infinite, otherwise False."""
+
+is_nan_p = fn_p(fn=math.isnan)
+"""Return True if value is not a number, otherwise False."""
+
 
 # Construction of a lazy predicate to check for valid json
 

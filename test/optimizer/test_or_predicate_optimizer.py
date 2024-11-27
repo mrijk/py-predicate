@@ -1,6 +1,6 @@
 from helpers import is_or_p
 
-from predicate import always_false_p, always_true_p, can_optimize, ge_p, gt_p, optimize
+from predicate import always_false_p, always_true_p, can_optimize, ge_p, optimize
 from predicate.standard_predicates import all_p, any_p, eq_p, in_p, ne_p, not_in_p
 
 
@@ -52,13 +52,9 @@ def test_or_optimize_true_right(p):
     assert optimized == always_true_p
 
 
-def test_or_optimize_eq():
+def test_or_optimize_eq(p, q):
     # p | p == p
-    p_1 = gt_p(2)
-    p_2 = gt_p(2)
-    p_3 = gt_p(3)
-
-    same = p_1 | p_2
+    same = p | p
 
     assert is_or_p(same)
     assert can_optimize(same)
@@ -67,7 +63,7 @@ def test_or_optimize_eq():
 
     assert not is_or_p(optimized)
 
-    not_same = p_1 | p_3
+    not_same = p | q
 
     assert is_or_p(not_same)
     assert not can_optimize(not_same)
