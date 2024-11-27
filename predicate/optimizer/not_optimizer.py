@@ -1,7 +1,7 @@
 from predicate.all_predicate import AllPredicate
+from predicate.any_predicate import AnyPredicate
 from predicate.predicate import (
     AndPredicate,
-    AnyPredicate,
     NotPredicate,
     OrPredicate,
     Predicate,

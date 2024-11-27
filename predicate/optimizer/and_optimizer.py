@@ -49,9 +49,6 @@ def optimize_and_predicate[T](predicate: AndPredicate[T]) -> Predicate[T]:
         case EqPredicate(v1), EqPredicate(v2) if v1 != v2:
             # x = v1 & x = v2 & v1 != v2 => False
             return always_false_p
-        case EqPredicate(v1), GePredicate(v2) if v1 > v2:
-            # x = v1 & x >= v2 & v1 < v2 => False
-            return always_false_p
 
         case GePredicate(v1), LePredicate(v2) if v1 < v2:
             return GeLePredicate(lower=v1, upper=v2)
@@ -62,13 +59,9 @@ def optimize_and_predicate[T](predicate: AndPredicate[T]) -> Predicate[T]:
 
         case GePredicate(v1), LtPredicate(v2) if v1 < v2:
             return GeLtPredicate(lower=v1, upper=v2)
-        case GePredicate(v1), LtPredicate(v2) if v1 >= v2:
-            return always_false_p
 
         case GtPredicate(v1), LePredicate(v2) if v1 < v2:
             return GtLePredicate(lower=v1, upper=v2)
-        case GtPredicate(v1), LePredicate(v2) if v1 >= v2:
-            return always_false_p
 
         case GtPredicate(v1), LtPredicate(v2) if v1 < v2:
             return GtLtPredicate(lower=v1, upper=v2)
@@ -105,6 +98,9 @@ def optimize_and_predicate[T](predicate: AndPredicate[T]) -> Predicate[T]:
 
         case _, _ if implies(right, left):
             return right  # q => p and (p & q) results in p
+
+        case _, _ if implies(left, negate(right)) or implies(right, negate(left)):
+            return always_false_p
 
         case _, _ if and_contains_negate(predicate, right):
             return always_false_p  # p & q & ... & ~p == False

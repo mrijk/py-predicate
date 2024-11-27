@@ -44,11 +44,21 @@ def random_floats(lower: float = -1e-6, upper: float = 1e6) -> Iterator:
 
 
 def random_ints(lower: int = -sys.maxsize, upper: int = sys.maxsize) -> Iterator[int]:
-    yield lower
-    yield upper
+    # yield lower
+    # yield upper
     # TODO: maybe first generate_true some smaller ints
     while True:
-        yield random.randint(lower, upper)
+        low = max(-1, lower)
+        high = min(1, upper)
+        if high >= low:
+            yield from (random.randint(low, high) for _ in range(0, 1))
+
+        low = max(-10, lower)
+        high = min(10, upper)
+        if high >= low:
+            yield from (random.randint(low, high) for _ in range(0, 10))
+
+        # yield random.randint(lower, upper)
 
 
 def random_uuids() -> Iterator[UUID]:

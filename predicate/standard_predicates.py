@@ -9,12 +9,12 @@ from uuid import UUID
 from more_itertools import ilen
 
 from predicate.all_predicate import AllPredicate
+from predicate.any_predicate import AnyPredicate
 from predicate.comp_predicate import CompPredicate
 from predicate.has_key_predicate import HasKeyPredicate
 from predicate.is_instance_predicate import IsInstancePredicate
 from predicate.lazy_predicate import LazyPredicate
 from predicate.predicate import (
-    AnyPredicate,
     ConstrainedT,
     EqPredicate,
     FnPredicate,

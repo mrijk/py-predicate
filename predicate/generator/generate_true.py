@@ -8,6 +8,7 @@ from functools import singledispatch
 import exrex  # type: ignore
 from more_itertools import interleave, random_combination_with_replacement, take
 
+from predicate.any_predicate import AnyPredicate
 from predicate.generator.helpers import (
     generate_ints,
     generate_strings,
@@ -26,7 +27,6 @@ from predicate.predicate import (
     AlwaysFalsePredicate,
     AlwaysTruePredicate,
     AndPredicate,
-    AnyPredicate,
     EqPredicate,
     GePredicate,
     GtPredicate,

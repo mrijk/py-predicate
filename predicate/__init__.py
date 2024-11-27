@@ -3,6 +3,7 @@
 __version__ = "0.0.1"
 
 from predicate.all_predicate import AllPredicate
+from predicate.any_predicate import AnyPredicate
 from predicate.formatter.format_dot import to_dot
 from predicate.formatter.format_json import to_json
 from predicate.generator.generate_false import generate_false
@@ -12,7 +13,6 @@ from predicate.predicate import (
     AlwaysFalsePredicate,
     AlwaysTruePredicate,
     AndPredicate,
-    AnyPredicate,
     EqPredicate,
     FnPredicate,
     GePredicate,

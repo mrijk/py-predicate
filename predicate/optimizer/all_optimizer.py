@@ -1,8 +1,8 @@
 from predicate.all_predicate import AllPredicate
+from predicate.any_predicate import AnyPredicate
 from predicate.predicate import (
     AlwaysFalsePredicate,
     AlwaysTruePredicate,
-    AnyPredicate,
     IsEmptyPredicate,
     IsNonePredicate,
     IsNotNonePredicate,

@@ -6,6 +6,7 @@ import graphviz  # type: ignore
 from more_itertools import first
 
 from predicate.all_predicate import AllPredicate
+from predicate.any_predicate import AnyPredicate
 from predicate.comp_predicate import CompPredicate
 from predicate.is_instance_predicate import IsInstancePredicate
 from predicate.lazy_predicate import LazyPredicate, find_predicate_by_ref
@@ -25,7 +26,6 @@ from predicate.predicate import (
 from predicate.range_predicate import GeLePredicate, GeLtPredicate, GtLePredicate, GtLtPredicate
 from predicate.root_predicate import RootPredicate, find_root_predicate
 from predicate.standard_predicates import (
-    AnyPredicate,
     EqPredicate,
     FnPredicate,
     GePredicate,

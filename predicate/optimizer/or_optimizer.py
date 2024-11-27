@@ -1,8 +1,8 @@
+from predicate.any_predicate import AnyPredicate
 from predicate.optimizer.in_optimizer import optimize_in_predicate, optimize_not_in_predicate
 from predicate.predicate import (
     AlwaysTruePredicate,
     AndPredicate,
-    AnyPredicate,
     EqPredicate,
     InPredicate,
     NotInPredicate,
@@ -82,6 +82,9 @@ def optimize_or_predicate[T](predicate: OrPredicate[T]) -> Predicate[T]:
 
         case AnyPredicate(left_any), AnyPredicate(right_any):
             return AnyPredicate(optimize(OrPredicate(left=left_any, right=right_any)))
+
+        # case _, _ if implies(left, negate(right)) or implies(right, negate(left)):
+        #     return always_true_p
 
         case _, _ if implies(left, right):
             return right
