@@ -10,6 +10,7 @@ from more_itertools import random_combination_with_replacement, take
 from predicate.all_predicate import AllPredicate
 from predicate.generator.helpers import (
     generate_anys,
+    generate_ints,
     generate_strings,
     generate_uuids,
     random_anys,
@@ -24,10 +25,14 @@ from predicate.predicate import (
     AndPredicate,
     EqPredicate,
     GePredicate,
+    GtPredicate,
+    InPredicate,
+    IsEmptyPredicate,
     IsFalsyPredicate,
     IsNonePredicate,
     IsNotNonePredicate,
     IsTruthyPredicate,
+    NePredicate,
     NotPredicate,
     OrPredicate,
     Predicate,
@@ -58,8 +63,8 @@ def generate_and(predicate: AndPredicate) -> Iterator:
     if optimize(predicate) == always_true_p:
         yield from []
     else:
-        yield from (item for item in generate_false(predicate.left) if not predicate.right(item))
-        yield from (item for item in generate_false(predicate.right) if not predicate.left(item))
+        yield from (item for item in generate_false(predicate.left))
+        yield from (item for item in generate_false(predicate.right))
 
 
 @generate_false.register
@@ -93,13 +98,50 @@ def generate_ge(predicate: GePredicate) -> Iterator:
 
 
 @generate_false.register
+def generate_gt(predicate: GtPredicate) -> Iterator:
+    match predicate.v:
+        case datetime() as dt:
+            yield from (dt - timedelta(days=days) for days in range(0, 5))
+        case float():
+            yield from random_floats(upper=predicate.v)
+        case int():
+            yield from random_ints(upper=predicate.v)
+        case str():
+            yield from generate_strings(NotPredicate(predicate=predicate))
+        case uuid.UUID():
+            yield from generate_uuids(NotPredicate(predicate=predicate))
+
+
+@generate_false.register
 def generate_falsy(_predicate: IsFalsyPredicate) -> Iterator:
     yield from generate_anys(IsTruthyPredicate())
 
 
 @generate_false.register
+def generate_in(predicate: InPredicate) -> Iterator:
+    # TODO: combine with generate_not_in true
+    for item in predicate.v:
+        match item:
+            case int():
+                yield from generate_ints(NotPredicate(predicate=predicate))
+            case str():
+                yield from generate_strings(NotPredicate(predicate=predicate))
+
+
+@generate_false.register
+def generate_is_empty(_predicate: IsEmptyPredicate) -> Iterator:
+    # TODO: add generic helper function
+    yield from ([1], {1, 2, 3}, (1,), "aap")
+
+
+@generate_false.register
+def generate_ne(predicate: NePredicate) -> Iterator:
+    yield from predicate.v
+
+
+@generate_false.register
 def generate_none(_predicate: IsNonePredicate) -> Iterator:
-    yield generate_anys(IsNotNonePredicate())
+    yield from generate_anys(IsNotNonePredicate())
 
 
 @generate_false.register

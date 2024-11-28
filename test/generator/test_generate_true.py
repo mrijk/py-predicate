@@ -15,20 +15,23 @@ from predicate import (
     is_bool_p,
     is_complex_p,
     is_datetime_p,
+    is_empty_p,
     is_falsy_p,
     is_float_p,
     is_int_p,
+    is_list_of_p,
     is_none_p,
     is_not_none_p,
     is_set_of_p,
     is_str_p,
     is_truthy_p,
+    is_tuple_of_p,
     is_uuid_p,
     ne_p,
     not_in_p,
 )
 from predicate.generator.generate_true import generate_true
-from predicate.standard_predicates import ge_p, gt_p, is_dict_p, is_set_p, le_p, lt_p, pos_p, regex_p, zero_p
+from predicate.standard_predicates import ge_p, gt_p, is_dict_p, is_set_p, le_p, lt_p, neg_p, pos_p, regex_p, zero_p
 
 
 @pytest.mark.parametrize(
@@ -42,6 +45,7 @@ from predicate.standard_predicates import ge_p, gt_p, is_dict_p, is_set_p, le_p,
         is_datetime_p,
         is_dict_p,
         is_falsy_p,
+        is_empty_p,
         is_float_p,
         is_none_p,
         is_not_none_p,
@@ -56,6 +60,7 @@ from predicate.standard_predicates import ge_p, gt_p, is_dict_p, is_set_p, le_p,
         ne_p(2),
         not_in_p(2, "foo", 4),
         regex_p("^foo"),
+        neg_p,
         pos_p,
         zero_p,
     ],
@@ -115,6 +120,36 @@ def test_generate_gt(value):
 )
 def test_generate_le(value):
     predicate = le_p(value)
+
+    assert_generated_true(predicate)
+
+
+@pytest.mark.parametrize(
+    "list_type_p",
+    [
+        is_bool_p,
+        is_datetime_p,
+        is_float_p,
+        is_int_p,
+        is_str_p,
+        is_int_p | is_str_p,
+        is_bool_p | is_datetime_p | is_str_p,
+    ],
+)
+def test_list_of(list_type_p):
+    predicate = is_list_of_p(list_type_p)
+
+    assert_generated_true(predicate)
+
+
+@pytest.mark.parametrize(
+    "tuple_types_p",
+    [
+        # (is_bool_p, )
+    ],
+)
+def test_tuple_of(tuple_types_p):
+    predicate = is_tuple_of_p(*tuple_types_p)
 
     assert_generated_true(predicate)
 

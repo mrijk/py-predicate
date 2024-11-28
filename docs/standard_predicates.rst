@@ -160,45 +160,94 @@ This predicates tests for greater than a value.
 
 is_bool_p
 ---------
+
+This predicate tests if the value is of type ``bool``. Only True if the value is either ``False`` or ``True``.
+
 .. code-block:: python
 
     from predicate import is_bool_p
 
+    assert is_bool_p(False)
+    assert is_bool_p(True)
+
+
 is_callable_p
 -------------
+
+This predicate tests if the value is of type ``Callable``.
+
 .. code-block:: python
 
     from predicate import is_callable_p
 
+    assert is_callable(is_callable)
+    assert is_callable(lambda x: x)
+    assert is_callable(str.upper)
+
+
+
 is_complex_p
 ------------
+
+This predicate tests if the value is of type ``complex``.
+
 .. code-block:: python
 
     from predicate import is_complex_p
 
+    assert not is_complex(1)
+    assert is_complex(complex(1, 1))
+
 is_container_p
 --------------
+
+This predicate tests if the value is of type ``Container``.
+
 .. code-block:: python
 
     from predicate import is_container_p
 
+    assert is_container_p((1, 2, 3))
+    assert is_container_p([1, 2, 3])
+    assert is_container_p({1, 2, 3})
+    assert is_container_p({"one": 1, "two": 2, "three": 3})
+    assert is_container_p("one")  # a string is also a container!
+
+
 is_datetime_p
 -------------
+
+This predicate tests if the value is of type ``datetime``.
+
 .. code-block:: python
 
     from predicate import is_datetime_p
 
 is_dict_p
 ---------
+
+This predicate tests if the value is of type ``dict``.
+
 .. code-block:: python
 
     from predicate import is_dict_p
 
+    assert is_dict_p({"one": 1, "two": 2, "three": 3})
+
+
 is_empty_p
 ----------
+
+This predicate tests if an iterable is empty.
+
 .. code-block:: python
 
     from predicate import is_empty_p
+
+    assert is_empty_p(())
+    assert is_empty_p({})
+    assert is_empty_p([])
+    assert is_empty_p("")
 
 .. _is_falsy_p:
 
@@ -222,6 +271,9 @@ is_finite_p
 
 is_float_p
 ----------
+
+This predicate tests if the value is of type ``float``.
+
 .. code-block:: python
 
     from predicate import is_float_p
@@ -246,18 +298,25 @@ is_instance_p
 
 is_int_p
 --------
+
+This predicate tests if the value is of type ``int``.
+
 .. code-block:: python
 
     from predicate import is_int_p
 
 is_iterable_of_p
 ----------------
+
 .. code-block:: python
 
     from predicate import is_iterable_of_p
 
 is_iterable_p
 -------------
+
+This predicate tests if the value is of type ``Iterable``.
+
 .. code-block:: python
 
     from predicate import is_iterable_p
@@ -270,6 +329,9 @@ is_list_of_p
 
 is_list_p
 ---------
+
+This predicate tests if the value is of type ``list``.
+
 .. code-block:: python
 
     from predicate import is_list_p
@@ -288,6 +350,9 @@ is_not_none_p
 
 is_predicate_p
 --------------
+
+This predicate tests if the value is of type ``Predicate``.
+
 .. code-block:: python
 
     from predicate import is_predicate_p
@@ -312,12 +377,18 @@ is_set_of_p
 
 is_set_p
 --------
+
+This predicate tests if the value is of type ``set``.
+
 .. code-block:: python
 
     from predicate import is_set_p
 
 is_str_p
 --------
+
+This predicate tests if the value is of type ``str``.
+
 .. code-block:: python
 
     from predicate import is_str_p
@@ -344,12 +415,18 @@ is_tuple_of_p
 
 is_tuple_p
 ----------
+
+This predicate tests if the value is of type ``tuple``.
+
 .. code-block:: python
 
     from predicate import is_tuple_p
 
 is_uuid_p
 ---------
+
+This predicate tests if the value is of type ``uuid``.
+
 .. code-block:: python
 
     from predicate import is_uuid_p

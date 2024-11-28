@@ -6,12 +6,11 @@ from functools import partial
 from typing import Any, Final, Hashable
 from uuid import UUID
 
-from more_itertools import ilen
-
 from predicate.all_predicate import AllPredicate
 from predicate.any_predicate import AnyPredicate
 from predicate.comp_predicate import CompPredicate
 from predicate.has_key_predicate import HasKeyPredicate
+from predicate.has_length_predicate import HasLengthPredicate
 from predicate.is_instance_predicate import IsInstancePredicate
 from predicate.lazy_predicate import LazyPredicate
 from predicate.predicate import (
@@ -110,7 +109,7 @@ def comp_p[T](fn: Callable[[Any], T], predicate: Predicate[T]) -> CompPredicate:
     return CompPredicate(fn=fn, predicate=predicate)
 
 
-def fn_p[T](fn: Callable[[T], bool]) -> FnPredicate[T]:
+def fn_p[T](fn: Callable[[T], bool]) -> Predicate[T]:
     """Return the boolean value of the function call."""
     return FnPredicate(predicate_fn=fn)
 
@@ -122,7 +121,7 @@ def tee_p[T](fn: Callable[[T], None]) -> Predicate[T]:
 
 def has_length_p(length: int) -> Predicate[Iterable]:
     """Return True if length of iterable is equal to value, otherwise False."""
-    return fn_p(lambda x: ilen(x) == length)
+    return HasLengthPredicate(length=length)
 
 
 neg_p = lt_p(0)

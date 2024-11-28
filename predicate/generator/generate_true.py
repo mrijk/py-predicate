@@ -31,6 +31,7 @@ from predicate.predicate import (
     GePredicate,
     GtPredicate,
     InPredicate,
+    IsEmptyPredicate,
     IsFalsyPredicate,
     IsNonePredicate,
     IsNotNonePredicate,
@@ -144,6 +145,11 @@ def generate_le(predicate: LePredicate) -> Iterator:
 @generate_true.register
 def generate_in(predicate: InPredicate) -> Iterator:
     yield from predicate.v
+
+
+@generate_true.register
+def generate_is_empty(_predicate: IsEmptyPredicate) -> Iterator:
+    yield from ([], {}, (), "", set())
 
 
 @generate_true.register
