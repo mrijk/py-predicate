@@ -4,13 +4,12 @@ from predicate.predicate import (
     AlwaysTruePredicate,
     AndPredicate,
     EqPredicate,
-    InPredicate,
-    NotInPredicate,
     NotPredicate,
     OrPredicate,
     Predicate,
     always_true_p,
 )
+from predicate.set_predicates import InPredicate, NotInPredicate
 
 
 def optimize_or_predicate[T](predicate: OrPredicate[T]) -> Predicate[T]:

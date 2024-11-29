@@ -170,46 +170,6 @@ class XorPredicate[T](Predicate[T]):
 
 
 @dataclass
-class InPredicate[T](Predicate[T]):
-    """A predicate class that models the 'in' predicate."""
-
-    v: set[T]
-
-    def __init__(self, v: Iterable[T]):
-        self.v = set(v)
-
-    def __call__(self, x: T) -> bool:
-        return x in self.v
-
-    def __eq__(self, other: object) -> bool:
-        return isinstance(other, InPredicate) and self.v == other.v
-
-    def __repr__(self) -> str:
-        items = ", ".join(str(item) for item in self.v)
-        return f"in_p({items})"
-
-
-@dataclass
-class NotInPredicate[T](Predicate[T]):
-    """A predicate class that models the 'not in' predicate."""
-
-    v: set[T]
-
-    def __init__(self, v: Iterable[T]):
-        self.v = set(v)
-
-    def __call__(self, x: T) -> bool:
-        return x not in self.v
-
-    def __eq__(self, other: object) -> bool:
-        return isinstance(other, NotInPredicate) and self.v == other.v
-
-    def __repr__(self) -> str:
-        items = ", ".join(str(item) for item in self.v)
-        return f"not_in_p({items})"
-
-
-@dataclass
 class EqPredicate[T](Predicate[T]):
     """A predicate class that models the 'eq' (=) predicate."""
 

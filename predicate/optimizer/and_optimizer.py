@@ -9,10 +9,8 @@ from predicate.predicate import (
     FnPredicate,
     GePredicate,
     GtPredicate,
-    InPredicate,
     LePredicate,
     LtPredicate,
-    NotInPredicate,
     NotPredicate,
     OrPredicate,
     Predicate,
@@ -20,6 +18,7 @@ from predicate.predicate import (
     always_true_p,
 )
 from predicate.range_predicate import GeLePredicate, GeLtPredicate, GtLePredicate, GtLtPredicate
+from predicate.set_predicates import InPredicate, IsSubsetPredicate, NotInPredicate
 
 
 def optimize_and_predicate[T](predicate: AndPredicate[T]) -> Predicate[T]:
@@ -46,16 +45,10 @@ def optimize_and_predicate[T](predicate: AndPredicate[T]) -> Predicate[T]:
         case AlwaysTruePredicate(), _:  # True & p == p
             return right
 
-        case EqPredicate(v1), EqPredicate(v2) if v1 != v2:
-            # x = v1 & x = v2 & v1 != v2 => False
-            return always_false_p
-
         case GePredicate(v1), LePredicate(v2) if v1 < v2:
             return GeLePredicate(lower=v1, upper=v2)
         case GePredicate(v1), LePredicate(v2) if v1 == v2:
             return EqPredicate(v=v1)
-        case GePredicate(v1), LePredicate(v2) if v1 > v2:
-            return always_false_p
 
         case GePredicate(v1), LtPredicate(v2) if v1 < v2:
             return GeLtPredicate(lower=v1, upper=v2)
@@ -65,11 +58,12 @@ def optimize_and_predicate[T](predicate: AndPredicate[T]) -> Predicate[T]:
 
         case GtPredicate(v1), LtPredicate(v2) if v1 < v2:
             return GtLtPredicate(lower=v1, upper=v2)
-        case GtPredicate(v1), LtPredicate(v2) if v1 >= v2:
-            return always_false_p
 
         case IsInstancePredicate(klass_left), IsInstancePredicate(klass_right) if klass_left != klass_right:
             return always_false_p
+
+        case IsSubsetPredicate(v1), IsSubsetPredicate(v2):
+            return IsSubsetPredicate(v) if (v := v1 & v2) else always_false_p
 
         case FnPredicate(predicate_fn), EqPredicate(v):
             return always_true_p if predicate_fn(v) else always_false_p
@@ -112,8 +106,7 @@ def optimize_and_predicate[T](predicate: AndPredicate[T]) -> Predicate[T]:
             return left
 
         case _:
-            # return AndPredicate(left=left, right=right)
-            return predicate
+            return AndPredicate(left=left, right=right)
 
 
 def and_contains_negate(predicate: AndPredicate, sub_predicate: Predicate) -> bool:

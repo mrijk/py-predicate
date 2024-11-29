@@ -1,4 +1,5 @@
-from predicate.predicate import EqPredicate, InPredicate, NePredicate, NotInPredicate, Predicate
+from predicate.predicate import EqPredicate, NePredicate, Predicate
+from predicate.set_predicates import InPredicate, NotInPredicate
 
 
 def optimize_in_predicate[T](predicate: InPredicate[T]) -> Predicate[T]:

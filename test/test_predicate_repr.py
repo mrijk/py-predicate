@@ -23,12 +23,14 @@ from predicate import (
 )
 from predicate.named_predicate import NamedPredicate
 from predicate.predicate import is_not_empty_p
+from predicate.set_predicates import is_real_subset_p, is_real_superset_p, is_subset_p, is_superset_p
 from predicate.standard_predicates import (
     ge_le_p,
     ge_lt_p,
     gt_le_p,
     gt_lt_p,
     has_key_p,
+    has_length_p,
     is_falsy_p,
     is_truthy_p,
     tee_p,
@@ -56,12 +58,17 @@ from predicate.standard_predicates import (
         (ge_lt_p(2, 3), "ge_lt_p(2, 3)"),
         (gt_lt_p(2, 3), "gt_lt_p(2, 3)"),
         (has_key_p("foo"), 'has_key_p("foo")'),
+        (has_length_p(42), "has_length_p(42)"),
         (in_p(2, 3, 4), "in_p(2, 3, 4)"),
         (is_empty_p, "is_empty_p"),
         (is_not_empty_p, "is_not_empty_p"),
         (is_none_p, "is_none_p"),
         (is_not_none_p, "is_not_none_p"),
         (is_str_p, "is_str_p"),
+        (is_real_subset_p({1, 2, 3}), "is_real_subset_p({1, 2, 3})"),
+        (is_subset_p({1, 2, 3}), "is_subset_p({1, 2, 3})"),
+        (is_real_superset_p({1, 2, 3}), "is_real_superset_p({1, 2, 3})"),
+        (is_superset_p({1, 2, 3}), "is_superset_p({1, 2, 3})"),
         (is_falsy_p, "is_falsy_p"),
         (is_truthy_p, "is_truthy_p"),
         (lazy_p("ref"), 'lazy_p("ref")'),

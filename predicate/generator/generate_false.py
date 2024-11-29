@@ -26,7 +26,6 @@ from predicate.predicate import (
     EqPredicate,
     GePredicate,
     GtPredicate,
-    InPredicate,
     IsEmptyPredicate,
     IsFalsyPredicate,
     IsNonePredicate,
@@ -38,6 +37,7 @@ from predicate.predicate import (
     Predicate,
     always_true_p,
 )
+from predicate.set_predicates import InPredicate
 
 
 @singledispatch

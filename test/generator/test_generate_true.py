@@ -31,6 +31,7 @@ from predicate import (
     not_in_p,
 )
 from predicate.generator.generate_true import generate_true
+from predicate.set_predicates import is_real_subset_p, is_subset_p
 from predicate.standard_predicates import ge_p, gt_p, is_dict_p, is_set_p, le_p, lt_p, neg_p, pos_p, regex_p, zero_p
 
 
@@ -63,6 +64,8 @@ from predicate.standard_predicates import ge_p, gt_p, is_dict_p, is_set_p, le_p,
         neg_p,
         pos_p,
         zero_p,
+        is_real_subset_p({1, 2, 3}),
+        is_subset_p({1, 2, 3}),
     ],
 )
 def test_generate_true(predicate):

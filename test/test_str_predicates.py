@@ -4,6 +4,7 @@ from predicate.str_predicates import (
     is_decimal_p,
     is_digit_p,
     is_lower_p,
+    is_space_p,
     is_title_p,
     is_upper_p,
 )
@@ -33,6 +34,11 @@ def test_is_digit_p():
 def test_is_lower_p():
     assert not is_lower_p("Foo")
     assert is_lower_p("foo")
+
+
+def test_is_space_p():
+    assert is_space_p(" ")
+    assert is_space_p("\t")
 
 
 def test_is_title_p():

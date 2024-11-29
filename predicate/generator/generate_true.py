@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 from functools import singledispatch
 
 import exrex  # type: ignore
-from more_itertools import interleave, random_combination_with_replacement, take
+from more_itertools import interleave, powerset_of_sets, random_combination_with_replacement, take
 
 from predicate.any_predicate import AnyPredicate
 from predicate.generator.helpers import (
@@ -30,7 +30,6 @@ from predicate.predicate import (
     EqPredicate,
     GePredicate,
     GtPredicate,
-    InPredicate,
     IsEmptyPredicate,
     IsFalsyPredicate,
     IsNonePredicate,
@@ -39,12 +38,12 @@ from predicate.predicate import (
     LePredicate,
     LtPredicate,
     NePredicate,
-    NotInPredicate,
     OrPredicate,
     Predicate,
     always_false_p,
 )
 from predicate.regex_predicate import RegexPredicate
+from predicate.set_predicates import InPredicate, IsRealSubsetPredicate, IsSubsetPredicate, NotInPredicate
 from predicate.standard_predicates import AllPredicate
 
 
@@ -140,6 +139,16 @@ def generate_le(predicate: LePredicate) -> Iterator:
             yield from generate_strings(predicate)
         case uuid.UUID():
             yield from generate_uuids(predicate)
+
+
+@generate_true.register
+def generate_subset(predicate: IsSubsetPredicate) -> Iterator:
+    yield from powerset_of_sets(predicate.v)
+
+
+@generate_true.register
+def generate_real_subset(predicate: IsRealSubsetPredicate) -> Iterator:
+    yield from (v for v in powerset_of_sets(predicate.v) if v != predicate.v)
 
 
 @generate_true.register

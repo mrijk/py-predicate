@@ -3,11 +3,19 @@ from functools import singledispatch
 from predicate.predicate import (
     AlwaysFalsePredicate,
     AlwaysTruePredicate,
+    AndPredicate,
     EqPredicate,
     GePredicate,
     GtPredicate,
-    InPredicate,
+    NePredicate,
     Predicate,
+)
+from predicate.set_predicates import (
+    InPredicate,
+    IsRealSubsetPredicate,
+    IsRealSupersetPredicate,
+    IsSubsetPredicate,
+    IsSupersetPredicate,
 )
 
 
@@ -18,13 +26,18 @@ def implies(predicate: Predicate, other: Predicate) -> bool:
 
 
 @implies.register
-def implies_false(_predicate: AlwaysFalsePredicate, _other: Predicate) -> bool:
+def _(_predicate: AlwaysFalsePredicate, _other: Predicate) -> bool:
     return True
 
 
 @implies.register
-def implies_true(_predicate: AlwaysTruePredicate, other: Predicate) -> bool:
+def _(_predicate: AlwaysTruePredicate, other: Predicate) -> bool:
     return other == AlwaysTruePredicate()
+
+
+@implies.register
+def _(predicate: AndPredicate, other: Predicate) -> bool:
+    return other == predicate.left or other == predicate.right
 
 
 @implies.register
@@ -54,11 +67,31 @@ def _(predicate: EqPredicate, other: Predicate) -> bool:
     match other:
         case EqPredicate(v):
             return predicate.v == v
+        case NePredicate(v):
+            return predicate.v != v
         case GePredicate(v):
             return predicate.v >= v
         case GtPredicate(v):
             return predicate.v > v
         case InPredicate(v):
             return predicate.v in v
+        case _:
+            return False
+
+
+@implies.register
+def _(predicate: IsRealSubsetPredicate, other: Predicate) -> bool:
+    match other:
+        case IsSubsetPredicate(v):
+            return predicate.v == v
+        case _:
+            return False
+
+
+@implies.register
+def _(predicate: IsRealSupersetPredicate, other: Predicate) -> bool:
+    match other:
+        case IsSupersetPredicate(v):
+            return predicate.v == v
         case _:
             return False

@@ -1,19 +1,17 @@
 from helpers import is_not_p
 
-from predicate import always_false_p, always_true_p, ge_p, is_empty_p
+from predicate import always_false_p, always_true_p, ge_p, in_p, is_empty_p, not_in_p
 from predicate.optimizer.predicate_optimizer import can_optimize, optimize
 from predicate.standard_predicates import (
     all_p,
     any_p,
     eq_p,
     gt_p,
-    in_p,
     is_none_p,
     is_not_none_p,
     le_p,
     lt_p,
     ne_p,
-    not_in_p,
 )
 
 

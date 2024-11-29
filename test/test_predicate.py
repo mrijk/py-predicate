@@ -15,7 +15,6 @@ from predicate import (
     fn_p,
     ge_p,
     gt_p,
-    in_p,
     is_bool_p,
     is_callable_p,
     is_complex_p,
@@ -34,7 +33,6 @@ from predicate import (
     le_p,
     lt_p,
     ne_p,
-    not_in_p,
 )
 from predicate.named_predicate import NamedPredicate
 from predicate.predicate import is_empty_p, is_not_empty_p
@@ -81,34 +79,6 @@ def test_is_falsy_p(value):
 @pytest.mark.parametrize("value", [True, not None, 13, {1}, "foo", (1,), [1]])
 def test_is_truthy_p(value):
     assert is_truthy_p(value)
-
-
-def test_in_p():
-    in_123 = in_p("1", "2", "3")
-
-    assert in_123("1")
-    assert not in_123("0")
-
-
-def test_in_p_eq():
-    p = in_p("1", "2", "3")
-    q = in_p("1", "2", "3")
-
-    assert p == q
-
-
-def test_in_p_ne():
-    p = in_p("1", "2", "3")
-    q = in_p("1", "2")
-
-    assert p != q
-
-
-def test_not_in_p():
-    not_in_123 = not_in_p("1", "2", "3")
-
-    assert not_in_123("0")
-    assert not not_in_123("1")
 
 
 def test_ge_p():

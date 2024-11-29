@@ -1,8 +1,9 @@
 from helpers import is_and_p, is_eq_p, is_false_p, is_true_p
 
-from predicate import always_false_p, always_true_p, ge_p, gt_p
+from predicate import always_false_p, always_true_p, ge_p, gt_p, in_p, not_in_p
 from predicate.optimizer.predicate_optimizer import can_optimize, optimize
 from predicate.predicate import is_empty_p
+from predicate.set_predicates import is_real_subset_p, is_real_superset_p, is_subset_p, is_superset_p
 from predicate.standard_predicates import (
     all_p,
     eq_p,
@@ -11,7 +12,6 @@ from predicate.standard_predicates import (
     ge_lt_p,
     gt_le_p,
     gt_lt_p,
-    in_p,
     is_int_p,
     is_none_p,
     is_not_none_p,
@@ -19,7 +19,6 @@ from predicate.standard_predicates import (
     le_p,
     lt_p,
     ne_p,
-    not_in_p,
 )
 
 
@@ -662,8 +661,57 @@ def test_optimize_fn_and_eq_true():
 
 
 def test_optimize_is_instance_different():
-    p = is_int_p
-    q = is_str_p
+    predicate = is_int_p & is_str_p
+
+    assert can_optimize(predicate)
+
+    optimized = optimize(predicate)
+
+    assert optimized == always_false_p
+
+
+def test_optimize_is_subset():
+    p = is_subset_p({1, 2, 3})
+    q = is_real_subset_p({1, 2, 3})
+
+    predicate = p & q
+
+    assert can_optimize(predicate)
+
+    optimized = optimize(predicate)
+
+    assert optimized == q
+
+
+def test_optimize_is_superset():
+    p = is_superset_p({1, 2, 3})
+    q = is_real_superset_p({1, 2, 3})
+
+    predicate = p & q
+
+    assert can_optimize(predicate)
+
+    optimized = optimize(predicate)
+
+    assert optimized == q
+
+
+def test_optimize_is_subset_subset():
+    p = is_subset_p({1, 2, 3})
+    q = is_subset_p({2, 3, 4})
+
+    predicate = p & q
+
+    assert can_optimize(predicate)
+
+    optimized = optimize(predicate)
+
+    assert optimized == is_subset_p({2, 3})
+
+
+def test_optimize_is_subset_subset_empty():
+    p = is_subset_p({1, 2, 3})
+    q = is_subset_p({4, 5, 6})
 
     predicate = p & q
 

@@ -25,17 +25,23 @@ from predicate.predicate import (
 )
 from predicate.range_predicate import GeLePredicate, GeLtPredicate, GtLePredicate, GtLtPredicate
 from predicate.root_predicate import RootPredicate, find_root_predicate
+from predicate.set_predicates import (
+    InPredicate,
+    IsRealSubsetPredicate,
+    IsRealSupersetPredicate,
+    IsSubsetPredicate,
+    IsSupersetPredicate,
+    NotInPredicate,
+)
 from predicate.standard_predicates import (
     EqPredicate,
     FnPredicate,
     GePredicate,
     GtPredicate,
-    InPredicate,
     IsNonePredicate,
     LePredicate,
     LtPredicate,
     NePredicate,
-    NotInPredicate,
 )
 from predicate.tee_predicate import TeePredicate
 from predicate.this_predicate import ThisPredicate, find_this_predicate
@@ -61,46 +67,52 @@ def to_dot(predicate: Predicate, predicate_string: str = "", show_optimized: boo
     return dot
 
 
+def set_to_str(v: set) -> str:
+    # TODO: truncate if too many items.
+    items = ", ".join(str(item) for item in v)
+    return f"{{{items}}}"
+
+
 def render(dot, predicate: Predicate, node_nr):
     node_predicate_mapping: dict[str, Predicate] = {}
 
-    def _add_node(name: str, *, label: str, predicate: Predicate):
+    def _add_node(name: str, *, label: str, predicate: Predicate) -> str:
         node = next(node_nr)
         unique_name = f"{name}_{node}"
         dot.node(unique_name, label=label)
         node_predicate_mapping[unique_name] = predicate
         return unique_name
 
+    def _add_node_left_right(name: str, *, label: str, predicate: Predicate, left: Predicate, right: Predicate) -> str:
+        node = _add_node(name, label=label, predicate=predicate)
+        dot.edge(node, to_value(left))
+        dot.edge(node, to_value(right))
+
+        return node
+
+    def _add_node_with_child(name: str, *, label: str, predicate: Predicate, child: Predicate) -> str:
+        node = _add_node(name, label=label, predicate=predicate)
+        dot.edge(node, to_value(child))
+        return node
+
     def to_value(predicate: Predicate):
         add_node = partial(_add_node, predicate=predicate)
+        add_node_left_right = partial(_add_node_left_right, predicate=predicate)
+        add_node_with_child = partial(_add_node_with_child, predicate=predicate)
 
         match predicate:
             case AllPredicate(all_predicate):
-                node = add_node("all", label="∀")
-                child = to_value(all_predicate)
-                dot.edge(node, child)
-                return node
+                return add_node_with_child("all", label="∀", child=all_predicate)
             case AlwaysFalsePredicate():
                 return add_node("F", label="false")
             case AlwaysTruePredicate():
                 return add_node("T", label="true")
             case AndPredicate(left, right):
-                node = add_node("and", label="∧")
-                left_node = to_value(left)
-                right_node = to_value(right)
-                dot.edge(node, left_node)
-                dot.edge(node, right_node)
-                return node
+                return add_node_left_right("and", label="∧", left=left, right=right)
             case AnyPredicate(any_predicate):
-                node = add_node("any", label="∃")
-                child = to_value(any_predicate)
-                dot.edge(node, child)
-                return node
+                return add_node_with_child("any", label="∃", child=any_predicate)
             case CompPredicate(_fn, comp_predicate):
-                node = add_node("comp", label="f")
-                child = to_value(comp_predicate)
-                dot.edge(node, child)
-                return node
+                return add_node_with_child("comp", label="f", child=comp_predicate)
             case EqPredicate(v):
                 return add_node("eq", label=f"x = {v}")
             case IsFalsyPredicate():
@@ -119,17 +131,24 @@ def render(dot, predicate: Predicate, node_nr):
             case GtPredicate(v):
                 return add_node("gt", label=f"x > {v}")
             case GtLePredicate(upper, lower):
-                return add_node("gele", label=f"{lower} ≤ x ≤ {upper}")
+                return add_node("gtle", label=f"{lower} ≤ x ≤ {upper}")
             case GtLtPredicate(upper, lower):
-                return add_node("gelt", label=f"{lower} ≤ x < {upper}")
+                return add_node("gtlt", label=f"{lower} ≤ x < {upper}")
             case InPredicate(v):
-                items = ", ".join(str(item) for item in v)
-                return add_node("in", label=f"x ∈ {{{items}}}")
+                return add_node("in", label=f"x ∈ {set_to_str(v)}")
             case IsInstancePredicate(klass):
                 name = klass[0].__name__  # type: ignore
                 return add_node("instance", label=f"is_{name}_p")
             case IsNonePredicate():
                 return add_node("none", label="x = None")
+            case IsRealSubsetPredicate(v):
+                return add_node("real_subset", label=f"x ⊂ {set_to_str(v)}")
+            case IsSubsetPredicate(v):
+                return add_node("subset", label=f"x ⊆ {set_to_str(v)}")
+            case IsRealSupersetPredicate(v):
+                return add_node("real_superset", label=f"x ⊃ {set_to_str(v)}")
+            case IsSupersetPredicate(v):
+                return add_node("superset", label=f"x ⊇ {set_to_str(v)}")
             case LazyPredicate(ref):
                 return add_node("lazy", label=ref)
             case LePredicate(v):
@@ -139,22 +158,13 @@ def render(dot, predicate: Predicate, node_nr):
             case NamedPredicate(name):
                 return add_node("named", label=name)
             case NotInPredicate(v):
-                items = ", ".join(str(item) for item in v)
-                return add_node("in", label=f"x ∉ {{{items}}}")
+                return add_node("in", label=f"x ∉ {set_to_str(v)}")
             case NePredicate(v):
                 return add_node("ne", label=f"x ≠ {v}")
             case NotPredicate(not_predicate):
-                child = to_value(not_predicate)
-                node = add_node("not", label="¬")
-                dot.edge(node, child)
-                return node
+                return add_node_with_child("not", label="¬", child=not_predicate)
             case OrPredicate(left, right):
-                node = add_node("or", label="∨")
-                left_node = to_value(left)
-                right_node = to_value(right)
-                dot.edge(node, left_node)
-                dot.edge(node, right_node)
-                return node
+                return add_node_left_right("or", label="∨", left=left, right=right)
             case RootPredicate():
                 return add_node("root", label="root")
             case TeePredicate():
@@ -162,12 +172,7 @@ def render(dot, predicate: Predicate, node_nr):
             case ThisPredicate():
                 return add_node("this", label="this")
             case XorPredicate(left, right):
-                node = add_node("xor", label="⊻")
-                left_node = to_value(left)
-                right_node = to_value(right)
-                dot.edge(node, left_node)
-                dot.edge(node, right_node)
-                return node
+                return add_node_left_right("xor", label="⊻", left=left, right=right)
             case _:
                 raise ValueError(f"Unknown predicate type {predicate}")
 
@@ -176,7 +181,7 @@ def render(dot, predicate: Predicate, node_nr):
     render_lazy_references(dot, node_predicate_mapping)
 
 
-def render_lazy_references(dot, node_predicate_mapping):
+def render_lazy_references(dot, node_predicate_mapping) -> None:
     def find_in_mapping(lookup: Predicate) -> str:
         return first(node for node, predicate in node_predicate_mapping.items() if predicate == lookup)
 
@@ -199,14 +204,14 @@ def render_lazy_references(dot, node_predicate_mapping):
                     add_dashed_line(node, this)
 
 
-def render_original(dot, predicate: Predicate, node_nr):
+def render_original(dot, predicate: Predicate, node_nr) -> None:
     with dot.subgraph(name="cluster_original") as original:
         original.attr(style="filled", color="lightgrey")
         original.attr(label="Original predicate")
         render(original, predicate, node_nr)
 
 
-def render_optimized(dot, predicate: Predicate, node_nr):
+def render_optimized(dot, predicate: Predicate, node_nr) -> None:
     optimized_predicate = optimize(predicate)
 
     with dot.subgraph(name="cluster_optimized") as optimized:

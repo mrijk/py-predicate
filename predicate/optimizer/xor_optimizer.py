@@ -3,7 +3,6 @@ from predicate.predicate import (
     AlwaysFalsePredicate,
     AlwaysTruePredicate,
     AndPredicate,
-    InPredicate,
     NotPredicate,
     OrPredicate,
     Predicate,
@@ -11,6 +10,7 @@ from predicate.predicate import (
     always_false_p,
     always_true_p,
 )
+from predicate.set_predicates import InPredicate
 
 
 def optimize_xor_predicate[T](predicate: XorPredicate[T]) -> Predicate[T]:

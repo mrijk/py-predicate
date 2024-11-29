@@ -27,37 +27,25 @@ from predicate import (
     to_dot,
 )
 from predicate.named_predicate import NamedPredicate
+from predicate.set_predicates import is_real_subset_p, is_real_superset_p, is_subset_p, is_superset_p
 from predicate.standard_predicates import ge_le_p, ge_lt_p, gt_le_p, gt_lt_p, is_truthy_p, root_p, tee_p, this_p
 
 
-def test_format_dot_false():
-    predicate = always_false_p
-
+@pytest.mark.parametrize(
+    "predicate",
+    [
+        always_false_p,
+        always_true_p,
+        is_falsy_p,
+        is_truthy_p,
+        is_subset_p({1, 2, 3}),
+        is_real_subset_p({1, 2, 3}),
+        is_superset_p({1, 2, 3}),
+        is_real_superset_p({1, 2, 3}),
+    ],
+)
+def test_format_dot(predicate):
     dot = to_dot(predicate, "test")
-
-    assert dot
-
-
-def test_format_dot_true():
-    predicate = always_true_p
-
-    dot = to_dot(predicate)
-
-    assert dot
-
-
-def test_format_dot_falsy():
-    predicate = is_falsy_p
-
-    dot = to_dot(predicate, "test")
-
-    assert dot
-
-
-def test_format_dot_truthy():
-    predicate = is_truthy_p
-
-    dot = to_dot(predicate)
 
     assert dot
 

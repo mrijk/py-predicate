@@ -3,6 +3,9 @@ Standard predicates
 
 This section describes the predicates that are included in py-predicate.
 
+.. include:: set_predicates.rst
+.. include:: str_predicates.rst
+
 all_p
 -----
 

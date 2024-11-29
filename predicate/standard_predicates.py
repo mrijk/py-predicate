@@ -19,7 +19,6 @@ from predicate.predicate import (
     FnPredicate,
     GePredicate,
     GtPredicate,
-    InPredicate,
     IsFalsyPredicate,
     IsNonePredicate,
     IsNotNonePredicate,
@@ -27,7 +26,6 @@ from predicate.predicate import (
     LePredicate,
     LtPredicate,
     NePredicate,
-    NotInPredicate,
     Predicate,
     resolve_predicate,
 )
@@ -42,16 +40,6 @@ is_not_none_p: Final[IsNotNonePredicate] = IsNotNonePredicate()
 
 is_none_p: Final[IsNonePredicate] = IsNonePredicate()
 """Return True if value is None, otherwise False."""
-
-
-def in_p[T](*v: T) -> InPredicate[T]:
-    """Return True if the values are included in the set, otherwise False."""
-    return InPredicate(v=v)
-
-
-def not_in_p[T](*v: T) -> NotInPredicate[T]:
-    """Return True if the values are not in the set, otherwise False."""
-    return NotInPredicate(v=v)
 
 
 def eq_p[T](v: T) -> EqPredicate[T]:

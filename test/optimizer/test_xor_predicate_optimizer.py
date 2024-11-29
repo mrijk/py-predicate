@@ -1,7 +1,7 @@
 from helpers import is_false_p, is_true_p, is_xor_p
 
-from predicate import always_false_p, always_true_p, can_optimize, ge_p, gt_p, le_p, optimize
-from predicate.standard_predicates import all_p, eq_p, in_p, lt_p
+from predicate import always_false_p, always_true_p, can_optimize, ge_p, gt_p, in_p, le_p, optimize
+from predicate.standard_predicates import all_p, eq_p, lt_p
 
 
 def test_xor_optimize_false_true():

@@ -15,8 +15,5 @@ class HasLengthPredicate[T](Predicate[T]):
     def __call__(self, iterable: Iterable[T]) -> bool:
         return ilen(iterable) == self.length
 
-    def __eq__(self, other: object) -> bool:
-        return isinstance(other, HasLengthPredicate) and self.length == other.length
-
     def __repr__(self) -> str:
-        return f"has_length({self.length})"
+        return f"has_length_p({self.length})"
