@@ -148,7 +148,10 @@ def test_list_of(list_type_p):
 @pytest.mark.parametrize(
     "tuple_types_p",
     [
-        # (is_bool_p, )
+        (is_bool_p,),
+        (is_int_p,),
+        (is_str_p,),
+        (is_int_p, is_int_p),
     ],
 )
 def test_tuple_of(tuple_types_p):

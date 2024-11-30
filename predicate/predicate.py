@@ -275,9 +275,6 @@ class IsEmptyPredicate[T](Predicate[T]):
     def __call__(self, iter: Iterable[T]) -> bool:
         return len(list(iter)) == 0
 
-    def __eq__(self, other: object) -> bool:
-        return isinstance(other, IsEmptyPredicate)
-
     def __repr__(self) -> str:
         return "is_empty_p"
 
@@ -288,9 +285,6 @@ class IsNotEmptyPredicate[T](Predicate[T]):
 
     def __call__(self, iter: Iterable[T]) -> bool:
         return len(list(iter)) > 0
-
-    def __eq__(self, other: object) -> bool:
-        return isinstance(other, IsNotEmptyPredicate)
 
     def __repr__(self) -> str:
         return "is_not_empty_p"
@@ -303,9 +297,6 @@ class AlwaysTruePredicate(Predicate):
     def __call__(self, *args, **kwargs):
         return True
 
-    def __eq__(self, other: object) -> bool:
-        return isinstance(other, AlwaysTruePredicate)
-
     def __repr__(self) -> str:
         return "always_true_p"
 
@@ -316,9 +307,6 @@ class AlwaysFalsePredicate(Predicate):
 
     def __call__(self, *args, **kwargs):
         return False
-
-    def __eq__(self, other: object) -> bool:
-        return isinstance(other, AlwaysFalsePredicate)
 
     def __repr__(self) -> str:
         return "always_false_p"
@@ -331,9 +319,6 @@ class IsNonePredicate[T](Predicate[T]):
     def __call__(self, x: T) -> bool:
         return x is None
 
-    def __eq__(self, other: object) -> bool:
-        return isinstance(other, IsNonePredicate)
-
     def __repr__(self) -> str:
         return "is_none_p"
 
@@ -344,9 +329,6 @@ class IsNotNonePredicate[T](Predicate[T]):
 
     def __call__(self, x: T) -> bool:
         return x is not None
-
-    def __eq__(self, other: object) -> bool:
-        return isinstance(other, IsNotNonePredicate)
 
     def __repr__(self) -> str:
         return "is_not_none_p"

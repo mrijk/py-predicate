@@ -55,7 +55,6 @@ from predicate.standard_predicates import (
     is_single_or_iterable_of_p,
     is_single_or_list_of_p,
     is_truthy_p,
-    is_tuple_of_p,
     neg_p,
     pos_p,
     tee_p,
@@ -364,18 +363,6 @@ def test_is_tuple_p():
     assert not is_tuple_p(None)
 
     assert is_tuple_p((3,))
-
-
-def test_is_tuple_of_p():
-    predicate = is_tuple_of_p(is_str_p, is_int_p & ge_p(2), is_bool_p)
-
-    assert not predicate(None)
-    assert not predicate(("foo",))
-    assert not predicate(("foo", 13))
-    assert not predicate(("foo", 13, None))
-    assert not predicate(("foo", 1, False))
-
-    assert predicate(("foo", 2, False))
 
 
 def test_is_uuid_p():

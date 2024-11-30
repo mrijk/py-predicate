@@ -4,6 +4,7 @@ import uuid
 from collections.abc import Iterator
 from datetime import datetime, timedelta
 from functools import singledispatch
+from itertools import cycle
 
 import exrex  # type: ignore
 from more_itertools import interleave, powerset_of_sets, random_combination_with_replacement, take
@@ -45,6 +46,7 @@ from predicate.predicate import (
 from predicate.regex_predicate import RegexPredicate
 from predicate.set_predicates import InPredicate, IsRealSubsetPredicate, IsSubsetPredicate, NotInPredicate
 from predicate.standard_predicates import AllPredicate
+from predicate.tuple_of_predicate import TupleOfPredicate
 
 
 @singledispatch
@@ -227,7 +229,7 @@ def generate_is_instance_p(predicate: IsInstancePredicate) -> Iterator:
     if klass is str:
         yield from random_strings()
     elif klass is bool:
-        yield from (False, True)
+        yield from cycle((False, True))
     elif klass is complex:
         yield from random_complex_numbers()
     elif klass == datetime:
@@ -254,3 +256,10 @@ def generate_any_p(any_predicate: AnyPredicate) -> Iterator:
     yield random_combination_with_replacement(values, 5)
 
     yield set(random_combination_with_replacement(values, 5))
+
+
+@generate_true.register
+def generate_tuple_of_p(tuple_of_predicate: TupleOfPredicate) -> Iterator:
+    predicates = tuple_of_predicate.predicates
+
+    yield from zip(*(generate_true(predicate) for predicate in predicates), strict=False)

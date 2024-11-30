@@ -58,6 +58,11 @@ def random_ints(lower: int = -sys.maxsize, upper: int = sys.maxsize) -> Iterator
         if high >= low:
             yield from (random.randint(low, high) for _ in range(0, 10))
 
+        low = max(-100, lower)
+        high = min(100, upper)
+        if high >= low:
+            yield from (random.randint(low, high) for _ in range(0, 100))
+
         # yield random.randint(lower, upper)
 
 

@@ -34,6 +34,7 @@ from predicate.regex_predicate import RegexPredicate
 from predicate.root_predicate import RootPredicate
 from predicate.tee_predicate import TeePredicate
 from predicate.this_predicate import ThisPredicate
+from predicate.tuple_of_predicate import TupleOfPredicate
 
 is_not_none_p: Final[IsNotNonePredicate] = IsNotNonePredicate()
 """Return True if value is not None, otherwise False."""
@@ -164,11 +165,7 @@ def is_single_or_list_of_p[T](predicate: Predicate[T]) -> Predicate:
 
 def is_tuple_of_p(*predicates: Predicate) -> Predicate:
     """Return True if value is a tuple, and for all elements in the tuple the predicate is True, otherwise False."""
-
-    def valid_tuple_values(x: Iterable) -> bool:
-        return all(p(v) for p, v in zip(predicates, x, strict=False))
-
-    return is_tuple_p & has_length_p(length=len(predicates)) & fn_p(fn=valid_tuple_values)
+    return TupleOfPredicate(list(predicates))
 
 
 def is_set_of_p[T](predicate: Predicate[T]) -> Predicate:
