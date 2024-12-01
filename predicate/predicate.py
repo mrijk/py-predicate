@@ -178,9 +178,6 @@ class EqPredicate[T](Predicate[T]):
     def __call__(self, x: T) -> bool:
         return x == self.v
 
-    def __eq__(self, other: object) -> bool:
-        return isinstance(other, EqPredicate) and self.v == other.v
-
     def __repr__(self) -> str:
         return f"eq_p({self.v})"
 
@@ -193,9 +190,6 @@ class NePredicate[T](Predicate[T]):
 
     def __call__(self, x: T) -> bool:
         return x != self.v
-
-    def __eq__(self, other: object) -> bool:
-        return isinstance(other, NePredicate) and self.v == other.v
 
     def __repr__(self) -> str:
         return f"ne_p({self.v})"
@@ -213,9 +207,6 @@ class GePredicate[T](Predicate[T]):
     def __call__(self, x: T) -> bool:
         return x >= self.v
 
-    def __eq__(self, other: object) -> bool:
-        return isinstance(other, GePredicate) and self.v == other.v
-
     def __repr__(self) -> str:
         return f"ge_p({self.v})"
 
@@ -228,9 +219,6 @@ class GtPredicate[T](Predicate[T]):
 
     def __call__(self, x: T) -> bool:
         return x > self.v
-
-    def __eq__(self, other: object) -> bool:
-        return isinstance(other, GtPredicate) and self.v == other.v
 
     def __repr__(self) -> str:
         return f"gt_p({self.v})"
@@ -245,9 +233,6 @@ class LePredicate[T](Predicate[T]):
     def __call__(self, x: T) -> bool:
         return x <= self.v
 
-    def __eq__(self, other: object) -> bool:
-        return isinstance(other, LePredicate) and self.v == other.v
-
     def __repr__(self) -> str:
         return f"le_p({self.v})"
 
@@ -260,9 +245,6 @@ class LtPredicate[T](Predicate[T]):
 
     def __call__(self, x: T) -> bool:
         return x < self.v
-
-    def __eq__(self, other: object) -> bool:
-        return isinstance(other, LtPredicate) and self.v == other.v
 
     def __repr__(self) -> str:
         return f"lt_p({self.v})"

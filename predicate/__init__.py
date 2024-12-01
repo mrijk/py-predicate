@@ -31,7 +31,16 @@ from predicate.predicate import (
     always_true_p,
     is_empty_p,
 )
-from predicate.set_predicates import InPredicate, NotInPredicate, in_p, not_in_p
+from predicate.set_predicates import (
+    InPredicate,
+    NotInPredicate,
+    in_p,
+    is_real_subset_p,
+    is_real_superset_p,
+    is_subset_p,
+    is_superset_p,
+    not_in_p,
+)
 from predicate.standard_predicates import (
     all_p,
     any_p,
@@ -159,6 +168,10 @@ __all__ = [
     "is_set_of_p",
     "is_set_p",
     "is_str_p",
+    "is_subset_p",
+    "is_superset_p",
+    "is_real_subset_p",
+    "is_real_superset_p",
     "is_title_p",
     "is_truthy_p",
     "is_tuple_of_p",
