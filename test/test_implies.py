@@ -72,10 +72,16 @@ def test_implies_eq_in():
     assert implies(p, in_p(3))
 
 
-def test_implies_eq_other():
+def test_implies_eq_ne():
     p = eq_p(3)
 
     assert implies(p, ne_p(2))
+
+
+def test_implies_eq_false():
+    p = eq_p(3)
+
+    assert not implies(p, always_true_p)
 
 
 def test_implies_is_real_subset_subset():
@@ -85,8 +91,20 @@ def test_implies_is_real_subset_subset():
     assert implies(p, is_subset_p({1, 2, 3}))
 
 
+def test_implies_is_real_subset_false():
+    p = is_real_subset_p({1, 2, 3})
+
+    assert not implies(p, always_true_p)
+
+
 def test_implies_is_real_super_superset():
     p = is_real_superset_p({1, 2, 3})
 
     assert not implies(p, is_superset_p({1, 2}))
     assert implies(p, is_superset_p({1, 2, 3}))
+
+
+def test_implies_is_real_super_false():
+    p = is_real_superset_p({1, 2, 3})
+
+    assert not implies(p, always_true_p)

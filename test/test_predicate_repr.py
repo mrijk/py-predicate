@@ -10,6 +10,7 @@ from predicate import (
     ge_p,
     gt_p,
     in_p,
+    is_bool_p,
     is_empty_p,
     is_none_p,
     is_not_none_p,
@@ -33,6 +34,7 @@ from predicate.standard_predicates import (
     has_length_p,
     is_falsy_p,
     is_truthy_p,
+    is_tuple_of_p,
     tee_p,
     this_p,
 )
@@ -71,6 +73,7 @@ from predicate.standard_predicates import (
         (is_superset_p({1, 2, 3}), "is_superset_p({1, 2, 3})"),
         (is_falsy_p, "is_falsy_p"),
         (is_truthy_p, "is_truthy_p"),
+        (is_tuple_of_p(is_str_p, is_bool_p), "is_tuple_of_p(is_str_p, is_bool_p)"),
         (lazy_p("ref"), 'lazy_p("ref")'),
         (le_p(2), "le_p(2)"),
         (lt_p(2), "lt_p(2)"),

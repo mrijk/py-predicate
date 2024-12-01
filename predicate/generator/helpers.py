@@ -47,23 +47,17 @@ def random_ints(lower: int = -sys.maxsize, upper: int = sys.maxsize) -> Iterator
     # yield lower
     # yield upper
     # TODO: maybe first generate_true some smaller ints
+
+    def between(limit: int) -> Iterator[int]:
+        low = max(-limit, lower)
+        high = min(limit, upper)
+        if high >= low:
+            yield from (random.randint(low, high) for _ in range(0, limit))
+
     while True:
-        low = max(-1, lower)
-        high = min(1, upper)
-        if high >= low:
-            yield from (random.randint(low, high) for _ in range(0, 1))
-
-        low = max(-10, lower)
-        high = min(10, upper)
-        if high >= low:
-            yield from (random.randint(low, high) for _ in range(0, 10))
-
-        low = max(-100, lower)
-        high = min(100, upper)
-        if high >= low:
-            yield from (random.randint(low, high) for _ in range(0, 100))
-
-        # yield random.randint(lower, upper)
+        yield from between(1)
+        yield from between(10)
+        yield from between(100)
 
 
 def random_uuids() -> Iterator[UUID]:
