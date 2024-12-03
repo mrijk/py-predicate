@@ -32,6 +32,7 @@ from predicate.predicate import (
 from predicate.range_predicate import GeLePredicate, GeLtPredicate, GtLePredicate, GtLtPredicate
 from predicate.regex_predicate import RegexPredicate
 from predicate.root_predicate import RootPredicate
+from predicate.set_of_predicate import SetOfPredicate
 from predicate.tee_predicate import TeePredicate
 from predicate.this_predicate import ThisPredicate
 from predicate.tuple_of_predicate import TupleOfPredicate
@@ -170,7 +171,8 @@ def is_tuple_of_p(*predicates: Predicate) -> Predicate:
 
 def is_set_of_p[T](predicate: Predicate[T]) -> Predicate:
     """Return True if value is a set, and for all elements in the set the predicate is True, otherwise False."""
-    return is_set_p & all_p(predicate)
+    # return is_set_p & all_p(predicate)
+    return SetOfPredicate(predicate)
 
 
 def regex_p(pattern: str) -> Predicate[str]:

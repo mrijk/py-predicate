@@ -51,7 +51,6 @@ from predicate.standard_predicates import (
     is_iterable_of_p,
     is_list_of_p,
     is_range_p,
-    is_set_of_p,
     is_single_or_iterable_of_p,
     is_single_or_list_of_p,
     is_truthy_p,
@@ -347,16 +346,6 @@ def test_is_set_p():
 
     assert is_set_p(set())
     assert is_set_p({3})
-
-
-def test_is_set_of_p():
-    is_set_of_str = is_set_of_p(is_str_p)
-
-    assert not is_set_of_str(None)
-    assert not is_set_of_str({1})
-
-    assert is_set_of_str(set())
-    assert is_set_of_str({"foo"})
 
 
 def test_is_tuple_p():

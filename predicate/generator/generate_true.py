@@ -44,6 +44,7 @@ from predicate.predicate import (
     always_false_p,
 )
 from predicate.regex_predicate import RegexPredicate
+from predicate.set_of_predicate import SetOfPredicate
 from predicate.set_predicates import InPredicate, IsRealSubsetPredicate, IsSubsetPredicate, NotInPredicate
 from predicate.standard_predicates import AllPredicate
 from predicate.tuple_of_predicate import TupleOfPredicate
@@ -263,3 +264,12 @@ def generate_tuple_of_p(tuple_of_predicate: TupleOfPredicate) -> Iterator:
     predicates = tuple_of_predicate.predicates
 
     yield from zip(*(generate_true(predicate) for predicate in predicates), strict=False)
+
+
+@generate_true.register
+def generate_set_of_p(set_of_predicate: SetOfPredicate) -> Iterator:
+    predicate = set_of_predicate.predicate
+
+    values = take(10, generate_true(predicate))
+
+    yield set(random_combination_with_replacement(values, 5))

@@ -37,6 +37,7 @@ from predicate.predicate import (
     Predicate,
     always_true_p,
 )
+from predicate.set_of_predicate import SetOfPredicate
 from predicate.set_predicates import InPredicate
 
 
@@ -164,3 +165,12 @@ def generate_is_instance_p(predicate: IsInstancePredicate) -> Iterator:
 def generate_or(predicate: OrPredicate) -> Iterator:
     yield from (item for item in generate_false(predicate.left) if not predicate.right(item))
     yield from (item for item in generate_false(predicate.right) if not predicate.left(item))
+
+
+@generate_false.register
+def generate_set_of_p(set_of_predicate: SetOfPredicate) -> Iterator:
+    predicate = set_of_predicate.predicate
+
+    values = take(10, generate_false(predicate))
+
+    yield set(random_combination_with_replacement(values, 5))
