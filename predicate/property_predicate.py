@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from typing import Callable
 
 from predicate import Predicate
 
@@ -9,8 +10,11 @@ class PropertyPredicate[T](Predicate[T]):
 
     getter: property
 
+    def __init__(self, getter: Callable):
+        self.getter = getter
+
     def __call__(self, obj: T) -> bool:
-        return self.getter.fget(obj)
+        return self.getter.fget(obj)  # type: ignore
 
     def __repr__(self) -> str:
-        return "todo"
+        return f"property_p({self.getter.__name__})"

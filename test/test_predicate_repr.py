@@ -22,6 +22,7 @@ from predicate import (
     not_in_p,
     regex_p,
 )
+from predicate.ip_address_predicates import is_ipv4_global_p
 from predicate.named_predicate import NamedPredicate
 from predicate.predicate import is_not_empty_p
 from predicate.set_predicates import is_real_subset_p, is_real_superset_p, is_subset_p, is_superset_p
@@ -33,6 +34,7 @@ from predicate.standard_predicates import (
     has_key_p,
     has_length_p,
     is_falsy_p,
+    is_set_of_p,
     is_truthy_p,
     is_tuple_of_p,
     tee_p,
@@ -73,6 +75,7 @@ from predicate.standard_predicates import (
         (is_superset_p({1, 2, 3}), "is_superset_p({1, 2, 3})"),
         (is_falsy_p, "is_falsy_p"),
         (is_truthy_p, "is_truthy_p"),
+        (is_set_of_p(is_str_p), "is_set_of_p(is_str_p)"),
         (is_tuple_of_p(is_str_p, is_bool_p), "is_tuple_of_p(is_str_p, is_bool_p)"),
         (lazy_p("ref"), 'lazy_p("ref")'),
         (le_p(2), "le_p(2)"),
@@ -83,6 +86,7 @@ from predicate.standard_predicates import (
         (tee_p(lambda x: None), "tee_p"),
         (this_p, "this_p"),
         (NamedPredicate(name="foo"), "foo"),
+        (is_ipv4_global_p, "property_p(is_global)"),
     ],
 )
 def test_repr_standard(predicate, representation):
