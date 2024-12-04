@@ -17,4 +17,4 @@ class PropertyPredicate[T](Predicate[T]):
         return self.getter.fget(obj)  # type: ignore
 
     def __repr__(self) -> str:
-        return f"property_p({self.getter.__name__})"
+        return "property_p"
