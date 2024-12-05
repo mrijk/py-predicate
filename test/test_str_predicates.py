@@ -1,4 +1,5 @@
 from predicate.str_predicates import (
+    ends_with_p,
     is_alnum_p,
     is_alpha_p,
     is_decimal_p,
@@ -7,6 +8,7 @@ from predicate.str_predicates import (
     is_space_p,
     is_title_p,
     is_upper_p,
+    starts_with_p,
 )
 
 
@@ -50,3 +52,17 @@ def test_is_title_p():
 def test_is_upper_p():
     assert not is_upper_p("Foo")
     assert is_upper_p("FOO")
+
+
+def test_ends_with_p():
+    predicate = ends_with_p("foo")
+
+    assert not predicate("foobar")
+    assert predicate("barfoo")
+
+
+def test_starts_with_p():
+    predicate = starts_with_p("foo")
+
+    assert not predicate("bar")
+    assert predicate("foobar")

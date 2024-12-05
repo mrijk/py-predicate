@@ -69,10 +69,11 @@ def optimize_or_predicate[T](predicate: OrPredicate[T]) -> Predicate[T]:
         case EqPredicate(v1), EqPredicate(v2) if v1 != v2:
             return InPredicate((v1, v2))
 
-        case InPredicate(v1), InPredicate(v2):
-            if v := v1 | v2:
-                return optimize_in_predicate(InPredicate(v=v))
-            return always_true_p
+        case EqPredicate(v1), NotInPredicate(v2) if v1 in v2:
+            return optimize_not_in_predicate(NotInPredicate(v2 - {v1}))
+
+        case InPredicate(v1), InPredicate(v2) if v := v1 | v2:
+            return optimize_in_predicate(InPredicate(v=v))
 
         case InPredicate(v1), NotInPredicate(v2):
             if v := v2 - (v1 & v2):
@@ -82,14 +83,17 @@ def optimize_or_predicate[T](predicate: OrPredicate[T]) -> Predicate[T]:
         case AnyPredicate(left_any), AnyPredicate(right_any):
             return AnyPredicate(optimize(OrPredicate(left=left_any, right=right_any)))
 
-        # case _, _ if implies(left, negate(right)) or implies(right, negate(left)):
-        #     return always_true_p
-
         case _, _ if implies(left, right):
             return right
 
         case _, _ if implies(right, left):
             return left
+
+        # case _, _ if implies(left, negate(right)):
+        #     return negate(left)
+        #
+        # case _, _ if implies(right, negate(left)):
+        #     return negate(right)
 
         case _, _ if or_contains_negate(predicate, right):
             return always_true_p  # p | q | ... | ~p == True
@@ -97,7 +101,8 @@ def optimize_or_predicate[T](predicate: OrPredicate[T]) -> Predicate[T]:
         case _, _ if or_contains_negate(predicate, left):
             return always_true_p  # q | p | ... | ~p == True
 
-    return OrPredicate(left=left, right=right)
+        case _:
+            return OrPredicate(left=left, right=right)
 
 
 def optimize_or_not[T](left: Predicate[T], right: Predicate[T]) -> Predicate[T] | None:

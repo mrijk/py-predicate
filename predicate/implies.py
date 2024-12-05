@@ -16,6 +16,7 @@ from predicate.set_predicates import (
     IsRealSupersetPredicate,
     IsSubsetPredicate,
     IsSupersetPredicate,
+    NotInPredicate,
 )
 
 
@@ -75,6 +76,8 @@ def _(predicate: EqPredicate, other: Predicate) -> bool:
             return predicate.v > v
         case InPredicate(v):
             return predicate.v in v
+        case NotInPredicate(v):
+            return predicate.v not in v
         case _:
             return False
 
@@ -93,5 +96,14 @@ def _(predicate: IsRealSupersetPredicate, other: Predicate) -> bool:
     match other:
         case IsSupersetPredicate(v):
             return predicate.v == v
+        case _:
+            return False
+
+
+@implies.register
+def _(predicate: InPredicate, other: Predicate) -> bool:
+    match other:
+        case InPredicate(v):
+            return predicate.v.issubset(v)
         case _:
             return False

@@ -108,3 +108,10 @@ def test_implies_is_real_super_false():
     p = is_real_superset_p({1, 2, 3})
 
     assert not implies(p, always_true_p)
+
+
+def test_implies_in_in():
+    p = in_p(1, 2, 3)
+
+    assert not implies(p, in_p(1, 2))
+    assert implies(p, in_p(1, 2, 3, 4))
