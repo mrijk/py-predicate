@@ -32,7 +32,19 @@ from predicate import (
 )
 from predicate.generator.generate_true import generate_true
 from predicate.set_predicates import is_real_subset_p, is_subset_p
-from predicate.standard_predicates import ge_p, gt_p, is_dict_p, is_set_p, le_p, lt_p, neg_p, pos_p, regex_p, zero_p
+from predicate.standard_predicates import (
+    ge_p,
+    gt_p,
+    has_key_p,
+    is_dict_p,
+    is_set_p,
+    le_p,
+    lt_p,
+    neg_p,
+    pos_p,
+    regex_p,
+    zero_p,
+)
 
 
 @pytest.mark.parametrize(
@@ -40,6 +52,7 @@ from predicate.standard_predicates import ge_p, gt_p, is_dict_p, is_set_p, le_p,
     [
         all_p(is_int_p),
         any_p(is_uuid_p),
+        has_key_p("foo"),
         in_p(2, 3, 4),
         is_bool_p,
         is_complex_p,

@@ -11,9 +11,11 @@ from more_itertools import interleave, powerset_of_sets, random_combination_with
 
 from predicate.any_predicate import AnyPredicate
 from predicate.generator.helpers import (
+    generate_anys,
     generate_ints,
     generate_strings,
     generate_uuids,
+    random_anys,
     random_complex_numbers,
     random_datetimes,
     random_dicts,
@@ -22,6 +24,7 @@ from predicate.generator.helpers import (
     random_strings,
     random_uuids,
 )
+from predicate.has_key_predicate import HasKeyPredicate
 from predicate.is_instance_predicate import IsInstancePredicate
 from predicate.optimizer.predicate_optimizer import optimize
 from predicate.predicate import (
@@ -130,6 +133,13 @@ def generate_gt(predicate: GtPredicate) -> Iterator:
 
 
 @generate_true.register
+def generate_has_key(predicate: HasKeyPredicate) -> Iterator:
+    key = predicate.key
+    for random_dict, value in zip(random_dicts(), random_anys(), strict=False):
+        yield random_dict | {key: value}
+
+
+@generate_true.register
 def generate_le(predicate: LePredicate) -> Iterator:
     match predicate.v:
         case datetime() as dt:
@@ -200,8 +210,8 @@ def generate_not_in(predicate: NotInPredicate) -> Iterator:
 
 
 @generate_true.register
-def generate_not_none(_predicate: IsNotNonePredicate) -> Iterator:
-    yield from ("foo", 3.14, 42)
+def generate_not_none(predicate: IsNotNonePredicate) -> Iterator:
+    yield from generate_anys(predicate)
 
 
 @generate_true.register
