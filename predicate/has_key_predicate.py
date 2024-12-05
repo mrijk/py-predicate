@@ -1,11 +1,10 @@
 from dataclasses import dataclass
-from typing import Any
 
 from predicate.predicate import Predicate
 
 
 @dataclass
-class HasKeyPredicate[T](Predicate[dict[T, Any]]):
+class HasKeyPredicate[T](Predicate[T]):
     """A predicate class that models the has key."""
 
     key: T
