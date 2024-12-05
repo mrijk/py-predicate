@@ -101,8 +101,7 @@ def optimize_or_predicate[T](predicate: OrPredicate[T]) -> Predicate[T]:
         case _, _ if or_contains_negate(predicate, left):
             return always_true_p  # q | p | ... | ~p == True
 
-        case _:
-            return OrPredicate(left=left, right=right)
+    return OrPredicate(left=left, right=right)
 
 
 def optimize_or_not[T](left: Predicate[T], right: Predicate[T]) -> Predicate[T] | None:
