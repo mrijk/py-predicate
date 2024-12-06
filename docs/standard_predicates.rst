@@ -238,6 +238,22 @@ This predicate tests if the value is of type ``dict``.
     assert is_dict_p({"one": 1, "two": 2, "three": 3})
 
 
+
+is_dict_of_p
+---------
+
+This predicate tests if the value is of type ``dict`` and the key and values match the predicates.
+
+.. code-block:: python
+
+    from predicate import is_dict_of_p, is_int_p, eq_p
+
+    # test for dictionaries that have keys x and y. The values should be integers
+    predicate = is_dict_of_p((eq_p("x"), is_int_p), (eq_p("y"), is_int_p))
+
+    assert predicate({"x": 1, "y": 7})
+
+
 is_empty_p
 ----------
 

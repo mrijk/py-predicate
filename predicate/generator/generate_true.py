@@ -4,12 +4,13 @@ import uuid
 from collections.abc import Iterator
 from datetime import datetime, timedelta
 from functools import singledispatch
-from itertools import cycle
+from itertools import cycle, repeat
 
 import exrex  # type: ignore
-from more_itertools import interleave, powerset_of_sets, random_combination_with_replacement, take
+from more_itertools import chunked, flatten, interleave, powerset_of_sets, random_combination_with_replacement, take
 
 from predicate.any_predicate import AnyPredicate
+from predicate.dict_of_predicate import DictOfPredicate
 from predicate.generator.helpers import (
     generate_anys,
     generate_ints,
@@ -94,7 +95,7 @@ def generate_and(predicate: AndPredicate) -> Iterator:
 
 @generate_true.register
 def generate_eq(predicate: EqPredicate) -> Iterator:
-    yield predicate.v
+    yield from repeat(predicate.v)
 
 
 @generate_true.register
@@ -254,6 +255,7 @@ def generate_is_instance_p(predicate: IsInstancePredicate) -> Iterator:
     elif klass is int:
         yield from random_ints()
     elif klass is set:
+        # TODO: generate random sets
         yield from (set(), {1, 2, 3}, {"foo", "bar"})
 
 
@@ -267,6 +269,18 @@ def generate_any_p(any_predicate: AnyPredicate) -> Iterator:
     yield random_combination_with_replacement(values, 5)
 
     yield set(random_combination_with_replacement(values, 5))
+
+
+@generate_true.register
+def generate_dict_of_p(dict_of_predicate: DictOfPredicate) -> Iterator:
+    key_value_predicates = dict_of_predicate.key_value_predicates
+
+    candidates = zip(
+        *flatten(((generate_true(key_p), generate_true(value_p)) for key_p, value_p in key_value_predicates)),
+        strict=False,
+    )
+
+    yield from (dict(chunked(candidate, 2)) for candidate in candidates)
 
 
 @generate_true.register

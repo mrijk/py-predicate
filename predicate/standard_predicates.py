@@ -9,6 +9,7 @@ from uuid import UUID
 from predicate.all_predicate import AllPredicate
 from predicate.any_predicate import AnyPredicate
 from predicate.comp_predicate import CompPredicate
+from predicate.dict_of_predicate import DictOfPredicate
 from predicate.has_key_predicate import HasKeyPredicate
 from predicate.has_length_predicate import HasLengthPredicate
 from predicate.is_instance_predicate import IsInstancePredicate
@@ -164,6 +165,12 @@ def is_single_or_list_of_p[T](predicate: Predicate[T]) -> Predicate:
     return is_list_of_p(predicate) | predicate
 
 
+def is_dict_of_p(*predicates: tuple[Predicate, Predicate]) -> Predicate:
+    """Return True if value is a set, and for all elements in the set the predicate is True, otherwise False."""
+    # return is_set_p & all_p(predicate)
+    return DictOfPredicate(list(predicates))
+
+
 def is_tuple_of_p(*predicates: Predicate) -> Predicate:
     """Return True if value is a tuple, and for all elements in the tuple the predicate is True, otherwise False."""
     return TupleOfPredicate(list(predicates))
@@ -265,7 +272,7 @@ this_p: PredicateFactory = PredicateFactory(factory=ThisPredicate)
 def dict_depth(value: dict) -> int:
     match value:
         case list() as l:
-            return 1 + max(dict_depth(item) for item in l)
+            return 1 + max(dict_depth(item) for item in l) if l else 0
         case dict() as d if d:
             return 1 + max(dict_depth(item) for item in d.values())
         case _:

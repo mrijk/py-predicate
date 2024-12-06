@@ -8,6 +8,7 @@ from more_itertools import first
 from predicate.all_predicate import AllPredicate
 from predicate.any_predicate import AnyPredicate
 from predicate.comp_predicate import CompPredicate
+from predicate.dict_of_predicate import DictOfPredicate
 from predicate.is_instance_predicate import IsInstancePredicate
 from predicate.lazy_predicate import LazyPredicate, find_predicate_by_ref
 from predicate.named_predicate import NamedPredicate
@@ -76,7 +77,7 @@ def set_to_str(v: set) -> str:
 def render(dot, predicate: Predicate, node_nr):
     node_predicate_mapping: dict[str, Predicate] = {}
 
-    def _add_node(name: str, *, label: str, predicate: Predicate) -> str:
+    def _add_node(name: str, *, label: str, predicate: Predicate | None) -> str:
         node = next(node_nr)
         unique_name = f"{name}_{node}"
         dot.node(unique_name, label=label)
@@ -136,6 +137,14 @@ def render(dot, predicate: Predicate, node_nr):
                 return add_node("gtlt", label=f"{lower} ≤ x < {upper}")
             case InPredicate(v):
                 return add_node("in", label=f"x ∈ {set_to_str(v)}")
+            case DictOfPredicate(key_value_predicates):
+                node = add_node("dict_of", label="is_dict_of")
+                for key, value in key_value_predicates:
+                    kv = _add_node("kv", label="kv", predicate=None)
+                    dot.edge(node, kv)
+                    dot.edge(kv, to_value(key), label="key")
+                    dot.edge(kv, to_value(value), label="value")
+                return node
             case IsInstancePredicate(klass):
                 name = klass[0].__name__  # type: ignore
                 return add_node("instance", label=f"is_{name}_p")

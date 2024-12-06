@@ -36,6 +36,7 @@ from predicate.standard_predicates import (
     ge_p,
     gt_p,
     has_key_p,
+    is_dict_of_p,
     is_dict_p,
     is_set_p,
     le_p,
@@ -136,6 +137,18 @@ def test_generate_gt(value):
 )
 def test_generate_le(value):
     predicate = le_p(value)
+
+    assert_generated_true(predicate)
+
+
+@pytest.mark.parametrize(
+    "key_value_predicates",
+    [
+        ([(is_str_p, is_int_p)]),
+    ],
+)
+def test_dict_of(key_value_predicates):
+    predicate = is_dict_of_p(*key_value_predicates)
 
     assert_generated_true(predicate)
 

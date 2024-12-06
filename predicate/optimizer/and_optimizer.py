@@ -78,10 +78,8 @@ def optimize_and_predicate[T](predicate: AndPredicate[T]) -> Predicate[T]:
                 return optimize_in_predicate(InPredicate(v=v))
             return always_false_p
 
-        case NotInPredicate(v1), NotInPredicate(v2):
-            if v := v1 | v2:
-                return optimize_not_in_predicate(NotInPredicate(v=v))
-            return always_true_p
+        case NotInPredicate(v1), NotInPredicate(v2) if v := v1 | v2:
+            return optimize_not_in_predicate(NotInPredicate(v=v))
 
         case AllPredicate(left_all), AllPredicate(right_all):
             # All(p1) & All(p2) => All(p1 & p2)

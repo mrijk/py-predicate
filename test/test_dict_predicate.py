@@ -35,6 +35,7 @@ def test_depth_eq_p():
 
     assert not depth_eq_3({})
     assert not depth_eq_3({"x": {}})
+    assert not depth_eq_3({"x": []})
 
     assert depth_eq_3({"x": {"y": 5}})
 
@@ -93,8 +94,7 @@ def test_dict_with_only_int_leaves():
     valid_values_p = is_iterable_of_p(valid_value_p)
     only_int = is_dict_p & comp_p(dict_values, valid_values_p)
 
-    # TODO 1: should we have a is_dict_of_p ?
-    # TODO 3: should we have >> for parameters:
+    # TODO: should we have >> for parameters:
     #         valid_value_p = node_p | is_iterable_of_p >> node_p
     #
     # only_int = is_dict_of_p(is_iterable_of_p(is_single_or_iterable_of_p(is_int_p | root_p)))
