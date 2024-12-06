@@ -81,7 +81,8 @@ def render(dot, predicate: Predicate, node_nr):
         node = next(node_nr)
         unique_name = f"{name}_{node}"
         dot.node(unique_name, label=label)
-        node_predicate_mapping[unique_name] = predicate
+        if predicate:
+            node_predicate_mapping[unique_name] = predicate
         return unique_name
 
     def _add_node_left_right(name: str, *, label: str, predicate: Predicate, left: Predicate, right: Predicate) -> str:
