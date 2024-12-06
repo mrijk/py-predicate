@@ -48,9 +48,9 @@ either a string, or a list of data that can again either be a string or a list o
 data. Ad infinitum.
 
 ```python
-from predicate import all_p, is_list_p, is_str_p, lazy_p
+from predicate import all_p, is_list_p, is_str_p, root_p
 
-str_or_list_of_str = is_str_p | (is_list_p & all_p(lazy_p("str_or_list_of_str")))
+str_or_list_of_str = is_str_p | (is_list_p & all_p(root_p))
 ```
 
 Using plain Python, the above one-liner would have to be coded as a (recursive) function.
