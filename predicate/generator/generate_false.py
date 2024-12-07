@@ -61,9 +61,7 @@ def generate_all_p(all_predicate: AllPredicate) -> Iterator:
 
 @generate_false.register
 def generate_and(predicate: AndPredicate) -> Iterator:
-    if optimize(predicate) == always_true_p:
-        yield from []
-    else:
+    if optimize(predicate) != always_true_p:
         yield from (item for item in generate_false(predicate.left))
         yield from (item for item in generate_false(predicate.right))
 

@@ -28,10 +28,19 @@ def random_datetimes(lower: datetime | None = None, upper: datetime | None = Non
     yield datetime.now()
 
 
-def random_strings() -> Iterator:
+def random_sets(min_size: int = 0, max_size: int = 10) -> Iterator:
+    if min_size == 0:
+        yield set()
+    while True:
+        length = random.randint(min_size, max_size)
+        values = take(length, random_anys())
+        yield set(values)
+
+
+def random_strings(min_size: int = 0, max_size: int = 10) -> Iterator:
     population = string.ascii_letters + string.digits
     while True:
-        length = random.randint(0, 100)
+        length = random.randint(min_size, max_size)
         yield "".join(choices(population, k=length))
 
 

@@ -10,6 +10,18 @@ class DictOfPredicate[T](Predicate[T]):
 
     key_value_predicates: list[tuple[Predicate, Predicate]]
 
+    def __init__(self, key_value_predicates: list[tuple[Predicate | str, Predicate]]):
+        def to_key_p(key_p: Predicate | str) -> Predicate:
+            from predicate.standard_predicates import eq_p
+
+            match key_p:
+                case str(s):
+                    return eq_p(s)
+                case _:
+                    return key_p
+
+        self.key_value_predicates = [(to_key_p(key_p), value_p) for key_p, value_p in key_value_predicates]
+
     def __call__(self, x: Any) -> bool:
         if not isinstance(x, dict):
             return False

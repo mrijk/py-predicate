@@ -165,7 +165,7 @@ def is_single_or_list_of_p[T](predicate: Predicate[T]) -> Predicate:
     return is_list_of_p(predicate) | predicate
 
 
-def is_dict_of_p(*predicates: tuple[Predicate, Predicate]) -> Predicate:
+def is_dict_of_p(*predicates: tuple[Predicate | str, Predicate]) -> Predicate:
     """Return True if value is a set, and for all elements in the set the predicate is True, otherwise False."""
     # return is_set_p & all_p(predicate)
     return DictOfPredicate(list(predicates))

@@ -7,7 +7,15 @@ from functools import singledispatch
 from itertools import cycle, repeat
 
 import exrex  # type: ignore
-from more_itertools import chunked, flatten, interleave, powerset_of_sets, random_combination_with_replacement, take
+from more_itertools import (
+    chunked,
+    flatten,
+    interleave,
+    powerset_of_sets,
+    random_combination_with_replacement,
+    random_permutation,
+    take,
+)
 
 from predicate.any_predicate import AnyPredicate
 from predicate.dict_of_predicate import DictOfPredicate
@@ -22,6 +30,7 @@ from predicate.generator.helpers import (
     random_dicts,
     random_floats,
     random_ints,
+    random_sets,
     random_strings,
     random_uuids,
 )
@@ -255,8 +264,7 @@ def generate_is_instance_p(predicate: IsInstancePredicate) -> Iterator:
     elif klass is int:
         yield from random_ints()
     elif klass is set:
-        # TODO: generate random sets
-        yield from (set(), {1, 2, 3}, {"foo", "bar"})
+        yield from random_sets()
 
 
 @generate_true.register
@@ -291,9 +299,15 @@ def generate_tuple_of_p(tuple_of_predicate: TupleOfPredicate) -> Iterator:
 
 
 @generate_true.register
-def generate_set_of_p(set_of_predicate: SetOfPredicate) -> Iterator:
+def generate_set_of_p(
+    set_of_predicate: SetOfPredicate, *, min_size: int = 0, max_size: int = 10, order: bool = False
+) -> Iterator:
     predicate = set_of_predicate.predicate
 
-    values = take(10, generate_true(predicate))
+    while True:
+        length = random.randint(min_size, max_size)
+        values = take(length, generate_true(predicate))
 
-    yield set(random_combination_with_replacement(values, 5))
+        # set sizes can be smaller than required, because of duplicates
+        if len(result := set(values)) == length:
+            yield result if order else random_permutation(result)

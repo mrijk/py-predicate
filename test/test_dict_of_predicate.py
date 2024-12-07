@@ -48,3 +48,18 @@ def test_is_dict_of_dict_p(value, expected):
     predicate = is_dict_of_p((is_str_p, is_xy_dict))
 
     assert predicate(value) is expected
+
+
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
+        ({}, False),
+        ({"x": "foo"}, False),
+        ({1: "foo"}, False),
+        ({"x": 1, "y": 2}, True),
+    ],
+)
+def test_is_dict_str_key(value, expected):
+    predicate = is_dict_of_p(("x", is_int_p), (eq_p("y"), is_int_p))
+
+    assert predicate(value) is expected
