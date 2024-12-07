@@ -1,7 +1,7 @@
 from abc import abstractmethod
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Callable, Final, Iterable
+from typing import Callable, Final, Iterable, override
 from uuid import UUID
 
 
@@ -28,6 +28,9 @@ class Predicate[T]:
     def __invert__(self) -> "Predicate":
         """Return the 'negated' predicate."""
         return NotPredicate(predicate=self)
+
+    def explain(self, *args, **kwargs) -> dict:
+        return {"result": True}
 
 
 def resolve_predicate[T](predicate: Predicate[T]) -> Predicate[T]:
@@ -81,6 +84,31 @@ class AndPredicate[T](Predicate[T]):
     def __repr__(self) -> str:
         return f"{repr(self.left)} & {repr(self.right)}"
 
+    @override
+    def explain(self, x: T) -> dict:
+        left_explanation = self.left.explain(x)
+
+        if not (left_result := left_explanation["result"]):
+            return {
+                "left": {
+                    "result": left_result,
+                    "explanation": left_explanation,
+                }
+            }
+
+        right_explanation = self.right.explain(x)
+        right_result = right_explanation["result"]
+        return {
+            "left": {
+                "result": left_result,
+                "explanation": left_explanation,
+            },
+            "right": {
+                "result": right_result,
+                "explanation": right_explanation,
+            },
+        }
+
 
 @dataclass
 class NotPredicate[T](Predicate[T]):
@@ -103,6 +131,12 @@ class NotPredicate[T](Predicate[T]):
 
     def __repr__(self) -> str:
         return f"~{repr(self.predicate)}"
+
+    @override
+    def explain(self, x: T) -> dict:
+        if self(x):
+            return {"result": True}
+        return {"result": False, "predicate": self.predicate.explain(x), "reason": f"not {repr(self.predicate)}"}
 
 
 @dataclass
@@ -136,6 +170,16 @@ class OrPredicate[T](Predicate[T]):
     def __repr__(self) -> str:
         return f"{repr(self.left)} | {repr(self.right)}"
 
+    @override
+    def explain(self, x: T) -> dict:
+        if self(x):
+            return {"result": True}
+        return {
+            "result": False,
+            "left": self.left.explain(x),
+            "right": self.right.explain(x),
+        }
+
 
 @dataclass
 class XorPredicate[T](Predicate[T]):
@@ -168,6 +212,16 @@ class XorPredicate[T](Predicate[T]):
     def __repr__(self) -> str:
         return f"{repr(self.left)} ^ {repr(self.right)}"
 
+    @override
+    def explain(self, x: T) -> dict:
+        if self(x):
+            return {"result": True}
+        return {
+            "result": False,
+            "left": self.left.explain(x),
+            "right": self.right.explain(x),
+        }
+
 
 @dataclass
 class EqPredicate[T](Predicate[T]):
@@ -196,58 +250,6 @@ class NePredicate[T](Predicate[T]):
 
 
 type ConstrainedT[T: (int, str, float, datetime, UUID)] = T
-
-
-@dataclass
-class GePredicate[T](Predicate[T]):
-    """A predicate class that models the 'ge' (>=) predicate."""
-
-    v: ConstrainedT
-
-    def __call__(self, x: T) -> bool:
-        return x >= self.v
-
-    def __repr__(self) -> str:
-        return f"ge_p({self.v})"
-
-
-@dataclass
-class GtPredicate[T](Predicate[T]):
-    """A predicate class that models the 'gt' (>) predicate."""
-
-    v: ConstrainedT
-
-    def __call__(self, x: T) -> bool:
-        return x > self.v
-
-    def __repr__(self) -> str:
-        return f"gt_p({self.v})"
-
-
-@dataclass
-class LePredicate[T](Predicate[T]):
-    """A predicate class that models the 'le' (<=) predicate."""
-
-    v: ConstrainedT
-
-    def __call__(self, x: T) -> bool:
-        return x <= self.v
-
-    def __repr__(self) -> str:
-        return f"le_p({self.v})"
-
-
-@dataclass
-class LtPredicate[T](Predicate[T]):
-    """A predicate class that models the 'lt' (<) predicate."""
-
-    v: ConstrainedT
-
-    def __call__(self, x: T) -> bool:
-        return x < self.v
-
-    def __repr__(self) -> str:
-        return f"lt_p({self.v})"
 
 
 @dataclass

@@ -9,8 +9,12 @@ from predicate.all_predicate import AllPredicate
 from predicate.any_predicate import AnyPredicate
 from predicate.comp_predicate import CompPredicate
 from predicate.dict_of_predicate import DictOfPredicate
+from predicate.ge_predicate import GePredicate
+from predicate.gt_predicate import GtPredicate
 from predicate.is_instance_predicate import IsInstancePredicate
 from predicate.lazy_predicate import LazyPredicate, find_predicate_by_ref
+from predicate.le_predicate import LePredicate
+from predicate.lt_predicate import LtPredicate
 from predicate.named_predicate import NamedPredicate
 from predicate.optimizer.predicate_optimizer import optimize
 from predicate.predicate import (
@@ -37,11 +41,7 @@ from predicate.set_predicates import (
 from predicate.standard_predicates import (
     EqPredicate,
     FnPredicate,
-    GePredicate,
-    GtPredicate,
     IsNonePredicate,
-    LePredicate,
-    LtPredicate,
     NePredicate,
 )
 from predicate.tee_predicate import TeePredicate

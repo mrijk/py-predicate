@@ -1,12 +1,12 @@
 from functools import singledispatch
 
+from predicate.ge_predicate import GePredicate
+from predicate.gt_predicate import GtPredicate
 from predicate.predicate import (
     AlwaysFalsePredicate,
     AlwaysTruePredicate,
     AndPredicate,
     EqPredicate,
-    GePredicate,
-    GtPredicate,
     NePredicate,
     Predicate,
 )

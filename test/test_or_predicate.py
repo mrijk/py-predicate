@@ -1,4 +1,5 @@
 from predicate import ge_p, gt_p, is_none_p, is_not_none_p, le_p, lt_p
+from predicate.explain import explain
 
 
 def test_or():
@@ -42,3 +43,18 @@ def test_or_always_true():
 
     assert always_true(13)
     assert always_true(None)
+
+
+def test_or_explain():
+    p = gt_p(4)
+    q = lt_p(3)
+
+    predicate = p | q
+
+    expected = {
+        "left": {"reason": "3 is not greater than 4", "result": False},
+        "result": False,
+        "right": {"reason": "3 is not less than 3", "result": False},
+    }
+
+    assert explain(predicate, 3) == expected

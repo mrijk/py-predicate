@@ -10,22 +10,22 @@ from predicate.all_predicate import AllPredicate
 from predicate.any_predicate import AnyPredicate
 from predicate.comp_predicate import CompPredicate
 from predicate.dict_of_predicate import DictOfPredicate
+from predicate.ge_predicate import GePredicate
+from predicate.gt_predicate import GtPredicate
 from predicate.has_key_predicate import HasKeyPredicate
 from predicate.has_length_predicate import HasLengthPredicate
 from predicate.is_instance_predicate import IsInstancePredicate
 from predicate.lazy_predicate import LazyPredicate
+from predicate.le_predicate import LePredicate
+from predicate.lt_predicate import LtPredicate
 from predicate.predicate import (
     ConstrainedT,
     EqPredicate,
     FnPredicate,
-    GePredicate,
-    GtPredicate,
     IsFalsyPredicate,
     IsNonePredicate,
     IsNotNonePredicate,
     IsTruthyPredicate,
-    LePredicate,
-    LtPredicate,
     NePredicate,
     Predicate,
     resolve_predicate,

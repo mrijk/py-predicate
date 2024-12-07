@@ -8,6 +8,7 @@ from functools import singledispatch
 from more_itertools import random_combination_with_replacement, take
 
 from predicate.all_predicate import AllPredicate
+from predicate.ge_predicate import GePredicate
 from predicate.generator.helpers import (
     generate_anys,
     generate_ints,
@@ -17,6 +18,7 @@ from predicate.generator.helpers import (
     random_floats,
     random_ints,
 )
+from predicate.gt_predicate import GtPredicate
 from predicate.is_instance_predicate import IsInstancePredicate
 from predicate.optimizer.predicate_optimizer import optimize
 from predicate.predicate import (
@@ -24,8 +26,6 @@ from predicate.predicate import (
     AlwaysTruePredicate,
     AndPredicate,
     EqPredicate,
-    GePredicate,
-    GtPredicate,
     IsEmptyPredicate,
     IsFalsyPredicate,
     IsNonePredicate,

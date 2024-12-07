@@ -1,16 +1,16 @@
 from predicate.all_predicate import AllPredicate
+from predicate.ge_predicate import GePredicate
+from predicate.gt_predicate import GtPredicate
 from predicate.implies import implies
 from predicate.is_instance_predicate import IsInstancePredicate
+from predicate.le_predicate import LePredicate
+from predicate.lt_predicate import LtPredicate
 from predicate.optimizer.in_optimizer import optimize_in_predicate, optimize_not_in_predicate
 from predicate.predicate import (
     AlwaysTruePredicate,
     AndPredicate,
     EqPredicate,
     FnPredicate,
-    GePredicate,
-    GtPredicate,
-    LePredicate,
-    LtPredicate,
     NotPredicate,
     OrPredicate,
     Predicate,
