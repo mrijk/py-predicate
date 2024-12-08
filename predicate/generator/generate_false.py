@@ -20,6 +20,7 @@ from predicate.generator.helpers import (
     random_ints,
 )
 from predicate.gt_predicate import GtPredicate
+from predicate.is_empty_predicate import IsEmptyPredicate
 from predicate.is_instance_predicate import IsInstancePredicate
 from predicate.is_none_predicate import IsNonePredicate
 from predicate.is_not_none_predicate import IsNotNonePredicate
@@ -29,7 +30,6 @@ from predicate.predicate import (
     AlwaysFalsePredicate,
     AlwaysTruePredicate,
     AndPredicate,
-    IsEmptyPredicate,
     IsFalsyPredicate,
     IsTruthyPredicate,
     NotPredicate,

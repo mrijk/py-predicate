@@ -11,6 +11,7 @@ from predicate.ge_predicate import GePredicate
 from predicate.generator.generate_false import generate_false
 from predicate.generator.generate_true import generate_true
 from predicate.gt_predicate import GtPredicate
+from predicate.is_empty_predicate import IsEmptyPredicate, IsNotEmptyPredicate, is_empty_p, is_not_empty_p
 from predicate.is_none_predicate import IsNonePredicate
 from predicate.is_not_none_predicate import IsNotNonePredicate
 from predicate.le_predicate import LePredicate
@@ -22,14 +23,12 @@ from predicate.predicate import (
     AlwaysTruePredicate,
     AndPredicate,
     FnPredicate,
-    IsEmptyPredicate,
     NotPredicate,
     OrPredicate,
     Predicate,
     XorPredicate,
     always_false_p,
     always_true_p,
-    is_empty_p,
 )
 from predicate.set_predicates import (
     InPredicate,
@@ -113,6 +112,7 @@ __all__ = [
     "InPredicate",
     "IsEmptyPredicate",
     "IsNonePredicate",
+    "IsNotEmptyPredicate",
     "IsNotNonePredicate",
     "NePredicate",
     "NotInPredicate",
@@ -166,6 +166,7 @@ __all__ = [
     "is_list_p",
     "is_lower_p",
     "is_none_p",
+    "is_not_empty_p",
     "is_not_none_p",
     "is_predicate_p",
     "is_range_p",

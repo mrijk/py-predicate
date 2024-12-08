@@ -1,7 +1,7 @@
 from abc import abstractmethod
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Any, Callable, Final, Iterable, override
+from typing import Any, Callable, Final, override
 from uuid import UUID
 
 
@@ -230,28 +230,6 @@ type ConstrainedT[T: (int, str, float, datetime, UUID)] = T
 
 
 @dataclass
-class IsEmptyPredicate[T](Predicate[T]):
-    """A predicate class that models the 'empty' predicate."""
-
-    def __call__(self, iter: Iterable[T]) -> bool:
-        return len(list(iter)) == 0
-
-    def __repr__(self) -> str:
-        return "is_empty_p"
-
-
-@dataclass
-class IsNotEmptyPredicate[T](Predicate[T]):
-    """A predicate class that models the 'not empty' predicate."""
-
-    def __call__(self, iter: Iterable[T]) -> bool:
-        return len(list(iter)) > 0
-
-    def __repr__(self) -> str:
-        return "is_not_empty_p"
-
-
-@dataclass
 class AlwaysTruePredicate(Predicate):
     """A predicate class that models the 'True' predicate."""
 
@@ -300,9 +278,3 @@ always_true_p: Final[AlwaysTruePredicate] = AlwaysTruePredicate()
 
 always_false_p: Final[AlwaysFalsePredicate] = AlwaysFalsePredicate()
 """Predicate that always evaluates to False."""
-
-is_empty_p: Final[IsEmptyPredicate] = IsEmptyPredicate()
-"""Predicate that returns True if the iterable is empty, otherwise False."""
-
-is_not_empty_p: Final[IsNotEmptyPredicate] = IsNotEmptyPredicate()
-"""Predicate that returns True if the iterable is not empty, otherwise False."""

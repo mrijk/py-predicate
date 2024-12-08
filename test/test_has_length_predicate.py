@@ -13,7 +13,7 @@ def test_has_length():
     assert of_length_1("f")
 
 
-def test_ge_explain():
+def test_has_length_explain():
     predicate = has_length_p(1)
 
     expected = {"reason": "Expected length 1, actual: 3", "result": False}

@@ -30,7 +30,6 @@ from predicate import (
     is_uuid_p,
 )
 from predicate.named_predicate import NamedPredicate
-from predicate.predicate import is_empty_p, is_not_empty_p
 from predicate.standard_predicates import (
     all_p,
     is_container_p,
@@ -260,18 +259,6 @@ def test_named_predicate():
 
     assert not p(False)
     assert p != q
-
-
-def test_is_empty():
-    assert not is_empty_p([1])
-    assert is_empty_p([])
-    assert is_empty_p(())
-
-
-def test_is_not_empty():
-    assert not is_not_empty_p([])
-    assert not is_not_empty_p(())
-    assert is_not_empty_p([1])
 
 
 def test_lambda():
