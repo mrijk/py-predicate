@@ -19,6 +19,7 @@ from more_itertools import (
 
 from predicate.any_predicate import AnyPredicate
 from predicate.dict_of_predicate import DictOfPredicate
+from predicate.eq_predicate import EqPredicate
 from predicate.ge_predicate import GePredicate
 from predicate.generator.helpers import (
     generate_anys,
@@ -40,18 +41,17 @@ from predicate.has_key_predicate import HasKeyPredicate
 from predicate.is_instance_predicate import IsInstancePredicate
 from predicate.le_predicate import LePredicate
 from predicate.lt_predicate import LtPredicate
+from predicate.ne_predicate import NePredicate
 from predicate.optimizer.predicate_optimizer import optimize
 from predicate.predicate import (
     AlwaysFalsePredicate,
     AlwaysTruePredicate,
     AndPredicate,
-    EqPredicate,
     IsEmptyPredicate,
     IsFalsyPredicate,
     IsNonePredicate,
     IsNotNonePredicate,
     IsTruthyPredicate,
-    NePredicate,
     OrPredicate,
     Predicate,
     always_false_p,

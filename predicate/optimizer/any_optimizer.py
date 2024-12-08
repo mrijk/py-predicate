@@ -1,10 +1,10 @@
 from predicate.all_predicate import AllPredicate
 from predicate.any_predicate import AnyPredicate
+from predicate.eq_predicate import EqPredicate
+from predicate.ne_predicate import NePredicate
 from predicate.predicate import (
     AlwaysFalsePredicate,
     AlwaysTruePredicate,
-    EqPredicate,
-    NePredicate,
     NotPredicate,
     Predicate,
     always_false_p,

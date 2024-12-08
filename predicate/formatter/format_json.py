@@ -3,6 +3,7 @@ from typing import Any
 from predicate.all_predicate import AllPredicate
 from predicate.any_predicate import AnyPredicate
 from predicate.named_predicate import NamedPredicate
+from predicate.ne_predicate import NePredicate
 from predicate.predicate import (
     AlwaysFalsePredicate,
     AlwaysTruePredicate,
@@ -10,7 +11,6 @@ from predicate.predicate import (
     FnPredicate,
     IsFalsyPredicate,
     IsTruthyPredicate,
-    NePredicate,
     NotPredicate,
     OrPredicate,
     Predicate,

@@ -226,32 +226,6 @@ class XorPredicate[T](Predicate[T]):
         }
 
 
-@dataclass
-class EqPredicate[T](Predicate[T]):
-    """A predicate class that models the 'eq' (=) predicate."""
-
-    v: T
-
-    def __call__(self, x: T) -> bool:
-        return x == self.v
-
-    def __repr__(self) -> str:
-        return f"eq_p({self.v})"
-
-
-@dataclass
-class NePredicate[T](Predicate[T]):
-    """A predicate class that models the 'ne' (!=) predicate."""
-
-    v: T
-
-    def __call__(self, x: T) -> bool:
-        return x != self.v
-
-    def __repr__(self) -> str:
-        return f"ne_p({self.v})"
-
-
 type ConstrainedT[T: (int, str, float, datetime, UUID)] = T
 
 

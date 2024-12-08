@@ -28,16 +28,11 @@ from predicate import (
     is_str_p,
     is_tuple_p,
     is_uuid_p,
-    ne_p,
 )
 from predicate.named_predicate import NamedPredicate
 from predicate.predicate import is_empty_p, is_not_empty_p
 from predicate.standard_predicates import (
     all_p,
-    ge_le_p,
-    ge_lt_p,
-    gt_le_p,
-    gt_lt_p,
     is_container_p,
     is_falsy_p,
     is_finite_p,
@@ -72,67 +67,6 @@ def test_is_falsy_p(value):
 @pytest.mark.parametrize("value", [True, not None, 13, {1}, "foo", (1,), [1]])
 def test_is_truthy_p(value):
     assert is_truthy_p(value)
-
-
-def test_ge_le_p():
-    ge_2_le_3 = ge_le_p(2, 3)
-
-    assert not ge_2_le_3(1)
-    assert not ge_2_le_3(4)
-    assert ge_2_le_3(2)
-    assert ge_2_le_3(3)
-
-
-def test_ge_lt_p():
-    ge_2_lt_3 = ge_lt_p(2, 3)
-
-    assert not ge_2_lt_3(1)
-    assert not ge_2_lt_3(3)
-    assert ge_2_lt_3(2)
-
-
-def test_gt_le_p():
-    gt_2_le_3 = gt_le_p(2, 3)
-
-    assert not gt_2_le_3(2)
-    assert not gt_2_le_3(4)
-    assert gt_2_le_3(3)
-
-
-def test_gt_lt_p():
-    gt_2_lt_3 = gt_lt_p(2, 4)
-
-    assert not gt_2_lt_3(2)
-    assert not gt_2_lt_3(4)
-    assert gt_2_lt_3(3)
-
-
-def test_eq_p_int():
-    eq_2 = eq_p(2)
-
-    assert eq_2(1) is False
-    assert eq_2(2) is True
-
-
-def test_eq_p_str():
-    eq_foo = eq_p("foo")
-
-    assert eq_foo("bar") is False
-    assert eq_foo("foo") is True
-
-
-def test_ne_p_int():
-    ne_2 = ne_p(2)
-
-    assert not ne_2(2)
-    assert ne_2(1)
-
-
-def test_ne_p_str():
-    ne_foo = ne_p("foo")
-
-    assert not ne_foo("foo")
-    assert ne_foo("bar")
 
 
 def test_eq_true_p():

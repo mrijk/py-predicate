@@ -4,6 +4,7 @@ __version__ = "0.0.1"
 
 from predicate.all_predicate import AllPredicate
 from predicate.any_predicate import AnyPredicate
+from predicate.eq_predicate import EqPredicate
 from predicate.formatter.format_dot import to_dot
 from predicate.formatter.format_json import to_json
 from predicate.ge_predicate import GePredicate
@@ -12,17 +13,16 @@ from predicate.generator.generate_true import generate_true
 from predicate.gt_predicate import GtPredicate
 from predicate.le_predicate import LePredicate
 from predicate.lt_predicate import LtPredicate
+from predicate.ne_predicate import NePredicate
 from predicate.optimizer.predicate_optimizer import can_optimize, optimize
 from predicate.predicate import (
     AlwaysFalsePredicate,
     AlwaysTruePredicate,
     AndPredicate,
-    EqPredicate,
     FnPredicate,
     IsEmptyPredicate,
     IsNonePredicate,
     IsNotNonePredicate,
-    NePredicate,
     NotPredicate,
     OrPredicate,
     Predicate,

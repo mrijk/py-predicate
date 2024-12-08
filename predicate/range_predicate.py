@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from typing import override
 
 from predicate.predicate import ConstrainedT, Predicate
 
@@ -16,6 +17,10 @@ class GeLePredicate[T](Predicate[T]):
     def __repr__(self) -> str:
         return f"ge_le_p({self.lower}, {self.upper})"
 
+    @override
+    def explain_failure(self, x: T) -> dict:
+        return {"result": False, "reason": f"{x} is not greater equal {self.lower} and less equal {self.upper}"}
+
 
 @dataclass
 class GeLtPredicate[T](Predicate[T]):
@@ -29,6 +34,10 @@ class GeLtPredicate[T](Predicate[T]):
 
     def __repr__(self) -> str:
         return f"ge_lt_p({self.lower}, {self.upper})"
+
+    @override
+    def explain_failure(self, x: T) -> dict:
+        return {"result": False, "reason": f"{x} is not greater equal {self.lower} and less than {self.upper}"}
 
 
 @dataclass
@@ -44,6 +53,13 @@ class GtLePredicate[T](Predicate[T]):
     def __repr__(self) -> str:
         return f"gt_le_p({self.lower}, {self.upper})"
 
+    @override
+    def explain_failure(self, x: T) -> dict:
+        return {
+            "result": False,
+            "reason": f"{x} is not greater than {self.lower} and less than or equal to {self.upper}",
+        }
+
 
 @dataclass
 class GtLtPredicate[T](Predicate[T]):
@@ -57,3 +73,7 @@ class GtLtPredicate[T](Predicate[T]):
 
     def __repr__(self) -> str:
         return f"gt_lt_p({self.lower}, {self.upper})"
+
+    @override
+    def explain_failure(self, x: T) -> dict:
+        return {"result": False, "reason": f"{x} is not greater than {self.lower} and less than {self.upper}"}
