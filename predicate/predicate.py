@@ -274,28 +274,6 @@ class AlwaysFalsePredicate(Predicate):
 
 
 @dataclass
-class IsNonePredicate[T](Predicate[T]):
-    """A predicate class that models the 'is none' predicate."""
-
-    def __call__(self, x: T) -> bool:
-        return x is None
-
-    def __repr__(self) -> str:
-        return "is_none_p"
-
-
-@dataclass
-class IsNotNonePredicate[T](Predicate[T]):
-    """A predicate class that models the 'is not none' predicate."""
-
-    def __call__(self, x: T) -> bool:
-        return x is not None
-
-    def __repr__(self) -> str:
-        return "is_not_none_p"
-
-
-@dataclass
 class IsFalsyPredicate[T](Predicate[T]):
     """A predicate class that the falsy (0, False, [], "", etc.) predicate."""
 

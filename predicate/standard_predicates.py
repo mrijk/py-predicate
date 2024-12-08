@@ -16,6 +16,8 @@ from predicate.gt_predicate import GtPredicate
 from predicate.has_key_predicate import HasKeyPredicate
 from predicate.has_length_predicate import HasLengthPredicate
 from predicate.is_instance_predicate import IsInstancePredicate
+from predicate.is_none_predicate import IsNonePredicate
+from predicate.is_not_none_predicate import IsNotNonePredicate
 from predicate.lazy_predicate import LazyPredicate
 from predicate.le_predicate import LePredicate
 from predicate.lt_predicate import LtPredicate
@@ -24,8 +26,6 @@ from predicate.predicate import (
     ConstrainedT,
     FnPredicate,
     IsFalsyPredicate,
-    IsNonePredicate,
-    IsNotNonePredicate,
     IsTruthyPredicate,
     Predicate,
     resolve_predicate,

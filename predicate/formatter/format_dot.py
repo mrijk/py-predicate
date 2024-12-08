@@ -13,6 +13,7 @@ from predicate.eq_predicate import EqPredicate
 from predicate.ge_predicate import GePredicate
 from predicate.gt_predicate import GtPredicate
 from predicate.is_instance_predicate import IsInstancePredicate
+from predicate.is_none_predicate import IsNonePredicate
 from predicate.lazy_predicate import LazyPredicate, find_predicate_by_ref
 from predicate.le_predicate import LePredicate
 from predicate.lt_predicate import LtPredicate
@@ -40,7 +41,7 @@ from predicate.set_predicates import (
     IsSupersetPredicate,
     NotInPredicate,
 )
-from predicate.standard_predicates import FnPredicate, IsNonePredicate
+from predicate.standard_predicates import FnPredicate
 from predicate.tee_predicate import TeePredicate
 from predicate.this_predicate import ThisPredicate, find_this_predicate
 

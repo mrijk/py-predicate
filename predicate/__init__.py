@@ -11,6 +11,8 @@ from predicate.ge_predicate import GePredicate
 from predicate.generator.generate_false import generate_false
 from predicate.generator.generate_true import generate_true
 from predicate.gt_predicate import GtPredicate
+from predicate.is_none_predicate import IsNonePredicate
+from predicate.is_not_none_predicate import IsNotNonePredicate
 from predicate.le_predicate import LePredicate
 from predicate.lt_predicate import LtPredicate
 from predicate.ne_predicate import NePredicate
@@ -21,8 +23,6 @@ from predicate.predicate import (
     AndPredicate,
     FnPredicate,
     IsEmptyPredicate,
-    IsNonePredicate,
-    IsNotNonePredicate,
     NotPredicate,
     OrPredicate,
     Predicate,
