@@ -6,6 +6,7 @@ def test_is_empty():
     assert not is_empty_p([1])
     assert is_empty_p([])
     assert is_empty_p(())
+    assert is_empty_p("")
 
 
 def test_is_empty_explain():
@@ -17,6 +18,7 @@ def test_is_not_empty():
     assert not is_not_empty_p([])
     assert not is_not_empty_p(())
     assert is_not_empty_p([1])
+    assert is_not_empty_p("foo")
 
 
 def test_is_not_empty_explain():
