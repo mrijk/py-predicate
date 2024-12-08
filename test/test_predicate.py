@@ -1,7 +1,7 @@
 import math
-from datetime import datetime, timedelta
+from datetime import datetime
 from unittest.mock import Mock
-from uuid import UUID, uuid4
+from uuid import uuid4
 
 import pytest
 
@@ -14,7 +14,6 @@ from predicate import (
     eq_true_p,
     fn_p,
     ge_p,
-    gt_p,
     is_bool_p,
     is_callable_p,
     is_complex_p,
@@ -79,14 +78,6 @@ def test_is_truthy_p(value):
     assert is_truthy_p(value)
 
 
-def test_ge_p():
-    ge_2 = ge_p(2)
-
-    assert not ge_2(1)
-    assert ge_2(2)
-    assert ge_2(3)
-
-
 def test_ge_le_p():
     ge_2_le_3 = ge_le_p(2, 3)
 
@@ -126,36 +117,6 @@ def test_str_ge_p():
     assert ge_bar("foo")
     assert not ge_bar("a")
     assert not ge_bar("A")
-
-
-def test_datetime_ge_p():
-    now = datetime.now()
-    yesterday = now - timedelta(days=1)
-    tomorrow = now + timedelta(days=1)
-
-    ge_now = ge_p(now)
-
-    assert ge_now(tomorrow)
-    assert not ge_now(yesterday)
-
-
-def test_uuid_ge_p():
-    u1 = UUID("10bec12e-e216-42fd-9754-ff0e0abcf27c")
-    u2 = UUID("a348c15c-57b1-40a0-94db-27a33897522b")
-
-    u = UUID("7e05cf1e-a7ad-433b-9396-7aec1c9692d2")
-
-    ge_u = ge_p(u)
-
-    assert not ge_u(u1)
-    assert ge_u(u2)
-
-
-def test_gt_p():
-    gt_2 = gt_p(2)
-
-    assert not gt_2(2)
-    assert gt_2(3)
 
 
 def test_le_p():

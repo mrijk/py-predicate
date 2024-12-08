@@ -1,5 +1,7 @@
 from dataclasses import dataclass
-from typing import Iterable
+from typing import Iterable, override
+
+from more_itertools import first
 
 from predicate.predicate import Predicate
 
@@ -15,3 +17,12 @@ class AllPredicate[T](Predicate[T]):
 
     def __repr__(self) -> str:
         return f"all({repr(self.predicate)})"
+
+    @override
+    def explain(self, iterable: Iterable[T]) -> dict:
+        if self(iterable):
+            return {"result": True}
+
+        fail = first(item for item in iterable if not self.predicate(item))
+
+        return {"result": False, "reason": f"Item '{fail}' didn't match predicate {repr(self.predicate)}"}

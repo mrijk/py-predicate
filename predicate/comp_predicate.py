@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Callable
+from typing import Callable, override
 
 from predicate.predicate import Predicate
 
@@ -16,3 +16,10 @@ class CompPredicate[S, T](Predicate[T]):
 
     def __repr__(self) -> str:
         return f"comp_p({repr(self.predicate)})"
+
+    @override
+    def explain(self, x: S) -> dict:
+        if self(x):
+            return {"result": True}
+
+        return {"result": False, "predicate": self.predicate.explain(x)}
