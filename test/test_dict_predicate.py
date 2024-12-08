@@ -1,4 +1,5 @@
 from predicate import is_iterable_of_p
+from predicate.explain import explain
 from predicate.standard_predicates import (
     comp_p,
     depth_eq_p,
@@ -23,11 +24,11 @@ def test_has_key_p():
     assert has_key_x({"x": 13})
 
 
-def test_has_keq_eq_p():
-    has_key_1 = has_key_p("x")
-    has_key_2 = has_key_p("x")
+def test_has_key_explain():
+    predicate = has_key_p("x")
 
-    assert has_key_1 == has_key_2
+    expected = {"reason": "Key 'x' is missing in {'y': 13}", "result": False}
+    assert explain(predicate, {"y": 13}) == expected
 
 
 def test_depth_eq_p():

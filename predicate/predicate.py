@@ -1,7 +1,7 @@
 from abc import abstractmethod
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Callable, Final, Iterable, override
+from typing import Any, Callable, Final, Iterable, override
 from uuid import UUID
 
 
@@ -29,8 +29,11 @@ class Predicate[T]:
         """Return the 'negated' predicate."""
         return NotPredicate(predicate=self)
 
-    def explain(self, *args, **kwargs) -> dict:
-        return {"result": True}
+    def explain(self, x: Any) -> dict:
+        return {"result": True} if self(x) else self.explain_failure(x)
+
+    def explain_failure(self, x: Any) -> dict:
+        raise NotImplementedError
 
 
 def resolve_predicate[T](predicate: Predicate[T]) -> Predicate[T]:

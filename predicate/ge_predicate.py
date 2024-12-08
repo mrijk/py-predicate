@@ -17,7 +17,5 @@ class GePredicate[T](Predicate[T]):
         return f"ge_p({self.v})"
 
     @override
-    def explain(self, x: T) -> dict:
-        if self(x):
-            return {"result": True}
+    def explain_failure(self, x: T) -> dict:
         return {"result": False, "reason": f"{x} is not greater or equal to {self.v}"}

@@ -17,7 +17,5 @@ class AnyPredicate[T](Predicate[T]):
         return f"any({repr(self.predicate)})"
 
     @override
-    def explain(self, iterable: Iterable[T]) -> dict:
-        if self(iterable):
-            return {"result": True}
+    def explain_failure(self, iterable: Iterable[T]) -> dict:
         return {"result": False, "reason": f"No item matches predicate {repr(self.predicate)}"}

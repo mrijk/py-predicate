@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Iterable
+from typing import Iterable, override
 
 from more_itertools import ilen
 
@@ -17,3 +17,7 @@ class HasLengthPredicate[T](Predicate[T]):
 
     def __repr__(self) -> str:
         return f"has_length_p({self.length})"
+
+    @override
+    def explain_failure(self, iterable: Iterable[T]) -> dict:
+        return {"result": False, "reason": f"Expected length {self.length}, actual: {ilen(iterable)}"}

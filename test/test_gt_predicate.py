@@ -20,6 +20,15 @@ def test_float_gt_p():
     assert gt_pi(9.99)
 
 
+def test_str_gt_p():
+    gt_bar = gt_p("bar")
+
+    assert not gt_bar("a")
+    assert not gt_bar("A")
+    assert not gt_bar("bar")
+    assert gt_bar("foo")
+
+
 def test_datetime_gt_p():
     now = datetime.now()
     yesterday = now - timedelta(days=1)

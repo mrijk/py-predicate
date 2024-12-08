@@ -21,6 +21,15 @@ def test_float_ge_p():
     assert ge_pi(9.99)
 
 
+def test_str_ge_p():
+    ge_bar = ge_p("bar")
+
+    assert not ge_bar("a")
+    assert not ge_bar("A")
+    assert ge_bar("bar")
+    assert ge_bar("foo")
+
+
 def test_datetime_ge_p():
     now = datetime.now()
     yesterday = now - timedelta(days=1)

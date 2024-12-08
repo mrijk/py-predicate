@@ -18,8 +18,5 @@ class CompPredicate[S, T](Predicate[T]):
         return f"comp_p({repr(self.predicate)})"
 
     @override
-    def explain(self, x: S) -> dict:
-        if self(x):
-            return {"result": True}
-
+    def explain_failure(self, x: S) -> dict:
         return {"result": False, "predicate": self.predicate.explain(x)}

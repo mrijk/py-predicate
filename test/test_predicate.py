@@ -19,7 +19,6 @@ from predicate import (
     is_complex_p,
     is_datetime_p,
     is_dict_p,
-    is_instance_p,
     is_int_p,
     is_iterable_p,
     is_list_p,
@@ -29,8 +28,6 @@ from predicate import (
     is_str_p,
     is_tuple_p,
     is_uuid_p,
-    le_p,
-    lt_p,
     ne_p,
 )
 from predicate.named_predicate import NamedPredicate
@@ -41,7 +38,6 @@ from predicate.standard_predicates import (
     ge_lt_p,
     gt_le_p,
     gt_lt_p,
-    has_length_p,
     is_container_p,
     is_falsy_p,
     is_finite_p,
@@ -109,29 +105,6 @@ def test_gt_lt_p():
     assert not gt_2_lt_3(2)
     assert not gt_2_lt_3(4)
     assert gt_2_lt_3(3)
-
-
-def test_str_ge_p():
-    ge_bar = ge_p("bar")
-
-    assert ge_bar("foo")
-    assert not ge_bar("a")
-    assert not ge_bar("A")
-
-
-def test_le_p():
-    le_2 = le_p(2)
-
-    assert not le_2(3)
-    assert le_2(1)
-    assert le_2(2)
-
-
-def test_lt_p():
-    lt_2 = lt_p(2)
-
-    assert not lt_2(2)
-    assert lt_2(1)
 
 
 def test_eq_p_int():
@@ -321,30 +294,6 @@ def test_is_uuid_p():
     assert is_uuid_p(uuid4())
 
 
-def test_is_instance_p():
-    is_str_or_int_p = is_instance_p(str, int)
-
-    assert not is_str_or_int_p(None)
-    assert not is_str_or_int_p([3])
-
-    assert is_str_or_int_p(3)
-    assert is_str_or_int_p("3")
-
-
-def test_is_instance_eq():
-    p = is_instance_p(int)
-    q = is_instance_p(int)
-
-    assert p == q
-
-
-def test_is_instance_ne():
-    p = is_instance_p(int)
-    q = is_instance_p(str, int)
-
-    assert p != q
-
-
 def test_eq_int():
     eq_1 = eq_p(2)
     eq_2 = eq_p(2)
@@ -389,13 +338,6 @@ def test_is_not_empty():
     assert not is_not_empty_p([])
     assert not is_not_empty_p(())
     assert is_not_empty_p([1])
-
-
-def test_has_length():
-    of_length_1 = has_length_p(1)
-
-    assert not of_length_1([])
-    assert of_length_1([1])
 
 
 def test_lambda():

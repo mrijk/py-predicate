@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from typing import override
 
 from predicate.predicate import Predicate
 
@@ -14,3 +15,7 @@ class HasKeyPredicate[T](Predicate[T]):
 
     def __repr__(self) -> str:
         return f'has_key_p("{self.key}")'
+
+    @override
+    def explain_failure(self, v: dict) -> dict:
+        return {"result": False, "reason": f"Key '{self.key}' is missing in {v}"}

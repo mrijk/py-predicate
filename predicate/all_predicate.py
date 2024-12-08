@@ -19,10 +19,7 @@ class AllPredicate[T](Predicate[T]):
         return f"all({repr(self.predicate)})"
 
     @override
-    def explain(self, iterable: Iterable[T]) -> dict:
-        if self(iterable):
-            return {"result": True}
-
+    def explain_failure(self, iterable: Iterable[T]) -> dict:
         fail = first(item for item in iterable if not self.predicate(item))
 
         return {"result": False, "reason": f"Item '{fail}' didn't match predicate {repr(self.predicate)}"}
