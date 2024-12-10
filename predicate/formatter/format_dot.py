@@ -75,7 +75,7 @@ def set_to_str(v: set) -> str:
     return f"{{{items}}}"
 
 
-def render(dot, predicate: Predicate, node_nr: count[int]):
+def render(dot, predicate: Predicate, node_nr: count):
     node_predicate_mapping: dict[str, Predicate] = {}
 
     def _add_node(name: str, *, label: str, predicate: Predicate | None) -> str:
@@ -220,14 +220,14 @@ def render_lazy_references(dot, node_predicate_mapping) -> None:
                     add_dashed_line(node, this)
 
 
-def render_original(dot, predicate: Predicate, node_nr: count[int]) -> None:
+def render_original(dot, predicate: Predicate, node_nr) -> None:
     with dot.subgraph(name="cluster_original") as original:
         original.attr(style="filled", color="lightgrey")
         original.attr(label="Original predicate")
         render(original, predicate, node_nr)
 
 
-def render_optimized(dot, predicate: Predicate, node_nr: count[int]) -> None:
+def render_optimized(dot, predicate: Predicate, node_nr) -> None:
     optimized_predicate = optimize(predicate)
 
     with dot.subgraph(name="cluster_optimized") as optimized:
