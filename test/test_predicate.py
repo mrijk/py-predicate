@@ -12,7 +12,6 @@ from predicate import (
     eq_false_p,
     eq_p,
     eq_true_p,
-    fn_p,
     ge_p,
     is_bool_p,
     is_callable_p,
@@ -22,7 +21,6 @@ from predicate import (
     is_int_p,
     is_iterable_p,
     is_list_p,
-    is_not_none_p,
     is_predicate_p,
     is_set_p,
     is_str_p,
@@ -259,15 +257,6 @@ def test_named_predicate():
 
     assert not p(False)
     assert p != q
-
-
-def test_lambda():
-    in_123 = fn_p(lambda x: str(x) in ["1", "2", "3"])
-    exists_p = is_not_none_p & in_123
-
-    assert not exists_p(None)
-    assert not exists_p(4)
-    assert exists_p(3)
 
 
 def test_tee():

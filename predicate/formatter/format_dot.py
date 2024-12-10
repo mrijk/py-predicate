@@ -10,6 +10,7 @@ from predicate.any_predicate import AnyPredicate
 from predicate.comp_predicate import CompPredicate
 from predicate.dict_of_predicate import DictOfPredicate
 from predicate.eq_predicate import EqPredicate
+from predicate.fn_predicate import FnPredicate
 from predicate.ge_predicate import GePredicate
 from predicate.gt_predicate import GtPredicate
 from predicate.is_instance_predicate import IsInstancePredicate
@@ -41,14 +42,16 @@ from predicate.set_predicates import (
     IsSupersetPredicate,
     NotInPredicate,
 )
-from predicate.standard_predicates import FnPredicate
 from predicate.tee_predicate import TeePredicate
 from predicate.this_predicate import ThisPredicate, find_this_predicate
+from predicate.tuple_of_predicate import TupleOfPredicate
 
 
-def to_dot(predicate: Predicate, predicate_string: str = "", show_optimized: bool = False):
+def to_dot(predicate: Predicate, predicate_string: str | None = None, show_optimized: bool = False):
     """Format predicate as a .dot file."""
-    graph_attr = {"label": predicate_string, "labelloc": "t"}
+    label = predicate_string if predicate_string else repr(predicate)
+
+    graph_attr = {"label": label, "labelloc": "t"}
 
     node_attr = {"shape": "rectangle", "style": "filled", "fillcolor": "#B7D7A8"}
 
@@ -72,7 +75,7 @@ def set_to_str(v: set) -> str:
     return f"{{{items}}}"
 
 
-def render(dot, predicate: Predicate, node_nr):
+def render(dot, predicate: Predicate, node_nr: count[int]):
     node_predicate_mapping: dict[str, Predicate] = {}
 
     def _add_node(name: str, *, label: str, predicate: Predicate | None) -> str:
@@ -179,6 +182,11 @@ def render(dot, predicate: Predicate, node_nr):
                 return add_node("tee", label="tee")
             case ThisPredicate():
                 return add_node("this", label="this")
+            case TupleOfPredicate(predicates):
+                node = add_node("tuple_of", label="is_tuple_of")
+                for tuple_predicate in predicates:
+                    dot.edge(node, to_value(tuple_predicate))
+                return node
             case XorPredicate(left, right):
                 return add_node_left_right("xor", label="⊻", left=left, right=right)
             case _:
@@ -212,14 +220,14 @@ def render_lazy_references(dot, node_predicate_mapping) -> None:
                     add_dashed_line(node, this)
 
 
-def render_original(dot, predicate: Predicate, node_nr) -> None:
+def render_original(dot, predicate: Predicate, node_nr: count[int]) -> None:
     with dot.subgraph(name="cluster_original") as original:
         original.attr(style="filled", color="lightgrey")
         original.attr(label="Original predicate")
         render(original, predicate, node_nr)
 
 
-def render_optimized(dot, predicate: Predicate, node_nr) -> None:
+def render_optimized(dot, predicate: Predicate, node_nr: count[int]) -> None:
     optimized_predicate = optimize(predicate)
 
     with dot.subgraph(name="cluster_optimized") as optimized:

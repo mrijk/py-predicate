@@ -1,5 +1,6 @@
 from predicate.all_predicate import AllPredicate
 from predicate.eq_predicate import EqPredicate
+from predicate.fn_predicate import FnPredicate
 from predicate.ge_predicate import GePredicate
 from predicate.gt_predicate import GtPredicate
 from predicate.implies import implies
@@ -10,7 +11,6 @@ from predicate.optimizer.in_optimizer import optimize_in_predicate, optimize_not
 from predicate.predicate import (
     AlwaysTruePredicate,
     AndPredicate,
-    FnPredicate,
     NotPredicate,
     OrPredicate,
     Predicate,

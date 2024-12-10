@@ -5,6 +5,7 @@ __version__ = "0.0.1"
 from predicate.all_predicate import AllPredicate
 from predicate.any_predicate import AnyPredicate
 from predicate.eq_predicate import EqPredicate
+from predicate.explain import explain
 from predicate.formatter.format_dot import to_dot
 from predicate.formatter.format_json import to_json
 from predicate.ge_predicate import GePredicate
@@ -22,7 +23,6 @@ from predicate.predicate import (
     AlwaysFalsePredicate,
     AlwaysTruePredicate,
     AndPredicate,
-    FnPredicate,
     NotPredicate,
     OrPredicate,
     Predicate,
@@ -104,7 +104,6 @@ __all__ = [
     "AndPredicate",
     "AnyPredicate",
     "EqPredicate",
-    "FnPredicate",
     "GePredicate",
     "GtPredicate",
     "LePredicate",
@@ -129,6 +128,7 @@ __all__ = [
     "eq_false_p",
     "eq_p",
     "eq_true_p",
+    "explain",
     "fn_p",
     "ge_le_p",
     "ge_lt_p",

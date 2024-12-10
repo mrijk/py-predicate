@@ -1,6 +1,6 @@
 from ipaddress import IPv4Address, IPv4Network, IPv6Address, IPv6Network
 
-from predicate import FnPredicate
+from predicate.fn_predicate import FnPredicate
 from predicate.predicate import Predicate
 from predicate.property_predicate import PropertyPredicate
 

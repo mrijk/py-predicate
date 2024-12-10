@@ -1,7 +1,7 @@
 from abc import abstractmethod
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Any, Callable, Final, override
+from typing import Any, Final, override
 from uuid import UUID
 
 
@@ -47,16 +47,6 @@ def resolve_predicate[T](predicate: Predicate[T]) -> Predicate[T]:
 
 
 @dataclass
-class FnPredicate[T](Predicate[T]):
-    """A predicate class that can hold a function."""
-
-    predicate_fn: Callable[[T], bool]
-
-    def __call__(self, x: T) -> bool:
-        return self.predicate_fn(x)
-
-
-@dataclass
 class AndPredicate[T](Predicate[T]):
     """A predicate class that models the 'and' predicate.
 
@@ -88,7 +78,7 @@ class AndPredicate[T](Predicate[T]):
         return f"{repr(self.left)} & {repr(self.right)}"
 
     @override
-    def explain(self, x: T) -> dict:
+    def explain_failure(self, x: T) -> dict:
         left_explanation = self.left.explain(x)
 
         if not (left_result := left_explanation["result"]):
@@ -136,9 +126,7 @@ class NotPredicate[T](Predicate[T]):
         return f"~{repr(self.predicate)}"
 
     @override
-    def explain(self, x: T) -> dict:
-        if self(x):
-            return {"result": True}
+    def explain_failure(self, x: T) -> dict:
         return {"result": False, "predicate": self.predicate.explain(x), "reason": f"not {repr(self.predicate)}"}
 
 
@@ -174,9 +162,7 @@ class OrPredicate[T](Predicate[T]):
         return f"{repr(self.left)} | {repr(self.right)}"
 
     @override
-    def explain(self, x: T) -> dict:
-        if self(x):
-            return {"result": True}
+    def explain_failure(self, x: T) -> dict:
         return {
             "result": False,
             "left": self.left.explain(x),
@@ -216,9 +202,7 @@ class XorPredicate[T](Predicate[T]):
         return f"{repr(self.left)} ^ {repr(self.right)}"
 
     @override
-    def explain(self, x: T) -> dict:
-        if self(x):
-            return {"result": True}
+    def explain_failure(self, x: T) -> dict:
         return {
             "result": False,
             "left": self.left.explain(x),
@@ -250,6 +234,10 @@ class AlwaysFalsePredicate(Predicate):
     def __repr__(self) -> str:
         return "always_false_p"
 
+    @override
+    def explain_failure(self, *args, **kwargs) -> dict:
+        return {"result": False, "reason": "Always returns False"}
+
 
 @dataclass
 class IsFalsyPredicate[T](Predicate[T]):
@@ -261,6 +249,10 @@ class IsFalsyPredicate[T](Predicate[T]):
     def __repr__(self) -> str:
         return "is_falsy_p"
 
+    @override
+    def explain_failure(self, x: T) -> dict:
+        return {"result": False, "reason": f"{x} is not a falsy value"}
+
 
 @dataclass
 class IsTruthyPredicate[T](Predicate[T]):
@@ -271,6 +263,10 @@ class IsTruthyPredicate[T](Predicate[T]):
 
     def __repr__(self) -> str:
         return "is_truthy_p"
+
+    @override
+    def explain_failure(self, x: T) -> dict:
+        return {"result": False, "reason": f"{x} is not a truthy value"}
 
 
 always_true_p: Final[AlwaysTruePredicate] = AlwaysTruePredicate()

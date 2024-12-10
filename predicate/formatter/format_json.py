@@ -2,13 +2,13 @@ from typing import Any
 
 from predicate.all_predicate import AllPredicate
 from predicate.any_predicate import AnyPredicate
+from predicate.fn_predicate import FnPredicate
 from predicate.named_predicate import NamedPredicate
 from predicate.ne_predicate import NePredicate
 from predicate.predicate import (
     AlwaysFalsePredicate,
     AlwaysTruePredicate,
     AndPredicate,
-    FnPredicate,
     IsFalsyPredicate,
     IsTruthyPredicate,
     NotPredicate,

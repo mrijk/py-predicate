@@ -1,6 +1,7 @@
 from collections.abc import Callable
 
-from predicate.predicate import FnPredicate, Predicate
+from predicate.fn_predicate import FnPredicate
+from predicate.predicate import Predicate
 from predicate.standard_predicates import fn_p
 
 
