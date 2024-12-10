@@ -1,7 +1,7 @@
 from abc import abstractmethod
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Callable, Final, Iterable
+from typing import Any, Final, override
 from uuid import UUID
 
 
@@ -29,6 +29,12 @@ class Predicate[T]:
         """Return the 'negated' predicate."""
         return NotPredicate(predicate=self)
 
+    def explain(self, x: Any) -> dict:
+        return {"result": True} if self(x) else self.explain_failure(x)
+
+    def explain_failure(self, x: Any) -> dict:
+        raise NotImplementedError
+
 
 def resolve_predicate[T](predicate: Predicate[T]) -> Predicate[T]:
     from predicate.standard_predicates import PredicateFactory
@@ -38,16 +44,6 @@ def resolve_predicate[T](predicate: Predicate[T]) -> Predicate[T]:
             return factory.predicate
         case _:
             return predicate
-
-
-@dataclass
-class FnPredicate[T](Predicate[T]):
-    """A predicate class that can hold a function."""
-
-    predicate_fn: Callable[[T], bool]
-
-    def __call__(self, x: T) -> bool:
-        return self.predicate_fn(x)
 
 
 @dataclass
@@ -81,6 +77,31 @@ class AndPredicate[T](Predicate[T]):
     def __repr__(self) -> str:
         return f"{repr(self.left)} & {repr(self.right)}"
 
+    @override
+    def explain_failure(self, x: T) -> dict:
+        left_explanation = self.left.explain(x)
+
+        if not (left_result := left_explanation["result"]):
+            return {
+                "left": {
+                    "result": left_result,
+                    "explanation": left_explanation,
+                }
+            }
+
+        right_explanation = self.right.explain(x)
+        right_result = right_explanation["result"]
+        return {
+            "left": {
+                "result": left_result,
+                "explanation": left_explanation,
+            },
+            "right": {
+                "result": right_result,
+                "explanation": right_explanation,
+            },
+        }
+
 
 @dataclass
 class NotPredicate[T](Predicate[T]):
@@ -103,6 +124,10 @@ class NotPredicate[T](Predicate[T]):
 
     def __repr__(self) -> str:
         return f"~{repr(self.predicate)}"
+
+    @override
+    def explain_failure(self, x: T) -> dict:
+        return {"result": False, "predicate": self.predicate.explain(x), "reason": f"not {repr(self.predicate)}"}
 
 
 @dataclass
@@ -136,6 +161,14 @@ class OrPredicate[T](Predicate[T]):
     def __repr__(self) -> str:
         return f"{repr(self.left)} | {repr(self.right)}"
 
+    @override
+    def explain_failure(self, x: T) -> dict:
+        return {
+            "result": False,
+            "left": self.left.explain(x),
+            "right": self.right.explain(x),
+        }
+
 
 @dataclass
 class XorPredicate[T](Predicate[T]):
@@ -168,108 +201,16 @@ class XorPredicate[T](Predicate[T]):
     def __repr__(self) -> str:
         return f"{repr(self.left)} ^ {repr(self.right)}"
 
-
-@dataclass
-class EqPredicate[T](Predicate[T]):
-    """A predicate class that models the 'eq' (=) predicate."""
-
-    v: T
-
-    def __call__(self, x: T) -> bool:
-        return x == self.v
-
-    def __repr__(self) -> str:
-        return f"eq_p({self.v})"
-
-
-@dataclass
-class NePredicate[T](Predicate[T]):
-    """A predicate class that models the 'ne' (!=) predicate."""
-
-    v: T
-
-    def __call__(self, x: T) -> bool:
-        return x != self.v
-
-    def __repr__(self) -> str:
-        return f"ne_p({self.v})"
+    @override
+    def explain_failure(self, x: T) -> dict:
+        return {
+            "result": False,
+            "left": self.left.explain(x),
+            "right": self.right.explain(x),
+        }
 
 
 type ConstrainedT[T: (int, str, float, datetime, UUID)] = T
-
-
-@dataclass
-class GePredicate[T](Predicate[T]):
-    """A predicate class that models the 'ge' (>=) predicate."""
-
-    v: ConstrainedT
-
-    def __call__(self, x: T) -> bool:
-        return x >= self.v
-
-    def __repr__(self) -> str:
-        return f"ge_p({self.v})"
-
-
-@dataclass
-class GtPredicate[T](Predicate[T]):
-    """A predicate class that models the 'gt' (>) predicate."""
-
-    v: ConstrainedT
-
-    def __call__(self, x: T) -> bool:
-        return x > self.v
-
-    def __repr__(self) -> str:
-        return f"gt_p({self.v})"
-
-
-@dataclass
-class LePredicate[T](Predicate[T]):
-    """A predicate class that models the 'le' (<=) predicate."""
-
-    v: ConstrainedT
-
-    def __call__(self, x: T) -> bool:
-        return x <= self.v
-
-    def __repr__(self) -> str:
-        return f"le_p({self.v})"
-
-
-@dataclass
-class LtPredicate[T](Predicate[T]):
-    """A predicate class that models the 'lt' (<) predicate."""
-
-    v: ConstrainedT
-
-    def __call__(self, x: T) -> bool:
-        return x < self.v
-
-    def __repr__(self) -> str:
-        return f"lt_p({self.v})"
-
-
-@dataclass
-class IsEmptyPredicate[T](Predicate[T]):
-    """A predicate class that models the 'empty' predicate."""
-
-    def __call__(self, iter: Iterable[T]) -> bool:
-        return len(list(iter)) == 0
-
-    def __repr__(self) -> str:
-        return "is_empty_p"
-
-
-@dataclass
-class IsNotEmptyPredicate[T](Predicate[T]):
-    """A predicate class that models the 'not empty' predicate."""
-
-    def __call__(self, iter: Iterable[T]) -> bool:
-        return len(list(iter)) > 0
-
-    def __repr__(self) -> str:
-        return "is_not_empty_p"
 
 
 @dataclass
@@ -293,27 +234,9 @@ class AlwaysFalsePredicate(Predicate):
     def __repr__(self) -> str:
         return "always_false_p"
 
-
-@dataclass
-class IsNonePredicate[T](Predicate[T]):
-    """A predicate class that models the 'is none' predicate."""
-
-    def __call__(self, x: T) -> bool:
-        return x is None
-
-    def __repr__(self) -> str:
-        return "is_none_p"
-
-
-@dataclass
-class IsNotNonePredicate[T](Predicate[T]):
-    """A predicate class that models the 'is not none' predicate."""
-
-    def __call__(self, x: T) -> bool:
-        return x is not None
-
-    def __repr__(self) -> str:
-        return "is_not_none_p"
+    @override
+    def explain_failure(self, *args, **kwargs) -> dict:
+        return {"result": False, "reason": "Always returns False"}
 
 
 @dataclass
@@ -326,6 +249,10 @@ class IsFalsyPredicate[T](Predicate[T]):
     def __repr__(self) -> str:
         return "is_falsy_p"
 
+    @override
+    def explain_failure(self, x: T) -> dict:
+        return {"result": False, "reason": f"{x} is not a falsy value"}
+
 
 @dataclass
 class IsTruthyPredicate[T](Predicate[T]):
@@ -337,15 +264,13 @@ class IsTruthyPredicate[T](Predicate[T]):
     def __repr__(self) -> str:
         return "is_truthy_p"
 
+    @override
+    def explain_failure(self, x: T) -> dict:
+        return {"result": False, "reason": f"{x} is not a truthy value"}
+
 
 always_true_p: Final[AlwaysTruePredicate] = AlwaysTruePredicate()
 """Predicate that always evaluates to True."""
 
 always_false_p: Final[AlwaysFalsePredicate] = AlwaysFalsePredicate()
 """Predicate that always evaluates to False."""
-
-is_empty_p: Final[IsEmptyPredicate] = IsEmptyPredicate()
-"""Predicate that returns True if the iterable is empty, otherwise False."""
-
-is_not_empty_p: Final[IsNotEmptyPredicate] = IsNotEmptyPredicate()
-"""Predicate that returns True if the iterable is not empty, otherwise False."""

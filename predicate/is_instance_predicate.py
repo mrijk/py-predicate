@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from typing import override
 
 from predicate.predicate import Predicate
 
@@ -15,3 +16,7 @@ class IsInstancePredicate[T](Predicate[T]):
     def __repr__(self) -> str:
         name = self.klass[0].__name__  # type: ignore
         return f"is_{name}_p"
+
+    @override
+    def explain_failure(self, x: T) -> dict:
+        return {"result": False, "reason": f"{x} is not an instance of {self.klass}"}

@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Any
+from typing import Any, override
 
 from predicate.predicate import Predicate
 
@@ -26,9 +26,6 @@ class DictOfPredicate[T](Predicate[T]):
         if not isinstance(x, dict):
             return False
 
-        if not x and self.key_value_predicates:
-            return False
-
         # For all values, a predicate must be True
         for key, value in x.items():
             if not any(key_p(key) and value_p(value) for key_p, value_p in self.key_value_predicates):
@@ -42,5 +39,10 @@ class DictOfPredicate[T](Predicate[T]):
         return True
 
     def __repr__(self) -> str:
-        # TODO
+        # TODO: show predicates
         return "is_dict_of_p"
+
+    @override
+    def explain_failure(self, x: Any) -> dict:
+        # TODO: finish
+        return {"result": False, "key_value_predicates": []}

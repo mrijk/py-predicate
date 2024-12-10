@@ -4,32 +4,31 @@ __version__ = "0.0.1"
 
 from predicate.all_predicate import AllPredicate
 from predicate.any_predicate import AnyPredicate
+from predicate.eq_predicate import EqPredicate
+from predicate.explain import explain
 from predicate.formatter.format_dot import to_dot
 from predicate.formatter.format_json import to_json
+from predicate.ge_predicate import GePredicate
 from predicate.generator.generate_false import generate_false
 from predicate.generator.generate_true import generate_true
+from predicate.gt_predicate import GtPredicate
+from predicate.is_empty_predicate import IsEmptyPredicate, IsNotEmptyPredicate, is_empty_p, is_not_empty_p
+from predicate.is_none_predicate import IsNonePredicate
+from predicate.is_not_none_predicate import IsNotNonePredicate
+from predicate.le_predicate import LePredicate
+from predicate.lt_predicate import LtPredicate
+from predicate.ne_predicate import NePredicate
 from predicate.optimizer.predicate_optimizer import can_optimize, optimize
 from predicate.predicate import (
     AlwaysFalsePredicate,
     AlwaysTruePredicate,
     AndPredicate,
-    EqPredicate,
-    FnPredicate,
-    GePredicate,
-    GtPredicate,
-    IsEmptyPredicate,
-    IsNonePredicate,
-    IsNotNonePredicate,
-    LePredicate,
-    LtPredicate,
-    NePredicate,
     NotPredicate,
     OrPredicate,
     Predicate,
     XorPredicate,
     always_false_p,
     always_true_p,
-    is_empty_p,
 )
 from predicate.set_predicates import (
     InPredicate,
@@ -105,15 +104,15 @@ __all__ = [
     "AndPredicate",
     "AnyPredicate",
     "EqPredicate",
-    "FnPredicate",
     "GePredicate",
     "GtPredicate",
+    "LePredicate",
+    "LtPredicate",
     "InPredicate",
     "IsEmptyPredicate",
     "IsNonePredicate",
+    "IsNotEmptyPredicate",
     "IsNotNonePredicate",
-    "LePredicate",
-    "LtPredicate",
     "NePredicate",
     "NotInPredicate",
     "NotPredicate",
@@ -129,6 +128,7 @@ __all__ = [
     "eq_false_p",
     "eq_p",
     "eq_true_p",
+    "explain",
     "fn_p",
     "ge_le_p",
     "ge_lt_p",
@@ -166,6 +166,7 @@ __all__ = [
     "is_list_p",
     "is_lower_p",
     "is_none_p",
+    "is_not_empty_p",
     "is_not_none_p",
     "is_predicate_p",
     "is_range_p",

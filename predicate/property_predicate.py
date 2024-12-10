@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Callable
+from typing import Callable, override
 
 from predicate import Predicate
 
@@ -18,3 +18,7 @@ class PropertyPredicate[T](Predicate[T]):
 
     def __repr__(self) -> str:
         return "property_p"
+
+    @override
+    def explain_failure(self, obj: T) -> dict:
+        return {"result": False, "reason": "tbd"}

@@ -24,8 +24,8 @@ from predicate import (
     regex_p,
 )
 from predicate.ip_address_predicates import is_ipv4_network_global_p
+from predicate.is_empty_predicate import is_not_empty_p
 from predicate.named_predicate import NamedPredicate
-from predicate.predicate import is_not_empty_p
 from predicate.set_predicates import is_real_subset_p, is_real_superset_p, is_subset_p, is_superset_p
 from predicate.standard_predicates import (
     ge_le_p,

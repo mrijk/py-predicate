@@ -1,6 +1,8 @@
 from more_itertools import one
 
-from predicate.predicate import EqPredicate, NePredicate, Predicate, always_false_p, always_true_p
+from predicate.eq_predicate import EqPredicate
+from predicate.ne_predicate import NePredicate
+from predicate.predicate import Predicate, always_false_p, always_true_p
 from predicate.set_predicates import InPredicate, NotInPredicate
 
 

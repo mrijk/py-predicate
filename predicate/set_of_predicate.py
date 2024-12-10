@@ -1,4 +1,7 @@
 from dataclasses import dataclass
+from typing import override
+
+from more_itertools import first
 
 from predicate.predicate import Predicate
 
@@ -14,3 +17,9 @@ class SetOfPredicate[T](Predicate[T]):
 
     def __repr__(self) -> str:
         return f"is_set_of_p({repr(self.predicate)})"
+
+    @override
+    def explain_failure(self, x: set[T]) -> dict:
+        fail = first(item for item in x if not self.predicate(item))
+
+        return {"result": False, "reason": f"Item '{fail}' didn't match predicate {repr(self.predicate)}"}

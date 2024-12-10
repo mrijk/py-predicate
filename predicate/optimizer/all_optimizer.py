@@ -1,11 +1,11 @@
 from predicate.all_predicate import AllPredicate
 from predicate.any_predicate import AnyPredicate
+from predicate.is_empty_predicate import IsEmptyPredicate
+from predicate.is_none_predicate import IsNonePredicate
+from predicate.is_not_none_predicate import IsNotNonePredicate
 from predicate.predicate import (
     AlwaysFalsePredicate,
     AlwaysTruePredicate,
-    IsEmptyPredicate,
-    IsNonePredicate,
-    IsNotNonePredicate,
     NotPredicate,
     Predicate,
     always_true_p,

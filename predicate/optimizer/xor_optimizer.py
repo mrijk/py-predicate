@@ -1,9 +1,9 @@
+from predicate.eq_predicate import EqPredicate
 from predicate.optimizer.in_optimizer import optimize_in_predicate
 from predicate.predicate import (
     AlwaysFalsePredicate,
     AlwaysTruePredicate,
     AndPredicate,
-    EqPredicate,
     NotPredicate,
     OrPredicate,
     Predicate,

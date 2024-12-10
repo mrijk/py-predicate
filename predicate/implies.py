@@ -1,13 +1,13 @@
 from functools import singledispatch
 
+from predicate.eq_predicate import EqPredicate
+from predicate.ge_predicate import GePredicate
+from predicate.gt_predicate import GtPredicate
+from predicate.ne_predicate import NePredicate
 from predicate.predicate import (
     AlwaysFalsePredicate,
     AlwaysTruePredicate,
     AndPredicate,
-    EqPredicate,
-    GePredicate,
-    GtPredicate,
-    NePredicate,
     Predicate,
 )
 from predicate.set_predicates import (

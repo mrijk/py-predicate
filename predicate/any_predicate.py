@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Iterable
+from typing import Iterable, override
 
 from predicate.predicate import Predicate
 
@@ -15,3 +15,7 @@ class AnyPredicate[T](Predicate[T]):
 
     def __repr__(self) -> str:
         return f"any({repr(self.predicate)})"
+
+    @override
+    def explain_failure(self, iterable: Iterable[T]) -> dict:
+        return {"result": False, "reason": f"No item matches predicate {repr(self.predicate)}"}

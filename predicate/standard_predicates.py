@@ -10,23 +10,23 @@ from predicate.all_predicate import AllPredicate
 from predicate.any_predicate import AnyPredicate
 from predicate.comp_predicate import CompPredicate
 from predicate.dict_of_predicate import DictOfPredicate
+from predicate.eq_predicate import EqPredicate
+from predicate.fn_predicate import FnPredicate
+from predicate.ge_predicate import GePredicate
+from predicate.gt_predicate import GtPredicate
 from predicate.has_key_predicate import HasKeyPredicate
 from predicate.has_length_predicate import HasLengthPredicate
 from predicate.is_instance_predicate import IsInstancePredicate
+from predicate.is_none_predicate import IsNonePredicate
+from predicate.is_not_none_predicate import IsNotNonePredicate
 from predicate.lazy_predicate import LazyPredicate
+from predicate.le_predicate import LePredicate
+from predicate.lt_predicate import LtPredicate
+from predicate.ne_predicate import NePredicate
 from predicate.predicate import (
     ConstrainedT,
-    EqPredicate,
-    FnPredicate,
-    GePredicate,
-    GtPredicate,
     IsFalsyPredicate,
-    IsNonePredicate,
-    IsNotNonePredicate,
     IsTruthyPredicate,
-    LePredicate,
-    LtPredicate,
-    NePredicate,
     Predicate,
     resolve_predicate,
 )
@@ -189,6 +189,9 @@ def regex_p(pattern: str) -> Predicate[str]:
 
 is_bool_p = is_instance_p(bool)
 """Returns True if the value is a bool, otherwise False."""
+
+is_bytearray_p = is_instance_p(bytearray)
+"""Returns True if the value is a bytearray, otherwise False."""
 
 is_callable_p = is_instance_p(Callable)  # type: ignore
 """Returns True if the value is a callable, otherwise False."""

@@ -22,7 +22,8 @@ from predicate import (
     is_none_p,
     is_not_none_p,
 )
-from predicate.predicate import IsFalsyPredicate, IsNotEmptyPredicate, IsTruthyPredicate, is_not_empty_p
+from predicate.is_empty_predicate import IsNotEmptyPredicate, is_not_empty_p
+from predicate.predicate import IsFalsyPredicate, IsTruthyPredicate
 from predicate.standard_predicates import is_falsy_p, is_truthy_p
 
 

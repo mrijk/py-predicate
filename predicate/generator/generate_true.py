@@ -19,6 +19,8 @@ from more_itertools import (
 
 from predicate.any_predicate import AnyPredicate
 from predicate.dict_of_predicate import DictOfPredicate
+from predicate.eq_predicate import EqPredicate
+from predicate.ge_predicate import GePredicate
 from predicate.generator.helpers import (
     generate_anys,
     generate_ints,
@@ -34,24 +36,22 @@ from predicate.generator.helpers import (
     random_strings,
     random_uuids,
 )
+from predicate.gt_predicate import GtPredicate
 from predicate.has_key_predicate import HasKeyPredicate
+from predicate.is_empty_predicate import IsEmptyPredicate
 from predicate.is_instance_predicate import IsInstancePredicate
+from predicate.is_none_predicate import IsNonePredicate
+from predicate.is_not_none_predicate import IsNotNonePredicate
+from predicate.le_predicate import LePredicate
+from predicate.lt_predicate import LtPredicate
+from predicate.ne_predicate import NePredicate
 from predicate.optimizer.predicate_optimizer import optimize
 from predicate.predicate import (
     AlwaysFalsePredicate,
     AlwaysTruePredicate,
     AndPredicate,
-    EqPredicate,
-    GePredicate,
-    GtPredicate,
-    IsEmptyPredicate,
     IsFalsyPredicate,
-    IsNonePredicate,
-    IsNotNonePredicate,
     IsTruthyPredicate,
-    LePredicate,
-    LtPredicate,
-    NePredicate,
     OrPredicate,
     Predicate,
     always_false_p,
