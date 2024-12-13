@@ -22,3 +22,7 @@ class PropertyPredicate[T](Predicate[T]):
     @override
     def explain_failure(self, obj: T) -> dict:
         return {"result": False, "reason": "tbd"}
+
+
+def property_p(getter: Callable):
+    return PropertyPredicate(getter=getter)

@@ -10,17 +10,22 @@ from predicate import (
     always_true_p,
     any_p,
     eq_p,
+    eq_true_p,
     fn_p,
+    generate_true,
     in_p,
     is_bool_p,
+    is_callable_p,
     is_complex_p,
     is_datetime_p,
     is_empty_p,
     is_falsy_p,
     is_float_p,
     is_int_p,
+    is_iterable_of_p,
     is_list_of_p,
     is_none_p,
+    is_not_empty_p,
     is_not_none_p,
     is_set_of_p,
     is_str_p,
@@ -30,14 +35,18 @@ from predicate import (
     ne_p,
     not_in_p,
 )
-from predicate.generator.generate_true import generate_true
 from predicate.set_predicates import is_real_subset_p, is_subset_p
 from predicate.standard_predicates import (
+    eq_false_p,
     ge_p,
     gt_p,
     has_key_p,
+    has_length_p,
+    is_container_p,
     is_dict_of_p,
     is_dict_p,
+    is_iterable_p,
+    is_list_p,
     is_set_p,
     le_p,
     lt_p,
@@ -53,24 +62,32 @@ from predicate.standard_predicates import (
     [
         all_p(is_int_p),
         any_p(is_uuid_p),
+        eq_false_p,
+        eq_true_p,
         has_key_p("foo"),
+        has_length_p(3),
         in_p(2, 3, 4),
         is_bool_p,
+        is_callable_p,
         is_complex_p,
+        is_container_p,
         is_datetime_p,
         is_dict_p,
         is_falsy_p,
         is_empty_p,
         is_float_p,
+        is_iterable_p,
+        is_list_p,
         is_none_p,
+        is_not_empty_p,
         is_not_none_p,
         is_truthy_p,
         is_int_p,
-        is_uuid_p,
+        # is_predicate_p,
         is_set_p,
         is_str_p,
         is_int_p | is_str_p,
-        le_p(2),
+        is_uuid_p,
         lt_p(2),
         ne_p(2),
         not_in_p(2, "foo", 4),
@@ -154,6 +171,18 @@ def test_dict_of(key_value_predicates):
 
 
 @pytest.mark.parametrize(
+    "iterable_of_p",
+    [
+        is_int_p,
+    ],
+)
+def test_iterable_of(iterable_of_p):
+    predicate = is_iterable_of_p(iterable_of_p)
+
+    assert_generated_true(predicate)
+
+
+@pytest.mark.parametrize(
     "list_type_p",
     [
         is_bool_p,
@@ -204,13 +233,13 @@ def test_set_of(set_type_p):
     assert_generated_true(predicate)
 
 
-def test_generate_false():
+def test_generate_always_false_p():
     predicate = always_false_p
 
     assert not list(generate_true(predicate))
 
 
-def test_generate_true_p():
+def test_generate_always_true_p():
     predicate = always_true_p
 
     assert_generated_true(predicate)

@@ -1,6 +1,7 @@
 import random
 import string
 import sys
+from collections.abc import Iterable
 from datetime import datetime
 from random import choices
 from typing import Iterator
@@ -15,6 +16,10 @@ def random_complex_numbers() -> Iterator:
     yield complex(1, 1)
 
 
+def random_callables() -> Iterator:
+    yield from (lambda x: x,)  # TODO: add more Callable's
+
+
 def random_dicts() -> Iterator:
     yield {}
     while True:
@@ -26,6 +31,11 @@ def random_dicts() -> Iterator:
 def random_datetimes(lower: datetime | None = None, upper: datetime | None = None) -> Iterator:
     # TODO
     yield datetime.now()
+
+
+def random_predicates() -> Iterator:
+    # TODO: implement
+    yield from []
 
 
 def random_sets(min_size: int = 0, max_size: int = 10) -> Iterator:
@@ -67,6 +77,22 @@ def random_ints(lower: int = -sys.maxsize, upper: int = sys.maxsize) -> Iterator
         yield from between(1)
         yield from between(10)
         yield from between(100)
+
+
+def random_iterables(min_size: int = 0, max_size: int = 10) -> Iterator[Iterable]:
+    if max_size == 0:
+        yield from ([], {}, (), "")
+    else:
+        while True:
+            yield from random_sets(min_size=min_size, max_size=max_size)
+
+
+def random_lists(min_size: int = 0, max_size: int = 10) -> Iterator[Iterable]:
+    if min_size == 0:
+        yield []
+    while True:
+        length = random.randint(min_size, max_size)
+        yield take(length, random_anys())
 
 
 def random_uuids() -> Iterator[UUID]:

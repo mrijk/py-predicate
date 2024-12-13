@@ -21,6 +21,7 @@ from predicate.is_none_predicate import IsNonePredicate
 from predicate.is_not_none_predicate import IsNotNonePredicate
 from predicate.lazy_predicate import LazyPredicate
 from predicate.le_predicate import LePredicate
+from predicate.list_of_predicate import ListOfPredicate
 from predicate.lt_predicate import LtPredicate
 from predicate.ne_predicate import NePredicate
 from predicate.predicate import (
@@ -157,7 +158,7 @@ def is_single_or_iterable_of_p[T](predicate: Predicate[T]) -> Predicate:
 
 def is_list_of_p[T](predicate: Predicate[T]) -> Predicate:
     """Return True if value is a list, and for all elements in the list the predicate is True, otherwise False."""
-    return is_list_p & all_p(predicate)
+    return ListOfPredicate(predicate)
 
 
 def is_single_or_list_of_p[T](predicate: Predicate[T]) -> Predicate:
@@ -241,10 +242,10 @@ is_tuple_p = is_instance_p(tuple)
 is_uuid_p = is_instance_p(UUID)
 """Returns True if the value is a UUID, otherwise False."""
 
-eq_true_p = eq_p(True)
+eq_true_p: Final[EqPredicate] = eq_p(True)
 """Returns True if the value is True, otherwise False."""
 
-eq_false_p = eq_p(False)
+eq_false_p: Final[EqPredicate] = eq_p(False)
 """Returns True if the value is False, otherwise False."""
 
 is_falsy_p: Final[IsFalsyPredicate] = IsFalsyPredicate()

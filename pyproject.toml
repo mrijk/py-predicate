@@ -77,10 +77,13 @@ line-length = 120
 lint.select = ["B", "C", "D", "E", "F", "I", "N", "RET", "S", "T", "W"]
 target-version = "py312"
 
+[lint.pycodestyle]
+#max-doc-length = 180
+
 [tool.ruff.lint.flake8-tidy-imports]
 ban-relative-imports = "all"
 
 [tool.ruff.lint.per-file-ignores]
-"test/*" = ["D400", "D415", "S101", "B033", "N816", "N802"]
+"test/*" = ["D400", "D415",  "S101"]
 
 [tool.mypy]

@@ -1,10 +1,11 @@
 import random
 import sys
-import uuid
-from collections.abc import Iterator
+from collections.abc import Callable, Container, Iterable, Iterator
 from datetime import datetime, timedelta
 from functools import singledispatch
 from itertools import cycle, repeat
+from typing import Any
+from uuid import UUID
 
 import exrex  # type: ignore
 from more_itertools import (
@@ -17,6 +18,7 @@ from more_itertools import (
     take,
 )
 
+from predicate import generate_false
 from predicate.any_predicate import AnyPredicate
 from predicate.dict_of_predicate import DictOfPredicate
 from predicate.eq_predicate import EqPredicate
@@ -27,22 +29,28 @@ from predicate.generator.helpers import (
     generate_strings,
     generate_uuids,
     random_anys,
+    random_callables,
     random_complex_numbers,
     random_datetimes,
     random_dicts,
     random_floats,
     random_ints,
+    random_iterables,
+    random_lists,
+    random_predicates,
     random_sets,
     random_strings,
     random_uuids,
 )
 from predicate.gt_predicate import GtPredicate
 from predicate.has_key_predicate import HasKeyPredicate
-from predicate.is_empty_predicate import IsEmptyPredicate
+from predicate.has_length_predicate import HasLengthPredicate
+from predicate.is_empty_predicate import IsEmptyPredicate, IsNotEmptyPredicate
 from predicate.is_instance_predicate import IsInstancePredicate
 from predicate.is_none_predicate import IsNonePredicate
 from predicate.is_not_none_predicate import IsNotNonePredicate
 from predicate.le_predicate import LePredicate
+from predicate.list_of_predicate import ListOfPredicate
 from predicate.lt_predicate import LtPredicate
 from predicate.ne_predicate import NePredicate
 from predicate.optimizer.predicate_optimizer import optimize
@@ -66,7 +74,7 @@ from predicate.tuple_of_predicate import TupleOfPredicate
 @singledispatch
 def generate_true[T](predicate: Predicate[T]) -> Iterator[T]:
     """Generate values that satisfy this predicate."""
-    raise ValueError("Please register generator for correct predicate type")
+    raise ValueError(f"Please register generator for correct predicate type: {predicate}")
 
 
 @generate_true.register
@@ -89,6 +97,27 @@ def generate_all_p(all_predicate: AllPredicate) -> Iterator:
 
 
 @generate_true.register
+def generate_any_p(any_predicate: AnyPredicate, min_size: int = 1, max_size: int = 10) -> Iterator:
+    predicate = any_predicate.predicate
+
+    while True:
+        length = random.randint(min_size, max_size)
+
+        nr_true_values = random.randint(1, length) if length > 1 else 1
+        nr_false_values = length - nr_true_values
+
+        false_values = take(nr_false_values, generate_false(predicate))
+        true_values = take(nr_true_values, generate_true(predicate))
+
+        combined_values = false_values + true_values
+
+        yield random_permutation(combined_values)
+
+        if len(result := set(random_permutation(combined_values))) == length:
+            yield result
+
+
+@generate_true.register
 def generate_always_true(_predicate: AlwaysTruePredicate) -> Iterator:
     yield True
 
@@ -108,7 +137,7 @@ def generate_eq(predicate: EqPredicate) -> Iterator:
 
 
 @generate_true.register
-def generate_false(_predicate: AlwaysFalsePredicate) -> Iterator:
+def generate_always_false(_predicate: AlwaysFalsePredicate) -> Iterator:
     yield from []
 
 
@@ -123,7 +152,7 @@ def generate_ge(predicate: GePredicate) -> Iterator:
             yield from random_ints(lower=predicate.v)
         case str():
             yield from generate_strings(predicate)
-        case uuid.UUID():
+        case UUID():
             yield from generate_uuids(predicate)
 
 
@@ -138,7 +167,7 @@ def generate_gt(predicate: GtPredicate) -> Iterator:
             yield from random_ints(lower=predicate.v + 1)
         case str():
             yield from generate_strings(predicate)
-        case uuid.UUID():
+        case UUID():
             yield from generate_uuids(predicate)
 
 
@@ -147,6 +176,12 @@ def generate_has_key(predicate: HasKeyPredicate) -> Iterator:
     key = predicate.key
     for random_dict, value in zip(random_dicts(), random_anys(), strict=False):
         yield random_dict | {key: value}
+
+
+@generate_true.register
+def generate_has_length(predicate: HasLengthPredicate) -> Iterator:
+    length = predicate.length
+    yield from random_iterables(min_size=length, max_size=length)
 
 
 @generate_true.register
@@ -160,7 +195,7 @@ def generate_le(predicate: LePredicate) -> Iterator:
             yield from random_ints(upper=predicate.v)
         case str():
             yield from generate_strings(predicate)
-        case uuid.UUID():
+        case UUID():
             yield from generate_uuids(predicate)
 
 
@@ -185,6 +220,11 @@ def generate_is_empty(_predicate: IsEmptyPredicate) -> Iterator:
 
 
 @generate_true.register
+def generate_is_not_empty(_predicate: IsNotEmptyPredicate) -> Iterator:
+    yield from random_iterables(min_size=1)
+
+
+@generate_true.register
 def generate_lt(predicate: LtPredicate) -> Iterator:
     match predicate.v:
         case datetime() as dt:
@@ -195,7 +235,7 @@ def generate_lt(predicate: LtPredicate) -> Iterator:
             yield from random_ints(upper=predicate.v - 1)
         case str():
             yield from generate_strings(predicate)
-        case uuid.UUID():
+        case UUID():
             yield from generate_uuids(predicate)
 
 
@@ -206,7 +246,7 @@ def generate_ne(predicate: NePredicate) -> Iterator:
 
 @generate_true.register
 def generate_none(_predicate: IsNonePredicate) -> Iterator:
-    yield None
+    yield from repeat(None)
 
 
 @generate_true.register
@@ -247,36 +287,26 @@ def generate_truthy(_predicate: IsTruthyPredicate) -> Iterator:
 @generate_true.register
 def generate_is_instance_p(predicate: IsInstancePredicate) -> Iterator:
     klass = predicate.klass[0]  # type: ignore
-    if klass is str:
-        yield from random_strings()
-    elif klass is bool:
-        yield from cycle((False, True))
-    elif klass is complex:
-        yield from random_complex_numbers()
-    elif klass == datetime:
-        yield from random_datetimes()
-    elif klass is dict:
-        yield from random_dicts()
-    elif klass is float:
-        yield from random_floats()
-    elif klass == uuid.UUID:
-        yield from random_uuids()
-    elif klass is int:
-        yield from random_ints()
-    elif klass is set:
-        yield from random_sets()
 
+    type_registry: dict[Any, Callable[[], Iterator]] = {
+        Callable: random_callables,
+        Container: lambda: ([], {}),  # type: ignore
+        Iterable: random_iterables,
+        Predicate: random_predicates,
+        UUID: random_uuids,
+        bool: lambda: cycle((False, True)),
+        complex: random_complex_numbers,
+        datetime: random_datetimes,
+        dict: random_dicts,
+        float: random_floats,
+        list: random_lists,
+        int: random_ints,
+        set: random_sets,
+        str: random_strings,
+    }
 
-@generate_true.register
-def generate_any_p(any_predicate: AnyPredicate) -> Iterator:
-    predicate = any_predicate.predicate
-    values = take(10, generate_true(predicate))
-
-    # TODO: also add some values for which predicate isn't valid
-
-    yield random_combination_with_replacement(values, 5)
-
-    yield set(random_combination_with_replacement(values, 5))
+    if generator := type_registry.get(klass):
+        yield from generator()
 
 
 @generate_true.register
@@ -289,6 +319,18 @@ def generate_dict_of_p(dict_of_predicate: DictOfPredicate) -> Iterator:
     )
 
     yield from (dict(chunked(candidate, 2)) for candidate in candidates)
+
+
+@generate_true.register
+def generate_list_of_p(list_of_predicate: ListOfPredicate, *, min_size: int = 0, max_size: int = 10) -> Iterator:
+    predicate = list_of_predicate.predicate
+
+    if min_size == 0:
+        yield []
+
+    while True:
+        length = random.randint(min_size, max_size)
+        yield take(length, generate_true(predicate))
 
 
 @generate_true.register

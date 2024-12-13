@@ -26,6 +26,9 @@ class DictOfPredicate[T](Predicate[T]):
         if not isinstance(x, dict):
             return False
 
+        if not x:
+            return False
+
         # For all values, a predicate must be True
         for key, value in x.items():
             if not any(key_p(key) and value_p(value) for key_p, value_p in self.key_value_predicates):

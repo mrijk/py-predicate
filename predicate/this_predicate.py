@@ -4,6 +4,7 @@ from functools import cached_property
 
 from predicate.all_predicate import AllPredicate
 from predicate.comp_predicate import CompPredicate
+from predicate.list_of_predicate import ListOfPredicate
 from predicate.predicate import AndPredicate, OrPredicate, Predicate
 
 
@@ -41,6 +42,8 @@ def predicate_in_predicate_tree(tree: Predicate, predicate: Predicate) -> bool:
     match tree:
         case AllPredicate(all_predicate):
             return predicate_in_predicate_tree(all_predicate, predicate)
+        case ListOfPredicate(list_of_predicate):
+            return predicate_in_predicate_tree(list_of_predicate, predicate)
         case AndPredicate(and_left, and_right):
             return predicate_in_predicate_tree(and_left, predicate) or predicate_in_predicate_tree(and_right, predicate)
         case CompPredicate(_, comp_predicate):
