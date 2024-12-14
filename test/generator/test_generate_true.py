@@ -38,7 +38,11 @@ from predicate import (
 from predicate.set_predicates import is_real_subset_p, is_subset_p
 from predicate.standard_predicates import (
     eq_false_p,
+    ge_le_p,
+    ge_lt_p,
     ge_p,
+    gt_le_p,
+    gt_lt_p,
     gt_p,
     has_key_p,
     has_length_p,
@@ -88,7 +92,6 @@ from predicate.standard_predicates import (
         is_str_p,
         is_int_p | is_str_p,
         is_uuid_p,
-        lt_p(2),
         ne_p(2),
         not_in_p(2, "foo", 4),
         regex_p("^foo"),
@@ -154,6 +157,86 @@ def test_generate_gt(value):
 )
 def test_generate_le(value):
     predicate = le_p(value)
+
+    assert_generated_true(predicate)
+
+
+@pytest.mark.parametrize(
+    "value",
+    [
+        2,
+        "foo",
+        3.14,
+        # datetime.now(),
+        uuid.uuid4(),
+    ],
+)
+def test_generate_lt(value):
+    predicate = lt_p(value)
+
+    assert_generated_true(predicate)
+
+
+@pytest.mark.parametrize(
+    "lower, upper",
+    [
+        (2, 5),
+        # ("bar", "foo"),
+        (3.14, 42.1),
+        # datetime.now(),
+        # uuid.uuid4(),
+    ],
+)
+def test_generate_ge_le(lower, upper):
+    predicate = ge_le_p(lower, upper)
+
+    assert_generated_true(predicate)
+
+
+@pytest.mark.parametrize(
+    "lower, upper",
+    [
+        (2, 5),
+        # ("bar", "foo"),
+        (3.14, 42.1),
+        # datetime.now(),
+        # uuid.uuid4(),
+    ],
+)
+def test_generate_ge_lt(lower, upper):
+    predicate = ge_lt_p(lower, upper)
+
+    assert_generated_true(predicate)
+
+
+@pytest.mark.parametrize(
+    "lower, upper",
+    [
+        (2, 5),
+        # ("bar", "foo"),
+        (3.14, 42.1),
+        # datetime.now(),
+        # uuid.uuid4(),
+    ],
+)
+def test_generate_gt_le(lower, upper):
+    predicate = gt_le_p(lower, upper)
+
+    assert_generated_true(predicate)
+
+
+@pytest.mark.parametrize(
+    "lower, upper",
+    [
+        (2, 5),
+        # ("bar", "foo"),
+        (3.14, 42.1),
+        # datetime.now(),
+        # uuid.uuid4(),
+    ],
+)
+def test_generate_gt_lt(lower, upper):
+    predicate = gt_lt_p(lower, upper)
 
     assert_generated_true(predicate)
 

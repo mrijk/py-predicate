@@ -64,6 +64,7 @@ from predicate.predicate import (
     Predicate,
     always_false_p,
 )
+from predicate.range_predicate import GeLePredicate, GeLtPredicate, GtLePredicate, GtLtPredicate
 from predicate.regex_predicate import RegexPredicate
 from predicate.set_of_predicate import SetOfPredicate
 from predicate.set_predicates import InPredicate, IsRealSubsetPredicate, IsSubsetPredicate, NotInPredicate
@@ -139,6 +140,42 @@ def generate_eq(predicate: EqPredicate) -> Iterator:
 @generate_true.register
 def generate_always_false(_predicate: AlwaysFalsePredicate) -> Iterator:
     yield from []
+
+
+@generate_true.register
+def generate_ge_le(predicate: GeLePredicate) -> Iterator:
+    match predicate.lower:
+        case int():
+            yield from random_ints(lower=predicate.lower, upper=predicate.upper)
+        case float():
+            yield from random_floats(lower=predicate.lower, upper=predicate.upper)
+
+
+@generate_true.register
+def generate_ge_lt(predicate: GeLtPredicate) -> Iterator:
+    match predicate.lower:
+        case int():
+            yield from random_ints(lower=predicate.lower, upper=predicate.upper - 1)
+        case float():
+            yield from random_floats(lower=predicate.lower, upper=predicate.upper - 0.01)  # TODO
+
+
+@generate_true.register
+def generate_gt_le(predicate: GtLePredicate) -> Iterator:
+    match predicate.lower:
+        case int():
+            yield from random_ints(lower=predicate.lower + 1, upper=predicate.upper)
+        case float():
+            yield from random_floats(lower=predicate.lower + 0.01, upper=predicate.upper)
+
+
+@generate_true.register
+def generate_gt_lt(predicate: GtLtPredicate) -> Iterator:
+    match predicate.lower:
+        case int():
+            yield from random_ints(lower=predicate.lower + 1, upper=predicate.upper - 1)
+        case float():
+            yield from random_floats(lower=predicate.lower + 1, upper=predicate.upper - 0.01)  # TODO
 
 
 @generate_true.register

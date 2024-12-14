@@ -12,8 +12,12 @@ from predicate import (
     eq_false_p,
     eq_p,
     eq_true_p,
+    ge_le_p,
+    ge_lt_p,
     ge_p,
     generate_false,
+    gt_le_p,
+    gt_lt_p,
     has_key_p,
     has_length_p,
     in_p,
@@ -103,6 +107,70 @@ def test_generate_eq(value):
 )
 def test_generate_ge(value):
     predicate = ge_p(value)
+
+    assert_generated_false(predicate)
+
+
+@pytest.mark.parametrize(
+    "lower, upper",
+    [
+        (2, 5),
+        # ("bar", "foo"),
+        (3.14, 42.1),
+        # datetime.now(),
+        # uuid.uuid4(),
+    ],
+)
+def test_generate_ge_le(lower, upper):
+    predicate = ge_le_p(lower, upper)
+
+    assert_generated_false(predicate)
+
+
+@pytest.mark.parametrize(
+    "lower, upper",
+    [
+        (2, 5),
+        # ("bar", "foo"),
+        (3.14, 42.1),
+        # datetime.now(),
+        # uuid.uuid4(),
+    ],
+)
+def test_generate_ge_lt(lower, upper):
+    predicate = ge_lt_p(lower, upper)
+
+    assert_generated_false(predicate)
+
+
+@pytest.mark.parametrize(
+    "lower, upper",
+    [
+        (2, 5),
+        # ("bar", "foo"),
+        (3.14, 42.1),
+        # datetime.now(),
+        # uuid.uuid4(),
+    ],
+)
+def test_generate_gt_le(lower, upper):
+    predicate = gt_le_p(lower, upper)
+
+    assert_generated_false(predicate)
+
+
+@pytest.mark.parametrize(
+    "lower, upper",
+    [
+        (2, 5),
+        # ("bar", "foo"),
+        (3.14, 42.1),
+        # datetime.now(),
+        # uuid.uuid4(),
+    ],
+)
+def test_generate_gt_lt(lower, upper):
+    predicate = gt_lt_p(lower, upper)
 
     assert_generated_false(predicate)
 
