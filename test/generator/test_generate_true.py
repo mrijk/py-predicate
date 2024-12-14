@@ -91,6 +91,8 @@ from predicate.standard_predicates import (
         is_set_p,
         is_str_p,
         is_int_p | is_str_p,
+        ~is_int_p,
+        is_int_p ^ is_str_p,
         is_uuid_p,
         ne_p(2),
         not_in_p(2, "foo", 4),

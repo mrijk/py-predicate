@@ -18,6 +18,7 @@ from predicate import (
     generate_false,
     gt_le_p,
     gt_lt_p,
+    gt_p,
     has_key_p,
     has_length_p,
     in_p,
@@ -45,6 +46,9 @@ from predicate import (
     is_truthy_p,
     is_tuple_of_p,
     is_uuid_p,
+    le_p,
+    lt_p,
+    neg_p,
     pos_p,
     zero_p,
 )
@@ -80,6 +84,9 @@ from predicate import (
         is_set_p,
         is_str_p,
         is_int_p | is_str_p,
+        ~is_int_p,
+        is_int_p ^ is_str_p,
+        neg_p,
         pos_p,
         zero_p,
     ],
@@ -107,6 +114,54 @@ def test_generate_eq(value):
 )
 def test_generate_ge(value):
     predicate = ge_p(value)
+
+    assert_generated_false(predicate)
+
+
+@pytest.mark.parametrize(
+    "value",
+    [
+        2,
+        "foo",
+        3.14,
+        datetime.now(),
+        uuid.uuid4(),
+    ],
+)
+def test_generate_gt(value):
+    predicate = gt_p(value)
+
+    assert_generated_false(predicate)
+
+
+@pytest.mark.parametrize(
+    "value",
+    [
+        2,
+        "foo",
+        3.14,
+        # datetime.now(),
+        uuid.uuid4(),
+    ],
+)
+def test_generate_le(value):
+    predicate = le_p(value)
+
+    assert_generated_false(predicate)
+
+
+@pytest.mark.parametrize(
+    "value",
+    [
+        2,
+        "foo",
+        3.14,
+        # # datetime.now(),
+        uuid.uuid4(),
+    ],
+)
+def test_generate_lt(value):
+    predicate = lt_p(value)
 
     assert_generated_false(predicate)
 

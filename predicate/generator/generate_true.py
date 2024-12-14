@@ -60,8 +60,10 @@ from predicate.predicate import (
     AndPredicate,
     IsFalsyPredicate,
     IsTruthyPredicate,
+    NotPredicate,
     OrPredicate,
     Predicate,
+    XorPredicate,
     always_false_p,
 )
 from predicate.range_predicate import GeLePredicate, GeLtPredicate, GtLePredicate, GtLtPredicate
@@ -287,6 +289,13 @@ def generate_none(_predicate: IsNonePredicate) -> Iterator:
 
 
 @generate_true.register
+def generate_not(predicate: NotPredicate) -> Iterator:
+    from predicate import generate_false
+
+    yield from generate_false(predicate.predicate)
+
+
+@generate_true.register
 def generate_not_in(predicate: NotInPredicate) -> Iterator:
     for item in predicate.v:
         match item:
@@ -390,3 +399,13 @@ def generate_set_of_p(
         # set sizes can be smaller than required, because of duplicates
         if len(result := set(values)) == length:
             yield result if order else random_permutation(result)
+
+
+@generate_true.register
+def generate_xor(predicate: XorPredicate) -> Iterator:
+    if optimize(predicate) == always_false_p:
+        yield from []
+    else:
+        left_and_not_right = (item for item in generate_true(predicate.left) if not predicate.right(item))
+        right_and_not_left = (item for item in generate_true(predicate.right) if not predicate.left(item))
+        yield from interleave(left_and_not_right, right_and_not_left)

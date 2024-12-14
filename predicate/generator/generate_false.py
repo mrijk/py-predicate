@@ -1,9 +1,9 @@
 import random
 import sys
-import uuid
 from collections.abc import Iterator
 from datetime import datetime, timedelta
 from functools import singledispatch
+from uuid import UUID
 
 from more_itertools import chunked, flatten, interleave, random_combination_with_replacement, random_permutation, take
 
@@ -29,7 +29,9 @@ from predicate.is_empty_predicate import IsEmptyPredicate, IsNotEmptyPredicate
 from predicate.is_instance_predicate import IsInstancePredicate
 from predicate.is_none_predicate import IsNonePredicate
 from predicate.is_not_none_predicate import IsNotNonePredicate
+from predicate.le_predicate import LePredicate
 from predicate.list_of_predicate import ListOfPredicate
+from predicate.lt_predicate import LtPredicate
 from predicate.ne_predicate import NePredicate
 from predicate.optimizer.predicate_optimizer import optimize
 from predicate.predicate import (
@@ -41,6 +43,8 @@ from predicate.predicate import (
     NotPredicate,
     OrPredicate,
     Predicate,
+    XorPredicate,
+    always_false_p,
     always_true_p,
 )
 from predicate.range_predicate import GeLePredicate, GeLtPredicate, GtLePredicate, GtLtPredicate
@@ -94,7 +98,7 @@ def generate_always_true(_predicate: AlwaysTruePredicate) -> Iterator:
 
 @generate_false.register
 def generate_eq(predicate: EqPredicate) -> Iterator:
-    yield from generate_anys(NotPredicate(predicate=predicate))
+    yield from generate_anys(~predicate)
 
 
 @generate_false.register
@@ -177,9 +181,9 @@ def generate_ge(predicate: GePredicate) -> Iterator:
         case int():
             yield from random_ints(upper=predicate.v - 1)
         case str():
-            yield from generate_strings(NotPredicate(predicate=predicate))
-        case uuid.UUID():
-            yield from generate_uuids(NotPredicate(predicate=predicate))
+            yield from generate_strings(~predicate)
+        case UUID():
+            yield from generate_uuids(~predicate)
 
 
 @generate_false.register
@@ -192,9 +196,9 @@ def generate_gt(predicate: GtPredicate) -> Iterator:
         case int():
             yield from random_ints(upper=predicate.v)
         case str():
-            yield from generate_strings(NotPredicate(predicate=predicate))
-        case uuid.UUID():
-            yield from generate_uuids(NotPredicate(predicate=predicate))
+            yield from generate_strings(~predicate)
+        case UUID():
+            yield from generate_uuids(~predicate)
 
 
 @generate_false.register
@@ -208,9 +212,9 @@ def generate_in(predicate: InPredicate) -> Iterator:
     for item in predicate.v:
         match item:
             case int():
-                yield from generate_ints(NotPredicate(predicate=predicate))
+                yield from generate_ints(~predicate)
             case str():
-                yield from generate_strings(NotPredicate(predicate=predicate))
+                yield from generate_strings(~predicate)
 
 
 @generate_false.register
@@ -224,6 +228,36 @@ def generate_is_not_empty(_predicate: IsNotEmptyPredicate) -> Iterator:
 
 
 @generate_false.register
+def generate_le(predicate: LePredicate) -> Iterator:
+    match predicate.v:
+        # case datetime() as dt:
+        #     yield from (dt - timedelta(days=days) for days in range(0, 5))
+        case float():
+            yield from random_floats(lower=predicate.v + 0.01)
+        case int():
+            yield from random_ints(lower=predicate.v + 1)
+        case str():
+            yield from generate_strings(~predicate)
+        case UUID():
+            yield from generate_uuids(~predicate)
+
+
+@generate_false.register
+def generate_lt(predicate: LtPredicate) -> Iterator:
+    match predicate.v:
+        # case datetime() as dt:
+        #     yield from (dt - timedelta(days=days) for days in range(0, 5))
+        case float():
+            yield from random_floats(lower=predicate.v)
+        case int():
+            yield from random_ints(lower=predicate.v)
+        case str():
+            yield from generate_strings(~predicate)
+        case UUID():
+            yield from generate_uuids(~predicate)
+
+
+@generate_false.register
 def generate_ne(predicate: NePredicate) -> Iterator:
     yield from predicate.v
 
@@ -231,6 +265,13 @@ def generate_ne(predicate: NePredicate) -> Iterator:
 @generate_false.register
 def generate_none(_predicate: IsNonePredicate) -> Iterator:
     yield from generate_anys(IsNotNonePredicate())
+
+
+@generate_false.register
+def generate_not(predicate: NotPredicate) -> Iterator:
+    from predicate import generate_true
+
+    yield from generate_true(predicate.predicate)
 
 
 @generate_false.register
@@ -293,3 +334,18 @@ def generate_set_of_p(set_of_predicate: SetOfPredicate) -> Iterator:
     values = take(10, generate_false(predicate))
 
     yield set(random_combination_with_replacement(values, 5))
+
+
+@generate_false.register
+def generate_xor(predicate: XorPredicate) -> Iterator:
+    if optimize(predicate) == always_true_p:
+        yield from []
+    else:
+        from predicate.generator.generate_true import generate_true
+
+        not_right_and_not_left = (item for item in generate_false(predicate.right) if not predicate.left(item))
+        if optimize(predicate.left & predicate.right) == always_false_p:
+            yield from not_right_and_not_left
+
+        left_and_right = (item for item in generate_true(predicate.left) if predicate.right(item))
+        yield from interleave(left_and_right, not_right_and_not_left)
