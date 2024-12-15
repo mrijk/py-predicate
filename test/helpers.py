@@ -1,9 +1,9 @@
-from predicate import (
-    AllPredicate,
+from predicate.all_predicate import AllPredicate
+from predicate.eq_predicate import EqPredicate
+from predicate.predicate import (
     AlwaysFalsePredicate,
     AlwaysTruePredicate,
     AndPredicate,
-    EqPredicate,
     NotPredicate,
     OrPredicate,
     XorPredicate,

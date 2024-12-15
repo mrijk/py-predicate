@@ -274,3 +274,11 @@ always_true_p: Final[AlwaysTruePredicate] = AlwaysTruePredicate()
 
 always_false_p: Final[AlwaysFalsePredicate] = AlwaysFalsePredicate()
 """Predicate that always evaluates to False."""
+
+# Next two predicates mimim the Rust equivalents
+
+always_p = always_true_p
+"""Synonym for always_true_p."""
+
+never_p = always_false_p
+"""Synonym for always_false_p."""

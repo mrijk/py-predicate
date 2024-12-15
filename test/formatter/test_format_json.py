@@ -1,7 +1,8 @@
 from dataclasses import dataclass
 
-from predicate import Predicate, all_p, always_false_p, always_true_p, any_p, fn_p, is_falsy_p, ne_p, to_json
+from predicate import all_p, always_false_p, always_true_p, any_p, fn_p, is_falsy_p, ne_p, to_json
 from predicate.named_predicate import NamedPredicate
+from predicate.predicate import Predicate
 from predicate.standard_predicates import is_truthy_p, tee_p
 
 

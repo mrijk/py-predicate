@@ -6,7 +6,6 @@ from uuid import uuid4
 import pytest
 
 from predicate import (
-    Predicate,
     always_false_p,
     always_true_p,
     eq_false_p,
@@ -28,6 +27,7 @@ from predicate import (
     is_uuid_p,
 )
 from predicate.named_predicate import NamedPredicate
+from predicate.predicate import Predicate
 from predicate.standard_predicates import (
     all_p,
     is_container_p,

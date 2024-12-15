@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import Callable, override
 
-from predicate import Predicate
+from predicate.predicate import Predicate
 
 
 @dataclass

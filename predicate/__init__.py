@@ -2,37 +2,20 @@
 
 __version__ = "0.0.1"
 
-from predicate.all_predicate import AllPredicate
-from predicate.any_predicate import AnyPredicate
-from predicate.eq_predicate import EqPredicate
 from predicate.explain import explain
 from predicate.formatter.format_dot import to_dot
 from predicate.formatter.format_json import to_json
-from predicate.ge_predicate import GePredicate
 from predicate.generator.generate_false import generate_false
 from predicate.generator.generate_true import generate_true
-from predicate.gt_predicate import GtPredicate
-from predicate.is_empty_predicate import IsEmptyPredicate, IsNotEmptyPredicate, is_empty_p, is_not_empty_p
-from predicate.is_none_predicate import IsNonePredicate
-from predicate.is_not_none_predicate import IsNotNonePredicate
-from predicate.le_predicate import LePredicate
-from predicate.lt_predicate import LtPredicate
-from predicate.ne_predicate import NePredicate
+from predicate.is_empty_predicate import is_empty_p, is_not_empty_p
 from predicate.optimizer.predicate_optimizer import can_optimize, optimize
 from predicate.predicate import (
-    AlwaysFalsePredicate,
-    AlwaysTruePredicate,
-    AndPredicate,
-    NotPredicate,
-    OrPredicate,
-    Predicate,
-    XorPredicate,
     always_false_p,
+    always_p,
     always_true_p,
+    never_p,
 )
 from predicate.set_predicates import (
-    InPredicate,
-    NotInPredicate,
     in_p,
     is_real_subset_p,
     is_real_superset_p,
@@ -100,28 +83,8 @@ from predicate.standard_predicates import (
 )
 
 __all__ = [
-    "AllPredicate",
-    "AlwaysFalsePredicate",
-    "AlwaysTruePredicate",
-    "AndPredicate",
-    "AnyPredicate",
-    "EqPredicate",
-    "GePredicate",
-    "GtPredicate",
-    "LePredicate",
-    "LtPredicate",
-    "InPredicate",
-    "IsEmptyPredicate",
-    "IsNonePredicate",
-    "IsNotEmptyPredicate",
-    "IsNotNonePredicate",
-    "NePredicate",
-    "NotInPredicate",
-    "NotPredicate",
-    "OrPredicate",
-    "Predicate",
-    "XorPredicate",
     "all_p",
+    "always_p",
     "always_false_p",
     "always_true_p",
     "any_p",
@@ -192,6 +155,7 @@ __all__ = [
     "lt_p",
     "ne_p",
     "neg_p",
+    "never_p",
     "not_in_p",
     "optimize",
     "pos_p",

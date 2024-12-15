@@ -1,29 +1,30 @@
 from functools import singledispatch
 
 from predicate import (
-    AlwaysFalsePredicate,
-    AlwaysTruePredicate,
-    EqPredicate,
-    GePredicate,
-    GtPredicate,
-    InPredicate,
-    IsEmptyPredicate,
-    IsNonePredicate,
-    IsNotNonePredicate,
-    LePredicate,
-    LtPredicate,
-    NePredicate,
-    NotInPredicate,
-    NotPredicate,
-    Predicate,
     always_false_p,
     always_true_p,
     is_empty_p,
     is_none_p,
     is_not_none_p,
 )
-from predicate.is_empty_predicate import IsNotEmptyPredicate, is_not_empty_p
-from predicate.predicate import IsFalsyPredicate, IsTruthyPredicate
+from predicate.eq_predicate import EqPredicate
+from predicate.ge_predicate import GePredicate
+from predicate.gt_predicate import GtPredicate
+from predicate.is_empty_predicate import IsEmptyPredicate, IsNotEmptyPredicate, is_not_empty_p
+from predicate.is_none_predicate import IsNonePredicate
+from predicate.is_not_none_predicate import IsNotNonePredicate
+from predicate.le_predicate import LePredicate
+from predicate.lt_predicate import LtPredicate
+from predicate.ne_predicate import NePredicate
+from predicate.predicate import (
+    AlwaysFalsePredicate,
+    AlwaysTruePredicate,
+    IsFalsyPredicate,
+    IsTruthyPredicate,
+    NotPredicate,
+    Predicate,
+)
+from predicate.set_predicates import InPredicate, NotInPredicate
 from predicate.standard_predicates import is_falsy_p, is_truthy_p
 
 
