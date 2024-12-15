@@ -1,5 +1,5 @@
 import uuid
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import pytest
 from more_itertools import take
@@ -169,7 +169,7 @@ def test_generate_le(value):
         2,
         "foo",
         3.14,
-        # datetime.now(),
+        datetime.now(),
         uuid.uuid4(),
     ],
 )
@@ -185,7 +185,7 @@ def test_generate_lt(value):
         (2, 5),
         # ("bar", "foo"),
         (3.14, 42.1),
-        # datetime.now(),
+        (datetime.now(), datetime.now() + timedelta(days=1)),
         # uuid.uuid4(),
     ],
 )
@@ -201,7 +201,7 @@ def test_generate_ge_le(lower, upper):
         (2, 5),
         # ("bar", "foo"),
         (3.14, 42.1),
-        # datetime.now(),
+        (datetime.now(), datetime.now() + timedelta(days=1)),
         # uuid.uuid4(),
     ],
 )
@@ -217,7 +217,7 @@ def test_generate_ge_lt(lower, upper):
         (2, 5),
         # ("bar", "foo"),
         (3.14, 42.1),
-        # datetime.now(),
+        (datetime.now(), datetime.now() + timedelta(days=1)),
         # uuid.uuid4(),
     ],
 )
@@ -233,7 +233,7 @@ def test_generate_gt_le(lower, upper):
         (2, 5),
         # ("bar", "foo"),
         (3.14, 42.1),
-        # datetime.now(),
+        (datetime.now(), datetime.now() + timedelta(days=1)),
         # uuid.uuid4(),
     ],
 )

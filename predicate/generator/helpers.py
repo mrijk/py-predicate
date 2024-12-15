@@ -2,7 +2,7 @@ import random
 import string
 import sys
 from collections.abc import Iterable
-from datetime import datetime
+from datetime import datetime, timedelta
 from random import choices
 from typing import Iterator
 from uuid import UUID, uuid4
@@ -10,6 +10,14 @@ from uuid import UUID, uuid4
 from more_itertools import interleave, take
 
 from predicate.predicate import Predicate
+
+
+def random_first_from_iterables(*iterables: Iterable) -> Iterator:
+    non_empty_iterables = [it for it in iterables if it]
+
+    while True:
+        chosen_iterable = random.choice(non_empty_iterables)
+        yield next(iter(chosen_iterable))
 
 
 def random_complex_numbers() -> Iterator:
@@ -29,8 +37,19 @@ def random_dicts() -> Iterator:
 
 
 def random_datetimes(lower: datetime | None = None, upper: datetime | None = None) -> Iterator:
-    # TODO
-    yield datetime.now()
+    start = lower if lower else datetime(year=1980, month=1, day=1)
+    end = upper if upper else datetime(year=2050, month=1, day=1)
+
+    now = datetime.now()
+
+    if start <= now <= end:
+        yield now
+
+    while True:
+        delta = end - start
+        int_delta = (delta.days * 24 * 60 * 60) + delta.seconds
+        random_second = random.randrange(int_delta)
+        yield start + timedelta(seconds=random_second)
 
 
 def random_predicates() -> Iterator:

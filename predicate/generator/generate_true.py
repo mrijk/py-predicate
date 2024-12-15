@@ -33,6 +33,7 @@ from predicate.generator.helpers import (
     random_complex_numbers,
     random_datetimes,
     random_dicts,
+    random_first_from_iterables,
     random_floats,
     random_ints,
     random_iterables,
@@ -81,13 +82,13 @@ def generate_true[T](predicate: Predicate[T]) -> Iterator[T]:
 
 
 @generate_true.register
-def generate_all_p(all_predicate: AllPredicate) -> Iterator:
+def generate_all_p(all_predicate: AllPredicate, *, min_size: int = 1, max_size: int = 10) -> Iterator:
     yield []
 
     predicate = all_predicate.predicate
 
     while True:
-        max_length = random.randint(1, 10)
+        max_length = random.randint(min_size, max_size)
 
         values = take(max_length, generate_true(predicate))
         yield random_combination_with_replacement(values, max_length)
@@ -100,7 +101,7 @@ def generate_all_p(all_predicate: AllPredicate) -> Iterator:
 
 
 @generate_true.register
-def generate_any_p(any_predicate: AnyPredicate, min_size: int = 1, max_size: int = 10) -> Iterator:
+def generate_any_p(any_predicate: AnyPredicate, *, min_size: int = 1, max_size: int = 10) -> Iterator:
     predicate = any_predicate.predicate
 
     while True:
@@ -147,6 +148,8 @@ def generate_always_false(_predicate: AlwaysFalsePredicate) -> Iterator:
 @generate_true.register
 def generate_ge_le(predicate: GeLePredicate) -> Iterator:
     match predicate.lower:
+        case datetime():
+            yield from random_datetimes(lower=predicate.lower, upper=predicate.upper)
         case int():
             yield from random_ints(lower=predicate.lower, upper=predicate.upper)
         case float():
@@ -156,6 +159,8 @@ def generate_ge_le(predicate: GeLePredicate) -> Iterator:
 @generate_true.register
 def generate_ge_lt(predicate: GeLtPredicate) -> Iterator:
     match predicate.lower:
+        case datetime():
+            yield from random_datetimes(lower=predicate.lower, upper=predicate.upper - timedelta(seconds=1))
         case int():
             yield from random_ints(lower=predicate.lower, upper=predicate.upper - 1)
         case float():
@@ -165,6 +170,8 @@ def generate_ge_lt(predicate: GeLtPredicate) -> Iterator:
 @generate_true.register
 def generate_gt_le(predicate: GtLePredicate) -> Iterator:
     match predicate.lower:
+        case datetime():
+            yield from random_datetimes(lower=predicate.lower + timedelta(seconds=1), upper=predicate.upper)
         case int():
             yield from random_ints(lower=predicate.lower + 1, upper=predicate.upper)
         case float():
@@ -174,6 +181,10 @@ def generate_gt_le(predicate: GtLePredicate) -> Iterator:
 @generate_true.register
 def generate_gt_lt(predicate: GtLtPredicate) -> Iterator:
     match predicate.lower:
+        case datetime():
+            yield from random_datetimes(
+                lower=predicate.lower + timedelta(seconds=1), upper=predicate.upper - timedelta(seconds=1)
+            )
         case int():
             yield from random_ints(lower=predicate.lower + 1, upper=predicate.upper - 1)
         case float():
@@ -183,8 +194,8 @@ def generate_gt_lt(predicate: GtLtPredicate) -> Iterator:
 @generate_true.register
 def generate_ge(predicate: GePredicate) -> Iterator:
     match predicate.v:
-        case datetime() as dt:
-            yield from (dt + timedelta(days=days) for days in range(0, 5))
+        case datetime():
+            yield from random_datetimes(lower=predicate.v)
         case float():
             yield from random_floats(lower=predicate.v)
         case int():
@@ -198,8 +209,8 @@ def generate_ge(predicate: GePredicate) -> Iterator:
 @generate_true.register
 def generate_gt(predicate: GtPredicate) -> Iterator:
     match predicate.v:
-        case datetime() as dt:
-            yield from (dt + timedelta(days=days) for days in range(1, 6))
+        case datetime():
+            yield from random_datetimes(lower=predicate.v + timedelta(seconds=1))
         case float():
             yield from random_floats(lower=predicate.v + sys.float_info.epsilon)
         case int():
@@ -226,8 +237,8 @@ def generate_has_length(predicate: HasLengthPredicate) -> Iterator:
 @generate_true.register
 def generate_le(predicate: LePredicate) -> Iterator:
     match predicate.v:
-        case datetime() as dt:
-            yield from (dt - timedelta(days=days) for days in range(0, 5))
+        case datetime():
+            yield from random_datetimes(upper=predicate.v)
         case float():
             yield from random_floats(upper=predicate.v)
         case int():
@@ -266,8 +277,8 @@ def generate_is_not_empty(_predicate: IsNotEmptyPredicate) -> Iterator:
 @generate_true.register
 def generate_lt(predicate: LtPredicate) -> Iterator:
     match predicate.v:
-        case datetime() as dt:
-            yield from (dt - timedelta(days=days) for days in range(0, 5))
+        case datetime():
+            yield from random_datetimes(upper=predicate.v - timedelta(seconds=1))
         case float():
             yield from random_floats(upper=predicate.v - sys.float_info.epsilon)
         case int():
@@ -312,7 +323,7 @@ def generate_not_none(predicate: IsNotNonePredicate) -> Iterator:
 
 @generate_true.register
 def generate_or(predicate: OrPredicate) -> Iterator:
-    yield from interleave(generate_true(predicate.left), generate_true(predicate.right))
+    yield from random_first_from_iterables(generate_true(predicate.left), generate_true(predicate.right))
 
 
 @generate_true.register

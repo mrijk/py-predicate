@@ -17,6 +17,7 @@ from predicate.generator.helpers import (
     generate_strings,
     generate_uuids,
     random_anys,
+    random_datetimes,
     random_dicts,
     random_floats,
     random_ints,
@@ -122,60 +123,76 @@ def generate_has_length(predicate: HasLengthPredicate) -> Iterator:
 @generate_false.register
 def generate_ge_le(predicate: GeLePredicate) -> Iterator:
     match predicate.lower:
+        case datetime():
+            smaller = random_datetimes(upper=predicate.lower - timedelta(seconds=1))
+            larger = random_datetimes(lower=predicate.upper + timedelta(seconds=1))
+            yield from interleave(smaller, larger)
         case int():
             smaller = random_ints(lower=predicate.lower - 100, upper=predicate.lower - 1)
-            greater = random_ints(lower=predicate.upper + 1, upper=predicate.upper + 100)
-            yield from interleave(smaller, greater)
+            larger = random_ints(lower=predicate.upper + 1, upper=predicate.upper + 100)
+            yield from interleave(smaller, larger)
         case float():
             smaller = random_floats(lower=predicate.lower - 100.0, upper=predicate.lower - 0.01)
-            greater = random_floats(lower=predicate.upper + 0.01, upper=predicate.upper + 100.0)
-            yield from interleave(smaller, greater)
+            larger = random_floats(lower=predicate.upper + 0.01, upper=predicate.upper + 100.0)
+            yield from interleave(smaller, larger)
 
 
 @generate_false.register
 def generate_ge_lt(predicate: GeLtPredicate) -> Iterator:
     match predicate.lower:
+        case datetime():
+            smaller = random_datetimes(upper=predicate.lower - timedelta(seconds=1))
+            larger = random_datetimes(lower=predicate.upper)
+            yield from interleave(smaller, larger)
         case int():
             smaller = random_ints(lower=predicate.lower - 100, upper=predicate.lower - 1)
-            greater = random_ints(lower=predicate.upper, upper=predicate.upper + 100)
-            yield from interleave(smaller, greater)
+            larger = random_ints(lower=predicate.upper, upper=predicate.upper + 100)
+            yield from interleave(smaller, larger)
         case float():
             smaller = random_floats(lower=predicate.lower - 100.0, upper=predicate.lower - 0.01)
-            greater = random_floats(lower=predicate.upper, upper=predicate.upper + 100.0)
-            yield from interleave(smaller, greater)
+            larger = random_floats(lower=predicate.upper, upper=predicate.upper + 100.0)
+            yield from interleave(smaller, larger)
 
 
 @generate_false.register
 def generate_gt_le(predicate: GtLePredicate) -> Iterator:
     match predicate.lower:
+        case datetime():
+            smaller = random_datetimes(upper=predicate.lower)
+            larger = random_datetimes(lower=predicate.upper + timedelta(seconds=1))
+            yield from interleave(smaller, larger)
         case int():
             smaller = random_ints(lower=predicate.lower - 100, upper=predicate.lower)
-            greater = random_ints(lower=predicate.upper + 1, upper=predicate.upper + 100)
-            yield from interleave(smaller, greater)
+            larger = random_ints(lower=predicate.upper + 1, upper=predicate.upper + 100)
+            yield from interleave(smaller, larger)
         case float():
             smaller = random_floats(lower=predicate.lower - 100.0, upper=predicate.lower)
-            greater = random_floats(lower=predicate.upper + 0.01, upper=predicate.upper + 100.0)
-            yield from interleave(smaller, greater)
+            larger = random_floats(lower=predicate.upper + 0.01, upper=predicate.upper + 100.0)
+            yield from interleave(smaller, larger)
 
 
 @generate_false.register
 def generate_gt_lt(predicate: GtLtPredicate) -> Iterator:
     match predicate.lower:
+        case datetime():
+            smaller = random_datetimes(upper=predicate.lower)
+            larger = random_datetimes(lower=predicate.upper)
+            yield from interleave(smaller, larger)
         case int():
             smaller = random_ints(lower=predicate.lower - 100, upper=predicate.lower)
-            greater = random_ints(lower=predicate.upper, upper=predicate.upper + 100)
-            yield from interleave(smaller, greater)
+            larger = random_ints(lower=predicate.upper, upper=predicate.upper + 100)
+            yield from interleave(smaller, larger)
         case float():
             smaller = random_floats(lower=predicate.lower - 100.0, upper=predicate.lower)
-            greater = random_floats(lower=predicate.upper, upper=predicate.upper + 100.0)
-            yield from interleave(smaller, greater)
+            larger = random_floats(lower=predicate.upper, upper=predicate.upper + 100.0)
+            yield from interleave(smaller, larger)
 
 
 @generate_false.register
 def generate_ge(predicate: GePredicate) -> Iterator:
     match predicate.v:
-        case datetime() as dt:
-            yield from (dt - timedelta(days=days) for days in range(1, 6))
+        case datetime():
+            yield from random_datetimes(upper=predicate.v - timedelta(seconds=1))
         case float():
             yield from random_floats(upper=predicate.v - sys.float_info.epsilon)
         case int():
@@ -189,8 +206,8 @@ def generate_ge(predicate: GePredicate) -> Iterator:
 @generate_false.register
 def generate_gt(predicate: GtPredicate) -> Iterator:
     match predicate.v:
-        case datetime() as dt:
-            yield from (dt - timedelta(days=days) for days in range(0, 5))
+        case datetime():
+            yield from random_datetimes(upper=predicate.v)
         case float():
             yield from random_floats(upper=predicate.v)
         case int():
@@ -230,8 +247,8 @@ def generate_is_not_empty(_predicate: IsNotEmptyPredicate) -> Iterator:
 @generate_false.register
 def generate_le(predicate: LePredicate) -> Iterator:
     match predicate.v:
-        # case datetime() as dt:
-        #     yield from (dt - timedelta(days=days) for days in range(0, 5))
+        case datetime():
+            yield from random_datetimes(lower=predicate.v + timedelta(seconds=1))
         case float():
             yield from random_floats(lower=predicate.v + 0.01)
         case int():
@@ -245,8 +262,8 @@ def generate_le(predicate: LePredicate) -> Iterator:
 @generate_false.register
 def generate_lt(predicate: LtPredicate) -> Iterator:
     match predicate.v:
-        # case datetime() as dt:
-        #     yield from (dt - timedelta(days=days) for days in range(0, 5))
+        case datetime():
+            yield from random_datetimes(lower=predicate.v)
         case float():
             yield from random_floats(lower=predicate.v)
         case int():
