@@ -7,7 +7,7 @@ from predicate.predicate import Predicate
 
 @dataclass
 class IsCallablePredicate[T](Predicate[T]):
-    """tbd."""
+    """A predicate class that models the is_callable predicate."""
 
     params: list
     return_type: Any

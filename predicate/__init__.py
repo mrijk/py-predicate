@@ -8,13 +8,9 @@ from predicate.formatter.format_json import to_json
 from predicate.generator.generate_false import generate_false
 from predicate.generator.generate_true import generate_true
 from predicate.is_empty_predicate import is_empty_p, is_not_empty_p
+from predicate.is_lambda_predicate import is_lambda_p, is_lambda_with_signature_p
 from predicate.optimizer.predicate_optimizer import can_optimize, optimize
-from predicate.predicate import (
-    always_false_p,
-    always_p,
-    always_true_p,
-    never_p,
-)
+from predicate.predicate import always_false_p, always_p, always_true_p, never_p
 from predicate.set_predicates import (
     in_p,
     is_real_subset_p,
@@ -128,6 +124,8 @@ __all__ = [
     "is_int_p",
     "is_iterable_of_p",
     "is_iterable_p",
+    "is_lambda_p",
+    "is_lambda_with_signature_p",
     "is_list_of_p",
     "is_list_p",
     "is_lower_p",
