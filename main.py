@@ -4,10 +4,11 @@ from typing import Annotated
 
 import typer
 
-from predicate import Predicate, to_json
 from predicate import optimize as optimize_predicate
+from predicate import to_json
 from predicate.formatter.format_dot import to_dot
 from predicate.parser import parse_expression
+from predicate.predicate import Predicate
 from predicate.truth_table import get_named_predicates, truth_table
 
 app = typer.Typer()
