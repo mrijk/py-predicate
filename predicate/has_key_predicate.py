@@ -18,4 +18,4 @@ class HasKeyPredicate[T](Predicate[T]):
 
     @override
     def explain_failure(self, v: dict) -> dict:
-        return {"result": False, "reason": f"Key '{self.key}' is missing in {v}"}
+        return {"reason": f"Key '{self.key}' is missing in {v}"}

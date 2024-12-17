@@ -19,4 +19,4 @@ class CompPredicate[S, T](Predicate[T]):
 
     @override
     def explain_failure(self, x: S) -> dict:
-        return {"result": False, "predicate": self.predicate.explain(x)}
+        return {"reason": self.predicate.explain(x)}

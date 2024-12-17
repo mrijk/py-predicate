@@ -19,7 +19,7 @@ class GeLePredicate[T](Predicate[T]):
 
     @override
     def explain_failure(self, x: T) -> dict:
-        return {"result": False, "reason": f"{x} is not greater equal {self.lower} and less equal {self.upper}"}
+        return {"reason": f"{x} is not greater equal {self.lower} and less equal {self.upper}"}
 
 
 @dataclass
@@ -37,7 +37,7 @@ class GeLtPredicate[T](Predicate[T]):
 
     @override
     def explain_failure(self, x: T) -> dict:
-        return {"result": False, "reason": f"{x} is not greater equal {self.lower} and less than {self.upper}"}
+        return {"reason": f"{x} is not greater equal {self.lower} and less than {self.upper}"}
 
 
 @dataclass
@@ -56,7 +56,6 @@ class GtLePredicate[T](Predicate[T]):
     @override
     def explain_failure(self, x: T) -> dict:
         return {
-            "result": False,
             "reason": f"{x} is not greater than {self.lower} and less than or equal to {self.upper}",
         }
 
@@ -76,4 +75,4 @@ class GtLtPredicate[T](Predicate[T]):
 
     @override
     def explain_failure(self, x: T) -> dict:
-        return {"result": False, "reason": f"{x} is not greater than {self.lower} and less than {self.upper}"}
+        return {"reason": f"{x} is not greater than {self.lower} and less than {self.upper}"}

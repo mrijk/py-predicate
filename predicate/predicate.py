@@ -30,7 +30,11 @@ class Predicate[T]:
         return NotPredicate(predicate=self)
 
     def explain(self, x: Any) -> dict:
-        return {"result": True} if self(x) else self.explain_failure(x)
+        if self(x):
+            return {"result": True}
+        return {
+            "result": False,
+        } | self.explain_failure(x)
 
     def explain_failure(self, x: Any) -> dict:
         raise NotImplementedError
@@ -127,7 +131,7 @@ class NotPredicate[T](Predicate[T]):
 
     @override
     def explain_failure(self, x: T) -> dict:
-        return {"result": False, "predicate": self.predicate.explain(x), "reason": f"not {repr(self.predicate)}"}
+        return {"predicate": self.predicate.explain(x), "reason": f"not {repr(self.predicate)}"}
 
 
 @dataclass
@@ -164,7 +168,6 @@ class OrPredicate[T](Predicate[T]):
     @override
     def explain_failure(self, x: T) -> dict:
         return {
-            "result": False,
             "left": self.left.explain(x),
             "right": self.right.explain(x),
         }
@@ -204,7 +207,6 @@ class XorPredicate[T](Predicate[T]):
     @override
     def explain_failure(self, x: T) -> dict:
         return {
-            "result": False,
             "left": self.left.explain(x),
             "right": self.right.explain(x),
         }
@@ -236,7 +238,7 @@ class AlwaysFalsePredicate(Predicate):
 
     @override
     def explain_failure(self, *args, **kwargs) -> dict:
-        return {"result": False, "reason": "Always returns False"}
+        return {"reason": "Always returns False"}
 
 
 @dataclass
@@ -251,7 +253,7 @@ class IsFalsyPredicate[T](Predicate[T]):
 
     @override
     def explain_failure(self, x: T) -> dict:
-        return {"result": False, "reason": f"{x} is not a falsy value"}
+        return {"reason": f"{x} is not a falsy value"}
 
 
 @dataclass
@@ -266,7 +268,7 @@ class IsTruthyPredicate[T](Predicate[T]):
 
     @override
     def explain_failure(self, x: T) -> dict:
-        return {"result": False, "reason": f"{x} is not a truthy value"}
+        return {"reason": f"{x} is not a truthy value"}
 
 
 always_true_p: Final[AlwaysTruePredicate] = AlwaysTruePredicate()

@@ -18,4 +18,4 @@ class AnyPredicate[T](Predicate[T]):
 
     @override
     def explain_failure(self, iterable: Iterable[T]) -> dict:
-        return {"result": False, "reason": f"No item matches predicate {repr(self.predicate)}"}
+        return {"reason": f"No item matches predicate {repr(self.predicate)}"}

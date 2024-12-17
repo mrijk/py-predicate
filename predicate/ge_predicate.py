@@ -18,4 +18,4 @@ class GePredicate[T](Predicate[T]):
 
     @override
     def explain_failure(self, x: T) -> dict:
-        return {"result": False, "reason": f"{x} is not greater or equal to {self.v}"}
+        return {"reason": f"{x} is not greater or equal to {self.v}"}

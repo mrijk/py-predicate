@@ -18,4 +18,4 @@ class FnPredicate[T](Predicate[T]):
 
     @override
     def explain_failure(self, x: T) -> dict:
-        return {"result": False, "reason": f"Function returned False for value {x}"}
+        return {"reason": f"Function returned False for value {x}"}

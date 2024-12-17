@@ -19,4 +19,4 @@ class IsInstancePredicate[T](Predicate[T]):
 
     @override
     def explain_failure(self, x: T) -> dict:
-        return {"result": False, "reason": f"{x} is not an instance of {self.klass}"}
+        return {"reason": f"{x} is not an instance of {self.klass}"}

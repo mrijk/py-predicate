@@ -22,4 +22,4 @@ class SetOfPredicate[T](Predicate[T]):
     def explain_failure(self, x: set[T]) -> dict:
         fail = first(item for item in x if not self.predicate(item))
 
-        return {"result": False, "reason": f"Item '{fail}' didn't match predicate {repr(self.predicate)}"}
+        return {"reason": f"Item '{fail}' didn't match predicate {repr(self.predicate)}"}

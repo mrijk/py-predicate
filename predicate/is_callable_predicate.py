@@ -34,8 +34,8 @@ class IsCallablePredicate[T](Predicate[T]):
                 return_type = annotations["return"]
 
                 if return_type != self.return_type:
-                    return {"result": False, "reason": f"Wrong return type: {return_type}"}
+                    return {"reason": f"Wrong return type: {return_type}"}
 
-                return {"result": False, "reason": "tbd"}
+                return {"reason": "tbd"}
             case _:
-                return {"result": False, "reason": f"{x} is not a Callable"}
+                return {"reason": f"{x} is not a Callable"}

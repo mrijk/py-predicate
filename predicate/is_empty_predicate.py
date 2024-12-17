@@ -16,7 +16,7 @@ class IsEmptyPredicate[T](Predicate[T]):
 
     @override
     def explain_failure(self, x: Iterable[T]) -> dict:
-        return {"result": False, "reason": f"Iterable {x} is not empty"}
+        return {"reason": f"Iterable {x} is not empty"}
 
 
 @dataclass
@@ -31,7 +31,7 @@ class IsNotEmptyPredicate[T](Predicate[T]):
 
     @override
     def explain_failure(self, x: T) -> dict:
-        return {"result": False, "reason": f"Iterable {x} is empty"}
+        return {"reason": f"Iterable {x} is empty"}
 
 
 is_empty_p: Final[IsEmptyPredicate] = IsEmptyPredicate()

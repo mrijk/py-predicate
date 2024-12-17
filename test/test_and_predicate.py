@@ -53,6 +53,9 @@ def test_and_explain():
 
     predicate = p & q
 
-    expected = {"left": {"explanation": {"reason": "2 is not greater than 2", "result": False}, "result": False}}
+    expected = {
+        "left": {"explanation": {"reason": "2 is not greater than 2", "result": False}, "result": False},
+        "result": False,
+    }
 
     assert explain(predicate, 2) == expected

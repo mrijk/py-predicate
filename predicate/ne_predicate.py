@@ -18,4 +18,4 @@ class NePredicate[T](Predicate[T]):
 
     @override
     def explain_failure(self, x: T) -> dict:
-        return {"result": False, "reason": f"{x} is equal to {self.v}"}
+        return {"reason": f"{x} is equal to {self.v}"}

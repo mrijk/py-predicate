@@ -17,11 +17,12 @@ class PropertyPredicate[T](Predicate[T]):
         return self.getter.fget(obj)  # type: ignore
 
     def __repr__(self) -> str:
+        # TODO
         return "property_p"
 
     @override
     def explain_failure(self, obj: T) -> dict:
-        return {"result": False, "reason": "tbd"}
+        return {"reason": "tbd"}
 
 
 def property_p(getter: Callable):

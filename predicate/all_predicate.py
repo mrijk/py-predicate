@@ -22,4 +22,4 @@ class AllPredicate[T](Predicate[T]):
     def explain_failure(self, iterable: Iterable[T]) -> dict:
         fail = first(item for item in iterable if not self.predicate(item))
 
-        return {"result": False, "reason": f"Item '{fail}' didn't match predicate {repr(self.predicate)}"}
+        return {"reason": f"Item '{fail}' didn't match predicate {repr(self.predicate)}"}

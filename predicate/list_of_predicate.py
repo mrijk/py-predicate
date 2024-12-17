@@ -30,6 +30,6 @@ class ListOfPredicate[T](Predicate[T]):
         match x:
             case list() as l:
                 fail = first(item for item in l if not self.predicate(item))
-                return {"result": False, "reason": f"Item '{fail}' didn't match predicate {repr(self.predicate)}"}
+                return {"reason": f"Item '{fail}' didn't match predicate {repr(self.predicate)}"}
             case _:
-                return {"result": False, "reason": f"{x} is not an instance of a list"}
+                return {"reason": f"{x} is not an instance of a list"}

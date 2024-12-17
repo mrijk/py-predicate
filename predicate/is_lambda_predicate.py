@@ -40,13 +40,12 @@ class IsLambdaPredicate[T](Predicate[T]):
             case Callable() as func if func_is_lambda(func):  # type: ignore
                 sig = signature(func)
                 return {
-                    "result": False,
                     "reason": f"Lambda has {len(sig.parameters)} parameters, expected: {self.nr_of_parameters}",
                 }
             case Callable() as func:  # type: ignore
-                return {"result": False, "reason": f"Function {func.__name__} is not a lambda"}
+                return {"reason": f"Function {func.__name__} is not a lambda"}
             case _:
-                return {"result": False, "reason": f"Value {x} is not a lambda"}
+                return {"reason": f"Value {x} is not a lambda"}
 
 
 is_lambda_p: Final[IsLambdaPredicate] = IsLambdaPredicate()

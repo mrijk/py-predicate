@@ -20,4 +20,4 @@ class HasLengthPredicate[T](Predicate[T]):
 
     @override
     def explain_failure(self, iterable: Iterable[T]) -> dict:
-        return {"result": False, "reason": f"Expected length {self.length}, actual: {ilen(iterable)}"}
+        return {"reason": f"Expected length {self.length}, actual: {ilen(iterable)}"}

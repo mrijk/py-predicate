@@ -16,5 +16,5 @@ def test_comp_explain():
 
     predicate = comp_p(fn=lambda x: 2 * x, predicate=ge_2)
 
-    expected = {"predicate": {"reason": "0 is not greater or equal to 2", "result": False}, "result": False}
+    expected = {"reason": {"reason": "0 is not greater or equal to 2", "result": False}, "result": False}
     assert explain(predicate, 0) == expected

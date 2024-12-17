@@ -16,4 +16,4 @@ class IsNotNonePredicate[T](Predicate[T]):
 
     @override
     def explain_failure(self, _x: T) -> dict:
-        return {"result": False, "reason": "Value is None"}
+        return {"reason": "Value is None"}
