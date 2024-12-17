@@ -1,6 +1,6 @@
 import pytest
 
-from predicate import is_int_p, is_list_of_p, is_str_p, root_p
+from predicate import explain, is_int_p, is_list_of_p, is_str_p, root_p
 
 
 def test_root_predicate():
@@ -25,3 +25,15 @@ def test_root_predicate_with_different_root():
 def test_root_predicate_dont_call():
     with pytest.raises(ValueError):
         root_p(13)
+
+
+def test_root_explain():
+    str_or_list_of_str = is_str_p | is_list_of_p(root_p)
+
+    expected = {
+        "left": {"reason": "13 is not an instance of (<class 'str'>,)", "result": False},
+        "result": False,
+        "right": {"reason": "13 is not an instance of a list", "result": False},
+    }
+
+    assert explain(str_or_list_of_str, 13) == expected

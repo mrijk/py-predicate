@@ -1,8 +1,7 @@
 from dataclasses import dataclass
 from typing import Iterable, override
 
-from more_itertools import first
-
+from predicate.helpers import first_false
 from predicate.predicate import Predicate
 
 
@@ -20,6 +19,6 @@ class AllPredicate[T](Predicate[T]):
 
     @override
     def explain_failure(self, iterable: Iterable[T]) -> dict:
-        fail = first(item for item in iterable if not self.predicate(item))
+        fail = first_false(iterable, self.predicate)
 
         return {"reason": f"Item '{fail}' didn't match predicate {repr(self.predicate)}"}

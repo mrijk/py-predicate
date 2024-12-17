@@ -1,5 +1,6 @@
 import re
 from dataclasses import dataclass
+from typing import override
 
 from predicate.predicate import Predicate
 
@@ -17,3 +18,7 @@ class RegexPredicate[T](Predicate[T]):
 
     def __repr__(self) -> str:
         return f'regex_p("{self.regex.pattern}")'
+
+    @override
+    def explain_failure(self, x: str) -> dict:
+        return {"reason": f"String {x} didn't match patter {self.regex.pattern}"}
