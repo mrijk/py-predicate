@@ -3,6 +3,7 @@ import sys
 from collections.abc import Iterator
 from datetime import datetime, timedelta
 from functools import singledispatch
+from itertools import repeat
 from uuid import UUID
 
 from more_itertools import chunked, flatten, interleave, random_combination_with_replacement, random_permutation, take
@@ -50,7 +51,7 @@ from predicate.predicate import (
 )
 from predicate.range_predicate import GeLePredicate, GeLtPredicate, GtLePredicate, GtLtPredicate
 from predicate.set_of_predicate import SetOfPredicate
-from predicate.set_predicates import InPredicate
+from predicate.set_predicates import InPredicate, NotInPredicate
 from predicate.standard_predicates import AnyPredicate, has_key_p
 from predicate.tuple_of_predicate import TupleOfPredicate
 
@@ -276,7 +277,7 @@ def generate_lt(predicate: LtPredicate) -> Iterator:
 
 @generate_false.register
 def generate_ne(predicate: NePredicate) -> Iterator:
-    yield from predicate.v
+    yield from repeat(predicate.v)
 
 
 @generate_false.register
@@ -289,6 +290,13 @@ def generate_not(predicate: NotPredicate) -> Iterator:
     from predicate import generate_true
 
     yield from generate_true(predicate.predicate)
+
+
+@generate_false.register
+def generate_not_in(predicate: NotInPredicate) -> Iterator:
+    from predicate import generate_true
+
+    yield from generate_true(InPredicate(v=predicate.v))
 
 
 @generate_false.register

@@ -11,6 +11,7 @@ from predicate.comp_predicate import CompPredicate
 from predicate.dict_of_predicate import DictOfPredicate
 from predicate.eq_predicate import EqPredicate
 from predicate.fn_predicate import FnPredicate
+from predicate.formatter.helpers import set_to_str
 from predicate.ge_predicate import GePredicate
 from predicate.gt_predicate import GtPredicate
 from predicate.is_instance_predicate import IsInstancePredicate
@@ -67,12 +68,6 @@ def to_dot(predicate: Predicate, predicate_string: str | None = None, show_optim
         render_optimized(dot, predicate, node_nr)
 
     return dot
-
-
-def set_to_str(v: set) -> str:
-    # TODO: truncate if too many items.
-    items = ", ".join(str(item) for item in v)
-    return f"{{{items}}}"
 
 
 def render(dot, predicate: Predicate, node_nr: count):
