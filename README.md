@@ -38,6 +38,21 @@ filtered = [x for x in range(10) if between_2_and_3(x)]
 Of course this example looks way more complicated than the original version. The point here is that you can build
 reusable predicates that can be used in multiple locations.
 
+So lets do just that, reuse our predicate to create a generator. The ``generate_false`` will create an infinite
+series of integers for which the predicate ``between_2_and_3`` is False. The ``generate_true`` will create an
+infinite (well, with lots of duplicates obviously) series of integers for which the predicate is True.
+
+```python
+from predicate import generate_false, generate_true
+from more_itertools import take
+
+take(5, generate_true(between_2_and_3))
+
+take(5, generate_false(between_2_and_3))
+```
+
+This might be useful for example in unit tests.
+
 # Example 2
 
 A unique (?) py-predicate feature is that you can define self referencing predicates.
