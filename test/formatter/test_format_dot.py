@@ -1,5 +1,3 @@
-from dataclasses import dataclass
-
 import pytest
 
 from predicate import (
@@ -26,9 +24,20 @@ from predicate import (
     to_dot,
 )
 from predicate.named_predicate import NamedPredicate
-from predicate.predicate import Predicate
 from predicate.set_predicates import is_real_subset_p, is_real_superset_p, is_subset_p, is_superset_p
-from predicate.standard_predicates import ge_le_p, ge_lt_p, gt_le_p, gt_lt_p, is_truthy_p, root_p, tee_p, this_p
+from predicate.standard_predicates import (
+    ge_le_p,
+    ge_lt_p,
+    gt_le_p,
+    gt_lt_p,
+    is_dict_of_p,
+    is_int_p,
+    is_truthy_p,
+    is_tuple_of_p,
+    root_p,
+    tee_p,
+    this_p,
+)
 
 
 @pytest.mark.parametrize(
@@ -162,6 +171,22 @@ def test_format_dot_in():
     assert dot
 
 
+def test_format_dot_dict_of():
+    predicate = is_dict_of_p((is_str_p, is_int_p))
+
+    dot = to_dot(predicate)
+
+    assert dot
+
+
+def test_format_dot_tuple_of():
+    predicate = is_tuple_of_p(is_str_p, is_int_p)
+
+    dot = to_dot(predicate)
+
+    assert dot
+
+
 def test_format_dot_le():
     predicate = le_p(13)
 
@@ -282,13 +307,6 @@ def test_format_dot_laz_unknown():
     assert dot
 
 
-def test_format_dot_unknown():
-    @dataclass
-    class UnknownPredicate[T](Predicate[T]):
-        def __call__(self, *args, **kwargs) -> bool:
-            return False
-
-    predicate = UnknownPredicate()
-
+def test_format_dot_unknown(unknown_p):
     with pytest.raises(ValueError):
-        to_dot(predicate)
+        to_dot(unknown_p)

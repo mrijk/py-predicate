@@ -3,6 +3,7 @@ import pytest
 from predicate import (
     all_p,
     always_p,
+    any_p,
     eq_false_p,
     eq_p,
     eq_true_p,
@@ -30,6 +31,7 @@ from predicate.formatter.format_latex import to_latex
         (always_p ^ never_p, "True \\oplus False"),
         (~always_p, "\\neg True"),
         (all_p(ge_p(2)), "\\forall x \\in S, x \\ge 2"),
+        (any_p(ge_p(2)), "\\exists x \\in S, x \\ge 2"),
         (eq_p(2), "x = 2"),
         (eq_false_p, "x = False"),
         (eq_true_p, "x = True"),
@@ -59,3 +61,8 @@ def test_format_latex_one_level(predicate, expected):
 )
 def test_format_latex_two_levels(predicate, expected):
     assert to_latex(predicate) == expected
+
+
+def test_format_latex_unknown(unknown_p):
+    with pytest.raises(ValueError):
+        to_latex(unknown_p)

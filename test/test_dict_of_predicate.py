@@ -1,6 +1,6 @@
 import pytest
 
-from predicate import eq_p, is_dict_of_p, is_int_p, is_str_p
+from predicate import eq_p, explain, is_dict_of_p, is_int_p, is_str_p
 
 
 @pytest.mark.parametrize(
@@ -63,3 +63,10 @@ def test_is_dict_str_key(value, expected):
     predicate = is_dict_of_p(("x", is_int_p), (eq_p("y"), is_int_p))
 
     assert predicate(value) is expected
+
+
+def test_is_dict_of_explain():
+    predicate = is_dict_of_p(("x", is_int_p), (eq_p("y"), is_str_p))
+
+    expected = {"key_value_predicates": [], "result": False}
+    assert explain(predicate, {"x": 42, "y": 42}) == expected

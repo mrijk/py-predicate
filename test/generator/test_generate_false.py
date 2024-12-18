@@ -332,3 +332,8 @@ def assert_generated_false(predicate):
 
     for value in values:
         assert not predicate(value)
+
+
+def test_generate_false_unknown(unknown_p):
+    with pytest.raises(ValueError):
+        take(5, generate_false(unknown_p))
