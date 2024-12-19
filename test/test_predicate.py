@@ -31,7 +31,6 @@ from predicate.predicate import Predicate
 from predicate.standard_predicates import (
     all_p,
     is_container_p,
-    is_falsy_p,
     is_finite_p,
     is_hashable_p,
     is_inf_p,
@@ -40,7 +39,6 @@ from predicate.standard_predicates import (
     is_range_p,
     is_single_or_iterable_of_p,
     is_single_or_list_of_p,
-    is_truthy_p,
     neg_p,
     pos_p,
     tee_p,
@@ -54,16 +52,6 @@ def test_always_true_p():
 
 def test_always_false_p():
     assert not always_false_p(13)
-
-
-@pytest.mark.parametrize("value", [False, None, 0, {}, "", (), []])
-def test_is_falsy_p(value):
-    assert is_falsy_p(value)
-
-
-@pytest.mark.parametrize("value", [True, not None, 13, {1}, "foo", (1,), [1]])
-def test_is_truthy_p(value):
-    assert is_truthy_p(value)
 
 
 def test_eq_true_p():

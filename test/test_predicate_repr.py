@@ -68,6 +68,7 @@ from predicate.standard_predicates import (
         (has_key_p("foo"), 'has_key_p("foo")'),
         (has_length_p(42), "has_length_p(42)"),
         (in_p(2, 3, 4), "in_p(2, 3, 4)"),
+        # (is_callable_p, "is_callable_p"),
         (is_empty_p, "is_empty_p"),
         (is_lambda_p, "is_lambda_p"),
         (is_not_empty_p, "is_not_empty_p"),

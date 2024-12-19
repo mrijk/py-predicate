@@ -89,6 +89,7 @@ def generate_any_p(any_predicate: AnyPredicate, min_size: int = 0, max_size: int
 @generate_false.register
 def generate_and(predicate: AndPredicate) -> Iterator:
     if optimize(predicate) != always_true_p:
+        # TODO
         yield from (item for item in generate_false(predicate.left))
         yield from (item for item in generate_false(predicate.right))
 
@@ -136,6 +137,8 @@ def generate_ge_le(predicate: GeLePredicate) -> Iterator:
             smaller = random_floats(lower=predicate.lower - 100.0, upper=predicate.lower - 0.01)
             larger = random_floats(lower=predicate.upper + 0.01, upper=predicate.upper + 100.0)
             yield from interleave(smaller, larger)
+        case _:
+            yield from []
 
 
 @generate_false.register

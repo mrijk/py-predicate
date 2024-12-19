@@ -3,8 +3,8 @@ from collections.abc import Iterator
 from dataclasses import dataclass
 from functools import cached_property
 
+from predicate.helpers import predicate_in_predicate_tree
 from predicate.predicate import Predicate
-from predicate.this_predicate import predicate_in_predicate_tree
 
 
 @dataclass

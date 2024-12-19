@@ -2,10 +2,8 @@ import inspect
 from dataclasses import dataclass
 from functools import cached_property
 
-from predicate.all_predicate import AllPredicate
-from predicate.comp_predicate import CompPredicate
-from predicate.list_of_predicate import ListOfPredicate
-from predicate.predicate import AndPredicate, OrPredicate, Predicate
+from predicate.helpers import predicate_in_predicate_tree
+from predicate.predicate import Predicate
 
 
 @dataclass
@@ -34,25 +32,3 @@ def find_this_predicate(frame, predicate: Predicate) -> Predicate | None:
     if next_frame := frame.f_back:
         return find_this_predicate(next_frame, predicate)
     return None
-
-
-def predicate_in_predicate_tree(tree: Predicate, predicate: Predicate) -> bool:
-    from predicate.standard_predicates import PredicateFactory
-
-    match tree:
-        case AllPredicate(all_predicate):
-            return predicate_in_predicate_tree(all_predicate, predicate)
-        case ListOfPredicate(list_of_predicate):
-            return predicate_in_predicate_tree(list_of_predicate, predicate)
-        case AndPredicate(and_left, and_right):
-            return predicate_in_predicate_tree(and_left, predicate) or predicate_in_predicate_tree(and_right, predicate)
-        case CompPredicate(_, comp_predicate):
-            return predicate_in_predicate_tree(comp_predicate, predicate)
-        case OrPredicate(or_left, or_right):
-            return predicate_in_predicate_tree(or_left, predicate) or predicate_in_predicate_tree(or_right, predicate)
-        case PredicateFactory() as factory:
-            return factory.predicate == predicate
-        case _ if tree == predicate:
-            return True
-        case _:
-            return False
