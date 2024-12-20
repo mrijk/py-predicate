@@ -1,6 +1,7 @@
 from abc import abstractmethod
 from dataclasses import dataclass
 from datetime import datetime
+from ipaddress import IPv4Address, IPv6Address
 from typing import Any, Final, override
 from uuid import UUID
 
@@ -212,7 +213,7 @@ class XorPredicate[T](Predicate[T]):
         }
 
 
-type ConstrainedT[T: (int, str, float, datetime, UUID)] = T
+type ConstrainedT[T: (int, str, float, datetime, UUID, IPv4Address, IPv6Address)] = T
 
 
 @dataclass

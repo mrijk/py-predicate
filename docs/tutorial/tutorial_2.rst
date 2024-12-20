@@ -35,7 +35,7 @@ Now you are ready to check your new predicate against the requirements, for exam
 
 .. code-block:: python
 
-    from uuid import uuid
+    from uuid import uuid4
 
     predicate([(uuid4(), "foo", 1)])  # True: 1 is a truthy value
     predicate([(uuid4(), "meh", 1)])  # False: missing "foo" or "bar"

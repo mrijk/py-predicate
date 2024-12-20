@@ -87,6 +87,7 @@ from predicate import (
         is_uuid_p,
         ne_p(2),
         not_in_p(2, "foo", 4),
+        ne_p(2) & ne_p(3),
         is_int_p | is_str_p,
         ~is_int_p,
         is_int_p ^ is_str_p,
@@ -302,9 +303,14 @@ def test_generate_always_false_p():
     assert_generated_false(predicate)
 
 
-def test_generate_always_true_p():
-    predicate = always_true_p
-
+@pytest.mark.parametrize(
+    "predicate",
+    [
+        always_true_p,
+        always_true_p & always_true_p,
+    ],
+)
+def test_generate_always_true_p(predicate):
     assert not list(generate_false(predicate))
 
 
@@ -337,3 +343,33 @@ def assert_generated_false(predicate):
 def test_generate_false_unknown(unknown_p):
     with pytest.raises(ValueError):
         take(5, generate_false(unknown_p))
+
+
+@pytest.mark.parametrize(
+    "compare_predicate",
+    [
+        ge_p,
+        gt_p,
+        le_p,
+        lt_p,
+    ],
+)
+def test_generate_false_unknown_compare(compare_predicate):
+    predicate = compare_predicate(v=None)
+    with pytest.raises(ValueError):
+        take(5, generate_false(predicate))
+
+
+@pytest.mark.parametrize(
+    "range_predicate",
+    [
+        ge_le_p,
+        ge_lt_p,
+        gt_le_p,
+        gt_lt_p,
+    ],
+)
+def test_generate_false_unknown_range(range_predicate):
+    predicate = range_predicate(lower="bar", upper="foo")
+    with pytest.raises(ValueError):
+        take(5, generate_false(predicate))

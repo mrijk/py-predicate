@@ -16,6 +16,7 @@ from predicate.ge_predicate import GePredicate
 from predicate.gt_predicate import GtPredicate
 from predicate.has_key_predicate import HasKeyPredicate
 from predicate.has_length_predicate import HasLengthPredicate
+from predicate.has_path_predicate import HasPathPredicate
 from predicate.is_instance_predicate import IsInstancePredicate
 from predicate.is_none_predicate import IsNonePredicate
 from predicate.is_not_none_predicate import IsNotNonePredicate
@@ -179,8 +180,12 @@ def is_tuple_of_p(*predicates: Predicate) -> Predicate:
 
 def is_set_of_p[T](predicate: Predicate[T]) -> Predicate:
     """Return True if value is a set, and for all elements in the set the predicate is True, otherwise False."""
-    # return is_set_p & all_p(predicate)
     return SetOfPredicate(predicate)
+
+
+def has_path_p(*predicates: Predicate) -> Predicate:
+    """Return True if value is a dict, and contains the path specified by the predicates, otherwise False."""
+    return HasPathPredicate(list(predicates))
 
 
 def regex_p(pattern: str) -> Predicate[str]:

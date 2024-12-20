@@ -3,8 +3,7 @@
 __version__ = "0.0.1"
 
 from predicate.explain import explain
-from predicate.formatter.format_dot import to_dot
-from predicate.formatter.format_json import to_json
+from predicate.formatter import to_dot, to_json, to_latex
 from predicate.generator.generate_false import generate_false
 from predicate.generator.generate_true import generate_true
 from predicate.is_empty_predicate import is_empty_p, is_not_empty_p
@@ -163,6 +162,7 @@ __all__ = [
     "this_p",
     "to_dot",
     "to_json",
+    "to_latex",
     "zero_p",
 ]
 

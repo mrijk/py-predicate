@@ -7,7 +7,11 @@ from predicate import (
     eq_false_p,
     eq_p,
     eq_true_p,
+    ge_le_p,
+    ge_lt_p,
     ge_p,
+    gt_le_p,
+    gt_lt_p,
     gt_p,
     in_p,
     is_real_subset_p,
@@ -18,9 +22,9 @@ from predicate import (
     neg_p,
     never_p,
     pos_p,
+    to_latex,
     zero_p,
 )
-from predicate.formatter.format_latex import to_latex
 
 
 @pytest.mark.parametrize(
@@ -36,7 +40,11 @@ from predicate.formatter.format_latex import to_latex
         (eq_false_p, "x = False"),
         (eq_true_p, "x = True"),
         (ge_p(2), "x \\ge 2"),
+        (ge_le_p(0, 3), "0 \\le x \\le 3"),
+        (ge_lt_p(0, 3), "0 \\le x \\lt 3"),
         (gt_p(2), "x \\gt 2"),
+        (gt_le_p(0, 3), "0 \\lt x \\le 3"),
+        (gt_lt_p(0, 3), "0 \\lt x \\lt 3"),
         (in_p(2, 3, 4), "x \\in \\{2, 3, 4\\}"),
         (le_p(2), "x \\le 2"),
         (lt_p(2), "x \\lt 2"),

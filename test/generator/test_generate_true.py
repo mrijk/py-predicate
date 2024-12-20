@@ -1,5 +1,6 @@
 import uuid
 from datetime import datetime, timedelta
+from ipaddress import IPv4Network
 
 import pytest
 from more_itertools import take
@@ -49,9 +50,11 @@ from predicate.standard_predicates import (
     is_container_p,
     is_dict_of_p,
     is_dict_p,
+    is_instance_p,
     is_iterable_p,
     is_list_p,
     is_set_p,
+    is_tuple_p,
     le_p,
     lt_p,
     neg_p,
@@ -90,12 +93,13 @@ from predicate.standard_predicates import (
         # is_predicate_p,
         is_set_p,
         is_str_p,
+        is_tuple_p,
         is_int_p | is_str_p,
         ~is_int_p,
         is_int_p ^ is_str_p,
         is_uuid_p,
         ne_p(2),
-        not_in_p(2, "foo", 4),
+        not_in_p(2, "foo", uuid.uuid4()),
         regex_p("^foo"),
         neg_p,
         pos_p,
@@ -348,3 +352,45 @@ def assert_generated_true(predicate):
 def test_generate_false_unknown(unknown_p):
     with pytest.raises(ValueError):
         take(5, generate_true(unknown_p))
+
+
+@pytest.mark.parametrize(
+    "compare_predicate",
+    [
+        ge_p,
+        gt_p,
+        le_p,
+        lt_p,
+    ],
+)
+def test_generate_true_unknown_compare(compare_predicate):
+    predicate = compare_predicate(v=None)
+    with pytest.raises(ValueError):
+        take(5, generate_true(predicate))
+
+
+@pytest.mark.parametrize(
+    "range_predicate",
+    [
+        ge_le_p,
+        ge_lt_p,
+        gt_le_p,
+        gt_lt_p,
+    ],
+)
+def test_generate_true_unknown_range(range_predicate):
+    predicate = range_predicate(lower="bar", upper="foo")
+    with pytest.raises(ValueError):
+        take(5, generate_true(predicate))
+
+
+def test_generate_true_not_in_p_unknown():
+    predicate = not_in_p(None)
+    with pytest.raises(ValueError):
+        take(5, generate_true(predicate))
+
+
+def test_generate_true_is_instance_unknown():
+    predicate = is_instance_p(IPv4Network)
+    with pytest.raises(ValueError, match="No generator found"):
+        take(5, generate_true(predicate))

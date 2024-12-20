@@ -3,6 +3,7 @@ import string
 import sys
 from collections.abc import Iterable
 from datetime import datetime, timedelta
+from itertools import cycle
 from random import choices
 from typing import Iterator
 from uuid import UUID, uuid4
@@ -21,11 +22,13 @@ def random_first_from_iterables(*iterables: Iterable) -> Iterator:
 
 
 def random_complex_numbers() -> Iterator:
-    yield complex(1, 1)
+    while True:
+        yield complex(1, 1)  # TODO
 
 
 def random_callables() -> Iterator:
-    yield from (lambda x: x,)  # TODO: add more Callable's
+    while True:
+        yield from (lambda x: x,)  # TODO: add more Callable's
 
 
 def random_dicts() -> Iterator:
@@ -66,6 +69,14 @@ def random_sets(min_size: int = 0, max_size: int = 10) -> Iterator:
         yield set(values)
 
 
+def random_bools() -> Iterator:
+    yield from cycle((False, True))
+
+
+def random_containers() -> Iterator:
+    yield from cycle(([], {}))
+
+
 def random_strings(min_size: int = 0, max_size: int = 10) -> Iterator:
     population = string.ascii_letters + string.digits
     while True:
@@ -102,8 +113,10 @@ def random_iterables(min_size: int = 0, max_size: int = 10) -> Iterator[Iterable
     if max_size == 0:
         yield from ([], {}, (), "")
     else:
-        while True:
-            yield from random_sets(min_size=min_size, max_size=max_size)
+        iterable_1 = random_sets(min_size=min_size, max_size=max_size)
+        iterable_2 = random_lists(min_size=min_size, max_size=max_size)
+        iterable_3 = random_tuples(min_size=min_size, max_size=max_size)
+        yield from random_first_from_iterables(iterable_1, iterable_2, iterable_3)
 
 
 def random_lists(min_size: int = 0, max_size: int = 10) -> Iterator[Iterable]:
@@ -112,6 +125,14 @@ def random_lists(min_size: int = 0, max_size: int = 10) -> Iterator[Iterable]:
     while True:
         length = random.randint(min_size, max_size)
         yield take(length, random_anys())
+
+
+def random_tuples(min_size: int = 0, max_size: int = 10) -> Iterator[Iterable]:
+    if min_size == 0:
+        yield ()
+    while True:
+        length = random.randint(min_size, max_size)
+        yield tuple(take(length, random_anys()))
 
 
 def random_uuids() -> Iterator[UUID]:

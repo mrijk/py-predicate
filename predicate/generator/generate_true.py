@@ -3,7 +3,7 @@ import sys
 from collections.abc import Callable, Container, Iterable, Iterator
 from datetime import datetime, timedelta
 from functools import singledispatch
-from itertools import cycle, repeat
+from itertools import repeat
 from typing import Any
 from uuid import UUID
 
@@ -11,7 +11,6 @@ import exrex  # type: ignore
 from more_itertools import (
     chunked,
     flatten,
-    interleave,
     powerset_of_sets,
     random_combination_with_replacement,
     random_permutation,
@@ -29,8 +28,10 @@ from predicate.generator.helpers import (
     generate_strings,
     generate_uuids,
     random_anys,
+    random_bools,
     random_callables,
     random_complex_numbers,
+    random_containers,
     random_datetimes,
     random_dicts,
     random_first_from_iterables,
@@ -41,6 +42,7 @@ from predicate.generator.helpers import (
     random_predicates,
     random_sets,
     random_strings,
+    random_tuples,
     random_uuids,
 )
 from predicate.gt_predicate import GtPredicate
@@ -131,8 +133,17 @@ def generate_and(predicate: AndPredicate) -> Iterator:
     if optimize(predicate) == always_false_p:
         yield from []
     else:
-        yield from (item for item in generate_true(predicate.left) if predicate.right(item))
-        yield from (item for item in generate_true(predicate.right) if predicate.left(item))
+        attempts = 100
+        try_left = (item for item in take(attempts, generate_true(predicate.left)) if predicate.right(item))
+        try_right = (item for item in take(attempts, generate_true(predicate.right)) if predicate.left(item))
+
+        range_1 = (item for item in generate_true(predicate.left) if predicate.right(item)) if try_left else ()
+        range_2 = (item for item in generate_true(predicate.right) if predicate.left(item)) if try_right else ()
+
+        if range_1 or range_2:
+            yield from random_first_from_iterables(range_1, range_2)
+
+        raise ValueError(f"Couldn't generate values that statisfy {predicate}")
 
 
 @generate_true.register
@@ -147,53 +158,59 @@ def generate_always_false(_predicate: AlwaysFalsePredicate) -> Iterator:
 
 @generate_true.register
 def generate_ge_le(predicate: GeLePredicate) -> Iterator:
-    match predicate.lower:
-        case datetime():
-            yield from random_datetimes(lower=predicate.lower, upper=predicate.upper)
-        case int():
-            yield from random_ints(lower=predicate.lower, upper=predicate.upper)
-        case float():
-            yield from random_floats(lower=predicate.lower, upper=predicate.upper)
+    match lower := predicate.lower, upper := predicate.upper:
+        case datetime(), _:
+            yield from random_datetimes(lower=lower, upper=upper)
+        case int(), _:
+            yield from random_ints(lower=lower, upper=upper)
+        case float(), _:
+            yield from random_floats(lower=lower, upper=upper)
+        case _:
+            raise ValueError(f"Can't generate for type {type(lower)}")
 
 
 @generate_true.register
 def generate_ge_lt(predicate: GeLtPredicate) -> Iterator:
-    match predicate.lower:
-        case datetime():
-            yield from random_datetimes(lower=predicate.lower, upper=predicate.upper - timedelta(seconds=1))
-        case int():
-            yield from random_ints(lower=predicate.lower, upper=predicate.upper - 1)
-        case float():
-            yield from random_floats(lower=predicate.lower, upper=predicate.upper - 0.01)  # TODO
+    match lower := predicate.lower, upper := predicate.upper:
+        case datetime(), _:
+            yield from random_datetimes(lower=lower, upper=upper - timedelta(seconds=1))
+        case int(), _:
+            yield from random_ints(lower=lower, upper=upper - 1)
+        case float(), _:
+            yield from random_floats(lower=lower, upper=upper - 0.01)  # TODO
+        case _:
+            raise ValueError(f"Can't generate for type {type(lower)}")
 
 
 @generate_true.register
 def generate_gt_le(predicate: GtLePredicate) -> Iterator:
-    match predicate.lower:
-        case datetime():
-            yield from random_datetimes(lower=predicate.lower + timedelta(seconds=1), upper=predicate.upper)
-        case int():
-            yield from random_ints(lower=predicate.lower + 1, upper=predicate.upper)
-        case float():
-            yield from random_floats(lower=predicate.lower + 0.01, upper=predicate.upper)
+    match lower := predicate.lower, upper := predicate.upper:
+        case datetime(), _:
+            yield from random_datetimes(lower=lower + timedelta(seconds=1), upper=upper)
+        case int(), _:
+            yield from random_ints(lower=lower + 1, upper=upper)
+        case float(), _:
+            yield from random_floats(lower=lower + 0.01, upper=upper)
+        case _:
+            raise ValueError(f"Can't generate for type {type(lower)}")
 
 
 @generate_true.register
 def generate_gt_lt(predicate: GtLtPredicate) -> Iterator:
-    match predicate.lower:
-        case datetime():
-            yield from random_datetimes(
-                lower=predicate.lower + timedelta(seconds=1), upper=predicate.upper - timedelta(seconds=1)
-            )
-        case int():
-            yield from random_ints(lower=predicate.lower + 1, upper=predicate.upper - 1)
-        case float():
-            yield from random_floats(lower=predicate.lower + 1, upper=predicate.upper - 0.01)  # TODO
+    match lower := predicate.lower, upper := predicate.upper:
+        case datetime(), _:
+            yield from random_datetimes(lower=lower + timedelta(seconds=1), upper=upper - timedelta(seconds=1))
+        case int(), _:
+            yield from random_ints(lower=lower + 1, upper=upper - 1)
+        case float(), _:
+            yield from random_floats(lower=lower + 0.01, upper=upper - 0.01)  # TODO
+        case _:
+            raise ValueError(f"Can't generate for type {type(lower)}")
 
 
 @generate_true.register
 def generate_ge(predicate: GePredicate) -> Iterator:
-    match predicate.v:
+    match v := predicate.v:
         case datetime():
             yield from random_datetimes(lower=predicate.v)
         case float():
@@ -204,11 +221,13 @@ def generate_ge(predicate: GePredicate) -> Iterator:
             yield from generate_strings(predicate)
         case UUID():
             yield from generate_uuids(predicate)
+        case _:
+            raise ValueError(f"Can't generate for type {type(v)}")
 
 
 @generate_true.register
 def generate_gt(predicate: GtPredicate) -> Iterator:
-    match predicate.v:
+    match v := predicate.v:
         case datetime():
             yield from random_datetimes(lower=predicate.v + timedelta(seconds=1))
         case float():
@@ -219,6 +238,8 @@ def generate_gt(predicate: GtPredicate) -> Iterator:
             yield from generate_strings(predicate)
         case UUID():
             yield from generate_uuids(predicate)
+        case _:
+            raise ValueError(f"Can't generate for type {type(v)}")
 
 
 @generate_true.register
@@ -236,7 +257,7 @@ def generate_has_length(predicate: HasLengthPredicate) -> Iterator:
 
 @generate_true.register
 def generate_le(predicate: LePredicate) -> Iterator:
-    match predicate.v:
+    match v := predicate.v:
         case datetime():
             yield from random_datetimes(upper=predicate.v)
         case float():
@@ -247,6 +268,8 @@ def generate_le(predicate: LePredicate) -> Iterator:
             yield from generate_strings(predicate)
         case UUID():
             yield from generate_uuids(predicate)
+        case _:
+            raise ValueError(f"Can't generate for type {type(v)}")
 
 
 @generate_true.register
@@ -276,7 +299,7 @@ def generate_is_not_empty(_predicate: IsNotEmptyPredicate) -> Iterator:
 
 @generate_true.register
 def generate_lt(predicate: LtPredicate) -> Iterator:
-    match predicate.v:
+    match v := predicate.v:
         case datetime():
             yield from random_datetimes(upper=predicate.v - timedelta(seconds=1))
         case float():
@@ -287,6 +310,8 @@ def generate_lt(predicate: LtPredicate) -> Iterator:
             yield from generate_strings(predicate)
         case UUID():
             yield from generate_uuids(predicate)
+        case _:
+            raise ValueError(f"Can't generate for type {type(v)}")
 
 
 @generate_true.register
@@ -308,12 +333,17 @@ def generate_not(predicate: NotPredicate) -> Iterator:
 
 @generate_true.register
 def generate_not_in(predicate: NotInPredicate) -> Iterator:
+    # TODO: not correct yet
     for item in predicate.v:
         match item:
             case int():
                 yield from generate_ints(predicate)
             case str():
                 yield from generate_strings(predicate)
+            case UUID():
+                yield from generate_uuids(predicate)
+            case _:
+                raise ValueError(f"Can't generate for type {type(item)}")
 
 
 @generate_true.register
@@ -347,11 +377,11 @@ def generate_is_instance_p(predicate: IsInstancePredicate) -> Iterator:
 
     type_registry: dict[Any, Callable[[], Iterator]] = {
         Callable: random_callables,
-        Container: lambda: ([], {}),  # type: ignore
+        Container: random_containers,
         Iterable: random_iterables,
         Predicate: random_predicates,
         UUID: random_uuids,
-        bool: lambda: cycle((False, True)),
+        bool: random_bools,
         complex: random_complex_numbers,
         datetime: random_datetimes,
         dict: random_dicts,
@@ -360,10 +390,13 @@ def generate_is_instance_p(predicate: IsInstancePredicate) -> Iterator:
         int: random_ints,
         set: random_sets,
         str: random_strings,
+        tuple: random_tuples,
     }
 
     if generator := type_registry.get(klass):
         yield from generator()
+
+    raise ValueError(f"No generator found for {klass}")
 
 
 @generate_true.register
@@ -419,4 +452,4 @@ def generate_xor(predicate: XorPredicate) -> Iterator:
     else:
         left_and_not_right = (item for item in generate_true(predicate.left) if not predicate.right(item))
         right_and_not_left = (item for item in generate_true(predicate.right) if not predicate.left(item))
-        yield from interleave(left_and_not_right, right_and_not_left)
+        yield from random_first_from_iterables(left_and_not_right, right_and_not_left)

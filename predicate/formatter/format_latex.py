@@ -15,6 +15,7 @@ from predicate.predicate import (
     Predicate,
     XorPredicate,
 )
+from predicate.range_predicate import GeLePredicate, GeLtPredicate, GtLePredicate, GtLtPredicate
 from predicate.set_predicates import InPredicate, IsRealSubsetPredicate, IsSubsetPredicate
 
 
@@ -40,6 +41,14 @@ def to_latex(predicate: Predicate) -> str:
             return f"x = {v}"
         case GePredicate(v):
             return f"x \\ge {v}"
+        case GeLePredicate(lower, upper):
+            return f"{lower} \\le x \\le {upper}"
+        case GeLtPredicate(lower, upper):
+            return f"{lower} \\le x \\lt {upper}"
+        case GtLePredicate(lower, upper):
+            return f"{lower} \\lt x \\le {upper}"
+        case GtLtPredicate(lower, upper):
+            return f"{lower} \\lt x \\lt {upper}"
         case GtPredicate(v):
             return f"x \\gt {v}"
         case InPredicate(v):

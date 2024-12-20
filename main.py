@@ -5,8 +5,7 @@ from typing import Annotated
 import typer
 
 from predicate import optimize as optimize_predicate
-from predicate import to_json
-from predicate.formatter.format_dot import to_dot
+from predicate.formatter import to_dot, to_json, to_latex
 from predicate.parser import parse_expression
 from predicate.predicate import Predicate
 from predicate.truth_table import get_named_predicates, truth_table
@@ -30,6 +29,14 @@ def dot(expression: str, optimize: Optimize = False) -> None:
 def json(expression: Expression, optimize: Optimize = False) -> None:
     if predicate := expression_to_predicate(expression, optimize):
         sys.stdout.write(json_lib.dumps(to_json(predicate)))
+    else:
+        failed_to_pass(expression)
+
+
+@app.command("latex", help="Output predicate as LaTeX")
+def latex(expression: Expression, optimize: Optimize = False) -> None:
+    if predicate := expression_to_predicate(expression, optimize):
+        sys.stdout.write(to_latex(predicate))
     else:
         failed_to_pass(expression)
 

@@ -50,7 +50,7 @@ def test_construct(predicate):
     true_set = take(5, generate_true(predicate))
     false_set = take(5, generate_false(predicate))
 
-    created_predicates = take(6, construct(false_set=false_set, true_set=true_set))
+    created_predicates = take(10, construct(false_set=false_set, true_set=true_set))
 
     assert optimize(predicate) in created_predicates
 
