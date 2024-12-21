@@ -44,6 +44,7 @@ from predicate.generator.helpers import (
     random_strings,
     random_tuples,
     random_uuids,
+    set_from_list,
 )
 from predicate.gt_predicate import GtPredicate
 from predicate.has_key_predicate import HasKeyPredicate
@@ -85,7 +86,8 @@ def generate_true[T](predicate: Predicate[T]) -> Iterator[T]:
 
 @generate_true.register
 def generate_all_p(all_predicate: AllPredicate, *, min_size: int = 1, max_size: int = 10) -> Iterator:
-    yield []
+    if min_size == 0:
+        yield []
 
     predicate = all_predicate.predicate
 
@@ -118,9 +120,9 @@ def generate_any_p(any_predicate: AnyPredicate, *, min_size: int = 1, max_size: 
         combined_values = false_values + true_values
 
         yield random_permutation(combined_values)
-
-        if len(result := set(random_permutation(combined_values))) == length:
-            yield result
+        yield from set_from_list(
+            combined_values,
+        )
 
 
 @generate_true.register
@@ -284,7 +286,8 @@ def generate_real_subset(predicate: IsRealSubsetPredicate) -> Iterator:
 
 @generate_true.register
 def generate_in(predicate: InPredicate) -> Iterator:
-    yield from predicate.v
+    while True:
+        yield from predicate.v
 
 
 @generate_true.register
@@ -440,9 +443,7 @@ def generate_set_of_p(
         length = random.randint(min_size, max_size)
         values = take(length, generate_true(predicate))
 
-        # set sizes can be smaller than required, because of duplicates
-        if len(result := set(values)) == length:
-            yield result if order else random_permutation(result)
+        yield from set_from_list(values, order)
 
 
 @generate_true.register

@@ -8,9 +8,10 @@ from random import choices
 from typing import Iterator
 from uuid import UUID, uuid4
 
-from more_itertools import interleave, take
+from more_itertools import first, interleave, random_permutation, take
 
 from predicate.predicate import Predicate
+from predicate.standard_predicates import is_hashable_p
 
 
 def random_first_from_iterables(*iterables: Iterable) -> Iterator:
@@ -19,6 +20,13 @@ def random_first_from_iterables(*iterables: Iterable) -> Iterator:
     while True:
         chosen_iterable = random.choice(non_empty_iterables)
         yield next(iter(chosen_iterable))
+
+
+def set_from_list[T](value: list[T], order: bool = False) -> Iterator[T]:
+    length = len(value)
+    if length and is_hashable_p(first(value)):
+        if len(result := set(value)) == length:
+            yield result if order else random_permutation(result)
 
 
 def random_complex_numbers() -> Iterator:
