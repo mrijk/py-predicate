@@ -22,7 +22,7 @@ def random_first_from_iterables(*iterables: Iterable) -> Iterator:
         yield next(iter(chosen_iterable))
 
 
-def set_from_list[T](value: list[T], order: bool = False) -> Iterator[T]:
+def set_from_list(value: list, order: bool = False) -> Iterator:
     length = len(value)
     if length and is_hashable_p(first(value)):
         if len(result := set(value)) == length:
