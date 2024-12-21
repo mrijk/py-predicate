@@ -33,3 +33,18 @@ Predicates can also be rendered in a visual way, using `Graphviz <https://graphv
     dot.render("/tmp/predicate.gv", view=True)
 
 In sample above, we render a simple predicate.
+
+LaTeX
+-----
+
+This formatter will output the predicate as a text string in `Latex https://www.latex-project.org/`_ format:
+
+.. code-block:: python
+
+    from predicate import to_latex, ne_p
+
+    predicate = ne_p(13)
+
+    latex = to_latex(predicate)
+
+    assert latex == "x \\neq 2"

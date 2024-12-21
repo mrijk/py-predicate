@@ -15,6 +15,10 @@ def first_false[T](iterable: Iterable[T], predicate: Predicate[T]) -> T:
     return first(filterfalse(predicate, iterable))
 
 
+def predicates_repr(predicates: list[Predicate]) -> str:
+    return ", ".join(repr(predicate) for predicate in predicates)
+
+
 def predicate_in_predicate_tree(tree: Predicate, predicate: Predicate) -> bool:
     from predicate.all_predicate import AllPredicate
     from predicate.list_of_predicate import ListOfPredicate

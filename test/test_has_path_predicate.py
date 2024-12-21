@@ -1,5 +1,5 @@
 from predicate import explain
-from predicate.standard_predicates import eq_p, has_path_p, is_int_p
+from predicate.standard_predicates import eq_p, ge_p, has_path_p, is_int_p, is_list_p
 
 
 def test_has_path_predicate():
@@ -34,7 +34,10 @@ def test_has_path_predicate_nested():
 
 def test_has_path_predicate_with_list():
     has_x = eq_p("x")
-    predicate = has_path_p(has_x)
+    has_y = eq_p("y")
+    ge_2 = ge_p(13)
+
+    predicate = has_path_p(has_x, is_list_p, has_y, ge_2)
 
     assert predicate({"x": [{"y": 13}]})
 

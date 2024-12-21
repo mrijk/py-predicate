@@ -24,7 +24,7 @@ class IsCallablePredicate[T](Predicate[T]):
                 return False
 
     def __repr__(self) -> str:
-        return "is_callable_p"
+        return "is_callable_p()"
 
     @override
     def explain_failure(self, x: Any) -> dict:
