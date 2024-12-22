@@ -21,6 +21,9 @@ class ListOfPredicate[T](Predicate[T]):
             case _:
                 return False
 
+    def __contains__(self, predicate: Predicate[T]) -> bool:
+        return predicate in self.predicate
+
     def __repr__(self) -> str:
         return f"is_list_of_p({self.predicate})"
 

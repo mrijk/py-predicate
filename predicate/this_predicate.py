@@ -2,7 +2,6 @@ import inspect
 from dataclasses import dataclass
 from functools import cached_property
 
-from predicate.helpers import predicate_in_predicate_tree
 from predicate.predicate import Predicate
 
 
@@ -27,7 +26,7 @@ class ThisPredicate[T](Predicate[T]):
 def find_this_predicate(frame, predicate: Predicate) -> Predicate | None:
     for key, value in frame.f_locals.items():
         if isinstance(value, Predicate) and value != predicate and key != "self":
-            if predicate_in_predicate_tree(value, predicate):
+            if predicate in value:
                 return value
     if next_frame := frame.f_back:
         return find_this_predicate(next_frame, predicate)

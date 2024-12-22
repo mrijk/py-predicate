@@ -13,6 +13,9 @@ class AnyPredicate[T](Predicate[T]):
     def __call__(self, iterable: Iterable[T]) -> bool:
         return any(self.predicate(x) for x in iterable)
 
+    def __contains__(self, predicate: Predicate[T]) -> bool:
+        return predicate in self.predicate
+
     def __repr__(self) -> str:
         return f"any({repr(self.predicate)})"
 

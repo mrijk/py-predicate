@@ -30,6 +30,10 @@ class Predicate[T]:
         """Return the 'negated' predicate."""
         return NotPredicate(predicate=self)
 
+    def __contains__(self, predicate: "Predicate") -> bool:
+        """Return True if the predicate argument is part of this predicate, otherwise False."""
+        return predicate == self
+
     def explain(self, x: Any) -> dict:
         if self(x):
             return {"result": True}
@@ -81,6 +85,9 @@ class AndPredicate[T](Predicate[T]):
 
     def __repr__(self) -> str:
         return f"{repr(self.left)} & {repr(self.right)}"
+
+    def __contains__(self, predicate: Predicate[T]) -> bool:
+        return predicate in self.left or predicate in self.right
 
     @override
     def explain_failure(self, x: T) -> dict:
@@ -165,6 +172,9 @@ class OrPredicate[T](Predicate[T]):
 
     def __repr__(self) -> str:
         return f"{repr(self.left)} | {repr(self.right)}"
+
+    def __contains__(self, predicate: Predicate[T]) -> bool:
+        return predicate in self.left or predicate in self.right
 
     @override
     def explain_failure(self, x: T) -> dict:

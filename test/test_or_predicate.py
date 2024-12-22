@@ -45,6 +45,14 @@ def test_or_always_true():
     assert always_true(None)
 
 
+def test_or_contains(p, q, r):
+    predicate = p | q
+
+    assert r not in predicate
+    assert p in predicate
+    assert q in predicate
+
+
 def test_or_explain():
     p = gt_p(4)
     q = lt_p(3)

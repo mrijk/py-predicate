@@ -47,6 +47,14 @@ def test_and_associative(p, q, r):
     pass
 
 
+def test_and_contains(p, q, r):
+    predicate = p & q
+
+    assert r not in predicate
+    assert p in predicate
+    assert q in predicate
+
+
 def test_and_explain():
     p = gt_p(2)
     q = lt_p(4)

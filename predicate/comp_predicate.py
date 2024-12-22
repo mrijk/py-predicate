@@ -17,6 +17,9 @@ class CompPredicate[S, T](Predicate[T]):
     def __repr__(self) -> str:
         return f"comp_p({repr(self.predicate)})"
 
+    def __contains__(self, predicate: Predicate[T]) -> bool:
+        return predicate in self.predicate
+
     @override
     def explain_failure(self, x: S) -> dict:
         return {"reason": self.predicate.explain(x)}
