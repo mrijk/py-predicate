@@ -117,13 +117,13 @@ def has_length_p(length: int) -> Predicate[Iterable]:
     return HasLengthPredicate(length=length)
 
 
-neg_p = lt_p(0)
+neg_p: Final[LtPredicate] = lt_p(0)
 """Returns True of the value is negative, otherwise False."""
 
-zero_p = eq_p(0)
+zero_p: Final[EqPredicate] = eq_p(0)
 """Returns True of the value is zero, otherwise False."""
 
-pos_p = gt_p(0)
+pos_p: Final[GtPredicate] = gt_p(0)
 """Returns True of the value is positive, otherwise False."""
 
 

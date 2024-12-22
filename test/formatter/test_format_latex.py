@@ -25,6 +25,7 @@ from predicate import (
     to_latex,
     zero_p,
 )
+from predicate.implies_predicate import implies_p
 
 
 @pytest.mark.parametrize(
@@ -45,6 +46,7 @@ from predicate import (
         (gt_p(2), "x \\gt 2"),
         (gt_le_p(0, 3), "0 \\lt x \\le 3"),
         (gt_lt_p(0, 3), "0 \\lt x \\lt 3"),
+        (implies_p(ge_p(2)), "p \\implies x \\ge 2"),
         (in_p(2, 3, 4), "x \\in \\{2, 3, 4\\}"),
         (le_p(2), "x \\le 2"),
         (lt_p(2), "x \\lt 2"),

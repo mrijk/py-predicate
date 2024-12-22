@@ -25,6 +25,7 @@ class HasPathPredicate[T](Predicate[T]):
     def explain_failure(self, x: Any) -> dict:
         match x:
             case dict():
+                # TODO: more details about first part of path that didn't match
                 return {"reason": f"Dictionary {x} didn't match path"}
             case _:
                 return {"reason": f"Value {x} is not a dict"}

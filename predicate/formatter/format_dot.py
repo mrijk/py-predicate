@@ -204,15 +204,12 @@ def render_lazy_references(dot, node_predicate_mapping) -> None:
 
     for node, predicate in node_predicate_mapping.items():
         match predicate:
-            case LazyPredicate():
-                if reference := find_predicate_by_ref(frame, predicate.ref):
-                    add_dashed_line(node, reference)
-            case RootPredicate():
-                if root := find_root_predicate(frame, predicate):
-                    add_dashed_line(node, root)
-            case ThisPredicate():
-                if this := find_this_predicate(frame, predicate):
-                    add_dashed_line(node, this)
+            case LazyPredicate() if reference := find_predicate_by_ref(frame, predicate.ref):
+                add_dashed_line(node, reference)
+            case RootPredicate() if root := find_root_predicate(frame, predicate):
+                add_dashed_line(node, root)
+            case ThisPredicate() if this := find_this_predicate(frame, predicate):
+                add_dashed_line(node, this)
 
 
 def render_original(dot, predicate: Predicate, node_nr) -> None:

@@ -2,6 +2,8 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from typing import Any, override
 
+from more_itertools import first
+
 from predicate.predicate import Predicate
 
 
@@ -24,7 +26,8 @@ class IsCallablePredicate[T](Predicate[T]):
                 return False
 
     def __repr__(self) -> str:
-        return "is_callable_p()"
+        return_type = self.return_type.__name__
+        return f"is_callable_p([], {return_type})"
 
     @override
     def explain_failure(self, x: Any) -> dict:
@@ -36,6 +39,17 @@ class IsCallablePredicate[T](Predicate[T]):
                 if return_type != self.return_type:
                     return {"reason": f"Wrong return type: {return_type}"}
 
-                return {"reason": "tbd"}
+                params = [param for key, param in annotations.items() if key != "return"]
+                combined = zip(self.params, params, strict=False)
+                different = first(
+                    (expected_param, param) for expected_param, param in combined if expected_param != param
+                )
+                expected, actual = different
+
+                return {"reason": f"Got type {actual.__name__}, expected {expected.__name__}"}
             case _:
                 return {"reason": f"{x} is not a Callable"}
+
+
+def is_callable_p(params: list, return_type: Any) -> IsCallablePredicate:
+    return IsCallablePredicate(params, return_type)

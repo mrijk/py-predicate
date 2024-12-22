@@ -53,3 +53,13 @@ def test_has_path_predicate_no_dict_explain():
 
     expected = {"reason": "Value foo is not a dict", "result": False}
     assert explain(predicate, "foo") == expected
+
+
+def test_has_path_predicate_no_match_explain():
+    has_x = eq_p("x")
+    has_y = eq_p("y")
+    y_is_13 = eq_p(13)
+    predicate = has_path_p(has_x, has_y, y_is_13)
+
+    expected = {"reason": "Dictionary {'y': 13} didn't match path", "result": False}
+    assert explain(predicate, {"y": 13}) == expected

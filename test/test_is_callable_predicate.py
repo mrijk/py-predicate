@@ -33,6 +33,16 @@ def test_is_callable_explain_wrong_return_type():
     assert explain(predicate, incorrect_return) == expected
 
 
+def test_is_callable_explain_wrong_parameter_types():
+    def incorrect_return(x: str) -> bool:
+        return True
+
+    predicate = is_callable_p([int], bool)
+
+    expected = {"reason": "Got type str, expected int", "result": False}
+    assert explain(predicate, incorrect_return) == expected
+
+
 def test_is_callable_explain_not_callable():
     predicate = is_callable_p([int], bool)
 

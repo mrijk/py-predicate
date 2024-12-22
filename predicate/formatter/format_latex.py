@@ -3,6 +3,7 @@ from predicate.any_predicate import AnyPredicate
 from predicate.eq_predicate import EqPredicate
 from predicate.ge_predicate import GePredicate
 from predicate.gt_predicate import GtPredicate
+from predicate.implies_predicate import ImpliesPredicate
 from predicate.le_predicate import LePredicate
 from predicate.lt_predicate import LtPredicate
 from predicate.ne_predicate import NePredicate
@@ -51,6 +52,8 @@ def to_latex(predicate: Predicate) -> str:
             return f"{lower} \\lt x \\lt {upper}"
         case GtPredicate(v):
             return f"x \\gt {v}"
+        case ImpliesPredicate(p):
+            return f"p \\implies {to_latex(p)}"
         case InPredicate(v):
             return f"x \\in {set_to_latex_set(v)}"
         case IsRealSubsetPredicate(v):

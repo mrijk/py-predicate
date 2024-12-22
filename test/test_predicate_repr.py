@@ -24,7 +24,9 @@ from predicate import (
     not_in_p,
     regex_p,
 )
+from predicate.implies_predicate import implies_p
 from predicate.ip_address_predicates import is_ipv4_network_global_p
+from predicate.is_callable_predicate import is_callable_p
 from predicate.is_empty_predicate import is_not_empty_p
 from predicate.named_predicate import NamedPredicate
 from predicate.set_predicates import is_real_subset_p, is_real_superset_p, is_subset_p, is_superset_p
@@ -69,8 +71,9 @@ from predicate.standard_predicates import (
         (has_key_p("foo"), 'has_key_p("foo")'),
         (has_length_p(42), "has_length_p(42)"),
         (has_path_p(is_str_p), "has_path_p(is_str_p)"),
+        (implies_p(ge_p(2)), "implies_p(ge_p(2))"),
         (in_p(2, 3, 4), "in_p(2, 3, 4)"),
-        # (is_callable_p, "is_callable_p"),
+        (is_callable_p([int], bool), "is_callable_p([], bool)"),
         (is_empty_p, "is_empty_p"),
         (is_lambda_p, "is_lambda_p"),
         (is_not_empty_p, "is_not_empty_p"),

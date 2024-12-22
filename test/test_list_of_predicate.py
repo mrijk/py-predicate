@@ -16,7 +16,7 @@ def test_is_list_of_explain():
     assert explain(predicate, ["one", "two", 3]) == expected
 
 
-def test_is_list_of_explain_no_list():
+def test_is_list_of_explain_not_a_list():
     predicate = is_list_of_p(is_str_p)
 
     expected = {"reason": "3 is not an instance of a list", "result": False}

@@ -1,15 +1,7 @@
 from lark import Lark, Transformer, UnexpectedEOF  # type: ignore
 
 from predicate.named_predicate import NamedPredicate
-from predicate.predicate import (
-    AndPredicate,
-    NotPredicate,
-    OrPredicate,
-    Predicate,
-    XorPredicate,
-    always_false_p,
-    always_true_p,
-)
+from predicate.predicate import Predicate, always_false_p, always_true_p
 
 grammar = Lark(
     """
@@ -37,9 +29,9 @@ class _PredicateTransformer(Transformer):
     def predicate(self, item) -> Predicate:
         return item[0]
 
-    def and_expression(self, items):
+    def and_expression(self, items: tuple[Predicate, Predicate]):
         left, right = items
-        return AndPredicate(left=left, right=right)
+        return left & right
 
     def false(self, _item) -> Predicate:
         return always_false_p
@@ -47,12 +39,13 @@ class _PredicateTransformer(Transformer):
     def grouped_expression(self, item):
         return item[0]
 
-    def not_expression(self, item) -> Predicate:
-        return NotPredicate(predicate=item[0])
+    def not_expression(self, item: tuple[Predicate]) -> Predicate:
+        predicate = item[0]
+        return ~predicate
 
-    def or_expression(self, items) -> Predicate:
+    def or_expression(self, items: tuple[Predicate, Predicate]) -> Predicate:
         left, right = items
-        return OrPredicate(left=left, right=right)
+        return left | right
 
     def true(self, _item) -> Predicate:
         return always_true_p
@@ -61,9 +54,9 @@ class _PredicateTransformer(Transformer):
         (name,) = item[0]
         return NamedPredicate(name=name)
 
-    def xor_expression(self, items) -> Predicate:
+    def xor_expression(self, items: tuple[Predicate, Predicate]) -> Predicate:
         left, right = items
-        return XorPredicate(left=left, right=right)
+        return left ^ right
 
     pass
 

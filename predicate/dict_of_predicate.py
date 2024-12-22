@@ -45,8 +45,11 @@ class DictOfPredicate[T](Predicate[T]):
 
     @override
     def explain_failure(self, x: Any) -> dict:
-        # TODO: finish
-        return {"key_value_predicates": []}
+        match x:
+            case dict():
+                return {"key_value_predicates": []}
+            case _:
+                return {"reason": f"{x} is not an instance of a dict"}
 
 
 def to_key_p(key_p: Predicate | str) -> Predicate:
