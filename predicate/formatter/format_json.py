@@ -1,16 +1,16 @@
 from typing import Any
 
 from predicate.all_predicate import AllPredicate
+from predicate.always_false_predicate import AlwaysFalsePredicate
+from predicate.always_true_predicate import AlwaysTruePredicate
 from predicate.any_predicate import AnyPredicate
 from predicate.fn_predicate import FnPredicate
+from predicate.is_falsy_predicate import IsFalsyPredicate
+from predicate.is_truthy_predicate import IsTruthyPredicate
 from predicate.named_predicate import NamedPredicate
 from predicate.ne_predicate import NePredicate
 from predicate.predicate import (
-    AlwaysFalsePredicate,
-    AlwaysTruePredicate,
     AndPredicate,
-    IsFalsyPredicate,
-    IsTruthyPredicate,
     NotPredicate,
     OrPredicate,
     Predicate,

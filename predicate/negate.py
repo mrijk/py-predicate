@@ -7,20 +7,20 @@ from predicate import (
     is_none_p,
     is_not_none_p,
 )
+from predicate.always_false_predicate import AlwaysFalsePredicate
+from predicate.always_true_predicate import AlwaysTruePredicate
 from predicate.eq_predicate import EqPredicate
 from predicate.ge_predicate import GePredicate
 from predicate.gt_predicate import GtPredicate
 from predicate.is_empty_predicate import IsEmptyPredicate, IsNotEmptyPredicate, is_not_empty_p
+from predicate.is_falsy_predicate import IsFalsyPredicate
 from predicate.is_none_predicate import IsNonePredicate
 from predicate.is_not_none_predicate import IsNotNonePredicate
+from predicate.is_truthy_predicate import IsTruthyPredicate
 from predicate.le_predicate import LePredicate
 from predicate.lt_predicate import LtPredicate
 from predicate.ne_predicate import NePredicate
 from predicate.predicate import (
-    AlwaysFalsePredicate,
-    AlwaysTruePredicate,
-    IsFalsyPredicate,
-    IsTruthyPredicate,
     NotPredicate,
     Predicate,
 )

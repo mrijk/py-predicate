@@ -3,10 +3,10 @@ from itertools import repeat
 
 from more_itertools import gray_product
 
+from predicate.always_false_predicate import AlwaysFalsePredicate
+from predicate.always_true_predicate import AlwaysTruePredicate
 from predicate.named_predicate import NamedPredicate
 from predicate.predicate import (
-    AlwaysFalsePredicate,
-    AlwaysTruePredicate,
     AndPredicate,
     NotPredicate,
     OrPredicate,

@@ -5,6 +5,7 @@ from predicate.explain import explain
 def test_all():
     all_int = all_p(is_int_p)
 
+    assert all_int([])
     assert all_int([1, 2, 3])
     assert not all_int([None, 2, 3])
 

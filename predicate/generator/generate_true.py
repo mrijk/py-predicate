@@ -18,6 +18,8 @@ from more_itertools import (
 )
 
 from predicate import generate_false
+from predicate.always_false_predicate import AlwaysFalsePredicate, always_false_p
+from predicate.always_true_predicate import AlwaysTruePredicate
 from predicate.any_predicate import AnyPredicate
 from predicate.dict_of_predicate import DictOfPredicate
 from predicate.eq_predicate import EqPredicate
@@ -50,26 +52,24 @@ from predicate.gt_predicate import GtPredicate
 from predicate.has_key_predicate import HasKeyPredicate
 from predicate.has_length_predicate import HasLengthPredicate
 from predicate.is_empty_predicate import IsEmptyPredicate, IsNotEmptyPredicate
+from predicate.is_falsy_predicate import IsFalsyPredicate
 from predicate.is_instance_predicate import IsInstancePredicate
 from predicate.is_none_predicate import IsNonePredicate
 from predicate.is_not_none_predicate import IsNotNonePredicate
+from predicate.is_truthy_predicate import IsTruthyPredicate
 from predicate.le_predicate import LePredicate
 from predicate.list_of_predicate import ListOfPredicate
 from predicate.lt_predicate import LtPredicate
 from predicate.ne_predicate import NePredicate
 from predicate.optimizer.predicate_optimizer import optimize
 from predicate.predicate import (
-    AlwaysFalsePredicate,
-    AlwaysTruePredicate,
     AndPredicate,
-    IsFalsyPredicate,
-    IsTruthyPredicate,
     NotPredicate,
     OrPredicate,
     Predicate,
     XorPredicate,
-    always_false_p,
 )
+from predicate.property_predicate import PropertyPredicate
 from predicate.range_predicate import GeLePredicate, GeLtPredicate, GtLePredicate, GtLtPredicate
 from predicate.regex_predicate import RegexPredicate
 from predicate.set_of_predicate import SetOfPredicate
@@ -79,7 +79,7 @@ from predicate.tuple_of_predicate import TupleOfPredicate
 
 
 @singledispatch
-def generate_true[T](predicate: Predicate[T]) -> Iterator[T]:
+def generate_true[T](predicate: Predicate[T], **kwargs) -> Iterator[T]:
     """Generate values that satisfy this predicate."""
     raise ValueError(f"Please register generator for correct predicate type: {predicate}")
 
@@ -431,6 +431,16 @@ def generate_tuple_of_p(tuple_of_predicate: TupleOfPredicate) -> Iterator:
     predicates = tuple_of_predicate.predicates
 
     yield from zip(*(generate_true(predicate) for predicate in predicates), strict=False)
+
+
+@generate_true.register
+def generate_property_p(property_predicate: PropertyPredicate) -> Iterator:
+    getter = property_predicate.getter
+
+    attributes = {getter.__name__: getter}
+    klass = type("Foo", (object,), attributes)
+
+    yield klass
 
 
 @generate_true.register

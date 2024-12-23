@@ -2,6 +2,8 @@
 
 __version__ = "0.0.1"
 
+from predicate.always_false_predicate import always_false_p, never_p
+from predicate.always_true_predicate import always_p, always_true_p
 from predicate.explain import explain
 from predicate.formatter import to_dot, to_json, to_latex
 from predicate.generator.generate_false import generate_false
@@ -9,7 +11,6 @@ from predicate.generator.generate_true import generate_true
 from predicate.is_empty_predicate import is_empty_p, is_not_empty_p
 from predicate.is_lambda_predicate import is_lambda_p, is_lambda_with_signature_p
 from predicate.optimizer.predicate_optimizer import can_optimize, optimize
-from predicate.predicate import always_false_p, always_p, always_true_p, never_p
 from predicate.set_predicates import (
     in_p,
     is_real_subset_p,
@@ -79,8 +80,8 @@ from predicate.standard_predicates import (
 
 __all__ = [
     "all_p",
-    "always_p",
     "always_false_p",
+    "always_p",
     "always_true_p",
     "any_p",
     "can_optimize",

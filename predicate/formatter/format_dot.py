@@ -6,6 +6,8 @@ import graphviz  # type: ignore
 from more_itertools import first
 
 from predicate.all_predicate import AllPredicate
+from predicate.always_false_predicate import AlwaysFalsePredicate
+from predicate.always_true_predicate import AlwaysTruePredicate
 from predicate.any_predicate import AnyPredicate
 from predicate.comp_predicate import CompPredicate
 from predicate.dict_of_predicate import DictOfPredicate
@@ -14,8 +16,10 @@ from predicate.fn_predicate import FnPredicate
 from predicate.formatter.helpers import set_to_str
 from predicate.ge_predicate import GePredicate
 from predicate.gt_predicate import GtPredicate
+from predicate.is_falsy_predicate import IsFalsyPredicate
 from predicate.is_instance_predicate import IsInstancePredicate
 from predicate.is_none_predicate import IsNonePredicate
+from predicate.is_truthy_predicate import IsTruthyPredicate
 from predicate.lazy_predicate import LazyPredicate, find_predicate_by_ref
 from predicate.le_predicate import LePredicate
 from predicate.lt_predicate import LtPredicate
@@ -23,11 +27,7 @@ from predicate.named_predicate import NamedPredicate
 from predicate.ne_predicate import NePredicate
 from predicate.optimizer.predicate_optimizer import optimize
 from predicate.predicate import (
-    AlwaysFalsePredicate,
-    AlwaysTruePredicate,
     AndPredicate,
-    IsFalsyPredicate,
-    IsTruthyPredicate,
     NotPredicate,
     OrPredicate,
     Predicate,

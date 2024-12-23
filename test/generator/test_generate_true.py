@@ -36,6 +36,7 @@ from predicate import (
     ne_p,
     not_in_p,
 )
+from predicate.property_predicate import property_p
 from predicate.set_predicates import is_real_subset_p, is_subset_p
 from predicate.standard_predicates import (
     eq_false_p,
@@ -64,10 +65,13 @@ from predicate.standard_predicates import (
 )
 
 
+def foo(self) -> bool:
+    return True
+
+
 @pytest.mark.parametrize(
     "predicate",
     [
-        all_p(is_int_p),
         any_p(is_uuid_p),
         eq_false_p,
         eq_true_p,
@@ -103,6 +107,7 @@ from predicate.standard_predicates import (
         regex_p("^foo"),
         neg_p,
         pos_p,
+        property_p(property(fget=foo)),
         zero_p,
         is_real_subset_p({1, 2, 3}),
         is_subset_p({1, 2, 3}),
@@ -110,6 +115,13 @@ from predicate.standard_predicates import (
 )
 def test_generate_true(predicate):
     assert_generated_true(predicate)
+
+
+@pytest.mark.parametrize("all_predicate", [ge_p(2), is_str_p, property_p(property(fget=foo))])
+def test_generate_all(all_predicate):
+    predicate = all_p(all_predicate)
+
+    assert_generated_true(predicate, min_size=0)
 
 
 @pytest.mark.parametrize("value", [2, "foo", "3.14", "complex(1, 2)"])
@@ -328,6 +340,12 @@ def test_generate_always_false_p():
     assert not list(generate_true(predicate))
 
 
+def test_generate_xor_always_false():
+    predicate = always_true_p ^ always_true_p
+
+    assert not list(generate_true(predicate))
+
+
 def test_generate_always_true_p():
     predicate = always_true_p
 
@@ -341,8 +359,8 @@ def test_generate_fn_p():
         generate_true(predicate)
 
 
-def assert_generated_true(predicate):
-    values = take(5, generate_true(predicate))
+def assert_generated_true(predicate, **kwargs):
+    values = take(5, generate_true(predicate, **kwargs))
     assert values
 
     for value in values:

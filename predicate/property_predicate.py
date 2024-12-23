@@ -12,17 +12,21 @@ class PropertyPredicate[T](Predicate[T]):
 
     def __init__(self, getter: Callable):
         self.getter = getter
+        self._property_name = self.getter.__name__
 
     def __call__(self, obj: T) -> bool:
-        return self.getter.fget(obj)  # type: ignore
+        if hasattr(obj, self.getter.__name__):
+            return self.getter.fget(obj)  # type: ignore
+        return False
 
     def __repr__(self) -> str:
-        # TODO
-        return "property_p"
+        return f"property_p({self._property_name})"
 
     @override
     def explain_failure(self, obj: T) -> dict:
-        return {"reason": "tbd"}
+        if hasattr(obj, self.getter.__name__):
+            return {"reason": f"Property {self._property_name} in Object {type(obj).__name__} returned False"}
+        return {"reason": f"Object {type(obj).__name__} has no property {self._property_name}"}
 
 
 def property_p(getter: Callable):

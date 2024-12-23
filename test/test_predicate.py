@@ -7,11 +7,9 @@ import pytest
 
 from predicate import (
     always_false_p,
-    always_true_p,
     eq_false_p,
     eq_p,
     eq_true_p,
-    explain,
     ge_p,
     is_bool_p,
     is_callable_p,
@@ -45,19 +43,6 @@ from predicate.standard_predicates import (
     tee_p,
     zero_p,
 )
-
-
-def test_always_true_p():
-    assert always_true_p(13)
-
-
-def test_always_false_p():
-    assert not always_false_p(13)
-
-
-def test_always_false_p_explain():
-    expected = {"reason": "Always returns False", "result": False}
-    assert explain(always_false_p, None) == expected
 
 
 def test_eq_true_p():
