@@ -12,7 +12,7 @@ class PropertyPredicate[T](Predicate[T]):
 
     def __init__(self, getter: Callable):
         self.getter = getter
-        self._property_name = self.getter.__name__
+        self._property_name = getter.__name__
 
     def __call__(self, obj: T) -> bool:
         if hasattr(obj, self.getter.__name__):

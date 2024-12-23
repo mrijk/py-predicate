@@ -1,6 +1,8 @@
 import uuid
+from collections.abc import Callable
 from datetime import datetime, timedelta
 from ipaddress import IPv4Network
+from typing import cast
 
 import pytest
 from more_itertools import take
@@ -107,7 +109,7 @@ def foo(self) -> bool:
         regex_p("^foo"),
         neg_p,
         pos_p,
-        property_p(property(fget=foo)),
+        property_p(cast(Callable, property(fget=foo))),
         zero_p,
         is_real_subset_p({1, 2, 3}),
         is_subset_p({1, 2, 3}),
@@ -117,7 +119,7 @@ def test_generate_true(predicate):
     assert_generated_true(predicate)
 
 
-@pytest.mark.parametrize("all_predicate", [ge_p(2), is_str_p, property_p(property(fget=foo))])
+@pytest.mark.parametrize("all_predicate", [ge_p(2), is_str_p, property_p(cast(Callable, property(fget=foo)))])
 def test_generate_all(all_predicate):
     predicate = all_p(all_predicate)
 
