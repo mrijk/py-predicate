@@ -14,6 +14,9 @@ class SetOfPredicate[T](Predicate[T]):
     def __call__(self, x: set[T]) -> bool:
         return all_true(x, self.predicate)
 
+    def __contains__(self, predicate: Predicate[T]) -> bool:
+        return predicate == self or predicate in self.predicate
+
     def __repr__(self) -> str:
         return f"is_set_of_p({self.predicate})"
 

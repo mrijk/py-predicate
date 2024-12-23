@@ -7,7 +7,6 @@ import pytest
 
 from predicate import (
     always_false_p,
-    always_true_p,
     eq_false_p,
     eq_p,
     eq_true_p,
@@ -44,14 +43,6 @@ from predicate.standard_predicates import (
     tee_p,
     zero_p,
 )
-
-
-def test_always_true_p():
-    assert always_true_p(13)
-
-
-def test_always_false_p():
-    assert not always_false_p(13)
 
 
 def test_eq_true_p():

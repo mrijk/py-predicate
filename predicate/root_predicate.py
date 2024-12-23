@@ -3,7 +3,6 @@ from collections.abc import Iterator
 from dataclasses import dataclass
 from functools import cached_property
 
-from predicate.helpers import predicate_in_predicate_tree
 from predicate.predicate import Predicate
 
 
@@ -29,7 +28,7 @@ def find_root_predicate(start_frame, predicate: Predicate) -> Predicate | None:
     for frame in get_frames(start_frame):
         for key, value in reversed(frame.f_locals.items()):
             if isinstance(value, Predicate) and value != predicate and key != "self":
-                if predicate_in_predicate_tree(value, predicate):
+                if predicate in value:
                     return value
     return None
 

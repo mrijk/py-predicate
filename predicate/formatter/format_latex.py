@@ -1,4 +1,6 @@
 from predicate.all_predicate import AllPredicate
+from predicate.always_false_predicate import AlwaysFalsePredicate
+from predicate.always_true_predicate import AlwaysTruePredicate
 from predicate.any_predicate import AnyPredicate
 from predicate.eq_predicate import EqPredicate
 from predicate.ge_predicate import GePredicate
@@ -8,8 +10,6 @@ from predicate.le_predicate import LePredicate
 from predicate.lt_predicate import LtPredicate
 from predicate.ne_predicate import NePredicate
 from predicate.predicate import (
-    AlwaysFalsePredicate,
-    AlwaysTruePredicate,
     AndPredicate,
     NotPredicate,
     OrPredicate,

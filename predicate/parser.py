@@ -1,7 +1,8 @@
 from lark import Lark, Transformer, UnexpectedEOF  # type: ignore
 
+from predicate import always_false_p, always_true_p
 from predicate.named_predicate import NamedPredicate
-from predicate.predicate import Predicate, always_false_p, always_true_p
+from predicate.predicate import Predicate
 
 grammar = Lark(
     """

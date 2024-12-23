@@ -9,6 +9,8 @@ from uuid import UUID
 from more_itertools import chunked, flatten, interleave, random_combination_with_replacement, random_permutation, take
 
 from predicate.all_predicate import AllPredicate
+from predicate.always_false_predicate import AlwaysFalsePredicate, always_false_p
+from predicate.always_true_predicate import AlwaysTruePredicate, always_true_p
 from predicate.dict_of_predicate import DictOfPredicate
 from predicate.eq_predicate import EqPredicate
 from predicate.ge_predicate import GePredicate
@@ -29,26 +31,22 @@ from predicate.gt_predicate import GtPredicate
 from predicate.has_key_predicate import HasKeyPredicate
 from predicate.has_length_predicate import HasLengthPredicate
 from predicate.is_empty_predicate import IsEmptyPredicate, IsNotEmptyPredicate
+from predicate.is_falsy_predicate import IsFalsyPredicate
 from predicate.is_instance_predicate import IsInstancePredicate
 from predicate.is_none_predicate import IsNonePredicate
 from predicate.is_not_none_predicate import IsNotNonePredicate
+from predicate.is_truthy_predicate import IsTruthyPredicate
 from predicate.le_predicate import LePredicate
 from predicate.list_of_predicate import ListOfPredicate
 from predicate.lt_predicate import LtPredicate
 from predicate.ne_predicate import NePredicate
 from predicate.optimizer.predicate_optimizer import optimize
 from predicate.predicate import (
-    AlwaysFalsePredicate,
-    AlwaysTruePredicate,
     AndPredicate,
-    IsFalsyPredicate,
-    IsTruthyPredicate,
     NotPredicate,
     OrPredicate,
     Predicate,
     XorPredicate,
-    always_false_p,
-    always_true_p,
 )
 from predicate.range_predicate import GeLePredicate, GeLtPredicate, GtLePredicate, GtLtPredicate
 from predicate.set_of_predicate import SetOfPredicate

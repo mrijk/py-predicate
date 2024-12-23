@@ -14,6 +14,9 @@ class AllPredicate[T](Predicate[T]):
     def __call__(self, iterable: Iterable[T]) -> bool:
         return all(self.predicate(x) for x in iterable)
 
+    def __contains__(self, predicate: Predicate[T]) -> bool:
+        return predicate in self.predicate
+
     def __repr__(self) -> str:
         return f"all({repr(self.predicate)})"
 

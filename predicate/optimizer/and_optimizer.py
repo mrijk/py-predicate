@@ -1,4 +1,6 @@
 from predicate.all_predicate import AllPredicate
+from predicate.always_false_predicate import always_false_p
+from predicate.always_true_predicate import AlwaysTruePredicate, always_true_p
 from predicate.eq_predicate import EqPredicate
 from predicate.fn_predicate import FnPredicate
 from predicate.ge_predicate import GePredicate
@@ -8,15 +10,7 @@ from predicate.is_instance_predicate import IsInstancePredicate
 from predicate.le_predicate import LePredicate
 from predicate.lt_predicate import LtPredicate
 from predicate.optimizer.in_optimizer import optimize_in_predicate, optimize_not_in_predicate
-from predicate.predicate import (
-    AlwaysTruePredicate,
-    AndPredicate,
-    NotPredicate,
-    OrPredicate,
-    Predicate,
-    always_false_p,
-    always_true_p,
-)
+from predicate.predicate import AndPredicate, NotPredicate, OrPredicate, Predicate
 from predicate.range_predicate import GeLePredicate, GeLtPredicate, GtLePredicate, GtLtPredicate
 from predicate.set_predicates import InPredicate, IsSubsetPredicate, NotInPredicate
 

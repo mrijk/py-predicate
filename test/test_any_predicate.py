@@ -11,6 +11,12 @@ def test_any():
     assert any_int([None, 2, 3])
 
 
+def test_any_contains(p, q, r):
+    any_int = any_p(is_int_p)
+
+    assert is_int_p in any_int
+
+
 def test_any_explain():
     predicate = any_p(is_int_p)
 

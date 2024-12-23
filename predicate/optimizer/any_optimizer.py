@@ -1,15 +1,10 @@
 from predicate.all_predicate import AllPredicate
+from predicate.always_false_predicate import AlwaysFalsePredicate, always_false_p
+from predicate.always_true_predicate import AlwaysTruePredicate, always_true_p
 from predicate.any_predicate import AnyPredicate
 from predicate.eq_predicate import EqPredicate
 from predicate.ne_predicate import NePredicate
-from predicate.predicate import (
-    AlwaysFalsePredicate,
-    AlwaysTruePredicate,
-    NotPredicate,
-    Predicate,
-    always_false_p,
-    always_true_p,
-)
+from predicate.predicate import NotPredicate, Predicate
 
 
 def optimize_any_predicate[T](predicate: AnyPredicate[T]) -> Predicate[T]:

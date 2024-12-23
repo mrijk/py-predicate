@@ -1,8 +1,7 @@
 import pytest
 
-from predicate import always_true_p, le_p
+from predicate import always_false_p, always_true_p, le_p
 from predicate.named_predicate import NamedPredicate
-from predicate.predicate import always_false_p
 from predicate.truth_table import get_named_predicates, set_named_values, truth_table
 
 

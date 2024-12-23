@@ -1,15 +1,13 @@
+from predicate.always_false_predicate import AlwaysFalsePredicate, always_false_p
+from predicate.always_true_predicate import AlwaysTruePredicate, always_true_p
 from predicate.eq_predicate import EqPredicate
 from predicate.optimizer.in_optimizer import optimize_in_predicate
 from predicate.predicate import (
-    AlwaysFalsePredicate,
-    AlwaysTruePredicate,
     AndPredicate,
     NotPredicate,
     OrPredicate,
     Predicate,
     XorPredicate,
-    always_false_p,
-    always_true_p,
 )
 from predicate.set_predicates import InPredicate
 

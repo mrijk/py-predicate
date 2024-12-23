@@ -2,7 +2,7 @@ from abc import abstractmethod
 from dataclasses import dataclass
 from datetime import datetime
 from ipaddress import IPv4Address, IPv6Address
-from typing import Any, Final, override
+from typing import Any, override
 from uuid import UUID
 
 
@@ -29,6 +29,10 @@ class Predicate[T]:
     def __invert__(self) -> "Predicate":
         """Return the 'negated' predicate."""
         return NotPredicate(predicate=self)
+
+    def __contains__(self, predicate: "Predicate") -> bool:
+        """Return True if the predicate argument is part of this predicate, otherwise False."""
+        return predicate == self
 
     def explain(self, x: Any) -> dict:
         if self(x):
@@ -82,6 +86,9 @@ class AndPredicate[T](Predicate[T]):
     def __repr__(self) -> str:
         return f"{repr(self.left)} & {repr(self.right)}"
 
+    def __contains__(self, predicate: Predicate[T]) -> bool:
+        return predicate == self or predicate in self.left or predicate in self.right
+
     @override
     def explain_failure(self, x: T) -> dict:
         left_explanation = self.left.explain(x)
@@ -128,11 +135,14 @@ class NotPredicate[T](Predicate[T]):
         return not self.predicate(x)
 
     def __repr__(self) -> str:
-        return f"~{repr(self.predicate)}"
+        return f"~{self.predicate}"
+
+    def __contains__(self, predicate: Predicate[T]) -> bool:
+        return predicate == self or predicate in self.predicate
 
     @override
     def explain_failure(self, x: T) -> dict:
-        return {"predicate": self.predicate.explain(x), "reason": f"not {repr(self.predicate)}"}
+        return {"predicate": self.predicate.explain(x), "reason": f"not {self.predicate}"}
 
 
 @dataclass
@@ -165,6 +175,9 @@ class OrPredicate[T](Predicate[T]):
 
     def __repr__(self) -> str:
         return f"{repr(self.left)} | {repr(self.right)}"
+
+    def __contains__(self, predicate: Predicate[T]) -> bool:
+        return predicate == self or predicate in self.left or predicate in self.right
 
     @override
     def explain_failure(self, x: T) -> dict:
@@ -205,6 +218,9 @@ class XorPredicate[T](Predicate[T]):
     def __repr__(self) -> str:
         return f"{repr(self.left)} ^ {repr(self.right)}"
 
+    def __contains__(self, predicate: Predicate[T]) -> bool:
+        return predicate == self or predicate in self.left or predicate in self.right
+
     @override
     def explain_failure(self, x: T) -> dict:
         return {
@@ -214,74 +230,3 @@ class XorPredicate[T](Predicate[T]):
 
 
 type ConstrainedT[T: (int, str, float, datetime, UUID, IPv4Address, IPv6Address)] = T
-
-
-@dataclass
-class AlwaysTruePredicate(Predicate):
-    """A predicate class that models the 'True' predicate."""
-
-    def __call__(self, *args, **kwargs):
-        return True
-
-    def __repr__(self) -> str:
-        return "always_true_p"
-
-
-@dataclass
-class AlwaysFalsePredicate(Predicate):
-    """A predicate class that models the 'False' predicate."""
-
-    def __call__(self, *args, **kwargs):
-        return False
-
-    def __repr__(self) -> str:
-        return "always_false_p"
-
-    @override
-    def explain_failure(self, *args, **kwargs) -> dict:
-        return {"reason": "Always returns False"}
-
-
-@dataclass
-class IsFalsyPredicate[T](Predicate[T]):
-    """A predicate class that the falsy (0, False, [], "", etc.) predicate."""
-
-    def __call__(self, x: T) -> bool:
-        return not bool(x)
-
-    def __repr__(self) -> str:
-        return "is_falsy_p"
-
-    @override
-    def explain_failure(self, x: T) -> dict:
-        return {"reason": f"{x} is not a falsy value"}
-
-
-@dataclass
-class IsTruthyPredicate[T](Predicate[T]):
-    """A predicate class that the truthy (13, True, [1], "foo", etc.) predicate."""
-
-    def __call__(self, x: T) -> bool:
-        return bool(x)
-
-    def __repr__(self) -> str:
-        return "is_truthy_p"
-
-    @override
-    def explain_failure(self, x: T) -> dict:
-        return {"reason": f"{x} is not a truthy value"}
-
-
-always_true_p: Final[AlwaysTruePredicate] = AlwaysTruePredicate()
-"""Predicate that always evaluates to True."""
-
-always_false_p: Final[AlwaysFalsePredicate] = AlwaysFalsePredicate()
-"""Predicate that always evaluates to False."""
-
-# Next two predicates mimim the Rust equivalents
-
-always_p = always_true_p
-"""Synonym for always_true_p."""
-
-never_p = always_false_p
-"""Synonym for always_false_p."""

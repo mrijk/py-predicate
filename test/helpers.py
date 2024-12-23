@@ -1,8 +1,8 @@
 from predicate.all_predicate import AllPredicate
+from predicate.always_false_predicate import AlwaysFalsePredicate
+from predicate.always_true_predicate import AlwaysTruePredicate
 from predicate.eq_predicate import EqPredicate
 from predicate.predicate import (
-    AlwaysFalsePredicate,
-    AlwaysTruePredicate,
     AndPredicate,
     NotPredicate,
     OrPredicate,
