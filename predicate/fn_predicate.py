@@ -14,7 +14,7 @@ class FnPredicate[T](Predicate[T]):
         return self.predicate_fn(x)
 
     def __repr__(self) -> str:
-        return "fn_p"
+        return f"fn_p(predicate_fn={self.predicate_fn.__name__})"
 
     @override
     def explain_failure(self, x: T) -> dict:

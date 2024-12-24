@@ -15,7 +15,9 @@ from predicate import (
     gt_p,
     in_p,
     is_real_subset_p,
+    is_real_superset_p,
     is_subset_p,
+    is_superset_p,
     le_p,
     lt_p,
     ne_p,
@@ -56,6 +58,8 @@ from predicate.implies_predicate import implies_p
         (zero_p, "x = 0"),
         (is_real_subset_p({1, 2, 3}), "x \\subseteq \\{1, 2, 3\\}"),
         (is_subset_p({1, 2, 3}), "x \\subset \\{1, 2, 3\\}"),
+        (is_real_superset_p({1, 2, 3}), "x \\supseteq \\{1, 2, 3\\}"),
+        (is_superset_p({1, 2, 3}), "x \\supset \\{1, 2, 3\\}"),
     ],
 )
 def test_format_latex_one_level(predicate, expected):

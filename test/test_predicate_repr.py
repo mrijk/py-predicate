@@ -100,7 +100,7 @@ from predicate.standard_predicates import (
         (tee_p(lambda x: None), "tee_p"),
         (this_p, "this_p"),
         (NamedPredicate(name="foo"), "foo"),
-        (is_ipv4_network_global_p, "property_p(is_global)"),
+        (is_ipv4_network_global_p, "property_p()"),
     ],
 )
 def test_repr_standard(predicate, representation):

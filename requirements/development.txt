@@ -4,9 +4,11 @@ coverage
 exrex
 graphviz
 lark
+more-itertools
 
 mypy
 pytest
 pytest-benchmark
+pytest-cov
 ruff
 typer

@@ -69,7 +69,6 @@ from predicate.predicate import (
     Predicate,
     XorPredicate,
 )
-from predicate.property_predicate import PropertyPredicate
 from predicate.range_predicate import GeLePredicate, GeLtPredicate, GtLePredicate, GtLtPredicate
 from predicate.regex_predicate import RegexPredicate
 from predicate.set_of_predicate import SetOfPredicate
@@ -433,14 +432,16 @@ def generate_tuple_of_p(tuple_of_predicate: TupleOfPredicate) -> Iterator:
     yield from zip(*(generate_true(predicate) for predicate in predicates), strict=False)
 
 
-@generate_true.register
-def generate_property_p(property_predicate: PropertyPredicate) -> Iterator:
-    getter = property_predicate.getter
+# TODO: property names were introduced in Python 3.13
 
-    attributes = {getter.__name__: getter}
-    klass = type("Foo", (object,), attributes)
-
-    yield klass
+# @generate_true.register
+# def generate_property_p(property_predicate: PropertyPredicate) -> Iterator:
+#     getter = property_predicate.getter
+#
+#     attributes = {getter.__name__: getter}
+#     klass = type("Foo", (object,), attributes)
+#
+#     yield klass
 
 
 @generate_true.register

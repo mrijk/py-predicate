@@ -17,7 +17,13 @@ from predicate.predicate import (
     XorPredicate,
 )
 from predicate.range_predicate import GeLePredicate, GeLtPredicate, GtLePredicate, GtLtPredicate
-from predicate.set_predicates import InPredicate, IsRealSubsetPredicate, IsSubsetPredicate
+from predicate.set_predicates import (
+    InPredicate,
+    IsRealSubsetPredicate,
+    IsRealSupersetPredicate,
+    IsSubsetPredicate,
+    IsSupersetPredicate,
+)
 
 
 def set_to_latex_set(v: set) -> str:
@@ -60,6 +66,10 @@ def to_latex(predicate: Predicate) -> str:
             return f"x \\subseteq {set_to_latex_set(v)}"
         case IsSubsetPredicate(v):
             return f"x \\subset {set_to_latex_set(v)}"
+        case IsRealSupersetPredicate(v):
+            return f"x \\supseteq {set_to_latex_set(v)}"
+        case IsSupersetPredicate(v):
+            return f"x \\supset {set_to_latex_set(v)}"
         case LePredicate(v):
             return f"x \\le {v}"
         case LtPredicate(v):
