@@ -5,6 +5,7 @@ from more_itertools import gray_product
 
 from predicate.always_false_predicate import AlwaysFalsePredicate
 from predicate.always_true_predicate import AlwaysTruePredicate
+from predicate.implies import Implies
 from predicate.named_predicate import NamedPredicate
 from predicate.predicate import (
     AndPredicate,
@@ -33,7 +34,9 @@ def get_named_predicates(predicate: Predicate) -> list[str]:
 
     def get_names() -> Iterator[str]:
         match predicate:
-            case AndPredicate(left, right) | OrPredicate(left, right) | XorPredicate(left, right):
+            case (
+                AndPredicate(left, right) | OrPredicate(left, right) | XorPredicate(left, right) | Implies(left, right)
+            ):
                 yield from get_named_predicates(left)
                 yield from get_named_predicates(right)
             case NotPredicate(not_predicate):
@@ -58,7 +61,7 @@ def execute_predicate(predicate: Predicate, values: dict) -> bool:
 def set_named_values(predicate: Predicate, values: dict) -> None:
     """Set the named predicate values."""
     match predicate:
-        case AndPredicate(left, right) | OrPredicate(left, right) | XorPredicate(left, right):
+        case AndPredicate(left, right) | OrPredicate(left, right) | XorPredicate(left, right) | Implies(left, right):
             set_named_values(left, values)
             set_named_values(right, values)
         case NotPredicate(not_predicate):

@@ -16,6 +16,7 @@ from predicate.fn_predicate import FnPredicate
 from predicate.formatter.helpers import set_to_str
 from predicate.ge_predicate import GePredicate
 from predicate.gt_predicate import GtPredicate
+from predicate.implies import Implies
 from predicate.is_falsy_predicate import IsFalsyPredicate
 from predicate.is_instance_predicate import IsInstancePredicate
 from predicate.is_none_predicate import IsNonePredicate
@@ -142,6 +143,8 @@ def render(dot, predicate: Predicate, node_nr: count):
                     dot.edge(kv, to_value(key), label="key")
                     dot.edge(kv, to_value(value), label="value")
                 return node
+            case Implies(left, right):
+                return add_node_left_right("implies", label="=>", left=left, right=right)
             case IsInstancePredicate(klass):
                 name = klass[0].__name__  # type: ignore
                 return add_node("instance", label=f"is_{name}_p")

@@ -1,6 +1,7 @@
 import pytest
 
 from predicate import always_false_p, always_true_p
+from predicate.implies import Implies
 from predicate.named_predicate import NamedPredicate
 from predicate.parser import parse_expression
 
@@ -106,6 +107,14 @@ def test_parser_grouped(p, q, r):
     predicate = parse_expression(expression)
 
     assert predicate == p & (q | r)
+
+
+def test_parser_implies(p, q):
+    expression = "p => q"
+
+    predicate = parse_expression(expression)
+
+    assert predicate == Implies(p, q)
 
 
 def test_parser_failure(p, q):

@@ -23,6 +23,7 @@ from predicate import (
     not_in_p,
     to_dot,
 )
+from predicate.implies import Implies
 from predicate.named_predicate import NamedPredicate
 from predicate.set_predicates import is_real_subset_p, is_real_superset_p, is_subset_p, is_superset_p
 from predicate.standard_predicates import (
@@ -93,6 +94,14 @@ def test_format_dot_all():
 
 def test_format_dot_any():
     predicate = any_p(predicate=always_true_p)
+
+    dot = to_dot(predicate)
+
+    assert dot
+
+
+def test_format_dot_implies(p, q):
+    predicate = Implies(p, q)
 
     dot = to_dot(predicate)
 

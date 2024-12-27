@@ -1,6 +1,7 @@
 from lark import Lark, Transformer, UnexpectedEOF  # type: ignore
 
 from predicate import always_false_p, always_true_p
+from predicate.implies import Implies
 from predicate.named_predicate import NamedPredicate
 from predicate.predicate import Predicate
 
@@ -9,7 +10,8 @@ grammar = Lark(
     predicate: expression | variable
 
     variable: WORD
-    ?expression: grouped_expression | or_expression | and_expression | xor_expression | not_expression | false | true
+    ?expression: grouped_expression | or_expression | and_expression | xor_expression | not_expression
+                | implies_expression | false | true
 
     false: "false"
     true: "true"
@@ -18,6 +20,7 @@ grammar = Lark(
     and_expression: predicate "&" predicate
     xor_expression: predicate "^" predicate
     not_expression: "~" predicate
+    implies_expression: predicate "=>" predicate
 
     %import common.WORD   // imports from terminal library
     %ignore " "           // Disregard spaces in text
@@ -39,6 +42,10 @@ class _PredicateTransformer(Transformer):
 
     def grouped_expression(self, item):
         return item[0]
+
+    def implies_expression(self, items: tuple[Predicate, Predicate]):
+        left, right = items
+        return Implies(left=left, right=right)
 
     def not_expression(self, item: tuple[Predicate]) -> Predicate:
         predicate = item[0]

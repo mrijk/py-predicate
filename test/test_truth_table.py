@@ -1,6 +1,7 @@
 import pytest
 
 from predicate import always_false_p, always_true_p, le_p
+from predicate.implies import implies_p_p
 from predicate.named_predicate import NamedPredicate
 from predicate.truth_table import get_named_predicates, set_named_values, truth_table
 
@@ -75,6 +76,14 @@ def test_truth_table_false(p):
     result = [row[1] for row in truth_table(predicate)]
 
     assert result == [False, True]
+
+
+def test_truth_table_implies(p, q):
+    predicate = implies_p_p(p, q)
+
+    result = [row[1] for row in truth_table(predicate)]
+
+    assert result == [True, True, False, True]
 
 
 def test_truth_table_true(p):

@@ -1,4 +1,6 @@
+from dataclasses import dataclass
 from functools import singledispatch
+from typing import override
 
 from predicate.always_false_predicate import AlwaysFalsePredicate
 from predicate.always_true_predicate import AlwaysTruePredicate
@@ -107,3 +109,25 @@ def _(predicate: InPredicate, other: Predicate) -> bool:
             return predicate.v.issubset(v)
         case _:
             return False
+
+
+@dataclass
+class Implies[T](Predicate[T]):
+    """A predicate class that models the 'implies' (=>) predicate."""
+
+    left: Predicate
+    right: Predicate
+
+    def __call__(self, x) -> bool:
+        return not self.left(x) or self.right(x)
+
+    def __repr__(self) -> str:
+        return f"{self.left} => {self.right}"
+
+    @override
+    def explain_failure(self, x) -> dict:
+        return {"reason": f"{self.left} doesn't imply {self.right}"}
+
+
+def implies_p_p(left: Predicate, right: Predicate) -> Predicate:
+    return Implies(left=left, right=right)
