@@ -70,7 +70,7 @@ def random_datetimes(lower: datetime | None = None, upper: datetime | None = Non
 def random_predicates(*, max_depth: int = 10) -> Iterator:
     subclasses = Predicate.__subclasses__()
 
-    iterables = [generate_predicate(subclass, max_depth=max_depth) for subclass in subclasses]
+    iterables = [generate_predicate(subclass, max_depth=max_depth) for subclass in subclasses]  # type: ignore
 
     yield from random_first_from_iterables(*iterables)
 
