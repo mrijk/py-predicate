@@ -119,9 +119,7 @@ def generate_any_p(any_predicate: AnyPredicate, *, min_size: int = 1, max_size: 
         combined_values = false_values + true_values
 
         yield random_permutation(combined_values)
-        yield from set_from_list(
-            combined_values,
-        )
+        yield from set_from_list(combined_values)
 
 
 @generate_true.register
@@ -374,7 +372,7 @@ def generate_truthy(_predicate: IsTruthyPredicate) -> Iterator:
 
 
 @generate_true.register
-def generate_is_instance_p(predicate: IsInstancePredicate) -> Iterator:
+def generate_is_instance_p(predicate: IsInstancePredicate, **kwargs) -> Iterator:
     klass = predicate.klass[0]  # type: ignore
 
     type_registry: dict[Any, Callable[[], Iterator]] = {
@@ -397,8 +395,10 @@ def generate_is_instance_p(predicate: IsInstancePredicate) -> Iterator:
 
     if generator := type_registry.get(klass):
         yield from generator()
-
-    raise ValueError(f"No generator found for {klass}")
+    elif klass == Predicate:
+        yield from random_predicates(**kwargs)
+    else:
+        raise ValueError(f"No generator found for {klass}")
 
 
 @generate_true.register

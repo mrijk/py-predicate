@@ -10,6 +10,7 @@ from uuid import UUID, uuid4
 
 from more_itertools import first, interleave, random_permutation, take
 
+from predicate.generator.generate_predicate import generate_predicate
 from predicate.predicate import Predicate
 from predicate.standard_predicates import is_hashable_p
 
@@ -19,7 +20,10 @@ def random_first_from_iterables(*iterables: Iterable) -> Iterator:
 
     while True:
         chosen_iterable = random.choice(non_empty_iterables)
-        yield next(iter(chosen_iterable))
+        try:
+            yield next(iter(chosen_iterable))
+        except StopIteration:
+            pass
 
 
 def set_from_list(value: list, order: bool = False) -> Iterator:
@@ -63,9 +67,12 @@ def random_datetimes(lower: datetime | None = None, upper: datetime | None = Non
         yield start + timedelta(seconds=random_second)
 
 
-def random_predicates() -> Iterator:
-    # TODO: implement
-    yield from []
+def random_predicates(*, max_depth: int = 10) -> Iterator:
+    subclasses = Predicate.__subclasses__()
+
+    iterables = [generate_predicate(subclass, max_depth=max_depth) for subclass in subclasses]
+
+    yield from random_first_from_iterables(*iterables)
 
 
 def random_sets(min_size: int = 0, max_size: int = 10) -> Iterator:
