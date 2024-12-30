@@ -35,9 +35,11 @@ from predicate.standard_predicates import (
     is_inf_p,
     is_iterable_of_p,
     is_list_of_p,
+    is_predicate_of_p,
     is_range_p,
     is_single_or_iterable_of_p,
     is_single_or_list_of_p,
+    ne_p,
     neg_p,
     pos_p,
     tee_p,
@@ -310,3 +312,9 @@ def test_is_inf_p():
 
     assert is_inf_p(-math.inf)
     assert is_inf_p(math.inf)
+
+
+def test_is_predicate_of_type():
+    predicate = is_predicate_of_p(int)
+
+    assert predicate(ne_p(2))

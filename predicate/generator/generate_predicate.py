@@ -1,14 +1,22 @@
 from typing import Iterator
 
 from predicate.eq_predicate import EqPredicate
+from predicate.ge_predicate import GePredicate
+from predicate.gt_predicate import GtPredicate
+from predicate.le_predicate import LePredicate
+from predicate.lt_predicate import LtPredicate
 from predicate.ne_predicate import NePredicate
 from predicate.predicate import AndPredicate, NotPredicate, OrPredicate, Predicate, XorPredicate
 
 
-def generate_predicate(predicate_type: type[Predicate], max_depth: int) -> Iterator[Predicate]:
+def generate_predicate(predicate_type: type[Predicate], max_depth: int, klass: type) -> Iterator[Predicate]:
     predicate_type_registry = {
         AndPredicate: generate_and_predicates,
         EqPredicate: generate_eq_predicates,
+        GePredicate: generate_ge_predicates,
+        GtPredicate: generate_gt_predicates,
+        LePredicate: generate_le_predicates,
+        LtPredicate: generate_lt_predicates,
         NePredicate: generate_ne_predicates,
         NotPredicate: generate_not_predicates,
         OrPredicate: generate_or_predicates,
@@ -16,67 +24,91 @@ def generate_predicate(predicate_type: type[Predicate], max_depth: int) -> Itera
     }
 
     if generator := predicate_type_registry.get(predicate_type):
-        yield from generator(max_depth=max_depth)
+        yield from generator(max_depth=max_depth, klass=klass)
     else:
         yield from []
         # raise ValueError(f"No generator defined for predicate type {predicate_type}")
 
 
-def generate_and_predicates(max_depth: int) -> Iterator:
+def random_values_of_type(klass: type) -> Iterator:
+    from predicate.generator.helpers import random_ints, random_strings
+
+    type_registry = {
+        int: random_ints,
+        str: random_strings,
+    }
+
+    if generator := type_registry.get(klass):
+        yield from generator()
+    else:
+        raise ValueError(f"No generator found for {klass}")
+
+
+def generate_and_predicates(max_depth: int, klass: type) -> Iterator:
     if not max_depth:
         return
 
     from predicate.generator.helpers import random_predicates
 
-    left_predicates = random_predicates(max_depth=max_depth - 1)
-    right_predicates = random_predicates(max_depth=max_depth - 1)
+    left_predicates = random_predicates(max_depth=max_depth - 1, klass=klass)
+    right_predicates = random_predicates(max_depth=max_depth - 1, klass=klass)
 
-    while True:
-        yield AndPredicate(left=next(left_predicates), right=next(right_predicates))
-
-
-def generate_eq_predicates(max_depth: int) -> Iterator:
-    while True:
-        yield EqPredicate(2)
+    yield from (left & right for left, right in zip(left_predicates, right_predicates, strict=False))
 
 
-def generate_ne_predicates(max_depth: int) -> Iterator:
-    while True:
-        yield NePredicate(2)
+def generate_eq_predicates(max_depth: int, klass: type) -> Iterator:
+    yield from (EqPredicate(value) for value in random_values_of_type(klass))
 
 
-def generate_not_predicates(max_depth: int) -> Iterator:
+def generate_ge_predicates(max_depth: int, klass: type) -> Iterator:
+    yield from (GePredicate(value) for value in random_values_of_type(klass))
+
+
+def generate_gt_predicates(max_depth: int, klass: type) -> Iterator:
+    yield from (GtPredicate(value) for value in random_values_of_type(klass))
+
+
+def generate_le_predicates(max_depth: int, klass: type) -> Iterator:
+    yield from (LePredicate(value) for value in random_values_of_type(klass))
+
+
+def generate_lt_predicates(max_depth: int, klass: type) -> Iterator:
+    yield from (LtPredicate(value) for value in random_values_of_type(klass))
+
+
+def generate_ne_predicates(max_depth: int, klass: type) -> Iterator:
+    yield from (NePredicate(value) for value in random_values_of_type(klass))
+
+
+def generate_not_predicates(max_depth: int, klass: type) -> Iterator:
     if not max_depth:
         return
 
     from predicate.generator.helpers import random_predicates
 
-    predicates = random_predicates(max_depth=max_depth - 1)
-    while True:
-        yield NotPredicate(predicate=next(predicates))
+    predicates = random_predicates(max_depth=max_depth - 1, klass=klass)
+    yield from (~predicate for predicate in predicates)
 
 
-def generate_or_predicates(max_depth: int) -> Iterator:
+def generate_or_predicates(max_depth: int, klass: type) -> Iterator:
     if not max_depth:
         return
 
     from predicate.generator.helpers import random_predicates
 
-    left_predicates = random_predicates(max_depth=max_depth - 1)
-    right_predicates = random_predicates(max_depth=max_depth - 1)
+    left_predicates = random_predicates(max_depth=max_depth - 1, klass=klass)
+    right_predicates = random_predicates(max_depth=max_depth - 1, klass=klass)
 
-    while True:
-        yield OrPredicate(left=next(left_predicates), right=next(right_predicates))
+    yield from (left | right for left, right in zip(left_predicates, right_predicates, strict=False))
 
 
-def generate_xor_predicates(max_depth: int) -> Iterator:
+def generate_xor_predicates(max_depth: int, klass: type) -> Iterator:
     if not max_depth:
         return
 
     from predicate.generator.helpers import random_predicates
 
-    left_predicates = random_predicates(max_depth=max_depth - 1)
-    right_predicates = random_predicates(max_depth=max_depth - 1)
+    left_predicates = random_predicates(max_depth=max_depth - 1, klass=klass)
+    right_predicates = random_predicates(max_depth=max_depth - 1, klass=klass)
 
-    while True:
-        yield XorPredicate(left=next(left_predicates), right=next(right_predicates))
+    yield from (left ^ right for left, right in zip(left_predicates, right_predicates, strict=False))

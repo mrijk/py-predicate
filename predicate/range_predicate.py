@@ -15,11 +15,11 @@ class GeLePredicate[T](Predicate[T]):
         return self.lower <= x <= self.upper
 
     def __repr__(self) -> str:
-        return f"ge_le_p({self.lower}, {self.upper})"
+        return f"ge_le_p({self.lower!r}, {self.upper!r})"
 
     @override
     def explain_failure(self, x: T) -> dict:
-        return {"reason": f"{x} is not greater equal {self.lower} and less equal {self.upper}"}
+        return {"reason": f"{x!r} is not greater equal {self.lower!r} and less equal {self.upper!r}"}
 
 
 @dataclass
@@ -33,11 +33,11 @@ class GeLtPredicate[T](Predicate[T]):
         return self.lower <= x < self.upper
 
     def __repr__(self) -> str:
-        return f"ge_lt_p({self.lower}, {self.upper})"
+        return f"ge_lt_p({self.lower!r}, {self.upper!r})"
 
     @override
     def explain_failure(self, x: T) -> dict:
-        return {"reason": f"{x} is not greater equal {self.lower} and less than {self.upper}"}
+        return {"reason": f"{x!r} is not greater equal {self.lower!r} and less than {self.upper!r}"}
 
 
 @dataclass
@@ -51,12 +51,12 @@ class GtLePredicate[T](Predicate[T]):
         return self.lower < x <= self.upper
 
     def __repr__(self) -> str:
-        return f"gt_le_p({self.lower}, {self.upper})"
+        return f"gt_le_p({self.lower!r}, {self.upper!r})"
 
     @override
     def explain_failure(self, x: T) -> dict:
         return {
-            "reason": f"{x} is not greater than {self.lower} and less than or equal to {self.upper}",
+            "reason": f"{x!r} is not greater than {self.lower!r} and less than or equal to {self.upper!r}",
         }
 
 
@@ -71,8 +71,8 @@ class GtLtPredicate[T](Predicate[T]):
         return self.lower < x < self.upper
 
     def __repr__(self) -> str:
-        return f"gt_lt_p({self.lower}, {self.upper})"
+        return f"gt_lt_p({self.lower!r}, {self.upper!r})"
 
     @override
     def explain_failure(self, x: T) -> dict:
-        return {"reason": f"{x} is not greater than {self.lower} and less than {self.upper}"}
+        return {"reason": f"{x!r} is not greater than {self.lower!r} and less than {self.upper!r}"}

@@ -56,6 +56,7 @@ from predicate.is_falsy_predicate import IsFalsyPredicate
 from predicate.is_instance_predicate import IsInstancePredicate
 from predicate.is_none_predicate import IsNonePredicate
 from predicate.is_not_none_predicate import IsNotNonePredicate
+from predicate.is_predicate_of_p import IsPredicateOfPredicate
 from predicate.is_truthy_predicate import IsTruthyPredicate
 from predicate.le_predicate import LePredicate
 from predicate.list_of_predicate import ListOfPredicate
@@ -372,6 +373,11 @@ def generate_truthy(_predicate: IsTruthyPredicate) -> Iterator:
 
 
 @generate_true.register
+def generate_predicate_of(predicate: IsPredicateOfPredicate, **kwargs) -> Iterator:
+    yield from random_predicates(**kwargs)
+
+
+@generate_true.register
 def generate_is_instance_p(predicate: IsInstancePredicate, **kwargs) -> Iterator:
     klass = predicate.klass[0]  # type: ignore
 
@@ -395,7 +401,7 @@ def generate_is_instance_p(predicate: IsInstancePredicate, **kwargs) -> Iterator
 
     if generator := type_registry.get(klass):
         yield from generator()
-    elif klass == Predicate:
+    elif klass == Predicate:  # TODO
         yield from random_predicates(**kwargs)
     else:
         raise ValueError(f"No generator found for {klass}")

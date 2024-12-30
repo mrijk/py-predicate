@@ -19,5 +19,5 @@ def test_ne_p_str():
 def test_eq_explain():
     predicate = ne_p("foo")
 
-    expected = {"reason": "foo is equal to foo", "result": False}
+    expected = {"reason": "foo is equal to 'foo'", "result": False}
     assert explain(predicate, "foo") == expected

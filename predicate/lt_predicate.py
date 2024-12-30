@@ -14,8 +14,8 @@ class LtPredicate[T](Predicate[T]):
         return x < self.v
 
     def __repr__(self) -> str:
-        return f"lt_p({self.v})"
+        return f"lt_p({self.v!r})"
 
     @override
     def explain_failure(self, x: T) -> dict:
-        return {"reason": f"{x} is not less than {self.v}"}
+        return {"reason": f"{x} is not less than {self.v!r}"}

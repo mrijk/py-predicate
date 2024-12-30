@@ -14,8 +14,8 @@ class EqPredicate[T](Predicate[T]):
         return x == self.v
 
     def __repr__(self) -> str:
-        return f"eq_p({self.v})"
+        return f"eq_p({self.v!r})"
 
     @override
     def explain_failure(self, x: T) -> dict:
-        return {"reason": f"{x} is not equal to {self.v}"}
+        return {"reason": f"{x} is not equal to {self.v!r}"}
