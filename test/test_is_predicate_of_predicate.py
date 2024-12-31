@@ -1,7 +1,8 @@
 import pytest
 
-from predicate import lt_p
-from predicate.standard_predicates import ge_p, is_predicate_of_p, le_p
+from predicate import explain, is_bool_p, is_int_p, lt_p
+from predicate.predicate import Predicate
+from predicate.standard_predicates import all_p, any_p, ge_p, is_list_of_p, is_predicate_of_p, is_str_p, le_p
 
 
 @pytest.mark.parametrize(
@@ -20,8 +21,37 @@ def test_is_predicate_of_type(klass, valid, invalid):
     assert predicate(lt_p(valid))
 
 
+@pytest.mark.parametrize("predicate", [all_p, any_p, is_list_of_p])
+@pytest.mark.parametrize(
+    ("klass", "valid", "invalid"),
+    [
+        (Predicate[int], is_int_p, is_str_p),
+        (Predicate[str], is_str_p, is_bool_p),
+    ],
+)
+def test_is_predicate_of_predicate_type(predicate, klass, valid, invalid):
+    predicate_of = is_predicate_of_p(klass)
+
+    assert not predicate_of(predicate(invalid))
+    assert predicate_of(predicate(valid))
+
+
 @pytest.mark.parametrize(("predicate", "klass"), [(~le_p(2), int), (ge_p("bar") & le_p("foo"), str)])
 def test_is_predicate_of_type_composed(predicate, klass):
     predicate_of = is_predicate_of_p(klass)
 
     assert predicate_of(predicate)
+
+
+def test_is_predicate_of_type_explain():
+    predicate = is_predicate_of_p(int)
+
+    expected = {"reason": "lt_p('foo') is not a predicate of type 'int'", "result": False}
+    assert explain(predicate, lt_p("foo")) == expected
+
+
+def test_is_predicate_of_type_explain_not_predicate():
+    predicate = is_predicate_of_p(int)
+
+    expected = {"reason": "Value `foo` is not a predicate", "result": False}
+    assert explain(predicate, "foo") == expected

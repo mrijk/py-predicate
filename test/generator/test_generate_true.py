@@ -53,6 +53,7 @@ from predicate.standard_predicates import (
     is_instance_p,
     is_iterable_p,
     is_list_p,
+    is_predicate_of_p,
     is_predicate_p,
     is_set_p,
     is_tuple_p,
@@ -297,6 +298,13 @@ def test_iterable_of(iterable_of_p):
 )
 def test_list_of(list_type_p):
     predicate = is_list_of_p(list_type_p)
+
+    assert_generated_true(predicate)
+
+
+@pytest.mark.parametrize("klass", [bool, float, int, str])
+def test_predicate_of(klass):
+    predicate = is_predicate_of_p(klass)
 
     assert_generated_true(predicate)
 

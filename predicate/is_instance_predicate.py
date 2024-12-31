@@ -18,5 +18,9 @@ class IsInstancePredicate[T](Predicate[T]):
         return f"is_{name}_p"
 
     @override
+    def get_klass(self) -> type:
+        return self.instance_klass  # type: ignore
+
+    @override
     def explain_failure(self, x: T) -> dict:
         return {"reason": f"{x} is not an instance of {self.instance_klass}"}

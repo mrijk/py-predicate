@@ -1,4 +1,4 @@
-from typing import Iterator
+from typing import Callable, Iterator
 
 from predicate.eq_predicate import EqPredicate
 from predicate.ge_predicate import GePredicate
@@ -31,10 +31,12 @@ def generate_predicate(predicate_type: type[Predicate], max_depth: int, klass: t
 
 
 def random_values_of_type(klass: type) -> Iterator:
-    from predicate.generator.helpers import random_ints, random_strings
+    from predicate.generator.helpers import random_bools, random_floats, random_ints, random_strings
 
-    type_registry = {
+    type_registry: dict[type, Callable[[], Iterator]] = {
+        bool: random_bools,
         int: random_ints,
+        float: random_floats,
         str: random_strings,
     }
 
@@ -44,16 +46,20 @@ def random_values_of_type(klass: type) -> Iterator:
         raise ValueError(f"No generator found for {klass}")
 
 
-def generate_and_predicates(max_depth: int, klass: type) -> Iterator:
-    if not max_depth:
-        return
-
+def generate_random_predicate_pairs(max_depth: int, klass: type) -> Iterator:
     from predicate.generator.helpers import random_predicates
 
     left_predicates = random_predicates(max_depth=max_depth - 1, klass=klass)
     right_predicates = random_predicates(max_depth=max_depth - 1, klass=klass)
 
-    yield from (left & right for left, right in zip(left_predicates, right_predicates, strict=False))
+    return zip(left_predicates, right_predicates, strict=False)
+
+
+def generate_and_predicates(max_depth: int, klass: type) -> Iterator:
+    if not max_depth:
+        return
+
+    yield from (left & right for left, right in generate_random_predicate_pairs(max_depth=max_depth, klass=klass))
 
 
 def generate_eq_predicates(max_depth: int, klass: type) -> Iterator:
@@ -94,21 +100,11 @@ def generate_or_predicates(max_depth: int, klass: type) -> Iterator:
     if not max_depth:
         return
 
-    from predicate.generator.helpers import random_predicates
-
-    left_predicates = random_predicates(max_depth=max_depth - 1, klass=klass)
-    right_predicates = random_predicates(max_depth=max_depth - 1, klass=klass)
-
-    yield from (left | right for left, right in zip(left_predicates, right_predicates, strict=False))
+    yield from (left | right for left, right in generate_random_predicate_pairs(max_depth=max_depth, klass=klass))
 
 
 def generate_xor_predicates(max_depth: int, klass: type) -> Iterator:
     if not max_depth:
         return
 
-    from predicate.generator.helpers import random_predicates
-
-    left_predicates = random_predicates(max_depth=max_depth - 1, klass=klass)
-    right_predicates = random_predicates(max_depth=max_depth - 1, klass=klass)
-
-    yield from (left ^ right for left, right in zip(left_predicates, right_predicates, strict=False))
+    yield from (left ^ right for left, right in generate_random_predicate_pairs(max_depth=max_depth, klass=klass))

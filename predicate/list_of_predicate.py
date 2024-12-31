@@ -28,6 +28,10 @@ class ListOfPredicate[T](Predicate[T]):
         return f"is_list_of_p({self.predicate})"
 
     @override
+    def get_klass(self) -> type:
+        return Predicate[self.predicate.klass]  # type: ignore[name-defined]
+
+    @override
     def explain_failure(self, x: Any) -> dict:
         match x:
             case list() as l:

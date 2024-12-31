@@ -23,4 +23,8 @@ class IsPredicateOfPredicate[T](Predicate[T]):
 
     @override
     def explain_failure(self, x: T) -> dict:
-        return {"reason": f"{x} is not a predicate of type {self.predicate_klass!r}"}
+        match x:
+            case Predicate():
+                return {"reason": f"{x} is not a predicate of type {self.predicate_klass.__name__!r}"}
+            case _:
+                return {"reason": f"Value `{x}` is not a predicate"}
