@@ -133,6 +133,7 @@ __all__ = [
     "is_none_p",
     "is_not_empty_p",
     "is_not_none_p",
+    "is_predicate_of_p",
     "is_predicate_p",
     "is_range_p",
     "is_set_of_p",

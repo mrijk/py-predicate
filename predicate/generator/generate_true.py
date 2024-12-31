@@ -374,12 +374,12 @@ def generate_truthy(_predicate: IsTruthyPredicate) -> Iterator:
 
 @generate_true.register
 def generate_predicate_of(predicate: IsPredicateOfPredicate, **kwargs) -> Iterator:
-    yield from random_predicates(**kwargs)
+    yield from random_predicates(**kwargs, klass=predicate.predicate_klass)
 
 
 @generate_true.register
 def generate_is_instance_p(predicate: IsInstancePredicate, **kwargs) -> Iterator:
-    klass = predicate.klass[0]  # type: ignore
+    klass = predicate.instance_klass[0]  # type: ignore
 
     type_registry: dict[Any, Callable[[], Iterator]] = {
         Callable: random_callables,

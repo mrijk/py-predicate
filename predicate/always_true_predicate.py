@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Final
+from typing import Any, Final, override
 
 from predicate.predicate import Predicate
 
@@ -13,6 +13,10 @@ class AlwaysTruePredicate(Predicate):
 
     def __repr__(self) -> str:
         return "always_true_p"
+
+    @override
+    def get_klass(self) -> type:
+        return type(Any)
 
 
 always_true_p: Final[AlwaysTruePredicate] = AlwaysTruePredicate()

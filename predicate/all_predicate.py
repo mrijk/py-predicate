@@ -18,10 +18,14 @@ class AllPredicate[T](Predicate[T]):
         return predicate in self.predicate
 
     def __repr__(self) -> str:
-        return f"all({repr(self.predicate)})"
+        return f"all_p({self.predicate!r})"
+
+    @override
+    def get_klass(self) -> type:
+        return self.predicate.klass
 
     @override
     def explain_failure(self, iterable: Iterable[T]) -> dict:
         fail = first_false(iterable, self.predicate)
 
-        return {"reason": f"Item '{fail}' didn't match predicate {repr(self.predicate)}"}
+        return {"reason": f"Item '{fail}' didn't match predicate {self.predicate!r}"}

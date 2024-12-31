@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Final, override
+from typing import Any, Final, override
 
 from predicate.predicate import Predicate
 
@@ -17,6 +17,10 @@ class AlwaysFalsePredicate(Predicate):
     @override
     def explain_failure(self, *args, **kwargs) -> dict:
         return {"reason": "Always returns False"}
+
+    @override
+    def get_klass(self) -> type:
+        return type(Any)
 
 
 always_false_p: Final[AlwaysFalsePredicate] = AlwaysFalsePredicate()

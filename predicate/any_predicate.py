@@ -17,8 +17,12 @@ class AnyPredicate[T](Predicate[T]):
         return predicate in self.predicate
 
     def __repr__(self) -> str:
-        return f"any({repr(self.predicate)})"
+        return f"any_p({self.predicate!r})"
+
+    @override
+    def get_klass(self) -> type:
+        return self.predicate.klass
 
     @override
     def explain_failure(self, iterable: Iterable[T]) -> dict:
-        return {"reason": f"No item matches predicate {repr(self.predicate)}"}
+        return {"reason": f"No item matches predicate {self.predicate!r}"}

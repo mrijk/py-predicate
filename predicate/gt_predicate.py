@@ -17,5 +17,9 @@ class GtPredicate[T](Predicate[T]):
         return f"gt_p({self.v!r})"
 
     @override
+    def get_klass(self) -> type:
+        return type(self.v)
+
+    @override
     def explain_failure(self, x: T) -> dict:
         return {"reason": f"{x} is not greater than {self.v!r}"}

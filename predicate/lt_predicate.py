@@ -17,5 +17,9 @@ class LtPredicate[T](Predicate[T]):
         return f"lt_p({self.v!r})"
 
     @override
+    def get_klass(self) -> type:
+        return type(self.v)
+
+    @override
     def explain_failure(self, x: T) -> dict:
         return {"reason": f"{x} is not less than {self.v!r}"}

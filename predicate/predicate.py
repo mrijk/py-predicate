@@ -34,6 +34,14 @@ class Predicate[T]:
         """Return True if the predicate argument is part of this predicate, otherwise False."""
         return predicate == self
 
+    @property
+    def klass(self) -> type:
+        return self.get_klass()
+
+    # @abstractmethod
+    def get_klass(self):
+        raise NotImplementedError
+
     def explain(self, x: Any) -> dict:
         if self(x):
             return {"result": True}
@@ -84,10 +92,14 @@ class AndPredicate[T](Predicate[T]):
                 return False
 
     def __repr__(self) -> str:
-        return f"{repr(self.left)} & {repr(self.right)}"
+        return f"{self.left!r} & {self.right!r}"
 
     def __contains__(self, predicate: Predicate[T]) -> bool:
         return predicate == self or predicate in self.left or predicate in self.right
+
+    @override
+    def get_klass(self) -> type:
+        return self.left.klass
 
     @override
     def explain_failure(self, x: T) -> dict:
@@ -141,6 +153,10 @@ class NotPredicate[T](Predicate[T]):
         return predicate == self or predicate in self.predicate
 
     @override
+    def get_klass(self) -> type:
+        return self.predicate.klass
+
+    @override
     def explain_failure(self, x: T) -> dict:
         return {"predicate": self.predicate.explain(x), "reason": f"not {self.predicate}"}
 
@@ -180,6 +196,10 @@ class OrPredicate[T](Predicate[T]):
         return predicate == self or predicate in self.left or predicate in self.right
 
     @override
+    def get_klass(self) -> type:
+        return self.left.klass
+
+    @override
     def explain_failure(self, x: T) -> dict:
         return {
             "left": self.left.explain(x),
@@ -216,10 +236,14 @@ class XorPredicate[T](Predicate[T]):
                 return False
 
     def __repr__(self) -> str:
-        return f"{repr(self.left)} ^ {repr(self.right)}"
+        return f"{self.left!r} ^ {self.right!r}"
 
     def __contains__(self, predicate: Predicate[T]) -> bool:
         return predicate == self or predicate in self.left or predicate in self.right
+
+    @override
+    def get_klass(self) -> type:
+        return self.left.klass
 
     @override
     def explain_failure(self, x: T) -> dict:

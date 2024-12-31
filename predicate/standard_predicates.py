@@ -28,11 +28,7 @@ from predicate.le_predicate import LePredicate
 from predicate.list_of_predicate import ListOfPredicate
 from predicate.lt_predicate import LtPredicate
 from predicate.ne_predicate import NePredicate
-from predicate.predicate import (
-    ConstrainedT,
-    Predicate,
-    resolve_predicate,
-)
+from predicate.predicate import ConstrainedT, Predicate, resolve_predicate
 from predicate.range_predicate import GeLePredicate, GeLtPredicate, GtLePredicate, GtLtPredicate
 from predicate.regex_predicate import RegexPredicate
 from predicate.root_predicate import RootPredicate
@@ -145,7 +141,7 @@ def lazy_p(ref: str) -> LazyPredicate:
 
 def is_instance_p(*klass: type) -> Predicate:
     """Return True if value is an instance of one of the classes, otherwise False."""
-    return IsInstancePredicate(klass=klass)
+    return IsInstancePredicate(instance_klass=klass)
 
 
 def is_iterable_of_p[T](predicate: Predicate[T]) -> Predicate:
@@ -195,7 +191,7 @@ def regex_p(pattern: str) -> Predicate[str]:
 
 
 def is_predicate_of_p(klass: type) -> Predicate:
-    return IsPredicateOfPredicate(klass)
+    return IsPredicateOfPredicate(predicate_klass=klass)
 
 
 is_bool_p = is_instance_p(bool)
