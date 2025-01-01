@@ -297,17 +297,36 @@ This predicate tests if the value is of type ``float``.
 
     from predicate import is_float_p
 
+    assert not is_float_p(3)
+    assert is_float_p(3.14)
+
+
 is_hashable_p
 -------------
+
+This predicate tests if the value is hashable.
+
 .. code-block:: python
 
     from predicate import is_hashable_p
 
+    assert not is_hashable_p({})
+    assert is_hashable_p("foo")
+
 is_inf_p
 --------
+
+This predicate tests if the value is infinite.
+
 .. code-block:: python
 
+    import math
     from predicate import is_inf_p
+
+    assert not is_inf_p(3)
+    assert is_inf_p(math.inf)
+
+
 
 is_instance_p
 -------------
@@ -323,6 +342,10 @@ This predicate tests if the value is of type ``int``.
 .. code-block:: python
 
     from predicate import is_int_p
+
+    assert not is_int_p(3.14)
+    assert is_int_p(3)
+
 
 is_iterable_of_p
 ----------------
@@ -342,9 +365,19 @@ This predicate tests if the value is of type ``Iterable``.
 
 is_list_of_p
 ------------
+
+This predicate predicate tests if the value if a list, where all items in the list conform to
+a given predicate.
+
 .. code-block:: python
 
-    from predicate import is_list_of_p
+    from predicate import is_list_of_p, is_str_p
+
+    is_list_of_str = is_list_of_p(is_str_p)
+
+    assert not is_list_of_str(["one", "two", 3])
+    assert is_list_of_str(["foo"])
+
 
 is_list_p
 ---------
@@ -355,17 +388,27 @@ This predicate tests if the value is of type ``list``.
 
     from predicate import is_list_p
 
+    assert not is_list_p({1, 2, 3})
+    assert is_list_p([1, 2, 3])
+
 is_none_p
 ---------
 .. code-block:: python
 
     from predicate import is_none_p
 
+    assert not is_none_p(13)
+    assert is_none_p(None)
+
+
 is_not_none_p
 -------------
 .. code-block:: python
 
     from predicate import is_not_none_p
+
+    assert not is_not_none_p(None)
+    assert is_not_none_p(13)
 
 is_predicate_p
 --------------
@@ -390,9 +433,19 @@ This predicate tests if value is a range.
 
 is_set_of_p
 -----------
+
+This predicate predicate tests if the value if a set, where all items in the set conform to
+a given predicate.
+
 .. code-block:: python
 
-    from predicate import is_set_of_p
+    from predicate import is_set_of_p, is_str_p
+
+    is_set_of_str = is_set_of_p(is_str_p)
+
+    assert not is_set_of_str({"one", "two", 3})
+    assert is_set_of_str({"foo"})
+
 
 is_set_p
 --------

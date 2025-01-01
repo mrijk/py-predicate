@@ -6,13 +6,15 @@ These predicates form the building blocks (and, or, not, xor) to compose more co
 And predicate
 -------------
 
-The 'and' predicate combines two predicates into a new one, using the overloaded & operator.
+The ``and`` predicate combines two predicates into a new one, using the overloaded & operator.
 
 The predicate evaluates to True if both predicates are True, otherwise False.
 
-In the next example we combine 2 predicates (ge_2 and le_3) into a new one:
+In the next example we combine 2 predicates (``ge_2`` and ``le_3``) into a new one:
 
 .. code-block:: python
+
+    from predicate import ge_p, le_p
 
     ge_2 = ge_p(2)
     le_3 = le_p(3)
@@ -27,13 +29,15 @@ In the next example we combine 2 predicates (ge_2 and le_3) into a new one:
 Or predicate
 ------------
 
-The 'or' predicate combines two predicates into a new one, using the overloaded | operator.
+The ``or`` predicate combines two predicates into a new one, using the overloaded | operator.
 
 The predicate evaluates to True if any of the predicates is true, otherwise False.
 
 Example:
 
 .. code-block:: python
+
+    from predicate import ge_p, le_p
 
     ge_4 = ge_p(4)
     le_2 = le_p(2)
@@ -47,7 +51,7 @@ Example:
 Xor predicate
 -------------
 
-The 'xor' predicate combines two predicates into a new one, using the overloaded ^ operator.
+The ``xor`` predicate combines two predicates into a new one, using the overloaded ^ operator.
 
 The predicate evaluates to True if exactly one of the two predicates is True, otherwise False.
 
@@ -55,6 +59,8 @@ Example:
 
 
 .. code-block:: python
+
+    from predicate import ge_p
 
     ge_2 = ge_p(2)
     ge_4 = ge_p(4)
@@ -69,11 +75,13 @@ Example:
 Not predicate
 -------------
 
-The 'not' predicate negates a predicate, using the overloaded ~ operator
+The ``not`` predicate negates a predicate, using the overloaded ~ operator
 
 Example:
 
 .. code-block:: python
+
+    from predicate import ge_p
 
     ge_2 = ge_p(2)
 
