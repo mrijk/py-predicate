@@ -1,6 +1,6 @@
 from helpers import is_or_p
 
-from predicate import always_false_p, always_true_p, can_optimize, ge_p, in_p, not_in_p, optimize
+from predicate import always_false_p, always_true_p, can_optimize, ge_p, in_p, is_empty_p, not_in_p, optimize
 from predicate.standard_predicates import all_p, any_p, eq_p, ne_p
 
 
@@ -280,3 +280,23 @@ def test_optimize_nested_or_1(p, q, r, s):
     optimized = optimize(predicate)
 
     assert optimized == always_true_p
+
+
+def test_or_optimize_all_or_any(p):
+    predicate = all_p(p) | any_p(p)
+
+    assert can_optimize(predicate)
+
+    optimized = optimize(predicate)
+
+    assert optimized == is_empty_p | any_p(p)
+
+
+def test_or_optimize_any_or_all(p):
+    predicate = any_p(p) | all_p(p)
+
+    assert can_optimize(predicate)
+
+    optimized = optimize(predicate)
+
+    assert optimized == is_empty_p | any_p(p)

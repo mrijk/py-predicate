@@ -1,6 +1,8 @@
+from predicate.all_predicate import AllPredicate
 from predicate.always_true_predicate import AlwaysTruePredicate, always_true_p
 from predicate.any_predicate import AnyPredicate
 from predicate.eq_predicate import EqPredicate
+from predicate.is_empty_predicate import IsEmptyPredicate
 from predicate.optimizer.in_optimizer import optimize_in_predicate, optimize_not_in_predicate
 from predicate.predicate import AndPredicate, NotPredicate, OrPredicate, Predicate
 from predicate.set_predicates import InPredicate, NotInPredicate
@@ -73,6 +75,12 @@ def optimize_or_predicate[T](predicate: OrPredicate[T]) -> Predicate[T]:
             if v := v2 - (v1 & v2):
                 return optimize_not_in_predicate(NotInPredicate(v=v))
             return always_true_p
+
+        case AllPredicate(left_all), AnyPredicate(right_any) if left_all == right_any:
+            return OrPredicate(left=IsEmptyPredicate(), right=right)
+
+        case AnyPredicate(left_any), AllPredicate(right_all) if left_any == right_all:
+            return OrPredicate(left=IsEmptyPredicate(), right=left)
 
         case AnyPredicate(left_any), AnyPredicate(right_any):
             return AnyPredicate(optimize(OrPredicate(left=left_any, right=right_any)))

@@ -1,5 +1,6 @@
 from typing import Callable, Iterator
 
+from predicate.all_predicate import AllPredicate
 from predicate.eq_predicate import EqPredicate
 from predicate.ge_predicate import GePredicate
 from predicate.gt_predicate import GtPredicate
@@ -11,6 +12,8 @@ from predicate.predicate import AndPredicate, NotPredicate, OrPredicate, Predica
 
 def generate_predicate(predicate_type: type[Predicate], max_depth: int, klass: type) -> Iterator[Predicate]:
     predicate_type_registry = {
+        # TODO: AllPredicate works on iterables
+        # AllPredicate: generate_all_predicates,
         AndPredicate: generate_and_predicates,
         EqPredicate: generate_eq_predicates,
         GePredicate: generate_ge_predicates,
@@ -53,6 +56,17 @@ def generate_random_predicate_pairs(max_depth: int, klass: type) -> Iterator:
     right_predicates = random_predicates(max_depth=max_depth - 1, klass=klass)
 
     return zip(left_predicates, right_predicates, strict=False)
+
+
+def generate_all_predicates(max_depth: int, klass: type) -> Iterator:
+    if not max_depth:
+        return
+
+    from predicate.generator.helpers import random_predicates
+
+    predicates = random_predicates(max_depth=max_depth - 1, klass=klass)
+
+    yield from (AllPredicate(predicate) for predicate in predicates)
 
 
 def generate_and_predicates(max_depth: int, klass: type) -> Iterator:
