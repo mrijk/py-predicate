@@ -23,10 +23,10 @@ from predicate.standard_predicates import is_bool_p, is_dict_p, is_list_p, is_no
 
 
 def construct(false_set: list, true_set: list, attempts: int = 30) -> Predicate | None:
-    predicates = list(initial_predicates())
+    predicates = initial_predicates()
 
     while attempts:
-        sorted_by_match = sort_by_match(predicates, false_set=false_set, true_set=true_set)
+        sorted_by_match = sort_by_match(list(predicates), false_set=false_set, true_set=true_set)
 
         if perfect_match(matched := first(sorted_by_match), false_set=false_set, true_set=true_set):
             return matched
