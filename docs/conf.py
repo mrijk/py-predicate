@@ -7,7 +7,7 @@
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
 project = "py-predicate"
-copyright = "2024, Maurits Rijk"
+copyright = "2024-2025, Maurits Rijk"
 author = "Maurits Rijk"
 release = "0.1"
 

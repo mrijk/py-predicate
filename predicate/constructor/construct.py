@@ -1,6 +1,6 @@
 from typing import Iterator
 
-from more_itertools import gray_product
+from more_itertools import first, take
 
 from predicate import (
     always_false_p,
@@ -14,32 +14,33 @@ from predicate import (
     is_str_p,
     is_truthy_p,
 )
+from predicate.constructor.helpers import perfect_match, sort_by_match
+from predicate.constructor.mutate import mutations
 from predicate.predicate import Predicate
-from predicate.standard_predicates import all_p, is_bool_p, is_dict_p, is_list_p, is_none_p
+from predicate.standard_predicates import is_bool_p, is_dict_p, is_list_p, is_none_p, ne_p, zero_p
 
 # TODO: this is very much work under construction (pun intended) and not ready for public consumption
 
 
-def construct(false_set: list, true_set: list) -> Iterator[Predicate]:
+def construct(false_set: list, true_set: list, attempts: int = 30) -> Predicate | None:
     predicates = list(initial_predicates())
 
-    while True:
-        for predicate in predicates:
-            all_true = all_p(predicate)
-            all_false = all_p(~predicate)
-            if all_true(true_set) and all_false(false_set):
-                yield predicate
+    while attempts:
+        sorted_by_match = sort_by_match(predicates, false_set=false_set, true_set=true_set)
 
-        predicates = list(create_mutations(predicates))
+        if perfect_match(matched := first(sorted_by_match), false_set=false_set, true_set=true_set):
+            return matched
+
+        predicates = create_mutations(take(100, sorted_by_match), false_set=false_set, true_set=true_set)
+
+        attempts -= 1
+
+    return None
 
 
-def create_mutations(candidates: list[Predicate]) -> Iterator[Predicate]:
-    pairs = gray_product(candidates, candidates)
-    for pair in pairs:
-        left, right = pair
-        if left != right:
-            yield left | right
-            yield left & right
+def create_mutations(candidates: list[Predicate], false_set: list, true_set: list) -> Iterator[Predicate]:
+    for candidate in candidates:
+        yield from mutations(candidate, false_set=false_set, true_set=true_set)
 
 
 def initial_predicates() -> Iterator[Predicate]:
@@ -58,3 +59,5 @@ def initial_predicates() -> Iterator[Predicate]:
     yield is_set_p
     yield is_str_p
     yield is_truthy_p
+    yield zero_p
+    yield ne_p(0)

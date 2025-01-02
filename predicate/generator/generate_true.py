@@ -317,7 +317,7 @@ def generate_lt(predicate: LtPredicate) -> Iterator:
 
 @generate_true.register
 def generate_ne(predicate: NePredicate) -> Iterator:
-    yield not predicate.v
+    yield from generate_anys(predicate)
 
 
 @generate_true.register
