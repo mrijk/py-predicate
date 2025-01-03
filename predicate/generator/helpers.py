@@ -81,7 +81,8 @@ def random_sets(min_size: int = 0, max_size: int = 10) -> Iterator:
     while True:
         length = random.randint(min_size, max_size)
         values = take(length, random_anys())
-        yield set(values)
+        if len(result := set(values)) == length:
+            yield result
 
 
 def random_bools() -> Iterator:
@@ -156,7 +157,7 @@ def random_uuids() -> Iterator[UUID]:
 
 
 def random_anys() -> Iterator:
-    yield from interleave(random_ints(), random_strings(), random_floats())
+    yield from interleave(random_bools(), random_ints(), random_strings(), random_floats(), random_datetimes())
 
 
 def generate_strings(predicate: Predicate[str]) -> Iterator[str]:

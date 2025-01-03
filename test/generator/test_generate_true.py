@@ -5,6 +5,7 @@ from ipaddress import IPv4Network
 import pytest
 from more_itertools import take
 
+from generator.helpers import combinations_of_2
 from predicate import (
     all_p,
     always_false_p,
@@ -99,7 +100,6 @@ def foo(self) -> bool:
         is_set_p,
         is_str_p,
         is_tuple_p,
-        is_int_p | is_str_p,
         ~is_int_p,
         is_int_p ^ is_str_p,
         is_uuid_p,
@@ -115,6 +115,13 @@ def foo(self) -> bool:
     ],
 )
 def test_generate_true(predicate):
+    assert_generated_true(predicate)
+
+
+@pytest.mark.parametrize("predicate_pair", combinations_of_2())
+def test_generate_true_or(predicate_pair):
+    predicate_1, predicate_2 = predicate_pair
+    predicate = predicate_1 | predicate_2
     assert_generated_true(predicate)
 
 

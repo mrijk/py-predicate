@@ -4,6 +4,7 @@ from datetime import datetime, timedelta
 import pytest
 from more_itertools import take
 
+from generator.helpers import combinations_of_2
 from predicate import (
     all_p,
     always_false_p,
@@ -90,9 +91,7 @@ from predicate import (
         ne_p(2),
         not_in_p(2, "foo", 4),
         ne_p(2) & ne_p(3),
-        is_int_p | is_str_p,
         ~is_int_p,
-        is_int_p ^ is_str_p,
         neg_p,
         pos_p,
         zero_p,
@@ -101,6 +100,33 @@ from predicate import (
     ],
 )
 def test_generate_false(predicate):
+    assert_generated_false(predicate)
+
+
+@pytest.mark.parametrize("predicate_pair", combinations_of_2())
+def test_generate_false_and(predicate_pair):
+    predicate_1, predicate_2 = predicate_pair
+    predicate = predicate_1 & predicate_2
+    assert_generated_false(predicate)
+
+
+@pytest.mark.parametrize("predicate_pair", combinations_of_2())
+def test_generate_false_or(predicate_pair):
+    predicate_1, predicate_2 = predicate_pair
+    predicate = predicate_1 | predicate_2
+    assert_generated_false(predicate)
+
+
+@pytest.mark.parametrize("predicate_pair", combinations_of_2())
+def test_generate_false_xor(predicate_pair):
+    predicate_1, predicate_2 = predicate_pair
+    predicate = predicate_1 ^ predicate_2
+    assert_generated_false(predicate)
+
+
+def test_generate_false_or_with_3():
+    predicate = is_int_p | is_str_p | is_float_p
+
     assert_generated_false(predicate)
 
 
@@ -334,14 +360,6 @@ def test_set_of(set_type_p):
     assert_generated_false(predicate)
 
 
-def assert_generated_false(predicate):
-    values = take(5, generate_false(predicate))
-    assert values
-
-    for value in values:
-        assert not predicate(value)
-
-
 def test_generate_false_unknown(unknown_p):
     with pytest.raises(ValueError):
         take(5, generate_false(unknown_p))
@@ -375,3 +393,11 @@ def test_generate_false_unknown_range(range_predicate):
     predicate = range_predicate(lower="bar", upper="foo")
     with pytest.raises(ValueError):
         take(5, generate_false(predicate))
+
+
+def assert_generated_false(predicate):
+    values = take(5, generate_false(predicate))
+    assert values
+
+    for value in values:
+        assert not predicate(value)

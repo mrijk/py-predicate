@@ -331,9 +331,18 @@ def generate_is_instance_p(predicate: IsInstancePredicate) -> Iterator:
 
 @generate_false.register
 def generate_or(predicate: OrPredicate) -> Iterator:
-    iterable_1 = (item for item in generate_false(predicate.left) if not predicate.right(item))
-    iterable_2 = (item for item in generate_false(predicate.right) if not predicate.left(item))
-    yield from random_first_from_iterables(iterable_1, iterable_2)
+    attempts = 100
+
+    try_left = (item for item in take(attempts, generate_false(predicate.left)) if not predicate.right(item))
+    try_right = (item for item in take(attempts, generate_false(predicate.right)) if not predicate.left(item))
+
+    range_1 = (item for item in generate_false(predicate.left) if not predicate.right(item)) if try_left else ()
+    range_2 = (item for item in generate_false(predicate.right) if not predicate.left(item)) if try_right else ()
+
+    if range_1 or range_2:
+        yield from random_first_from_iterables(range_1, range_2)
+
+    raise ValueError(f"Couldn't generate values that statisfy {predicate}")
 
 
 @generate_false.register
