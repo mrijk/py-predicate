@@ -1,6 +1,6 @@
 import pytest
 
-from predicate import always_false_p, always_true_p
+from predicate import always_false_p, always_true_p, ge_p
 from predicate.implies import Implies
 from predicate.named_predicate import NamedPredicate
 from predicate.parser import parse_expression
@@ -125,8 +125,16 @@ def test_parser_failure(p, q):
     assert predicate is None
 
 
-# def test_parser_gt():
-#     expression = "x > 2"
-#
-#     with pytest.raises(Exception):
-#         parse_expression(expression)
+def test_parser_ge_p():
+    expression = "ge_p(2)"
+
+    predicate = parse_expression(expression)
+
+    assert predicate == ge_p(2)
+
+
+def test_parser_gt_p():
+    expression = "gt_p(2)"
+
+    with pytest.raises(Exception):  # noqa: B017
+        parse_expression(expression)

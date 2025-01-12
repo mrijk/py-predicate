@@ -3,7 +3,9 @@ import sys
 from typing import Annotated
 
 import typer
+from more_itertools import take
 
+from predicate import generate_true
 from predicate import optimize as optimize_predicate
 from predicate.formatter import to_dot, to_json, to_latex
 from predicate.parser import parse_expression
@@ -12,6 +14,7 @@ from predicate.truth_table import get_named_predicates, truth_table
 
 app = typer.Typer()
 
+Number = Annotated[int, typer.Option("--number", "-n", help="Number of values to generate")]
 Expression = Annotated[str, typer.Argument(help="Predicate expression")]
 Optimize = Annotated[bool, typer.Option("--optimize", "-o", help="Enable predicate optimization")]
 
@@ -58,6 +61,18 @@ def table(expression: Expression, optimize: Optimize = False) -> None:
         sys.stdout.write(f"{format_header(predicate)}\n")
         for row in truth_table(predicate):
             sys.stdout.write(f"{format_values(row[0])}:   {as_bit(row[1])}\n")
+    else:
+        failed_to_pass(expression)
+
+
+@app.command("generate", help="Generate values based on the predicate expression")
+def generate(expression: Expression, number: Number = 10) -> None:
+    if predicate := expression_to_predicate(expression):
+        if values := take(number, generate_true(predicate)):
+            for value in values:
+                sys.stdout.write(f"{value}\n")
+        else:
+            sys.stderr.write(f"Could not generate True values for predicate `{predicate}`\n")
     else:
         failed_to_pass(expression)
 

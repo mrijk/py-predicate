@@ -1,3 +1,5 @@
+from datetime import datetime
+
 import pytest
 from generator.helpers import combinations_of_2
 from more_itertools import take
@@ -35,7 +37,6 @@ from predicate.constructor.construct import construct
     [
         always_false_p,
         always_true_p,
-        eq_p(13),
         is_falsy_p,
         is_bool_p,
         is_datetime_p,
@@ -48,7 +49,6 @@ from predicate.constructor.construct import construct
         is_dict_p,
         is_list_p,
         is_set_p,
-        ne_p(42),
         is_int_p | is_str_p | is_float_p,
         ge_p(13),
         gt_p(13),
@@ -57,6 +57,24 @@ from predicate.constructor.construct import construct
     ],
 )
 def test_construct(predicate):
+    assert_generated(predicate)
+
+
+@pytest.mark.parametrize("value", [42, 3.14, "foo", True, datetime.now()])
+def test_construct_eq(value):
+    predicate = eq_p(value)
+    assert_generated(predicate)
+
+
+@pytest.mark.parametrize("value", [42, True])
+def test_construct_ge(value):
+    predicate = ge_p(value)
+    assert_generated(predicate)
+
+
+@pytest.mark.parametrize("value", [42, 3.14, "foo", True, datetime.now()])
+def test_construct_ne(value):
+    predicate = ne_p(value)
     assert_generated(predicate)
 
 
@@ -83,6 +101,15 @@ def test_construct_xor(predicate_pair):
     predicate = predicate_1 ^ predicate_2
 
     assert_generated(predicate)
+
+
+def test_construct_not_possible():
+    false_set = [0]
+    true_set = [0]
+
+    matched = construct(false_set=false_set, true_set=true_set)
+
+    assert matched is None
 
 
 def assert_generated(predicate):

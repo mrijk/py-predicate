@@ -1,4 +1,4 @@
-from typing import Callable, Iterator
+from typing import Any, Callable, Iterator
 
 from predicate.all_predicate import AllPredicate
 from predicate.eq_predicate import EqPredicate
@@ -11,7 +11,7 @@ from predicate.predicate import AndPredicate, NotPredicate, OrPredicate, Predica
 
 
 def generate_predicate(predicate_type: type[Predicate], max_depth: int, klass: type) -> Iterator[Predicate]:
-    predicate_type_registry = {
+    predicate_type_registry: dict[type, Any] = {
         # TODO: AllPredicate works on iterables
         # AllPredicate: generate_all_predicates,
         AndPredicate: generate_and_predicates,

@@ -218,6 +218,7 @@ def generate_ge(predicate: GePredicate) -> Iterator:
         case int():
             yield from random_ints(lower=predicate.v)
         case str():
+            yield v
             yield from generate_strings(predicate)
         case UUID():
             yield from generate_uuids(predicate)
