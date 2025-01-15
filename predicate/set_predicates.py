@@ -1,5 +1,7 @@
 from dataclasses import dataclass
-from typing import Iterable
+from typing import Any, Iterable, override
+
+from more_itertools import first
 
 from predicate.predicate import Predicate
 
@@ -71,6 +73,12 @@ class InPredicate[T](Predicate[T]):
     def __repr__(self) -> str:
         items = ", ".join(str(item) for item in self.v)
         return f"in_p({items})"
+
+    @override
+    def get_klass(self) -> type:
+        # TODO: v could have different types
+        types = (type(value) for value in self.v)
+        return first(types, Any)
 
 
 @dataclass

@@ -382,7 +382,7 @@ def generate_predicate_of(predicate: IsPredicateOfPredicate, **kwargs) -> Iterat
 def generate_is_instance_p(predicate: IsInstancePredicate, **kwargs) -> Iterator:
     klass = predicate.instance_klass[0]  # type: ignore
 
-    type_registry: dict[Any, Callable[[], Iterator]] = {
+    type_registry: dict[Any, Callable[[...], Iterator]] = {
         Callable: random_callables,
         Container: random_containers,
         Iterable: random_iterables,
@@ -401,7 +401,7 @@ def generate_is_instance_p(predicate: IsInstancePredicate, **kwargs) -> Iterator
     }
 
     if generator := type_registry.get(klass):
-        yield from generator()
+        yield from generator(**kwargs)
     elif klass == Predicate:  # TODO
         yield from random_predicates(**kwargs)
     else:

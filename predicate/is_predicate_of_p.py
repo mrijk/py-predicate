@@ -13,12 +13,12 @@ class IsPredicateOfPredicate[T](Predicate[T]):
     def __call__(self, x: Any) -> bool:
         match x:
             case Predicate() as predicate:
-                return predicate.klass == self.predicate_klass
+                return predicate.klass == self.predicate_klass or predicate.klass == Any
             case _:
                 return False
 
     def __repr__(self) -> str:
-        name = self.predicate_klass[0].__name__  # type: ignore
+        name = self.predicate_klass.__name__  # type: ignore
         return f"is_predicate_of_p({name!r})"
 
     @override

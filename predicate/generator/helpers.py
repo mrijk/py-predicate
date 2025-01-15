@@ -1,14 +1,14 @@
 import random
 import string
 import sys
-from collections.abc import Iterable
+from collections.abc import Callable, Iterable
 from datetime import datetime, timedelta
 from itertools import cycle
 from random import choices
-from typing import Iterator
+from typing import Any, Iterator
 from uuid import UUID, uuid4
 
-from more_itertools import first, interleave, random_permutation, take
+from more_itertools import first, interleave, random_permutation, repeatfunc, take
 
 from predicate.generator.generate_predicate import generate_predicate
 from predicate.predicate import Predicate
@@ -34,8 +34,7 @@ def set_from_list(value: list, order: bool = False) -> Iterator:
 
 
 def random_complex_numbers() -> Iterator:
-    while True:
-        yield complex(1, 1)  # TODO
+    yield from (complex(real, imaginary) for real, imaginary in zip(random_ints(), random_ints(), strict=False))
 
 
 def random_callables() -> Iterator:
@@ -75,12 +74,12 @@ def random_predicates(*, max_depth: int = 10, klass: type = int) -> Iterator:
     yield from random_first_from_iterables(*iterables)
 
 
-def random_sets(min_size: int = 0, max_size: int = 10) -> Iterator:
+def random_sets(min_size: int = 0, max_size: int = 10, klass=Any) -> Iterator:
     if min_size == 0:
         yield set()
     while True:
         length = random.randint(min_size, max_size)
-        values = take(length, random_anys())
+        values = take(length, random_values_of_type(klass=klass))
         if len(result := set(values)) == length:
             yield result
 
@@ -111,7 +110,6 @@ def random_floats(lower: float = -1e-6, upper: float = 1e6) -> Iterator:
 def random_ints(lower: int = -sys.maxsize, upper: int = sys.maxsize) -> Iterator[int]:
     # yield lower
     # yield upper
-    # TODO: maybe first generate_true some smaller ints
 
     def between(limit: int) -> Iterator[int]:
         low = max(-limit, lower)
@@ -125,39 +123,67 @@ def random_ints(lower: int = -sys.maxsize, upper: int = sys.maxsize) -> Iterator
         yield from between(100)
 
 
-def random_iterables(min_size: int = 0, max_size: int = 10) -> Iterator[Iterable]:
+def random_iterables(min_size: int = 0, max_size: int = 10, klass=Any) -> Iterator[Iterable]:
     if max_size == 0:
         yield from ([], {}, (), "")
     else:
-        iterable_1 = random_sets(min_size=min_size, max_size=max_size)
-        iterable_2 = random_lists(min_size=min_size, max_size=max_size)
-        iterable_3 = random_tuples(min_size=min_size, max_size=max_size)
+        iterable_1 = random_sets(min_size=min_size, max_size=max_size, klass=klass)
+        iterable_2 = random_lists(min_size=min_size, max_size=max_size, klass=klass)
+        iterable_3 = random_tuples(min_size=min_size, max_size=max_size, klass=klass)
         yield from random_first_from_iterables(iterable_1, iterable_2, iterable_3)
 
 
-def random_lists(min_size: int = 0, max_size: int = 10) -> Iterator[Iterable]:
+def random_lists(min_size: int = 0, max_size: int = 10, klass=Any) -> Iterator[Iterable]:
     if min_size == 0:
         yield []
     while True:
         length = random.randint(min_size, max_size)
-        yield take(length, random_anys())
+        yield take(length, random_values_of_type(klass=klass))
 
 
-def random_tuples(min_size: int = 0, max_size: int = 10) -> Iterator[Iterable]:
+def random_tuples(min_size: int = 0, max_size: int = 10, klass=Any) -> Iterator[Iterable]:
     if min_size == 0:
         yield ()
     while True:
         length = random.randint(min_size, max_size)
-        yield tuple(take(length, random_anys()))
+        yield tuple(take(length, random_values_of_type(klass=klass)))
 
 
 def random_uuids() -> Iterator[UUID]:
-    while True:
-        yield uuid4()
+    yield from repeatfunc(uuid4)
 
 
 def random_anys() -> Iterator:
     yield from interleave(random_bools(), random_ints(), random_strings(), random_floats(), random_datetimes())
+
+
+def random_values_of_type(klass: type) -> Iterator:
+    type_registry: dict[type, Callable[[], Iterator]] = {
+        bool: random_bools,
+        int: random_ints,
+        float: random_floats,
+        str: random_strings,
+        Any: random_anys,
+    }
+
+    if generator := type_registry.get(klass):
+        yield from generator()
+    else:
+        raise ValueError(f"No generator found for {klass}")
+
+
+def random_constrained_values_of_type(klass: type) -> Iterator:
+    type_registry: dict[type, Callable[[], Iterator]] = {
+        int: random_ints,
+        float: random_floats,
+        str: random_strings,
+    }
+
+    if generator := type_registry.get(klass):
+        yield from generator()
+    else:
+        yield from []
+        # raise ValueError(f"No generator found for {klass}")
 
 
 def generate_strings(predicate: Predicate[str]) -> Iterator[str]:
