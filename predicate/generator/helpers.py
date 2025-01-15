@@ -163,11 +163,12 @@ def random_values_of_type(klass: type) -> Iterator:
         int: random_ints,
         float: random_floats,
         str: random_strings,
-        Any: random_anys,
     }
 
     if generator := type_registry.get(klass):
         yield from generator()
+    elif klass == Any:
+        yield from random_anys()
     else:
         raise ValueError(f"No generator found for {klass}")
 

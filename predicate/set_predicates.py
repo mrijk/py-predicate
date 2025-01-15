@@ -78,7 +78,7 @@ class InPredicate[T](Predicate[T]):
     def get_klass(self) -> type:
         # TODO: v could have different types
         types = (type(value) for value in self.v)
-        return first(types, Any)
+        return first(types, Any)  # type: ignore
 
 
 @dataclass
