@@ -18,6 +18,10 @@ class GeLePredicate[T](Predicate[T]):
         return f"ge_le_p({self.lower!r}, {self.upper!r})"
 
     @override
+    def get_klass(self) -> type:
+        return type(self.lower)
+
+    @override
     def explain_failure(self, x: T) -> dict:
         return {"reason": f"{x!r} is not greater equal {self.lower!r} and less equal {self.upper!r}"}
 
@@ -34,6 +38,10 @@ class GeLtPredicate[T](Predicate[T]):
 
     def __repr__(self) -> str:
         return f"ge_lt_p({self.lower!r}, {self.upper!r})"
+
+    @override
+    def get_klass(self) -> type:
+        return type(self.lower)
 
     @override
     def explain_failure(self, x: T) -> dict:
@@ -54,6 +62,10 @@ class GtLePredicate[T](Predicate[T]):
         return f"gt_le_p({self.lower!r}, {self.upper!r})"
 
     @override
+    def get_klass(self) -> type:
+        return type(self.lower)
+
+    @override
     def explain_failure(self, x: T) -> dict:
         return {
             "reason": f"{x!r} is not greater than {self.lower!r} and less than or equal to {self.upper!r}",
@@ -72,6 +84,10 @@ class GtLtPredicate[T](Predicate[T]):
 
     def __repr__(self) -> str:
         return f"gt_lt_p({self.lower!r}, {self.upper!r})"
+
+    @override
+    def get_klass(self) -> type:
+        return type(self.lower)
 
     @override
     def explain_failure(self, x: T) -> dict:

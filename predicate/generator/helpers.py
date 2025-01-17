@@ -85,7 +85,8 @@ def random_sets(min_size: int = 0, max_size: int = 10, klass=Any) -> Iterator:
 
 
 def random_bools() -> Iterator:
-    yield from cycle((False, True))
+    yield from (False, True)
+    yield from repeatfunc(random.choice, None, (False, True))
 
 
 def random_containers() -> Iterator:
@@ -185,6 +186,17 @@ def random_constrained_values_of_type(klass: type) -> Iterator:
     else:
         yield from []
         # raise ValueError(f"No generator found for {klass}")
+
+
+def random_constrained_pairs_of_type(klass: type) -> Iterator[tuple]:
+    def ordered_tuple(x: Any, y: Any) -> tuple:
+        return (x, y) if x <= y else (y, x)
+
+    values_1 = random_constrained_values_of_type(klass)
+    values_2 = random_constrained_values_of_type(klass)
+    values = zip(values_1, values_2, strict=False)
+
+    yield from (ordered_tuple(x, y) for x, y in values)
 
 
 def generate_strings(predicate: Predicate[str]) -> Iterator[str]:

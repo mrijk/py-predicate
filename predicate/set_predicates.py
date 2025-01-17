@@ -58,6 +58,12 @@ class IsRealSupersetPredicate[T](Predicate[T]):
         return f"is_real_superset_p({self.v})"
 
 
+def class_from_set(v: set):
+    # TODO: v could have different types
+    types = (type(value) for value in v)
+    return first(types, Any)  # type: ignore
+
+
 @dataclass
 class InPredicate[T](Predicate[T]):
     """A predicate class that models the 'in' predicate."""
@@ -76,9 +82,7 @@ class InPredicate[T](Predicate[T]):
 
     @override
     def get_klass(self) -> type:
-        # TODO: v could have different types
-        types = (type(value) for value in self.v)
-        return first(types, Any)  # type: ignore
+        return class_from_set(self.v)
 
 
 @dataclass
@@ -96,6 +100,10 @@ class NotInPredicate[T](Predicate[T]):
     def __repr__(self) -> str:
         items = ", ".join(str(item) for item in self.v)
         return f"not_in_p({items})"
+
+    @override
+    def get_klass(self) -> type:
+        return class_from_set(self.v)
 
 
 def is_subset_p[T](v: set[T]) -> IsSubsetPredicate[T]:

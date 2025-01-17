@@ -8,7 +8,8 @@ from predicate.le_predicate import LePredicate
 from predicate.lt_predicate import LtPredicate
 from predicate.ne_predicate import NePredicate
 from predicate.predicate import AndPredicate, NotPredicate, OrPredicate, Predicate, XorPredicate
-from predicate.set_predicates import InPredicate
+from predicate.range_predicate import GeLePredicate, GeLtPredicate, GtLePredicate, GtLtPredicate
+from predicate.set_predicates import InPredicate, NotInPredicate
 
 
 def generate_predicate(predicate_type: type[Predicate], max_depth: int, klass: type) -> Iterator[Predicate]:
@@ -17,12 +18,17 @@ def generate_predicate(predicate_type: type[Predicate], max_depth: int, klass: t
         # AllPredicate: generate_all_predicates,
         AndPredicate: generate_and_predicates,
         EqPredicate: generate_eq_predicates,
+        GeLePredicate: generate_ge_le_predicates,
+        GeLtPredicate: generate_ge_lt_predicates,
         GePredicate: generate_ge_predicates,
         GtPredicate: generate_gt_predicates,
+        GtLePredicate: generate_gt_le_predicates,
+        GtLtPredicate: generate_gt_lt_predicates,
         InPredicate: generate_in_predicates,
         LePredicate: generate_le_predicates,
         LtPredicate: generate_lt_predicates,
         NePredicate: generate_ne_predicates,
+        NotInPredicate: generate_not_in_predicates,
         NotPredicate: generate_not_predicates,
         OrPredicate: generate_or_predicates,
         XorPredicate: generate_xor_predicates,
@@ -68,6 +74,30 @@ def generate_eq_predicates(max_depth: int, klass: type) -> Iterator:
     yield from (EqPredicate(value) for value in random_values_of_type(klass))
 
 
+def generate_ge_le_predicates(max_depth: int, klass: type) -> Iterator:
+    from predicate.generator.helpers import random_constrained_pairs_of_type
+
+    yield from (GeLePredicate(lower=lower, upper=upper) for lower, upper in random_constrained_pairs_of_type(klass))
+
+
+def generate_ge_lt_predicates(max_depth: int, klass: type) -> Iterator:
+    from predicate.generator.helpers import random_constrained_pairs_of_type
+
+    yield from (GeLtPredicate(lower=lower, upper=upper) for lower, upper in random_constrained_pairs_of_type(klass))
+
+
+def generate_gt_le_predicates(max_depth: int, klass: type) -> Iterator:
+    from predicate.generator.helpers import random_constrained_pairs_of_type
+
+    yield from (GtLePredicate(lower=lower, upper=upper) for lower, upper in random_constrained_pairs_of_type(klass))
+
+
+def generate_gt_lt_predicates(max_depth: int, klass: type) -> Iterator:
+    from predicate.generator.helpers import random_constrained_pairs_of_type
+
+    yield from (GtLtPredicate(lower=lower, upper=upper) for lower, upper in random_constrained_pairs_of_type(klass))
+
+
 def generate_ge_predicates(max_depth: int, klass: type) -> Iterator:
     from predicate.generator.helpers import random_constrained_values_of_type
 
@@ -84,6 +114,12 @@ def generate_in_predicates(max_depth: int, klass: type) -> Iterator:
     from predicate.generator.helpers import random_iterables
 
     yield from (InPredicate(iterable) for iterable in random_iterables(klass=klass))
+
+
+def generate_not_in_predicates(max_depth: int, klass: type) -> Iterator:
+    from predicate.generator.helpers import random_iterables
+
+    yield from (NotInPredicate(iterable) for iterable in random_iterables(klass=klass))
 
 
 def generate_le_predicates(max_depth: int, klass: type) -> Iterator:
