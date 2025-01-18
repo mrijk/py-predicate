@@ -20,6 +20,9 @@ class SetOfPredicate[T](Predicate[T]):
     def __repr__(self) -> str:
         return f"is_set_of_p({self.predicate})"
 
+    def get_klass(self) -> type:
+        return self.predicate.klass
+
     @override
     def explain_failure(self, x: set[T]) -> dict:
         fail = first_false(x, self.predicate)

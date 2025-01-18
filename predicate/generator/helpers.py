@@ -30,7 +30,7 @@ def set_from_list(value: list, order: bool = False) -> Iterator:
     length = len(value)
     if length and is_hashable_p(first(value)):
         if len(result := set(value)) == length:
-            yield result if order else random_permutation(result)
+            yield result if order else set(random_permutation(result))
 
 
 def random_complex_numbers() -> Iterator:

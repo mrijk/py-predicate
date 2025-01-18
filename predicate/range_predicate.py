@@ -1,3 +1,4 @@
+from abc import abstractmethod
 from dataclasses import dataclass
 from typing import override
 
@@ -5,11 +6,25 @@ from predicate.predicate import ConstrainedT, Predicate
 
 
 @dataclass
-class GeLePredicate[T](Predicate[T]):
-    """A predicate class that models the 'lower <= x <= upper' predicate."""
+class RangePredicate[T](Predicate[T]):
+    """Abstract base class."""
+
+    @abstractmethod
+    def __call__(self, x: T) -> bool:
+        pass
 
     lower: ConstrainedT
     upper: ConstrainedT
+
+    @override
+    def get_klass(self) -> type:
+        return type(self.lower)
+
+
+@dataclass
+# class GeLePredicate[T](Predicate[T]):
+class GeLePredicate[T](RangePredicate[T]):
+    """A predicate class that models the 'lower <= x <= upper' predicate."""
 
     def __call__(self, x: T) -> bool:
         return self.lower <= x <= self.upper
@@ -18,20 +33,13 @@ class GeLePredicate[T](Predicate[T]):
         return f"ge_le_p({self.lower!r}, {self.upper!r})"
 
     @override
-    def get_klass(self) -> type:
-        return type(self.lower)
-
-    @override
     def explain_failure(self, x: T) -> dict:
         return {"reason": f"{x!r} is not greater equal {self.lower!r} and less equal {self.upper!r}"}
 
 
 @dataclass
-class GeLtPredicate[T](Predicate[T]):
+class GeLtPredicate[T](RangePredicate[T]):
     """A predicate class that models the 'lower <= x < upper' predicate."""
-
-    lower: ConstrainedT
-    upper: ConstrainedT
 
     def __call__(self, x: T) -> bool:
         return self.lower <= x < self.upper
@@ -40,30 +48,19 @@ class GeLtPredicate[T](Predicate[T]):
         return f"ge_lt_p({self.lower!r}, {self.upper!r})"
 
     @override
-    def get_klass(self) -> type:
-        return type(self.lower)
-
-    @override
     def explain_failure(self, x: T) -> dict:
         return {"reason": f"{x!r} is not greater equal {self.lower!r} and less than {self.upper!r}"}
 
 
 @dataclass
-class GtLePredicate[T](Predicate[T]):
+class GtLePredicate[T](RangePredicate[T]):
     """A predicate class that models the 'lower < x <= upper' predicate."""
-
-    lower: ConstrainedT
-    upper: ConstrainedT
 
     def __call__(self, x: T) -> bool:
         return self.lower < x <= self.upper
 
     def __repr__(self) -> str:
         return f"gt_le_p({self.lower!r}, {self.upper!r})"
-
-    @override
-    def get_klass(self) -> type:
-        return type(self.lower)
 
     @override
     def explain_failure(self, x: T) -> dict:
@@ -73,21 +70,14 @@ class GtLePredicate[T](Predicate[T]):
 
 
 @dataclass
-class GtLtPredicate[T](Predicate[T]):
+class GtLtPredicate[T](RangePredicate[T]):
     """A predicate class that models the 'lower < x < upper' predicate."""
-
-    lower: ConstrainedT
-    upper: ConstrainedT
 
     def __call__(self, x: T) -> bool:
         return self.lower < x < self.upper
 
     def __repr__(self) -> str:
         return f"gt_lt_p({self.lower!r}, {self.upper!r})"
-
-    @override
-    def get_klass(self) -> type:
-        return type(self.lower)
 
     @override
     def explain_failure(self, x: T) -> dict:

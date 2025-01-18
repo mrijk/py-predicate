@@ -39,7 +39,7 @@ class Predicate[T]:
         return self.get_klass()
 
     # @abstractmethod
-    def get_klass(self):
+    def get_klass(self) -> type:
         raise NotImplementedError
 
     def explain(self, x: Any) -> dict:

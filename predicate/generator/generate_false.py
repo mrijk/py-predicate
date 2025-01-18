@@ -6,7 +6,7 @@ from functools import singledispatch
 from itertools import repeat
 from uuid import UUID
 
-from more_itertools import chunked, flatten, interleave, random_combination_with_replacement, random_permutation, take
+from more_itertools import chunked, flatten, interleave, random_permutation, take
 
 from predicate.all_predicate import AllPredicate
 from predicate.always_false_predicate import AlwaysFalsePredicate, always_false_p
@@ -62,15 +62,11 @@ def generate_false[T](_predicate: Predicate[T]) -> Iterator[T]:
 
 
 @generate_false.register
-def generate_all_p(all_predicate: AllPredicate) -> Iterator:
+def generate_all_p(all_predicate: AllPredicate, *, min_size: int = 1, max_size: int = 10) -> Iterator:
     predicate = all_predicate.predicate
 
     while True:
-        max_length = random.randint(1, 10)
-
-        # TODO: combination of some true values, or just rewrite as any(false)
-        values = take(max_length, generate_false(predicate))
-        yield random_combination_with_replacement(values, max_length)
+        yield generate_at_least_one_false(predicate, min_size=min_size, max_size=max_size)
 
 
 @generate_false.register
@@ -363,9 +359,7 @@ def generate_list_of_p(list_of_predicate: ListOfPredicate, *, min_size: int = 1,
     predicate = list_of_predicate.predicate
 
     while True:
-        length = random.randint(min_size, max_size)
-        # TODO: generate mix of both false (at least 1) and true
-        yield take(length, generate_false(predicate))
+        yield list(generate_at_least_one_false(predicate, min_size=min_size, max_size=max_size))
 
 
 @generate_false.register
@@ -377,12 +371,14 @@ def generate_tuple_of_p(tuple_of_predicate: TupleOfPredicate) -> Iterator:
 
 
 @generate_false.register
-def generate_set_of_p(set_of_predicate: SetOfPredicate) -> Iterator:
+def generate_set_of_p(set_of_predicate: SetOfPredicate, *, min_size: int = 1, max_size: int = 10) -> Iterator:
     predicate = set_of_predicate.predicate
 
-    values = take(10, generate_false(predicate))
-
-    yield set(random_combination_with_replacement(values, 5))
+    while True:
+        result = set(generate_at_least_one_false(predicate, min_size=min_size, max_size=max_size))
+        # This check is needed because {False, 0} and {True, 1} result in {False} and {True}
+        if not set_of_predicate(result):
+            yield result
 
 
 @generate_false.register
@@ -399,3 +395,19 @@ def generate_xor(predicate: XorPredicate) -> Iterator:
         left_and_right = (item for item in generate_true(predicate.left) if predicate.right(item))
 
         yield from random_first_from_iterables(left_and_right, not_right_and_not_left)
+
+
+def generate_at_least_one_false(predicate: Predicate, *, min_size: int, max_size: int) -> tuple:
+    from predicate import generate_true
+
+    length = random.randint(min_size, max_size)
+
+    nr_false_values = random.randint(1, length) if length > 1 else 1
+    nr_true_values = length - nr_false_values
+
+    false_values = take(nr_false_values, generate_false(predicate))
+    true_values = take(nr_true_values, generate_true(predicate))
+
+    combined_values = false_values + true_values
+
+    return random_permutation(combined_values)
