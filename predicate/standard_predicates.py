@@ -109,9 +109,9 @@ def tee_p[T](fn: Callable[[T], None]) -> Predicate[T]:
     return TeePredicate(fn=fn)
 
 
-def has_length_p(length: int) -> Predicate[Iterable]:
+def has_length_p(length_p: Predicate[int]) -> Predicate[Iterable]:
     """Return True if length of iterable is equal to value, otherwise False."""
-    return HasLengthPredicate(length=length)
+    return HasLengthPredicate(length_p=length_p)
 
 
 neg_p: Final[LtPredicate] = lt_p(0)

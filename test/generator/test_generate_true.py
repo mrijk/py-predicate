@@ -78,7 +78,6 @@ def foo(self) -> bool:
         eq_false_p,
         eq_true_p,
         has_key_p("foo"),
-        has_length_p(3),
         in_p(2, 3, 4),
         is_bool_p,
         is_callable_p,
@@ -374,14 +373,6 @@ def test_generate_fn_p():
         generate_true(predicate)
 
 
-def assert_generated_true(predicate, **kwargs):
-    values = take(5, generate_true(predicate, **kwargs))
-    assert values
-
-    for value in values:
-        assert predicate(value)
-
-
 def test_generate_false_unknown(unknown_p):
     with pytest.raises(ValueError):
         take(5, generate_true(unknown_p))
@@ -427,3 +418,24 @@ def test_generate_true_is_instance_unknown():
     predicate = is_instance_p(IPv4Network)
     with pytest.raises(ValueError, match="No generator found"):
         take(5, generate_true(predicate))
+
+
+@pytest.mark.parametrize(
+    "length_p",
+    [
+        eq_p(2),
+        le_p(2),
+    ],
+)
+def test_generate_has_length_p(length_p):
+    predicate = has_length_p(length_p=length_p)
+
+    assert_generated_true(predicate)
+
+
+def assert_generated_true(predicate, **kwargs):
+    values = take(5, generate_true(predicate, **kwargs))
+    assert values
+
+    for value in values:
+        assert predicate(value)

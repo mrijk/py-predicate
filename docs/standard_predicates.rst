@@ -161,6 +161,20 @@ This predicates tests for greater than a value.
     assert not gt_2(2)
     assert gt_2(3)
 
+has_length_p
+------------
+
+This predicate tests the length of an iterable against another predicate.
+
+.. code-block:: python
+
+    from predicate import has_length_p, lt_p
+
+    has_length_lt_2 = has_length_p(lt_p(2))
+
+    assert not has_length_lt_2([1, 2, 3])
+    assert has_length_lt_2({1})
+
 is_bool_p
 ---------
 

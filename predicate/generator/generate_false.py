@@ -6,7 +6,7 @@ from functools import singledispatch
 from itertools import repeat
 from uuid import UUID
 
-from more_itertools import chunked, flatten, interleave, random_permutation, take
+from more_itertools import chunked, first, flatten, interleave, random_permutation, take
 
 from predicate.all_predicate import AllPredicate
 from predicate.always_false_predicate import AlwaysFalsePredicate, always_false_p
@@ -41,13 +41,7 @@ from predicate.list_of_predicate import ListOfPredicate
 from predicate.lt_predicate import LtPredicate
 from predicate.ne_predicate import NePredicate
 from predicate.optimizer.predicate_optimizer import optimize
-from predicate.predicate import (
-    AndPredicate,
-    NotPredicate,
-    OrPredicate,
-    Predicate,
-    XorPredicate,
-)
+from predicate.predicate import AndPredicate, NotPredicate, OrPredicate, Predicate, XorPredicate
 from predicate.range_predicate import GeLePredicate, GeLtPredicate, GtLePredicate, GtLtPredicate
 from predicate.set_of_predicate import SetOfPredicate
 from predicate.set_predicates import InPredicate, NotInPredicate
@@ -56,9 +50,9 @@ from predicate.tuple_of_predicate import TupleOfPredicate
 
 
 @singledispatch
-def generate_false[T](_predicate: Predicate[T]) -> Iterator[T]:
+def generate_false[T](predicate: Predicate[T]) -> Iterator[T]:
     """Generate values that don't satisfy this predicate."""
-    raise ValueError("Please register generator for correct predicate type")
+    raise ValueError(f"Please register generator for correct predicate type: {predicate!r}")
 
 
 @generate_false.register
@@ -111,8 +105,13 @@ def generate_has_key(predicate: HasKeyPredicate) -> Iterator:
 
 @generate_false.register
 def generate_has_length(predicate: HasLengthPredicate) -> Iterator:
-    length = predicate.length
-    yield from random_iterables(max_size=length - 1)
+    length_p = predicate.length_p
+    invalid_lengths = generate_false(length_p)
+    invalid_length = first(invalid_lengths)
+
+    # TODO: generate with different invalid lengths
+
+    yield from random_iterables(min_size=invalid_length, max_size=invalid_length)
 
 
 @generate_false.register

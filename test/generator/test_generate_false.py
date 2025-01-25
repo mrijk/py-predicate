@@ -66,7 +66,6 @@ from predicate import (
         eq_false_p,
         eq_true_p,
         has_key_p("foo"),
-        has_length_p(3),
         in_p(2, 3, 4),
         is_bool_p,
         is_callable_p,
@@ -316,7 +315,7 @@ def test_list_of(list_type_p):
         (is_bool_p,),
         (is_int_p,),
         (is_str_p,),
-        (is_int_p, is_int_p),
+        (is_int_p, is_str_p),
     ],
 )
 def test_tuple_of(tuple_types_p):
@@ -393,6 +392,19 @@ def test_generate_false_unknown_range(range_predicate):
     predicate = range_predicate(lower="bar", upper="foo")
     with pytest.raises(ValueError):
         take(5, generate_false(predicate))
+
+
+@pytest.mark.parametrize(
+    "length_p",
+    [
+        eq_p(2),
+        le_p(2),
+    ],
+)
+def test_generate_false_has_length_p(length_p):
+    predicate = has_length_p(length_p=length_p)
+
+    assert_generated_false(predicate)
 
 
 def assert_generated_false(predicate):

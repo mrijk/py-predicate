@@ -9,6 +9,7 @@ from predicate.lt_predicate import LtPredicate
 from predicate.ne_predicate import NePredicate
 from predicate.predicate import AndPredicate, NotPredicate, OrPredicate, Predicate, XorPredicate
 from predicate.range_predicate import GeLePredicate, GeLtPredicate, GtLePredicate, GtLtPredicate
+from predicate.set_of_predicate import SetOfPredicate
 from predicate.set_predicates import InPredicate, NotInPredicate
 
 
@@ -59,6 +60,17 @@ def generate_all_predicates(max_depth: int, klass: type) -> Iterator:
     predicates = random_predicates(max_depth=max_depth - 1, klass=klass)
 
     yield from (AllPredicate(predicate) for predicate in predicates)
+
+
+def generate_set_of_predicates(max_depth: int, klass: type) -> Iterator:
+    if not max_depth:
+        return
+
+    from predicate.generator.helpers import random_predicates
+
+    predicates = random_predicates(max_depth=max_depth - 1, klass=klass)
+
+    yield from (SetOfPredicate(predicate) for predicate in predicates)
 
 
 def generate_and_predicates(max_depth: int, klass: type) -> Iterator:
