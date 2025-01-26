@@ -8,7 +8,6 @@ from predicate.explain import explain
 from predicate.formatter import to_dot, to_json, to_latex
 from predicate.generator.generate_false import generate_false
 from predicate.generator.generate_true import generate_true
-from predicate.is_empty_predicate import is_empty_p, is_not_empty_p
 from predicate.is_lambda_predicate import is_lambda_p, is_lambda_with_signature_p
 from predicate.optimizer.predicate_optimizer import can_optimize, optimize
 from predicate.set_predicates import (
@@ -42,6 +41,7 @@ from predicate.standard_predicates import (
     is_datetime_p,
     is_dict_of_p,
     is_dict_p,
+    is_empty_p,
     is_falsy_p,
     is_finite_p,
     is_float_p,
@@ -55,6 +55,7 @@ from predicate.standard_predicates import (
     is_list_p,
     is_nan_p,
     is_none_p,
+    is_not_empty_p,
     is_not_none_p,
     is_predicate_of_p,
     is_predicate_p,

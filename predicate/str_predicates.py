@@ -1,6 +1,5 @@
 from collections.abc import Callable
 
-from predicate.fn_predicate import FnPredicate
 from predicate.predicate import Predicate
 from predicate.standard_predicates import fn_p
 
@@ -48,9 +47,9 @@ is_upper_p = create_is_str_p(str.isupper)
 
 def starts_with_p(prefix: str) -> Predicate[str]:
     """Return True if the string starts with the specified prefix, False otherwise."""
-    return FnPredicate(lambda x: x.startswith(prefix))
+    return fn_p(fn=lambda x: x.startswith(prefix))
 
 
 def ends_with_p(suffix: str) -> Predicate[str]:
     """Return True if the string ends with the specified suffix, False otherwise."""
-    return FnPredicate(lambda x: x.endswith(suffix))
+    return fn_p(fn=lambda x: x.endswith(suffix))

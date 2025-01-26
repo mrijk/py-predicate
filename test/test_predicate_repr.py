@@ -27,7 +27,6 @@ from predicate import (
 from predicate.implies_predicate import implies_p
 from predicate.ip_address_predicates import is_ipv4_network_global_p
 from predicate.is_callable_predicate import is_callable_p
-from predicate.is_empty_predicate import is_not_empty_p
 from predicate.named_predicate import NamedPredicate
 from predicate.set_predicates import is_real_subset_p, is_real_superset_p, is_subset_p, is_superset_p
 from predicate.standard_predicates import (
@@ -41,6 +40,7 @@ from predicate.standard_predicates import (
     is_falsy_p,
     is_int_p,
     is_list_of_p,
+    is_not_empty_p,
     is_set_of_p,
     is_truthy_p,
     is_tuple_of_p,
@@ -74,9 +74,9 @@ from predicate.standard_predicates import (
         (implies_p(ge_p(2)), "implies_p(ge_p(2))"),
         (in_p(2, 3, 4), "in_p(2, 3, 4)"),
         (is_callable_p([int], bool), "is_callable_p([], bool)"),
-        (is_empty_p, "is_empty_p"),
+        (is_empty_p, "has_length_p(eq_p(0))"),
         (is_lambda_p, "is_lambda_p"),
-        (is_not_empty_p, "is_not_empty_p"),
+        (is_not_empty_p, "has_length_p(gt_p(0))"),
         (is_none_p, "is_none_p"),
         (is_not_none_p, "is_not_none_p"),
         (is_str_p, "is_str_p"),

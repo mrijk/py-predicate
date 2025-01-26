@@ -13,6 +13,7 @@ from predicate.always_false_predicate import AlwaysFalsePredicate, always_false_
 from predicate.always_true_predicate import AlwaysTruePredicate, always_true_p
 from predicate.dict_of_predicate import DictOfPredicate
 from predicate.eq_predicate import EqPredicate
+from predicate.fn_predicate import FnPredicate
 from predicate.ge_predicate import GePredicate
 from predicate.generator.helpers import (
     generate_anys,
@@ -30,7 +31,6 @@ from predicate.generator.helpers import (
 from predicate.gt_predicate import GtPredicate
 from predicate.has_key_predicate import HasKeyPredicate
 from predicate.has_length_predicate import HasLengthPredicate
-from predicate.is_empty_predicate import IsEmptyPredicate, IsNotEmptyPredicate
 from predicate.is_falsy_predicate import IsFalsyPredicate
 from predicate.is_instance_predicate import IsInstancePredicate
 from predicate.is_none_predicate import IsNonePredicate
@@ -230,6 +230,11 @@ def generate_falsy(_predicate: IsFalsyPredicate) -> Iterator:
 
 
 @generate_false.register
+def generate_fn_p(predicate: FnPredicate) -> Iterator:
+    yield from predicate.generate_false_fn()
+
+
+@generate_false.register
 def generate_in(predicate: InPredicate) -> Iterator:
     # TODO: combine with generate_not_in true
     for item in predicate.v:
@@ -240,14 +245,14 @@ def generate_in(predicate: InPredicate) -> Iterator:
                 yield from generate_strings(~predicate)
 
 
-@generate_false.register
-def generate_is_empty(_predicate: IsEmptyPredicate) -> Iterator:
-    yield from random_iterables(min_size=1)
-
-
-@generate_false.register
-def generate_is_not_empty(_predicate: IsNotEmptyPredicate) -> Iterator:
-    yield from random_iterables(max_size=0)
+# @generate_false.register
+# def generate_is_empty(_predicate: IsEmptyPredicate) -> Iterator:
+#     yield from random_iterables(min_size=1)
+#
+#
+# @generate_false.register
+# def generate_is_not_empty(_predicate: IsNotEmptyPredicate) -> Iterator:
+#     yield from random_iterables(max_size=0)
 
 
 @generate_false.register

@@ -1,7 +1,11 @@
 from dataclasses import dataclass
-from typing import Callable, override
+from typing import Callable, Iterator, override
 
 from predicate.predicate import Predicate
+
+
+def undefined() -> Iterator:
+    raise ValueError("Please register generator type")
 
 
 @dataclass
@@ -9,6 +13,8 @@ class FnPredicate[T](Predicate[T]):
     """A predicate class that can hold a function."""
 
     predicate_fn: Callable[[T], bool]
+    generate_false_fn: Callable[[], Iterator]
+    generate_true_fn: Callable[[], Iterator]
 
     def __call__(self, x: T) -> bool:
         return self.predicate_fn(x)

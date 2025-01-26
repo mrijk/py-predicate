@@ -3,7 +3,7 @@ from collections.abc import Callable, Container, Iterable
 from dataclasses import dataclass
 from datetime import datetime
 from functools import partial
-from typing import Any, Final, Hashable
+from typing import Any, Final, Hashable, Iterator
 from uuid import UUID
 
 from predicate.all_predicate import AllPredicate
@@ -11,7 +11,7 @@ from predicate.any_predicate import AnyPredicate
 from predicate.comp_predicate import CompPredicate
 from predicate.dict_of_predicate import DictOfPredicate
 from predicate.eq_predicate import EqPredicate
-from predicate.fn_predicate import FnPredicate
+from predicate.fn_predicate import FnPredicate, undefined
 from predicate.ge_predicate import GePredicate
 from predicate.gt_predicate import GtPredicate
 from predicate.has_key_predicate import HasKeyPredicate
@@ -99,9 +99,15 @@ def comp_p[T](fn: Callable[[Any], T], predicate: Predicate[T]) -> CompPredicate:
     return CompPredicate(fn=fn, predicate=predicate)
 
 
-def fn_p[T](fn: Callable[[T], bool]) -> Predicate[T]:
+def fn_p[
+    T
+](
+    fn: Callable[[T], bool],
+    generate_false_fn: Callable[[], Iterator] = undefined,
+    generate_true_fn: Callable[[], Iterator] = undefined,
+) -> Predicate[T]:
     """Return the boolean value of the function call."""
-    return FnPredicate(predicate_fn=fn)
+    return FnPredicate(predicate_fn=fn, generate_false_fn=generate_false_fn, generate_true_fn=generate_true_fn)
 
 
 def tee_p[T](fn: Callable[[T], None]) -> Predicate[T]:
@@ -122,6 +128,15 @@ zero_p: Final[EqPredicate] = eq_p(0)
 
 pos_p: Final[GtPredicate] = gt_p(0)
 """Returns True of the value is positive, otherwise False."""
+
+is_even_p: Final[Predicate[int]] = fn_p(lambda x: x % 2 == 0)
+is_odd_p: Final[Predicate[int]] = fn_p(lambda x: x % 2 != 0)
+
+is_empty_p: Final[Predicate] = has_length_p(zero_p)
+"""Predicate that returns True if the iterable is empty, otherwise False."""
+
+is_not_empty_p: Final[Predicate] = has_length_p(pos_p)
+"""Predicate that returns True if the iterable is not empty, otherwise False."""
 
 
 def any_p[T](predicate: Predicate[T]) -> AnyPredicate[T]:

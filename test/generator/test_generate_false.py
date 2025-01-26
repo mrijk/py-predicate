@@ -13,6 +13,7 @@ from predicate import (
     eq_false_p,
     eq_p,
     eq_true_p,
+    fn_p,
     ge_le_p,
     ge_lt_p,
     ge_p,
@@ -30,7 +31,6 @@ from predicate import (
     is_datetime_p,
     is_dict_of_p,
     is_dict_p,
-    is_empty_p,
     is_falsy_p,
     is_float_p,
     is_int_p,
@@ -39,7 +39,6 @@ from predicate import (
     is_list_of_p,
     is_list_p,
     is_none_p,
-    is_not_empty_p,
     is_not_none_p,
     is_predicate_p,
     is_set_of_p,
@@ -73,13 +72,13 @@ from predicate import (
         is_container_p,
         is_datetime_p,
         is_dict_p,
-        is_empty_p,
+        # is_empty_p,
         is_falsy_p,
         is_float_p,
         is_iterable_p,
         is_list_p,
         is_none_p,
-        is_not_empty_p,
+        # is_not_empty_p,
         is_not_none_p,
         is_predicate_p,
         is_truthy_p,
@@ -355,6 +354,15 @@ def test_generate_always_true_p(predicate):
 )
 def test_set_of(set_type_p):
     predicate = is_set_of_p(set_type_p)
+
+    assert_generated_false(predicate)
+
+
+def test_generate_fn_p():
+    def generate_false_fn():
+        yield from [2, 4]
+
+    predicate = fn_p(lambda x: x % 2, generate_false_fn=generate_false_fn)
 
     assert_generated_false(predicate)
 

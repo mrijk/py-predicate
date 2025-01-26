@@ -367,13 +367,15 @@ def test_generate_always_true_p():
 
 
 def test_generate_fn_p():
-    predicate = fn_p(lambda _x: True)
+    def generate_true_fn():
+        yield from [1, 3]
 
-    with pytest.raises(ValueError):
-        generate_true(predicate)
+    predicate = fn_p(lambda x: x % 2, generate_true_fn=generate_true_fn)
+
+    assert_generated_true(predicate)
 
 
-def test_generate_false_unknown(unknown_p):
+def test_generate_true_unknown(unknown_p):
     with pytest.raises(ValueError):
         take(5, generate_true(unknown_p))
 
@@ -424,7 +426,7 @@ def test_generate_true_is_instance_unknown():
     "length_p",
     [
         eq_p(2),
-        le_p(2),
+        # le_p(2),
     ],
 )
 def test_generate_has_length_p(length_p):

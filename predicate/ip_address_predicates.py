@@ -1,6 +1,6 @@
 from ipaddress import IPv4Address, IPv4Network, IPv6Address, IPv6Network
 
-from predicate.fn_predicate import FnPredicate
+from predicate import fn_p
 from predicate.predicate import Predicate
 from predicate.property_predicate import PropertyPredicate
 
@@ -40,8 +40,8 @@ is_ipv6_network_site_local_p: Predicate[IPv6Network] = PropertyPredicate(getter=
 
 
 def subnet_of_p(value: IPv4Network | IPv6Network) -> Predicate[IPv4Network | IPv6Network]:
-    return FnPredicate(lambda network: network.subnet_of(value))  # type: ignore
+    return fn_p(fn=lambda network: network.subnet_of(value))  # type: ignore
 
 
 def supernet_of_p(value: IPv4Network | IPv6Network) -> Predicate[IPv4Network | IPv6Network]:
-    return FnPredicate(lambda network: network.supernet_of(value))  # type: ignore
+    return fn_p(fn=lambda network: network.supernet_of(value))  # type: ignore

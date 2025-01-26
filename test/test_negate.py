@@ -1,7 +1,6 @@
 from predicate import eq_p, ge_p, gt_p, is_empty_p, is_none_p, is_not_none_p, le_p, lt_p, ne_p
-from predicate.is_empty_predicate import is_not_empty_p
 from predicate.negate import negate
-from predicate.standard_predicates import is_falsy_p, is_truthy_p
+from predicate.standard_predicates import is_falsy_p, is_not_empty_p, is_truthy_p
 
 
 def test_negate_eq():
