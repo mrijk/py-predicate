@@ -161,6 +161,7 @@ def random_anys() -> Iterator:
 def random_values_of_type(klass: type) -> Iterator:
     type_registry: dict[type, Callable[[], Iterator]] = {
         bool: random_bools,
+        datetime: random_datetimes,
         int: random_ints,
         float: random_floats,
         str: random_strings,

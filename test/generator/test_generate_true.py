@@ -426,7 +426,7 @@ def test_generate_true_is_instance_unknown():
     "length_p",
     [
         eq_p(2),
-        # le_p(2),
+        ge_le_p(lower=1, upper=3),
     ],
 )
 def test_generate_has_length_p(length_p):

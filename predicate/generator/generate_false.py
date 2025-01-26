@@ -27,6 +27,7 @@ from predicate.generator.helpers import (
     random_floats,
     random_ints,
     random_iterables,
+    random_values_of_type,
 )
 from predicate.gt_predicate import GtPredicate
 from predicate.has_key_predicate import HasKeyPredicate
@@ -88,7 +89,7 @@ def generate_always_true(_predicate: AlwaysTruePredicate) -> Iterator:
 
 @generate_false.register
 def generate_eq(predicate: EqPredicate) -> Iterator:
-    yield from generate_anys(~predicate)
+    yield from (value for value in random_values_of_type(klass=predicate.klass) if not predicate(value))
 
 
 @generate_false.register
@@ -106,7 +107,7 @@ def generate_has_key(predicate: HasKeyPredicate) -> Iterator:
 @generate_false.register
 def generate_has_length(predicate: HasLengthPredicate) -> Iterator:
     length_p = predicate.length_p
-    invalid_lengths = generate_false(length_p)
+    invalid_lengths = (length for length in generate_false(length_p) if length >= 0)
     invalid_length = first(invalid_lengths)
 
     # TODO: generate with different invalid lengths
@@ -243,16 +244,6 @@ def generate_in(predicate: InPredicate) -> Iterator:
                 yield from generate_ints(~predicate)
             case str():
                 yield from generate_strings(~predicate)
-
-
-# @generate_false.register
-# def generate_is_empty(_predicate: IsEmptyPredicate) -> Iterator:
-#     yield from random_iterables(min_size=1)
-#
-#
-# @generate_false.register
-# def generate_is_not_empty(_predicate: IsNotEmptyPredicate) -> Iterator:
-#     yield from random_iterables(max_size=0)
 
 
 @generate_false.register
