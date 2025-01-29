@@ -300,16 +300,6 @@ def generate_in(predicate: InPredicate) -> Iterator:
         yield from predicate.v
 
 
-# @generate_true.register
-# def generate_is_empty(_predicate: IsEmptyPredicate) -> Iterator:
-#     yield from ([], {}, (), "", set())
-#
-#
-# @generate_true.register
-# def generate_is_not_empty(_predicate: IsNotEmptyPredicate) -> Iterator:
-#     yield from random_iterables(min_size=1)
-
-
 @generate_true.register
 def generate_lt(predicate: LtPredicate) -> Iterator:
     match v := predicate.v:
