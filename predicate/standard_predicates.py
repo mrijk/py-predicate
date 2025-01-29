@@ -99,9 +99,7 @@ def comp_p[T](fn: Callable[[Any], T], predicate: Predicate[T]) -> CompPredicate:
     return CompPredicate(fn=fn, predicate=predicate)
 
 
-def fn_p[
-    T
-](
+def fn_p[T](
     fn: Callable[[T], bool],
     generate_false_fn: Callable[[], Iterator] = undefined,
     generate_true_fn: Callable[[], Iterator] = undefined,

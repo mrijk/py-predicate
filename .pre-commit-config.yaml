@@ -1,6 +1,6 @@
 repos:
   - repo: https://github.com/psf/black
-    rev: 24.10.0
+    rev: 25.1.0
     hooks:
       - id: black
         language_version: python3.12
@@ -22,8 +22,7 @@ repos:
         exclude: ^requirements/artifactory.txt$
       - id: detect-private-key
   - repo: https://github.com/astral-sh/ruff-pre-commit
-  # Ruff version.
-    rev: v0.7.2
+    rev: v0.9.3
     hooks:
       - id: ruff
         args: [ --fix, --exit-non-zero-on-fix, --show-fixes ]
