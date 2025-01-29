@@ -2,9 +2,16 @@ import pytest
 from more_itertools import take
 
 from predicate import is_predicate_of_p
+from predicate.all_predicate import AllPredicate
+from predicate.any_predicate import AnyPredicate
 from predicate.eq_predicate import EqPredicate
 from predicate.ge_predicate import GePredicate
-from predicate.generator.generate_predicate import generate_predicate, generate_set_of_predicates
+from predicate.generator.generate_predicate import (
+    generate_all_predicates,
+    generate_any_predicates,
+    generate_predicate,
+    generate_set_of_predicates,
+)
 from predicate.gt_predicate import GtPredicate
 from predicate.le_predicate import LePredicate
 from predicate.lt_predicate import LtPredicate
@@ -66,6 +73,28 @@ def test_generate_not_predicate(klass):
 @pytest.mark.parametrize("klass", (int, str, float))
 def test_generate_basic_predicate(predicate_type, klass):
     generator = generate_predicate(predicate_type, max_depth=1, klass=klass)
+    predicates = take(AMOUNT_TO_GENERATE, generator)
+
+    assert predicates
+
+    is_klass_predicate = is_predicate_of_p(klass)
+
+    for predicate in predicates:
+        assert isinstance(predicate, predicate_type)
+        assert is_klass_predicate(predicate)
+
+
+@pytest.mark.parametrize(
+    ("predicate_type", "generate_func"),
+    [
+        (AllPredicate, generate_all_predicates),
+        (AnyPredicate, generate_any_predicates),
+    ],
+)
+@pytest.mark.parametrize("klass", (int, str, float))
+def test_generate_all_predicate(predicate_type, generate_func, klass):
+    generator = generate_func(max_depth=2, klass=klass)
+
     predicates = take(AMOUNT_TO_GENERATE, generator)
 
     assert predicates

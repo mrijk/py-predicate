@@ -41,14 +41,14 @@ def optimize_or_predicate[T](predicate: OrPredicate[T]) -> Predicate[T]:
                     Predicate() as q,
                     Predicate() as p,
                     NotPredicate(right_not),
-                ) if left_not == p and right_not == q:
+                ) if (left_not == p and right_not == q):
                     return p ^ q  # (~p & q) | (p & ~q) == p ^ q
                 case (
                     Predicate() as p,
                     NotPredicate(left_not),
                     NotPredicate(right_not),
                     Predicate() as q,
-                ) if left_not == q and right_not == p:
+                ) if (left_not == q and right_not == p):
                     return p ^ q  # (p & ~q) | (~p & q) == p ^ q
                 case _:
                     return OrPredicate(left=left, right=right)

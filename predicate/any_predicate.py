@@ -21,7 +21,7 @@ class AnyPredicate[T](Predicate[T]):
 
     @override
     def get_klass(self) -> type:
-        return Predicate[self.predicate.klass]  # type: ignore[name-defined]
+        return self.predicate.klass
 
     @override
     def explain_failure(self, iterable: Iterable[T]) -> dict:
