@@ -1,5 +1,5 @@
 from predicate import eq_p, is_float_p, is_int_p, is_str_p
-from predicate.match_predicate import exactly_n, match_p, optional, repeat, star, wildcard
+from predicate.match_predicate import exactly_n, match_p, optional, plus, repeat, star, wildcard
 
 
 def test_match_first():
@@ -36,7 +36,7 @@ def test_match_first_n_followed_by_m():
     assert predicate([1, 2, 3, "foo", "bar"])
 
 
-def test_optional():
+def test_match_optional():
     maybe_int = optional(is_int_p)
     predicate = match_p(maybe_int, is_str_p)
 
@@ -45,7 +45,7 @@ def test_optional():
     assert predicate([1, "foo"])
 
 
-def test_exactly_and_optional():
+def test_match_exactly_and_optional():
     maybe_int = optional(is_int_p)
     three_ints = exactly_n(3, is_int_p)
 
@@ -54,7 +54,7 @@ def test_exactly_and_optional():
     assert predicate([1, 2, 3])
 
 
-def test_repeat():
+def test_match_repeat():
     one_to_three = repeat(1, 3, is_int_p)
 
     predicate = match_p(one_to_three)
@@ -65,7 +65,7 @@ def test_repeat():
     assert predicate([1, 2, 3])
 
 
-def test_repeat_and_exactly():
+def test_match_repeat_and_exactly():
     one_to_three = repeat(1, 3, is_int_p)
 
     predicate = match_p(one_to_three, is_int_p)
@@ -85,7 +85,7 @@ def test_repeat_and_exactly_and_repeat():
     assert predicate([1, 2, 3.0, "foo", "bar"])
 
 
-def test_star():
+def test_match_star():
     zero_or_more_ints = star(is_int_p)
 
     predicate = match_p(zero_or_more_ints)
@@ -95,33 +95,55 @@ def test_star():
     assert predicate([1, 2])
 
 
-def test_star_and_str():
+def test_match_star_and_str():
     zero_or_more_ints = star(is_int_p)
 
     predicate = match_p(zero_or_more_ints, is_str_p)
 
+    assert predicate(["foo"])
     assert predicate([1, 2, "foo"])
 
 
-def test_any_int():
+def test_match_any_int():
     predicate = match_p(wildcard, is_int_p, wildcard)
 
     assert not predicate(["foo", "bar"])
     assert predicate(["foo", "bar", 1, "foo", "bar"])
 
 
-def test_int_followed_by_str():
+def test_match_int_followed_by_str():
     predicate = match_p(wildcard, is_int_p, is_str_p, wildcard)
 
     assert not predicate(["foo", 1])
     assert predicate([3.14, 1, "foo", 3.14])
 
 
-def test_exactly_with_not():
+def test_match_exactly_with_not():
     two_strings = exactly_n(2, is_str_p)
 
     predicate = match_p(two_strings, optional(~is_str_p))
 
-    # TODO
-    # assert not predicate(["foo", "bar", "foobar"])
+    assert not predicate(["foo", "bar", "foobar"])
     assert predicate(["foo", "bar"])
+
+
+def test_match_plus():
+    one_or_more_ints = plus(is_int_p)
+
+    predicate = match_p(one_or_more_ints)
+
+    assert not predicate([])
+    assert not predicate(["foo"])
+    assert predicate([1])
+    assert predicate([1, 2])
+
+
+def test_match_plus_and_str():
+    one_or_more_ints = plus(is_int_p)
+
+    predicate = match_p(one_or_more_ints, is_str_p)
+
+    assert not predicate([])
+    assert not predicate(["foo"])
+    assert not predicate([1])
+    assert predicate([1, "foo"])

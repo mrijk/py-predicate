@@ -9,6 +9,7 @@ from predicate.formatter import to_dot, to_json, to_latex
 from predicate.generator.generate_false import generate_false
 from predicate.generator.generate_true import generate_true
 from predicate.is_lambda_predicate import is_lambda_p, is_lambda_with_signature_p
+from predicate.match_predicate import exactly_n, match_p, optional, plus, repeat, star
 from predicate.optimizer.predicate_optimizer import can_optimize, optimize
 from predicate.set_predicates import (
     in_p,
@@ -91,6 +92,7 @@ __all__ = [
     "eq_false_p",
     "eq_p",
     "eq_true_p",
+    "exactly_n",
     "explain",
     "fn_p",
     "ge_le_p",
@@ -154,14 +156,19 @@ __all__ = [
     "lazy_p",
     "le_p",
     "lt_p",
+    "match_p",
     "ne_p",
     "neg_p",
     "never_p",
     "not_in_p",
     "optimize",
+    "optional",
+    "plus",
     "pos_p",
     "regex_p",
+    "repeat",
     "root_p",
+    "star",
     "tee_p",
     "this_p",
     "to_dot",

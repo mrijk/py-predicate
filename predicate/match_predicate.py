@@ -71,6 +71,19 @@ def exactly_n(n: int, predicate: Predicate) -> Callable:
     return _exactly_n
 
 
+def plus(predicate: Predicate) -> Callable:
+    """Match at least one instance of the given predicate."""
+
+    def _plus(predicates: list[Callable], iterable: Iterable) -> bool:
+        if not iterable:
+            return False
+
+        item, *rest = iterable
+        return predicate(item) and star(predicate)(predicates, rest)
+
+    return _plus
+
+
 def star(predicate: Predicate) -> Callable:
     """Match any instances of the given predicate."""
 
@@ -84,7 +97,7 @@ def star(predicate: Predicate) -> Callable:
             if predicates:
                 matched = match(predicates, rest)
                 return match(predicates, iterable) if not matched else True  # backtrack
-        return False
+        return match(predicates, iterable) if predicates else False
 
     return _star
 
@@ -96,7 +109,9 @@ def optional(predicate: Predicate) -> Callable:
         if not iterable:
             return True
         item, *rest = iterable
-        return (predicate(item) and match(predicates, rest)) or match(predicates, iterable)
+        if predicates:
+            return (predicate(item) and match(predicates, rest)) or match(predicates, iterable)
+        return predicate(item)
 
     return _optional
 
