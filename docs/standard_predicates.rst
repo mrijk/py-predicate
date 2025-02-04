@@ -254,7 +254,7 @@ This predicate tests if the value is of type ``dict``.
 
 
 is_dict_of_p
----------
+------------
 
 This predicate tests if the value is of type ``dict`` and the key and values match the predicates.
 
