@@ -66,3 +66,47 @@ In this example we want to match a list that should start with zero or more inte
     predicate(["foo"])  # True
     predicate([1, "foo"])  # True
     predicate([1, 2, "foo"])  # True
+
+
+The ``plus`` operator
+---------------------
+
+This is an implementation of the + (polus) that indicates that either 1 or more matches of the
+predicate should evaluate to True.
+
+In the following example we want to match on at least one integer, followed by at least one string:
+
+.. code-block:: python
+
+    from predicate import match_p, is_int_p, is_str_p, plus
+
+    one_or_more_ints = plus(is_int_p)
+    one_or_more_strings = plus(is_str_p)
+
+    predicate = match_p(one_or_more_ints, one_or_more_ints)
+
+    predicate([2])  # False
+    predicate(["foo"])  # False
+    predicate([1, "foo"])  # True
+    predicate([1, 2, "foo"])  # True
+
+
+The ``repeat`` operator
+-----------------------
+
+Sometimes you want to check for a range. In standard regular syntax this is indicated with curly brackets.
+
+In the following example we match on an iterable starting with 2 or 3 integers, followed by a string:
+
+.. code-block:: python
+
+    from predicate import match_p, is_int_p, is_str_p, repeat
+
+    one_or_two_ints = repeat(2, 3, is_int_p)
+
+    predicate = match_p(one_or_two_ints, is_str_p)
+
+    predicate([1])  # False
+    predicate([1, "foo"])  # False
+    predicate([1, 2, "foo"])  # True
+    predicate([1, 2, 3, 4, "foo"])  # False
