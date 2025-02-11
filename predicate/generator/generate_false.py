@@ -1,12 +1,12 @@
 import random
 import sys
-from collections.abc import Iterator
+from collections.abc import Iterable, Iterator
 from datetime import datetime, timedelta
 from functools import singledispatch
 from itertools import repeat
 from uuid import UUID
 
-from more_itertools import chunked, first, flatten, interleave, random_permutation, take
+from more_itertools import chunked, first, flatten, interleave, partial_product, random_permutation, take
 
 from predicate.all_predicate import AllPredicate
 from predicate.always_false_predicate import AlwaysFalsePredicate, always_false_p
@@ -357,12 +357,30 @@ def generate_list_of_p(list_of_predicate: ListOfPredicate, *, min_size: int = 1,
         yield list(generate_at_least_one_false(predicate, min_size=min_size, max_size=max_size))
 
 
+def bool_array_from_int(n: int) -> Iterable[bool]:
+    while n:
+        yield n % 2 == 0
+        n >>= 1
+    while True:
+        yield True
+
+
 @generate_false.register
 def generate_tuple_of_p(tuple_of_predicate: TupleOfPredicate) -> Iterator:
+    from predicate import generate_true
+
     predicates = tuple_of_predicate.predicates
 
-    # TODO: generate mix of both false (at least 1) and true
-    yield from zip(*(generate_false(predicate) for predicate in predicates), strict=False)
+    length = len(predicates)
+    max_number = 2**length - 1
+    generators = [(generate_false(predicate), generate_true(predicate)) for predicate in predicates]
+
+    while True:
+        n = random.randint(1, max_number)
+        values = take(length, (bool_array_from_int(n)))
+        selected = (generator[value] for generator, value in zip(generators, values, strict=False))
+
+        yield first(partial_product(*selected))
 
 
 @generate_false.register
