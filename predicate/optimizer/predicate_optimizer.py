@@ -3,6 +3,7 @@ from predicate.any_predicate import AnyPredicate
 from predicate.optimizer.all_optimizer import optimize_all_predicate
 from predicate.optimizer.and_optimizer import optimize_and_predicate
 from predicate.optimizer.any_optimizer import optimize_any_predicate
+from predicate.optimizer.helpers import MaybeOptimized, NotOptimized, Optimized
 from predicate.optimizer.in_optimizer import optimize_in_predicate, optimize_not_in_predicate
 from predicate.optimizer.not_optimizer import optimize_not_predicate
 from predicate.optimizer.or_optimizer import optimize_or_predicate
@@ -11,7 +12,7 @@ from predicate.predicate import AndPredicate, NotPredicate, OrPredicate, Predica
 from predicate.set_predicates import InPredicate, NotInPredicate
 
 
-def optimize[T](predicate: Predicate[T]) -> Predicate[T]:
+def optimizations[T](predicate: Predicate[T]) -> MaybeOptimized[T]:
     """Optimize the given predicate."""
     match predicate:
         case AllPredicate() as all_predicate:
@@ -31,9 +32,21 @@ def optimize[T](predicate: Predicate[T]) -> Predicate[T]:
         case NotInPredicate() as not_in_predicate:
             return optimize_not_in_predicate(not_in_predicate)
         case _:
+            return NotOptimized()
+
+
+def optimize[T](predicate: Predicate[T]) -> Predicate[T]:
+    match optimizations(predicate):
+        case Optimized(optimized):
+            return optimized
+        case _:
             return predicate
 
 
 def can_optimize[T](predicate: Predicate[T]) -> bool:
     """Return True if the predicate can be optimized, otherwise False."""
-    return optimize(predicate) != predicate
+    match optimizations(predicate):
+        case Optimized(_):
+            return True
+        case _:
+            return False

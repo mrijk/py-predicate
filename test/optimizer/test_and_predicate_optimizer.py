@@ -1,4 +1,5 @@
-from helpers import is_and_p, is_eq_p, is_false_p, is_true_p
+import pytest
+from helpers import is_eq_p
 
 from predicate import always_false_p, always_true_p, ge_p, gt_p, in_p, is_empty_p, not_in_p
 from predicate.optimizer.predicate_optimizer import can_optimize, optimize
@@ -25,162 +26,179 @@ def test_and_optimize_right_false(p):
     # p & False == False
     predicate = p & always_false_p
 
-    assert is_and_p(predicate)
     assert can_optimize(predicate)
 
     optimized = optimize(predicate)
 
-    assert is_false_p(optimized)
+    assert optimized == always_false_p
 
 
 def test_and_optimize_right_true(p):
     # p & True == p
     predicate = p & always_true_p
 
-    assert is_and_p(predicate)
     assert can_optimize(predicate)
 
     optimized = optimize(predicate)
 
-    assert not is_and_p(optimized)
+    assert optimized == p
 
 
 def test_and_optimize_left_false(p):
     # False & p == False
     predicate = always_false_p & p
 
-    assert is_and_p(predicate)
     assert can_optimize(predicate)
 
     optimized = optimize(predicate)
 
-    assert is_false_p(optimized)
+    assert optimized == always_false_p
 
 
 def test_and_optimize_left_true(p):
     # True & p == p
     predicate = always_true_p & p
 
-    assert is_and_p(predicate)
     assert can_optimize(predicate)
 
     optimized = optimize(predicate)
 
-    assert not is_and_p(optimized)
+    assert optimized == p
 
 
-def test_and_optimize_false_and_false():
-    # False & False == False
-    always_false = always_false_p & always_false_p
+@pytest.mark.parametrize(
+    "left, right, expected, description",
+    [
+        (always_false_p, always_false_p, always_false_p, "False & False == False"),
+        (always_false_p, always_true_p, always_false_p, "False & True == False"),
+        (always_true_p, always_false_p, always_false_p, "True & False == False"),
+        (always_true_p, always_true_p, always_true_p, "True & True == True"),
+    ],
+)
+def test_and_truth_combinations(left, right, expected, description):
+    predicate = left & right
 
-    assert is_and_p(always_false)
-    assert can_optimize(always_false)
+    assert can_optimize(predicate)
 
-    optimized = optimize(always_false)
+    optimized = optimize(predicate)
 
-    assert is_false_p(optimized)
-
-
-def test_and_optimize_true_and_true():
-    # True & True == True
-    always_true = always_true_p & always_true_p
-
-    assert is_and_p(always_true)
-    assert can_optimize(always_true)
-
-    optimized = optimize(always_true)
-
-    assert is_true_p(optimized)
+    assert optimized == expected, description
 
 
-def test_and_optimize_true_and_false():
-    # True & False == False
-    always_false = always_true_p & always_false_p
+def test_and_optimize_eq_single_p(p):
+    # p == p
 
-    assert is_and_p(always_false)
-    assert can_optimize(always_false)
+    same = p
 
-    optimized = optimize(always_false)
+    assert not can_optimize(same)
 
-    assert is_false_p(optimized)
+    optimized = optimize(same)
 
-
-def test_and_optimize_false_and_true():
-    # False & True == False
-    always_false = always_false_p & always_true_p
-
-    assert is_and_p(always_false)
-    assert can_optimize(always_false)
-
-    optimized = optimize(always_false)
-
-    assert is_false_p(optimized)
+    assert optimized == p
 
 
-def test_and_optimize_eq(p, q):
-    # p & p == p
+def test_and_optimize_eq_multiple_p(p):
+    # p & p & p == p
 
     same = p & p
 
-    assert is_and_p(same)
     assert can_optimize(same)
 
     optimized = optimize(same)
 
-    assert not is_and_p(optimized)
+    assert optimized == p
+
+
+def test_and_optimize_eq_nested_one(p, q):
+    # p & q & p == p & q
+
+    same = p & q & p
+
+    assert can_optimize(same)
+
+    optimized = optimize(same)
+
+    assert optimized == p & q
+
+
+def test_and_optimize_eq_nested_two(p, q, r):
+    # p & q & r & p == p & q & r
+
+    same = p & q & r & p
+
+    assert can_optimize(same)
+
+    optimized = optimize(same)
+
+    assert optimized == p & q & r
+
+
+def test_and_optimize_eq_complex(p, q, r):
+    # p & q & r & p == p & q & r
+
+    predicate = (p & q) & (p & ~q)
+
+    assert can_optimize(predicate)
+
+    optimized = optimize(predicate)
+
+    assert optimized == always_false_p
+
+
+def test_and_not_optimize_eq(p, q):
+    # p & q == p & q
 
     not_same = p & q
 
-    assert is_and_p(not_same)
     assert not can_optimize(not_same)
 
     not_optimized = optimize(not_same)
 
-    assert is_and_p(not_optimized)
+    assert not_optimized == p & q
 
 
-def test_and_optimize_not_right(p, q):
+def test_and_optimize_not_right(p):
     # p & ~p == False
 
     same = p & ~p
 
-    assert is_and_p(same)
     assert can_optimize(same)
 
     optimized = optimize(same)
 
-    assert is_false_p(optimized)
+    assert optimized == always_false_p
 
+
+def test_and_optimize_not_right_different(p, q):
     not_same = p & ~q
 
-    assert is_and_p(not_same)
     assert not can_optimize(not_same)
 
     not_optimized = optimize(not_same)
 
-    assert is_and_p(not_optimized)
+    assert not_optimized == p & ~q
 
 
-def test_and_optimize_not_left(p, q):
+def test_and_optimize_not_left(p):
     # ~p & p == False
 
     same = ~p & p
 
-    assert is_and_p(same)
     assert can_optimize(same)
 
     optimized = optimize(same)
 
-    assert is_false_p(optimized)
+    assert optimized == always_false_p
 
+
+def test_and_optimize_not_left_different(p, q):
     not_same = ~p & q
 
-    assert is_and_p(not_same)
     assert not can_optimize(not_same)
 
     not_optimized = optimize(not_same)
 
-    assert is_and_p(not_optimized)
+    assert not_optimized == ~p & q
 
 
 def test_optimize_eq_v1_eq_v2():

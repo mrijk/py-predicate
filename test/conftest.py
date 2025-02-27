@@ -2,30 +2,30 @@ from dataclasses import dataclass
 
 import pytest
 
+from predicate.named_predicate import NamedPredicate
 from predicate.predicate import Predicate
-from predicate.standard_predicates import fn_p
 
 # Couple of pre-defined predicates as fixtures.
 
 
 @pytest.fixture
 def p():
-    return fn_p(lambda x: x > 2)
+    return NamedPredicate(name="p")
 
 
 @pytest.fixture
 def q():
-    return fn_p(lambda x: x > 3)
+    return NamedPredicate(name="q")
 
 
 @pytest.fixture
 def r():
-    return fn_p(lambda x: x > 4)
+    return NamedPredicate(name="r")
 
 
 @pytest.fixture
 def s():
-    return fn_p(lambda x: x > 5)
+    return NamedPredicate(name="s")
 
 
 @pytest.fixture
