@@ -1,6 +1,6 @@
 from predicate.all_predicate import AllPredicate
 from predicate.any_predicate import AnyPredicate
-from predicate.optimizer.helpers import MaybeOptimized, Optimized
+from predicate.optimizer.helpers import MaybeOptimized, NotOptimized, Optimized
 from predicate.predicate import AndPredicate, NotPredicate, OrPredicate, XorPredicate
 
 
@@ -28,7 +28,7 @@ def optimize_not_predicate[T](predicate: NotPredicate[T]) -> MaybeOptimized[T]:
                 case NotPredicate(not_predicate), _:
                     return Optimized(OrPredicate(left=not_predicate, right=negate(right)))  # ~(~p & q) => p | ~q
                 case _:
-                    return Optimized(negate(optimized))
+                    return Optimized(negate(optimized)) if optimized != predicate.predicate else NotOptimized()
 
         case AnyPredicate(any_predicate):
             match negate(any_predicate):
@@ -41,7 +41,7 @@ def optimize_not_predicate[T](predicate: NotPredicate[T]) -> MaybeOptimized[T]:
                 case NotPredicate(not_predicate), _:
                     return Optimized(AndPredicate(left=not_predicate, right=negate(right)))  # ~(~p | q) => p & ~q
                 case _:
-                    return Optimized(negate(optimized))
+                    return Optimized(negate(optimized)) if optimized != predicate.predicate else NotOptimized()
 
         case XorPredicate(left, right):
             match left, right:

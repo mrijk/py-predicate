@@ -27,5 +27,3 @@ def optimize_all_predicate[T](predicate: AllPredicate[T]) -> MaybeOptimized[T]:
             pass
 
     return NotOptimized() if optimized == predicate.predicate else Optimized(AllPredicate(predicate=optimized))
-
-    # return AllPredicate(predicate=optimized)

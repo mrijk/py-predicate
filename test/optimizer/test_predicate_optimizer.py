@@ -1,7 +1,5 @@
 from helpers import (
     is_and_p,
-    is_not_p,
-    is_or_p,
 )
 
 from predicate import (
@@ -17,7 +15,6 @@ def test_optimize_not_or(p):
 
     predicate = ~(p | ~p)
 
-    assert is_not_p(predicate)
     assert can_optimize(predicate)
 
     optimized = optimize(predicate)
@@ -30,7 +27,6 @@ def test_optimize_not_and(p):
 
     predicate = ~(p & ~p)
 
-    assert is_not_p(predicate)
     assert can_optimize(predicate)
 
     optimized = optimize(predicate)
@@ -43,7 +39,6 @@ def test_optimize_not_xor_p_q(p, q):
 
     predicate = ~(p ^ q)
 
-    assert is_not_p(predicate)
     assert can_optimize(predicate)
 
     optimized = optimize(predicate)
@@ -56,7 +51,6 @@ def test_optimize_not_xor_not_p_q(p, q):
 
     predicate = ~(~p ^ q)
 
-    assert is_not_p(predicate)
     assert can_optimize(predicate)
 
     optimized = optimize(predicate)
@@ -69,7 +63,6 @@ def test_optimize_not_xor_p_not_q(p, q):
 
     predicate = ~(p ^ ~q)
 
-    assert is_not_p(predicate)
     assert can_optimize(predicate)
 
     optimized = optimize(predicate)
@@ -82,7 +75,6 @@ def test_optimize_or_1(p, q):
 
     predicate = p | (~p & q)
 
-    assert is_or_p(predicate)
     assert can_optimize(predicate)
 
     optimized = optimize(predicate)
@@ -95,7 +87,6 @@ def test_optimize_and_1(p, q):
 
     predicate = p & (~p | q)
 
-    assert is_and_p(predicate)
     assert can_optimize(predicate)
 
     optimized = optimize(predicate)
