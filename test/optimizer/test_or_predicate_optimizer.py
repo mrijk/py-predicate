@@ -1,5 +1,3 @@
-from helpers import is_or_p
-
 from predicate import always_false_p, always_true_p, can_optimize, ge_p, in_p, is_empty_p, not_in_p, optimize
 from predicate.standard_predicates import all_p, any_p, eq_p, ne_p
 
@@ -48,7 +46,7 @@ def test_or_optimize_true_right(p):
     assert optimized == always_true_p
 
 
-def test_or_optimize_eq(p, q):
+def test_or_optimize_eq(p):
     # p | p == p
     same = p | p
 
@@ -56,8 +54,10 @@ def test_or_optimize_eq(p, q):
 
     optimized = optimize(same)
 
-    assert not is_or_p(optimized)
+    assert optimized == p
 
+
+def test_or_optimize_eq_not_same(p, q):
     not_same = p | q
 
     assert not can_optimize(not_same)
@@ -87,7 +87,6 @@ def test_or_optimize_right_not_same_after_optimization(p):
 
     predicate = q | r
 
-    assert is_or_p(predicate)
     assert can_optimize(predicate)
 
     optimized = optimize(predicate)
@@ -99,7 +98,6 @@ def test_or_optimize_negate(p):
     # p | ~p == True
     predicate = p | ~p
 
-    assert is_or_p(predicate)
     assert can_optimize(predicate)
 
     optimized = optimize(predicate)
@@ -111,7 +109,6 @@ def test_or_optimize_left_not_same(p):
     # ~p | p == True
     predicate = ~p | p
 
-    assert is_or_p(predicate)
     assert can_optimize(predicate)
 
     optimized = optimize(predicate)
@@ -123,7 +120,6 @@ def test_or_optimize_not_not_same(p, q):
     # p | ~q with p != q
     predicate = p | q
 
-    assert is_or_p(predicate)
     assert not can_optimize(predicate)
 
 

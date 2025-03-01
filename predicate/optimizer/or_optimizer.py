@@ -32,14 +32,14 @@ def optimize_or_predicate[T](predicate: OrPredicate[T]) -> MaybeOptimized[T]:
         case EqPredicate(v1), EqPredicate(v2) if v1 != v2:
             return Optimized(InPredicate((v1, v2)))
         case EqPredicate(v1), NotInPredicate(v2) if v1 in v2:
-            return Optimized(optimize_not_in_predicate(NotInPredicate(v2 - {v1})))
+            return Optimized(optimize(NotInPredicate(v2 - {v1})))
 
         case InPredicate(v1), InPredicate(v2) if v := v1 | v2:
-            return Optimized(optimize_in_predicate(InPredicate(v=v)))
+            return Optimized(optimize(InPredicate(v=v)))
 
         case InPredicate(v1), NotInPredicate(v2):
             if v := v2 - (v1 & v2):
-                return Optimized(optimize_not_in_predicate(NotInPredicate(v=v)))
+                return Optimized(optimize(NotInPredicate(v=v)))
             return Optimized(always_true_p)
 
         #
@@ -58,7 +58,7 @@ def optimize_or_predicate[T](predicate: OrPredicate[T]) -> MaybeOptimized[T]:
                 case Optimized(optimized):
                     return Optimized(predicate=optimize(optimized | or_right))
                 case _:
-                    match optimizations(or_right & right):
+                    match optimizations(or_right | right):
                         case Optimized(optimized):
                             return Optimized(optimize(optimized | or_left))
                         case _:
