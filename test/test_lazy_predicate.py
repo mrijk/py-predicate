@@ -5,6 +5,7 @@ import pytest
 from predicate.standard_predicates import (
     all_p,
     comp_p,
+    is_bool_p,
     is_dict_p,
     is_float_p,
     is_int_p,
@@ -40,7 +41,7 @@ def test_is_json():
 
     json_keys_p = all_p(is_str_p)
 
-    _valid_value = is_str_p | is_int_p | is_float_p | json_list_p | _valid_json_p | is_none_p
+    _valid_value = is_str_p | is_int_p | is_bool_p | is_float_p | json_list_p | _valid_json_p | is_none_p
     json_values_p = comp_p(lambda x: x.values(), all_p(_valid_value))
 
     is_json_p = (is_dict_p & json_keys_p & json_values_p) | json_list_p

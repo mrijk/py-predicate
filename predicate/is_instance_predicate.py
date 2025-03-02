@@ -11,6 +11,9 @@ class IsInstancePredicate[T](Predicate[T]):
     instance_klass: type | tuple
 
     def __call__(self, x: object) -> bool:
+        # This is different from standard Python behaviour: a False/True value is not an int!
+        if isinstance(x, bool) and self.instance_klass[0] is int:
+            return False
         return isinstance(x, self.instance_klass)
 
     def __repr__(self) -> str:
