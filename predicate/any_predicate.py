@@ -24,5 +24,10 @@ class AnyPredicate[T](Predicate[T]):
         return self.predicate.klass
 
     @override
+    @property
+    def count(self) -> int:
+        return 1 + self.predicate.count
+
+    @override
     def explain_failure(self, iterable: Iterable[T]) -> dict:
         return {"reason": f"No item matches predicate {self.predicate!r}"}

@@ -35,6 +35,11 @@ class Predicate[T]:
         return predicate == self
 
     @property
+    def count(self) -> int:
+        """Returns number of operators in a predicated. Used for optimization."""
+        return 0
+
+    @property
     def klass(self) -> type:
         return self.get_klass()
 
@@ -102,6 +107,11 @@ class AndPredicate[T](Predicate[T]):
         return self.left.klass
 
     @override
+    @property
+    def count(self) -> int:
+        return 1 + self.left.count + self.right.count
+
+    @override
     def explain_failure(self, x: T) -> dict:
         left_explanation = self.left.explain(x)
 
@@ -157,6 +167,11 @@ class NotPredicate[T](Predicate[T]):
         return self.predicate.klass
 
     @override
+    @property
+    def count(self) -> int:
+        return 1 + self.predicate.count
+
+    @override
     def explain_failure(self, x: T) -> dict:
         return {"predicate": self.predicate.explain(x), "reason": f"not {self.predicate}"}
 
@@ -198,6 +213,11 @@ class OrPredicate[T](Predicate[T]):
     @override
     def get_klass(self) -> type:
         return self.left.klass
+
+    @override
+    @property
+    def count(self) -> int:
+        return 1 + self.left.count + self.right.count
 
     @override
     def explain_failure(self, x: T) -> dict:
@@ -244,6 +264,11 @@ class XorPredicate[T](Predicate[T]):
     @override
     def get_klass(self) -> type:
         return self.left.klass
+
+    @override
+    @property
+    def count(self) -> int:
+        return 1 + self.left.count + self.right.count
 
     @override
     def explain_failure(self, x: T) -> dict:

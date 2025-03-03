@@ -1,13 +1,10 @@
-from helpers import is_all_p
-
 from predicate import always_false_p, always_true_p, can_optimize, optimize
-from predicate.standard_predicates import all_p, any_p, eq_p, is_none_p, is_not_none_p, ne_p
+from predicate.standard_predicates import all_p, any_p, eq_p, has_length_p, is_none_p, is_not_none_p, ne_p
 
 
 def test_optimize_all_true():
     predicate = all_p(always_true_p)
 
-    assert is_all_p(predicate)
     assert can_optimize(predicate)
 
     optimized = optimize(predicate)
@@ -18,12 +15,11 @@ def test_optimize_all_true():
 def test_optimize_all_false():
     predicate = all_p(always_false_p)
 
-    assert is_all_p(predicate)
     assert can_optimize(predicate)
 
     optimized = optimize(predicate)
 
-    assert not is_all_p(optimized)
+    assert optimized == has_length_p(eq_p(0))
 
 
 def test_not_optimize_all():

@@ -94,7 +94,6 @@ def test_construct_and(predicate_pair):
     assert_generated(predicate)
 
 
-@pytest.mark.skip(reason="Fix me!")
 @pytest.mark.parametrize("predicate_pair", combinations_of_2())
 def test_construct_xor(predicate_pair):
     predicate_1, predicate_2 = predicate_pair

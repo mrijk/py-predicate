@@ -91,6 +91,7 @@ def test_is_datetime_p():
 
 
 def test_is_int_p():
+    assert not is_int_p(False)
     assert not is_int_p(None)
     assert not is_int_p("3")
     assert not is_int_p(3.0)

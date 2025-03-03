@@ -4,25 +4,25 @@ from predicate.always_false_predicate import always_false_p
 from predicate.always_true_predicate import always_true_p
 from predicate.eq_predicate import EqPredicate
 from predicate.ne_predicate import NePredicate
-from predicate.predicate import Predicate
+from predicate.optimizer.helpers import MaybeOptimized, NotOptimized, Optimized
 from predicate.set_predicates import InPredicate, NotInPredicate
 
 
-def optimize_in_predicate[T](predicate: InPredicate[T]) -> Predicate[T]:
+def optimize_in_predicate[T](predicate: InPredicate[T]) -> MaybeOptimized[T]:
     match len(v := predicate.v):
         case 0:
-            return always_false_p
+            return Optimized(always_false_p)
         case 1:
-            return EqPredicate(one(v))
+            return Optimized(EqPredicate(one(v)))
         case _:
-            return predicate
+            return NotOptimized()
 
 
-def optimize_not_in_predicate[T](predicate: NotInPredicate[T]) -> Predicate[T]:
+def optimize_not_in_predicate[T](predicate: NotInPredicate[T]) -> MaybeOptimized[T]:
     match len(v := predicate.v):
         case 0:
-            return always_true_p
+            return Optimized(always_true_p)
         case 1:
-            return NePredicate(one(v))
+            return Optimized(NePredicate(one(v)))
         case _:
-            return predicate
+            return NotOptimized()
