@@ -99,5 +99,5 @@ def optimize_and_predicate[T](predicate: AndPredicate[T]) -> MaybeOptimized[T]:
             return Optimized(right)  # q => p and (p & q) results in p
         case _, _ if implies(left, negate(right)) or implies(right, negate(left)):
             return Optimized(always_false_p)
-        case _:
-            return NotOptimized()
+
+    return Optimized(left & right) if (left != predicate.left or right != predicate.right) else NotOptimized()

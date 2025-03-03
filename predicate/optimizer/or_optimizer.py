@@ -103,5 +103,5 @@ def optimize_or_predicate[T](predicate: OrPredicate[T]) -> MaybeOptimized[T]:
             return Optimized(right)
         case _, _ if implies(right, left):
             return Optimized(left)
-        case _:
-            return NotOptimized()
+
+    return Optimized(left | right) if (left != predicate.left or right != predicate.right) else NotOptimized()

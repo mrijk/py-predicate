@@ -12,7 +12,7 @@ class IsInstancePredicate[T](Predicate[T]):
 
     def __call__(self, x: object) -> bool:
         # This is different from standard Python behaviour: a False/True value is not an int!
-        if isinstance(x, bool) and self.instance_klass[0] is int:
+        if isinstance(x, bool) and self.instance_klass[0] is int:  # type: ignore
             return False
         return isinstance(x, self.instance_klass)
 
