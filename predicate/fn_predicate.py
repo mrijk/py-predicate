@@ -13,8 +13,8 @@ class FnPredicate[T](Predicate[T]):
     """A predicate class that can hold a function."""
 
     predicate_fn: Callable[[T], bool]
-    generate_false_fn: Callable[[], Iterator]
-    generate_true_fn: Callable[[], Iterator]
+    generate_false_fn: Callable[[], Iterator] = undefined
+    generate_true_fn: Callable[[], Iterator] = undefined
 
     def __call__(self, x: T) -> bool:
         return self.predicate_fn(x)

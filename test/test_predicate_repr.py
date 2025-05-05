@@ -30,6 +30,7 @@ from predicate.is_callable_predicate import is_callable_p
 from predicate.named_predicate import NamedPredicate
 from predicate.set_predicates import is_real_subset_p, is_real_superset_p, is_subset_p, is_superset_p
 from predicate.standard_predicates import (
+    fn_p,
     ge_le_p,
     ge_lt_p,
     gt_le_p,
@@ -62,6 +63,7 @@ from predicate.standard_predicates import (
         (any_p(eq_p(2)), "any_p(eq_p(2))"),
         (comp_p(lambda x: x, eq_p(2)), "comp_p(eq_p(2))"),
         (eq_p(2), "eq_p(2)"),
+        (fn_p(lambda x: x), "fn_p(predicate_fn=<lambda>)"),
         (ge_p(2), "ge_p(2)"),
         (gt_p(2), "gt_p(2)"),
         (ge_le_p(2, 3), "ge_le_p(2, 3)"),
