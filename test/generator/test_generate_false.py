@@ -271,7 +271,7 @@ def test_generate_gt_lt(lower, upper):
 @pytest.mark.parametrize(
     "key_value_predicates",
     [
-        ([(is_str_p, is_int_p)]),
+        ([(is_str_p, is_int_p), (is_str_p, is_int_p)]),
     ],
 )
 def test_dict_of(key_value_predicates):
