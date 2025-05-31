@@ -11,7 +11,7 @@ class PropertyPredicate[T](Predicate[T]):
     getter: property
 
     def __init__(self, getter: Callable):
-        self.getter = getter
+        self.getter = getter  # type: ignore
 
     def __call__(self, obj: T) -> bool:
         return self.getter.fget(obj)  # type: ignore

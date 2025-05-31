@@ -22,7 +22,7 @@ class MatchPredicate[T](Predicate[T]):
                     case Predicate() as p:
                         yield repr(p)
                     case FunctionType() as f:
-                        yield f.__doc__
+                        yield f.__doc__ or "unknown()"
 
         param = ", ".join(callable_repr())
 
