@@ -118,6 +118,19 @@ def has_length_p(length_p: Predicate[int]) -> Predicate[Iterable]:
     return HasLengthPredicate(length_p=length_p)
 
 
+def generate_even_numbers() -> Iterator[int]:
+    from predicate.generator.helpers import random_ints
+
+    yield 0
+    yield from (value for value in random_ints() if value % 2 == 0)
+
+
+def generate_odd_numbers() -> Iterator[int]:
+    from predicate.generator.helpers import random_ints
+
+    yield from (value for value in random_ints() if value % 2 != 0)
+
+
 neg_p: Final[LtPredicate] = lt_p(0)
 """Returns True of the value is negative, otherwise False."""
 
@@ -127,13 +140,17 @@ zero_p: Final[EqPredicate] = eq_p(0)
 pos_p: Final[GtPredicate] = gt_p(0)
 """Returns True of the value is positive, otherwise False."""
 
-is_even_p: Final[Predicate[int]] = fn_p(lambda x: x % 2 == 0)
-is_odd_p: Final[Predicate[int]] = fn_p(lambda x: x % 2 != 0)
+is_even_p: Final[Predicate[int]] = fn_p(
+    lambda x: x % 2 == 0, generate_true_fn=generate_even_numbers, generate_false_fn=generate_odd_numbers
+)
+is_odd_p: Final[Predicate[int]] = fn_p(
+    lambda x: x % 2 != 0, generate_true_fn=generate_odd_numbers, generate_false_fn=generate_even_numbers
+)
 
-is_empty_p: Final[Predicate] = has_length_p(zero_p)
+is_empty_p: Final[Predicate[Iterable]] = has_length_p(zero_p)
 """Predicate that returns True if the iterable is empty, otherwise False."""
 
-is_not_empty_p: Final[Predicate] = has_length_p(pos_p)
+is_not_empty_p: Final[Predicate[Iterable]] = has_length_p(pos_p)
 """Predicate that returns True if the iterable is not empty, otherwise False."""
 
 

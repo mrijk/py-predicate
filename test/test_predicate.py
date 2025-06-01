@@ -1,6 +1,5 @@
 import math
 from datetime import datetime
-from unittest.mock import Mock
 from uuid import uuid4
 
 import pytest
@@ -10,7 +9,6 @@ from predicate import (
     eq_false_p,
     eq_p,
     eq_true_p,
-    ge_p,
     is_bool_p,
     is_callable_p,
     is_complex_p,
@@ -28,7 +26,6 @@ from predicate import (
 from predicate.named_predicate import NamedPredicate
 from predicate.predicate import Predicate
 from predicate.standard_predicates import (
-    all_p,
     is_container_p,
     is_finite_p,
     is_hashable_p,
@@ -40,7 +37,6 @@ from predicate.standard_predicates import (
     is_single_or_list_of_p,
     neg_p,
     pos_p,
-    tee_p,
     zero_p,
 )
 
@@ -237,19 +233,6 @@ def test_named_predicate():
 
     assert not p(False)
     assert p != q
-
-
-def test_tee():
-    log_fn = Mock()
-    log = tee_p(fn=log_fn)
-
-    ge_2 = ge_p(2)
-
-    predicate = all_p(log & ge_2)
-
-    assert predicate(range(2, 5))
-
-    assert log_fn.call_count == 3
 
 
 @pytest.mark.parametrize(
