@@ -15,6 +15,7 @@ class CompPredicate[S, T](Predicate[T]):
         return self.predicate(self.fn(x))
 
     def __repr__(self) -> str:
+        # TODO: find a representation for the function
         return f"comp_p({self.predicate!r})"
 
     def __contains__(self, predicate: Predicate[T]) -> bool:

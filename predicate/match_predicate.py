@@ -72,9 +72,6 @@ def repeat(m: int, n: int, predicate: Predicate) -> Callable:
                 return True
         return False
 
-    _repeat.parent = repeat
-    _repeat.predicate = predicate
-
     return _repeat
 
 
