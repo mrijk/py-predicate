@@ -12,8 +12,14 @@ def test_is_instance_p():
     assert is_str_or_int_p("3")
 
 
-def test_explain():
-    predicate = is_instance_p(str, int)
+def test_explain_single():
+    predicate = is_instance_p(int)
+    expected = {"reason": "None is not an instance of type int", "result": False}
+    assert explain(predicate, None) == expected
 
-    expected = {"reason": "None is not an instance of (<class 'str'>, <class 'int'>)", "result": False}
+
+def test_explain():
+    predicate = is_instance_p(str, int, float)
+
+    expected = {"reason": "None is not an instance of type str, int or float", "result": False}
     assert explain(predicate, None) == expected

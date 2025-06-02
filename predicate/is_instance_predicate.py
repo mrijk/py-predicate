@@ -1,7 +1,15 @@
 from dataclasses import dataclass
-from typing import override
+from typing import Iterator, override
 
 from predicate.predicate import Predicate
+
+
+def join_with_or(s: list[str]) -> str:
+    first = s[:-1]
+    last = s[-1]
+    if first:
+        return f"{', '.join(first)} or {last}"
+    return last
 
 
 @dataclass
@@ -26,4 +34,14 @@ class IsInstancePredicate[T](Predicate[T]):
 
     @override
     def explain_failure(self, x: T) -> dict:
-        return {"reason": f"{x} is not an instance of {self.instance_klass}"}
+        def class_names() -> Iterator[str]:
+            match self.instance_klass:
+                case tuple() as klasses:
+                    for klass in klasses:
+                        yield klass.__name__
+                case _:
+                    yield self.instance_klass.__name__
+
+        klasses = join_with_or(list(class_names()))
+
+        return {"reason": f"{x} is not an instance of type {klasses}"}

@@ -205,7 +205,7 @@ def is_tuple_of_p(*predicates: Predicate) -> Predicate:
     return TupleOfPredicate(list(predicates))
 
 
-def is_set_of_p[T](predicate: Predicate[T]) -> Predicate:
+def is_set_of_p[T](predicate: Predicate[T]) -> Predicate[set[T]]:
     """Return True if value is a set, and for all elements in the set the predicate is True, otherwise False."""
     return SetOfPredicate(predicate)
 

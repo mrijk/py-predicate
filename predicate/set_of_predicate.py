@@ -12,7 +12,11 @@ class SetOfPredicate[T](Predicate[T]):
     predicate: Predicate
 
     def __call__(self, x: set[T]) -> bool:
-        return all_true(x, self.predicate)
+        match x:
+            case set() as s:
+                return all_true(s, self.predicate)
+            case _:
+                return False
 
     def __contains__(self, predicate: Predicate[T]) -> bool:
         return predicate == self or predicate in self.predicate
@@ -25,6 +29,9 @@ class SetOfPredicate[T](Predicate[T]):
 
     @override
     def explain_failure(self, x: set[T]) -> dict:
-        fail = first_false(x, self.predicate)
-
-        return {"reason": f"Item '{fail}' didn't match predicate {self.predicate}"}
+        match x:
+            case set() as s:
+                fail = first_false(s, self.predicate)
+                return {"reason": f"Item '{fail}' didn't match predicate {self.predicate}"}
+            case _:
+                return {"reason": f"{x} is not an instance of a set"}
