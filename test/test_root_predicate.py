@@ -31,7 +31,7 @@ def test_root_explain():
     str_or_list_of_str = is_str_p | is_list_of_p(root_p)
 
     expected = {
-        "left": {"reason": "13 is not an instance of (<class 'str'>,)", "result": False},
+        "left": {"reason": "13 is not an instance of type str", "result": False},
         "result": False,
         "right": {"reason": "13 is not an instance of a list", "result": False},
     }
