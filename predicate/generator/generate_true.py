@@ -76,6 +76,7 @@ from predicate.regex_predicate import RegexPredicate
 from predicate.set_of_predicate import SetOfPredicate
 from predicate.set_predicates import InPredicate, IsRealSubsetPredicate, IsSubsetPredicate, NotInPredicate
 from predicate.standard_predicates import AllPredicate
+from predicate.tee_predicate import TeePredicate
 from predicate.tuple_of_predicate import TupleOfPredicate
 
 
@@ -473,3 +474,8 @@ def generate_xor(predicate: XorPredicate) -> Iterator:
         left_and_not_right = (item for item in generate_true(predicate.left) if not predicate.right(item))
         right_and_not_left = (item for item in generate_true(predicate.right) if not predicate.left(item))
         yield from random_first_from_iterables(left_and_not_right, right_and_not_left)
+
+
+@generate_true.register
+def generate_tee(_predicate: TeePredicate) -> Iterator:
+    yield from []

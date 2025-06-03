@@ -57,6 +57,7 @@ from predicate import (
     neg_p,
     not_in_p,
     pos_p,
+    tee_p,
     zero_p,
 )
 
@@ -118,6 +119,12 @@ def test_generate_false_and(predicate_pair):
 def test_generate_false_or(predicate_pair):
     predicate_1, predicate_2 = predicate_pair
     predicate = predicate_1 | predicate_2
+    assert_generated_false(predicate)
+
+
+def test_generate_tee():
+    predicate = tee_p(fn=lambda x: x) & eq_p(2)
+
     assert_generated_false(predicate)
 
 

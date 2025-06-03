@@ -47,6 +47,7 @@ from predicate.range_predicate import GeLePredicate, GeLtPredicate, GtLePredicat
 from predicate.set_of_predicate import SetOfPredicate
 from predicate.set_predicates import InPredicate, NotInPredicate
 from predicate.standard_predicates import AnyPredicate, has_key_p
+from predicate.tee_predicate import TeePredicate
 from predicate.tuple_of_predicate import TupleOfPredicate
 
 
@@ -424,3 +425,8 @@ def generate_at_least_one_false(predicate: Predicate, *, min_size: int, max_size
     combined_values = false_values + true_values
 
     return random_permutation(combined_values)
+
+
+@generate_false.register
+def generate_tee(_predicate: TeePredicate) -> Iterator:
+    yield from []

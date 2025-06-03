@@ -65,6 +65,7 @@ from predicate.standard_predicates import (
     neg_p,
     pos_p,
     regex_p,
+    tee_p,
     zero_p,
 )
 
@@ -125,6 +126,12 @@ def test_generate_true(predicate):
 def test_generate_true_or(predicate_pair):
     predicate_1, predicate_2 = predicate_pair
     predicate = predicate_1 | predicate_2
+    assert_generated_true(predicate)
+
+
+def test_generate_tee():
+    predicate = tee_p(fn=lambda x: x) & eq_p(2)
+
     assert_generated_true(predicate)
 
 
