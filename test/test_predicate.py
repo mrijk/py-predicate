@@ -76,7 +76,7 @@ def test_is_callable_p():
 def test_is_complex():
     assert not is_complex_p(1)
 
-    assert is_complex_p(complex(2, 1))
+    assert is_complex_p(2 + 1j)
 
 
 def test_is_datetime_p():

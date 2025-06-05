@@ -253,14 +253,14 @@ def generate_has_key(predicate: HasKeyPredicate) -> Iterator:
 
 
 @generate_true.register
-def generate_has_length(predicate: HasLengthPredicate) -> Iterator:
+def generate_has_length(predicate: HasLengthPredicate, *, klass: object = Any) -> Iterator:
     length_p = predicate.length_p
     valid_lengths = generate_true(length_p)
     valid_length = first(valid_lengths)
 
     # TODO: generate with different invalid lengths
 
-    yield from random_iterables(min_size=valid_length, max_size=valid_length)
+    yield from random_iterables(min_size=valid_length, max_size=valid_length, klass=klass)
 
 
 @generate_true.register

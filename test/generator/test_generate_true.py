@@ -446,6 +446,25 @@ def test_generate_has_length_p(length_p):
     assert_generated_true(predicate)
 
 
+@pytest.mark.parametrize(
+    "length_p, klass",
+    [
+        (eq_p(2), int),
+        (ge_le_p(lower=1, upper=3), str),
+    ],
+)
+def test_generate_has_length_p_with_klass(length_p, klass):
+    predicate = has_length_p(length_p=length_p)
+    values_p = all_p(is_instance_p(klass))
+
+    values = take(5, generate_true(predicate, klass=klass))
+    assert values
+
+    for value in values:
+        assert predicate(value)
+        assert values_p(value)
+
+
 def assert_generated_true(predicate, **kwargs):
     values = take(5, generate_true(predicate, **kwargs))
     assert values

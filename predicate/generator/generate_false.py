@@ -4,6 +4,7 @@ from collections.abc import Iterable, Iterator
 from datetime import datetime, timedelta
 from functools import singledispatch
 from itertools import repeat
+from typing import Any
 from uuid import UUID
 
 from more_itertools import chunked, first, flatten, interleave, partial_product, random_permutation, take
@@ -52,7 +53,7 @@ from predicate.tuple_of_predicate import TupleOfPredicate
 
 
 @singledispatch
-def generate_false[T](predicate: Predicate[T]) -> Iterator[T]:
+def generate_false[T](predicate: Predicate[T], **kwargs) -> Iterator[T]:
     """Generate values that don't satisfy this predicate."""
     raise ValueError(f"Please register generator for correct predicate type: {predicate!r}")
 
@@ -106,14 +107,14 @@ def generate_has_key(predicate: HasKeyPredicate) -> Iterator:
 
 
 @generate_false.register
-def generate_has_length(predicate: HasLengthPredicate) -> Iterator:
+def generate_has_length(predicate: HasLengthPredicate, *, klass: object = Any) -> Iterator:
     length_p = predicate.length_p
     invalid_lengths = (length for length in generate_false(length_p) if length >= 0)
     invalid_length = first(invalid_lengths)
 
     # TODO: generate with different invalid lengths
 
-    yield from random_iterables(min_size=invalid_length, max_size=invalid_length)
+    yield from random_iterables(min_size=invalid_length, max_size=invalid_length, klass=klass)
 
 
 @generate_false.register
