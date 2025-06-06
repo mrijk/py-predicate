@@ -12,7 +12,7 @@ from more_itertools import first, interleave, random_permutation, repeatfunc, ta
 
 from predicate.generator.generate_predicate import generate_predicate
 from predicate.predicate import Predicate
-from predicate.standard_predicates import is_hashable_p
+from predicate.standard_predicates import is_hashable_p, is_int_p
 
 
 def random_first_from_iterables(*iterables: Iterable) -> Iterator:
@@ -74,12 +74,14 @@ def random_predicates(*, max_depth: int = 10, klass: type = int) -> Iterator:
     yield from random_first_from_iterables(*iterables)
 
 
-def random_sets(min_size: int = 0, max_size: int = 10, klass=Any) -> Iterator:
+def random_sets(min_size: int = 0, max_size: int = 10, value_p: Predicate = is_int_p) -> Iterator:
     if min_size == 0:
         yield set()
     while True:
+        from predicate import generate_true
+
         length = random.randint(min_size, max_size)
-        values = take(length, random_values_of_type(klass=klass))
+        values = take(length, generate_true(value_p))
         if len(result := set(values)) == length:
             yield result
 
@@ -124,30 +126,34 @@ def random_ints(lower: int = -sys.maxsize, upper: int = sys.maxsize) -> Iterator
         yield from between(100)
 
 
-def random_iterables(min_size: int = 0, max_size: int = 10, klass=Any) -> Iterator[Iterable]:
+def random_iterables(min_size: int = 0, max_size: int = 10, value_p=is_int_p) -> Iterator[Iterable]:
     if max_size == 0:
         yield from ([], {}, (), "")
     else:
-        iterable_1 = random_sets(min_size=min_size, max_size=max_size, klass=klass)
-        iterable_2 = random_lists(min_size=min_size, max_size=max_size, klass=klass)
-        iterable_3 = random_tuples(min_size=min_size, max_size=max_size, klass=klass)
+        iterable_1 = random_sets(min_size=min_size, max_size=max_size, value_p=value_p)
+        iterable_2 = random_lists(min_size=min_size, max_size=max_size, value_p=value_p)
+        iterable_3 = random_tuples(min_size=min_size, max_size=max_size, value_p=value_p)
         yield from random_first_from_iterables(iterable_1, iterable_2, iterable_3)
 
 
-def random_lists(min_size: int = 0, max_size: int = 10, klass=Any) -> Iterator[Iterable]:
+def random_lists(min_size: int = 0, max_size: int = 10, value_p: Predicate = is_int_p) -> Iterator[Iterable]:
     if min_size == 0:
         yield []
     while True:
+        from predicate import generate_true
+
         length = random.randint(min_size, max_size)
-        yield take(length, random_values_of_type(klass=klass))
+        yield take(length, generate_true(value_p))
 
 
-def random_tuples(min_size: int = 0, max_size: int = 10, klass=Any) -> Iterator[Iterable]:
+def random_tuples(min_size: int = 0, max_size: int = 10, value_p: Predicate = is_int_p) -> Iterator[Iterable]:
     if min_size == 0:
         yield ()
     while True:
+        from predicate import generate_true
+
         length = random.randint(min_size, max_size)
-        yield tuple(take(length, random_values_of_type(klass=klass)))
+        yield tuple(take(length, generate_true(value_p)))
 
 
 def random_uuids() -> Iterator[UUID]:

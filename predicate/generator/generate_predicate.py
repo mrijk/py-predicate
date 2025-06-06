@@ -135,15 +135,17 @@ def generate_gt_predicates(max_depth: int, klass: type) -> Iterator:
 
 
 def generate_in_predicates(max_depth: int, klass: type) -> Iterator:
+    from predicate import is_instance_p
     from predicate.generator.helpers import random_iterables
 
-    yield from (InPredicate(iterable) for iterable in random_iterables(klass=klass))
+    yield from (InPredicate(iterable) for iterable in random_iterables(value_p=is_instance_p(klass)))
 
 
 def generate_not_in_predicates(max_depth: int, klass: type) -> Iterator:
+    from predicate import is_instance_p
     from predicate.generator.helpers import random_iterables
 
-    yield from (NotInPredicate(iterable) for iterable in random_iterables(klass=klass))
+    yield from (NotInPredicate(iterable) for iterable in random_iterables(value_p=is_instance_p(klass)))
 
 
 def generate_le_predicates(max_depth: int, klass: type) -> Iterator:

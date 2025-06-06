@@ -4,7 +4,6 @@ from collections.abc import Iterable, Iterator
 from datetime import datetime, timedelta
 from functools import singledispatch
 from itertools import repeat
-from typing import Any
 from uuid import UUID
 
 from more_itertools import chunked, first, flatten, interleave, partial_product, random_permutation, take
@@ -47,7 +46,7 @@ from predicate.predicate import AndPredicate, NotPredicate, OrPredicate, Predica
 from predicate.range_predicate import GeLePredicate, GeLtPredicate, GtLePredicate, GtLtPredicate
 from predicate.set_of_predicate import SetOfPredicate
 from predicate.set_predicates import InPredicate, NotInPredicate
-from predicate.standard_predicates import AnyPredicate, has_key_p
+from predicate.standard_predicates import AnyPredicate, has_key_p, is_int_p
 from predicate.tee_predicate import TeePredicate
 from predicate.tuple_of_predicate import TupleOfPredicate
 
@@ -107,14 +106,14 @@ def generate_has_key(predicate: HasKeyPredicate) -> Iterator:
 
 
 @generate_false.register
-def generate_has_length(predicate: HasLengthPredicate, *, klass: object = Any) -> Iterator:
+def generate_has_length(predicate: HasLengthPredicate, *, value_p=is_int_p) -> Iterator:
     length_p = predicate.length_p
     invalid_lengths = (length for length in generate_false(length_p) if length >= 0)
     invalid_length = first(invalid_lengths)
 
     # TODO: generate with different invalid lengths
 
-    yield from random_iterables(min_size=invalid_length, max_size=invalid_length, klass=klass)
+    yield from random_iterables(min_size=invalid_length, max_size=invalid_length, value_p=value_p)
 
 
 @generate_false.register
