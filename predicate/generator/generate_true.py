@@ -75,7 +75,7 @@ from predicate.range_predicate import GeLePredicate, GeLtPredicate, GtLePredicat
 from predicate.regex_predicate import RegexPredicate
 from predicate.set_of_predicate import SetOfPredicate
 from predicate.set_predicates import InPredicate, IsRealSubsetPredicate, IsSubsetPredicate, NotInPredicate
-from predicate.standard_predicates import AllPredicate
+from predicate.standard_predicates import AllPredicate, is_int_p
 from predicate.tee_predicate import TeePredicate
 from predicate.tuple_of_predicate import TupleOfPredicate
 
@@ -253,14 +253,14 @@ def generate_has_key(predicate: HasKeyPredicate) -> Iterator:
 
 
 @generate_true.register
-def generate_has_length(predicate: HasLengthPredicate, *, klass: object = Any) -> Iterator:
+def generate_has_length(predicate: HasLengthPredicate, *, value_p=is_int_p) -> Iterator:
     length_p = predicate.length_p
     valid_lengths = generate_true(length_p)
     valid_length = first(valid_lengths)
 
     # TODO: generate with different invalid lengths
 
-    yield from random_iterables(min_size=valid_length, max_size=valid_length, klass=klass)
+    yield from random_iterables(min_size=valid_length, max_size=valid_length, value_p=value_p)
 
 
 @generate_true.register
