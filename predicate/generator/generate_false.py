@@ -107,13 +107,7 @@ def generate_has_key(predicate: HasKeyPredicate) -> Iterator:
 
 @generate_false.register
 def generate_has_length(predicate: HasLengthPredicate, *, value_p=is_int_p) -> Iterator:
-    length_p = predicate.length_p
-    invalid_lengths = (length for length in generate_false(length_p) if length >= 0)
-    invalid_length = first(invalid_lengths)
-
-    # TODO: generate with different invalid lengths
-
-    yield from random_iterables(min_size=invalid_length, max_size=invalid_length, value_p=value_p)
+    yield from random_iterables(length_p=~predicate.length_p, value_p=value_p)
 
 
 @generate_false.register

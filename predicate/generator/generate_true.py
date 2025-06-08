@@ -10,7 +10,6 @@ from uuid import UUID
 import exrex  # type: ignore
 from more_itertools import (
     chunked,
-    first,
     flatten,
     powerset_of_sets,
     random_combination_with_replacement,
@@ -254,13 +253,7 @@ def generate_has_key(predicate: HasKeyPredicate) -> Iterator:
 
 @generate_true.register
 def generate_has_length(predicate: HasLengthPredicate, *, value_p=is_int_p) -> Iterator:
-    length_p = predicate.length_p
-    valid_lengths = generate_true(length_p)
-    valid_length = first(valid_lengths)
-
-    # TODO: generate with different invalid lengths
-
-    yield from random_iterables(min_size=valid_length, max_size=valid_length, value_p=value_p)
+    yield from random_iterables(length_p=predicate.length_p, value_p=value_p)
 
 
 @generate_true.register

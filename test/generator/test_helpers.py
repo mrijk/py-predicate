@@ -110,9 +110,10 @@ def test_random_list():
 
 
 def test_random_list_with_limits():
-    lists = take(10, random_lists(min_size=3, max_size=5))
+    length_p = ge_le_p(lower=3, upper=5)
+    lists = take(10, random_lists(length_p=length_p))
 
-    all_lists = all_p(is_list_p & has_length_p(ge_le_p(lower=3, upper=5)))
+    all_lists = all_p(is_list_p & has_length_p(length_p))
 
     assert all_lists(lists)
 
@@ -136,9 +137,10 @@ def test_random_sets():
 
 
 def test_random_sets_with_limits():
-    sets = take(10, random_sets(min_size=3, max_size=5))
+    length_p = ge_le_p(lower=3, upper=5)
+    sets = take(10, random_sets(length_p=length_p))
 
-    all_sets = all_p(is_set_p & has_length_p(length_p=ge_le_p(lower=3, upper=5)))
+    all_sets = all_p(is_set_p & has_length_p(length_p=length_p))
 
     assert all_sets(sets)
 
@@ -178,9 +180,11 @@ def test_random_tuples():
 
 
 def test_random_tuples_with_limits():
-    tuples = take(10, random_tuples(min_size=3, max_size=5))
+    length_p = ge_le_p(lower=3, upper=5)
 
-    all_tuples = all_p(is_tuple_p & has_length_p(length_p=ge_le_p(lower=3, upper=5)))
+    tuples = take(10, random_tuples(length_p=length_p))
+
+    all_tuples = all_p(is_tuple_p & has_length_p(length_p=length_p))
 
     assert all_tuples(tuples)
 
