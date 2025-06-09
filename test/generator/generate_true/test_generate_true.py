@@ -5,6 +5,7 @@ from ipaddress import IPv4Network
 import pytest
 from more_itertools import take
 
+from generator.generate_true.helpers import assert_generated_true
 from generator.helpers import combinations_of_2
 from predicate import (
     all_p,
@@ -463,11 +464,3 @@ def test_generate_has_length_p_with_klass(length_p, value_p):
     for value in values:
         assert predicate(value)
         assert values_p(value)
-
-
-def assert_generated_true(predicate, **kwargs):
-    values = take(5, generate_true(predicate, **kwargs))
-    assert values
-
-    for value in values:
-        assert predicate(value)

@@ -10,6 +10,7 @@ from uuid import UUID
 import exrex  # type: ignore
 from more_itertools import (
     chunked,
+    first,
     flatten,
     powerset_of_sets,
     random_combination_with_replacement,
@@ -19,7 +20,7 @@ from more_itertools import (
 
 from predicate import generate_false
 from predicate.always_false_predicate import AlwaysFalsePredicate, always_false_p
-from predicate.always_true_predicate import AlwaysTruePredicate
+from predicate.always_true_predicate import AlwaysTruePredicate, always_true_p
 from predicate.any_predicate import AnyPredicate
 from predicate.dict_of_predicate import DictOfPredicate
 from predicate.eq_predicate import EqPredicate
@@ -52,6 +53,7 @@ from predicate.generator.helpers import (
 from predicate.gt_predicate import GtPredicate
 from predicate.has_key_predicate import HasKeyPredicate
 from predicate.has_length_predicate import HasLengthPredicate
+from predicate.has_path_predicate import HasPathPredicate
 from predicate.is_falsy_predicate import IsFalsyPredicate
 from predicate.is_instance_predicate import IsInstancePredicate
 from predicate.is_none_predicate import IsNonePredicate
@@ -74,7 +76,7 @@ from predicate.range_predicate import GeLePredicate, GeLtPredicate, GtLePredicat
 from predicate.regex_predicate import RegexPredicate
 from predicate.set_of_predicate import SetOfPredicate
 from predicate.set_predicates import InPredicate, IsRealSubsetPredicate, IsSubsetPredicate, NotInPredicate
-from predicate.standard_predicates import AllPredicate, is_int_p
+from predicate.standard_predicates import AllPredicate, is_dict_of_p, is_int_p
 from predicate.tee_predicate import TeePredicate
 from predicate.tuple_of_predicate import TupleOfPredicate
 
@@ -126,7 +128,7 @@ def generate_any_p(any_predicate: AnyPredicate, *, min_size: int = 1, max_size: 
 
 @generate_true.register
 def generate_always_true(_predicate: AlwaysTruePredicate) -> Iterator:
-    yield True
+    yield from random_anys()
 
 
 @generate_true.register
@@ -254,6 +256,19 @@ def generate_has_key(predicate: HasKeyPredicate) -> Iterator:
 @generate_true.register
 def generate_has_length(predicate: HasLengthPredicate, *, value_p=is_int_p) -> Iterator:
     yield from random_iterables(length_p=predicate.length_p, value_p=value_p)
+
+
+@generate_true.register
+def generate_has_path(predicate: HasPathPredicate) -> Iterator:
+    path = predicate.path
+    root = first(path)
+
+    valid_keys = generate_true(root)
+
+    while True:
+        valid_key = next(valid_keys)
+        dict_of = is_dict_of_p((valid_key, always_true_p))
+        yield from generate_true(dict_of)
 
 
 @generate_true.register

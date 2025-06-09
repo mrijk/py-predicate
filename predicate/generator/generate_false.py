@@ -32,6 +32,7 @@ from predicate.generator.helpers import (
 from predicate.gt_predicate import GtPredicate
 from predicate.has_key_predicate import HasKeyPredicate
 from predicate.has_length_predicate import HasLengthPredicate
+from predicate.has_path_predicate import HasPathPredicate
 from predicate.is_falsy_predicate import IsFalsyPredicate
 from predicate.is_instance_predicate import IsInstancePredicate
 from predicate.is_none_predicate import IsNonePredicate
@@ -46,7 +47,7 @@ from predicate.predicate import AndPredicate, NotPredicate, OrPredicate, Predica
 from predicate.range_predicate import GeLePredicate, GeLtPredicate, GtLePredicate, GtLtPredicate
 from predicate.set_of_predicate import SetOfPredicate
 from predicate.set_predicates import InPredicate, NotInPredicate
-from predicate.standard_predicates import AnyPredicate, has_key_p, is_int_p
+from predicate.standard_predicates import AnyPredicate, has_key_p, is_dict_of_p, is_int_p
 from predicate.tee_predicate import TeePredicate
 from predicate.tuple_of_predicate import TupleOfPredicate
 
@@ -108,6 +109,21 @@ def generate_has_key(predicate: HasKeyPredicate) -> Iterator:
 @generate_false.register
 def generate_has_length(predicate: HasLengthPredicate, *, value_p=is_int_p) -> Iterator:
     yield from random_iterables(length_p=~predicate.length_p, value_p=value_p)
+
+
+@generate_false.register
+def generate_has_path(predicate: HasPathPredicate) -> Iterator:
+    path = predicate.path
+    root = first(path)
+
+    from predicate import generate_true
+
+    valid_keys = generate_true(root)
+
+    while True:
+        valid_key = next(valid_keys)
+        dict_of = is_dict_of_p((valid_key, always_false_p))
+        yield from generate_false(dict_of)
 
 
 @generate_false.register

@@ -5,7 +5,7 @@ from collections.abc import Callable, Iterable
 from datetime import datetime, timedelta
 from itertools import cycle
 from random import choices
-from typing import Any, Iterator
+from typing import Any, Final, Iterator
 from uuid import UUID, uuid4
 
 from more_itertools import first, interleave, random_permutation, repeatfunc, take
@@ -42,7 +42,7 @@ def random_callables() -> Iterator:
         yield from (lambda x: x,)  # TODO: add more Callable's
 
 
-default_size_p = ge_le_p(lower=0, upper=5)
+default_size_p: Final = ge_le_p(lower=0, upper=5)
 
 
 def random_dicts(
@@ -88,7 +88,7 @@ def random_predicates(*, max_depth: int = 10, klass: type = int) -> Iterator:
     yield from random_first_from_iterables(*iterables)
 
 
-default_length_p = ge_le_p(lower=0, upper=10)
+default_length_p: Final = ge_le_p(lower=0, upper=10)
 
 
 def random_sets(length_p: Predicate = default_length_p, value_p: Predicate = is_int_p) -> Iterator:
