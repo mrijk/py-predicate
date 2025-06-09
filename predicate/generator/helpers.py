@@ -12,7 +12,7 @@ from more_itertools import first, interleave, random_permutation, repeatfunc, ta
 
 from predicate.generator.generate_predicate import generate_predicate
 from predicate.predicate import Predicate
-from predicate.standard_predicates import ge_le_p, is_hashable_p, is_int_p
+from predicate.standard_predicates import ge_le_p, is_hashable_p, is_int_p, is_str_p
 
 
 def random_first_from_iterables(*iterables: Iterable) -> Iterator:
@@ -42,12 +42,26 @@ def random_callables() -> Iterator:
         yield from (lambda x: x,)  # TODO: add more Callable's
 
 
-def random_dicts() -> Iterator:
-    yield {}
+default_size_p = ge_le_p(lower=0, upper=5)
+
+
+def random_dicts(
+    key_p: Predicate = is_str_p, value_p: Predicate = is_int_p, size_p: Predicate = default_size_p
+) -> Iterator:
+    from predicate import generate_true
+
+    if size_p(0):
+        yield {}
+
+    valid_keys = generate_true(key_p)
+    valid_values = generate_true(value_p)
+    valid_sizes = generate_true(size_p)
+
     while True:
-        keys = take(5, random_strings())
-        values = take(5, random_anys())
-        yield dict(zip(keys, values, strict=False))
+        if (valid_size := next(valid_sizes)) >= 0:
+            keys = take(valid_size, valid_keys)
+            values = take(valid_size, valid_values)
+            yield dict(zip(keys, values, strict=False))
 
 
 def random_datetimes(lower: datetime | None = None, upper: datetime | None = None) -> Iterator:

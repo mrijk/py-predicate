@@ -8,6 +8,7 @@ from predicate import (
     ge_le_p,
     ge_p,
     has_length_p,
+    in_p,
     is_bool_p,
     is_complex_p,
     is_container_p,
@@ -74,6 +75,16 @@ def test_random_containers():
 
 def test_random_dicts():
     dicts = take(10, random_dicts())
+
+    all_dict = all_p(is_dict_p)
+
+    assert first(dicts) == {}
+    assert all_dict(dicts)
+
+
+def test_random_dicts_with_value_p():
+    value_p = in_p("foo", "bar", "foobar")
+    dicts = take(10, random_dicts(value_p=value_p))
 
     all_dict = all_p(is_dict_p)
 
