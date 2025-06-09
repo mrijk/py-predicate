@@ -10,7 +10,6 @@ from uuid import UUID
 import exrex  # type: ignore
 from more_itertools import (
     chunked,
-    first,
     flatten,
     powerset_of_sets,
     random_combination_with_replacement,
@@ -76,7 +75,7 @@ from predicate.range_predicate import GeLePredicate, GeLtPredicate, GtLePredicat
 from predicate.regex_predicate import RegexPredicate
 from predicate.set_of_predicate import SetOfPredicate
 from predicate.set_predicates import InPredicate, IsRealSubsetPredicate, IsSubsetPredicate, NotInPredicate
-from predicate.standard_predicates import AllPredicate, is_dict_of_p, is_int_p
+from predicate.standard_predicates import AllPredicate, is_dict_of_p, is_int_p, is_list_of_p, is_list_p
 from predicate.tee_predicate import TeePredicate
 from predicate.tuple_of_predicate import TupleOfPredicate
 
@@ -127,7 +126,7 @@ def generate_any_p(any_predicate: AnyPredicate, *, min_size: int = 1, max_size: 
 
 
 @generate_true.register
-def generate_always_true(_predicate: AlwaysTruePredicate) -> Iterator:
+def generate_always_true(_predicate: AlwaysTruePredicate, **_kwargs) -> Iterator:
     yield from random_anys()
 
 
@@ -150,7 +149,7 @@ def generate_and(predicate: AndPredicate) -> Iterator:
 
 
 @generate_true.register
-def generate_eq(predicate: EqPredicate) -> Iterator:
+def generate_eq(predicate: EqPredicate, **_kwargs) -> Iterator:
     yield from repeat(predicate.v)
 
 
@@ -212,7 +211,7 @@ def generate_gt_lt(predicate: GtLtPredicate) -> Iterator:
 
 
 @generate_true.register
-def generate_ge(predicate: GePredicate) -> Iterator:
+def generate_ge(predicate: GePredicate, **_kwargs) -> Iterator:
     match v := predicate.v:
         case datetime():
             yield from random_datetimes(lower=predicate.v)
@@ -258,17 +257,35 @@ def generate_has_length(predicate: HasLengthPredicate, *, value_p=is_int_p) -> I
     yield from random_iterables(length_p=predicate.length_p, value_p=value_p)
 
 
+def create_value_predicate(path: list[Predicate]) -> Predicate:
+    match path:
+        case [head]:
+            return head
+        case [root, *rest] if root == is_list_p:
+            valid_value = create_value_predicate(rest)
+            return is_list_of_p(valid_value)
+        case [root, *rest]:
+            valid_keys = generate_true(root)
+            valid_key = next(valid_keys)
+            valid_value = create_value_predicate(rest)
+            return is_dict_of_p((valid_key, valid_value))
+        case []:
+            return always_true_p
+        case _:
+            raise ValueError("Unreachable")
+
+
 @generate_true.register
 def generate_has_path(predicate: HasPathPredicate) -> Iterator:
-    path = predicate.path
-    root = first(path)
+    root, *rest = predicate.path
 
     valid_keys = generate_true(root)
 
     while True:
         valid_key = next(valid_keys)
-        dict_of = is_dict_of_p((valid_key, always_true_p))
-        yield from generate_true(dict_of)
+        valid_value = create_value_predicate(rest)
+        dict_of = is_dict_of_p((valid_key, valid_value))
+        yield from generate_true(dict_of, min_size=1)
 
 
 @generate_true.register
@@ -419,11 +436,11 @@ def generate_is_instance_p(predicate: IsInstancePredicate, **kwargs) -> Iterator
 
 
 @generate_true.register
-def generate_dict_of_p(dict_of_predicate: DictOfPredicate) -> Iterator:
+def generate_dict_of_p(dict_of_predicate: DictOfPredicate, **kwargs) -> Iterator:
     key_value_predicates = dict_of_predicate.key_value_predicates
 
     candidates = zip(
-        *flatten(((generate_true(key_p), generate_true(value_p)) for key_p, value_p in key_value_predicates)),
+        *flatten(((generate_true(key_p), generate_true(value_p, **kwargs)) for key_p, value_p in key_value_predicates)),
         strict=False,
     )
 

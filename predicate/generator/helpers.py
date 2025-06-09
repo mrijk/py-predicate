@@ -129,7 +129,7 @@ def random_floats(lower: float = -1e-6, upper: float = 1e6) -> Iterator:
         yield random.uniform(lower, upper)
 
 
-def random_ints(lower: int = -sys.maxsize, upper: int = sys.maxsize) -> Iterator[int]:
+def random_ints(lower: int = -sys.maxsize, upper: int = sys.maxsize, **_kwargs) -> Iterator[int]:
     # yield lower
     # yield upper
 
