@@ -4,7 +4,7 @@ from collections.abc import Callable, Container, Iterable, Iterator
 from datetime import datetime, timedelta
 from functools import singledispatch
 from itertools import repeat
-from typing import Any
+from typing import Any, Final
 from uuid import UUID
 
 import exrex  # type: ignore
@@ -26,6 +26,7 @@ from predicate.eq_predicate import EqPredicate
 from predicate.fn_predicate import FnPredicate
 from predicate.ge_predicate import GePredicate
 from predicate.generator.helpers import (
+    default_length_p,
     generate_anys,
     generate_ints,
     generate_strings,
@@ -71,30 +72,33 @@ from predicate.predicate import (
     Predicate,
     XorPredicate,
 )
+from predicate.property_predicate import PropertyPredicate
 from predicate.range_predicate import GeLePredicate, GeLtPredicate, GtLePredicate, GtLtPredicate
 from predicate.regex_predicate import RegexPredicate
 from predicate.set_of_predicate import SetOfPredicate
 from predicate.set_predicates import InPredicate, IsRealSubsetPredicate, IsSubsetPredicate, NotInPredicate
-from predicate.standard_predicates import AllPredicate, is_dict_of_p, is_int_p, is_list_of_p, is_list_p
+from predicate.standard_predicates import AllPredicate, ge_le_p, ge_p, is_dict_of_p, is_int_p, is_list_of_p, is_list_p
 from predicate.tee_predicate import TeePredicate
 from predicate.tuple_of_predicate import TupleOfPredicate
 
 
 @singledispatch
-def generate_true[T](predicate: Predicate[T], **kwargs) -> Iterator[T]:
+def generate_true[T](predicate: Predicate[T], **_kwargs) -> Iterator[T]:
     """Generate values that satisfy this predicate."""
     raise ValueError(f"Please register generator for correct predicate type: {predicate}")
 
 
 @generate_true.register
-def generate_all_p(all_predicate: AllPredicate, *, min_size: int = 1, max_size: int = 10) -> Iterator:
-    if min_size == 0:
+def generate_all_p(all_predicate: AllPredicate, *, length_p: Predicate = default_length_p) -> Iterator:
+    if length_p(0):
         yield []
 
     predicate = all_predicate.predicate
 
+    valid_max_lengths = generate_true(length_p)
+
     while True:
-        max_length = random.randint(min_size, max_size)
+        max_length = next(valid_max_lengths)
 
         values = take(max_length, generate_true(predicate))
         yield random_combination_with_replacement(values, max_length)
@@ -106,12 +110,17 @@ def generate_all_p(all_predicate: AllPredicate, *, min_size: int = 1, max_size: 
         yield list(random_combination_with_replacement(values, max_length))
 
 
+default_any_length_p: Final = ge_le_p(lower=1, upper=10)
+
+
 @generate_true.register
-def generate_any_p(any_predicate: AnyPredicate, *, min_size: int = 1, max_size: int = 10) -> Iterator:
+def generate_any_p(any_predicate: AnyPredicate, *, length_p: Predicate = default_any_length_p) -> Iterator:
     predicate = any_predicate.predicate
 
+    valid_lengths = generate_true(length_p)
+
     while True:
-        length = random.randint(min_size, max_size)
+        length = next(valid_lengths)
 
         nr_true_values = random.randint(1, length) if length > 1 else 1
         nr_false_values = length - nr_true_values
@@ -285,7 +294,7 @@ def generate_has_path(predicate: HasPathPredicate) -> Iterator:
         valid_key = next(valid_keys)
         valid_value = create_value_predicate(rest)
         dict_of = is_dict_of_p((valid_key, valid_value))
-        yield from generate_true(dict_of, min_size=1)
+        yield from generate_true(dict_of, length_p=ge_p(1))
 
 
 @generate_true.register
@@ -448,14 +457,16 @@ def generate_dict_of_p(dict_of_predicate: DictOfPredicate, **kwargs) -> Iterator
 
 
 @generate_true.register
-def generate_list_of_p(list_of_predicate: ListOfPredicate, *, min_size: int = 0, max_size: int = 10) -> Iterator:
+def generate_list_of_p(list_of_predicate: ListOfPredicate, *, length_p: Predicate = default_length_p) -> Iterator:
     predicate = list_of_predicate.predicate
 
-    if min_size == 0:
+    if length_p(0):
         yield []
 
+    valid_lengths = generate_true(length_p)
+
     while True:
-        length = random.randint(min_size, max_size)
+        length = next(valid_lengths)
         yield take(length, generate_true(predicate))
 
 
@@ -466,26 +477,29 @@ def generate_tuple_of_p(tuple_of_predicate: TupleOfPredicate) -> Iterator:
     yield from zip(*(generate_true(predicate) for predicate in predicates), strict=False)
 
 
-# TODO: property names were introduced in Python 3.13
+# property names were introduced in Python 3.13
+if sys.version_info.minor > 12:
 
-# @generate_true.register
-# def generate_property_p(property_predicate: PropertyPredicate) -> Iterator:
-#     getter = property_predicate.getter
-#
-#     attributes = {getter.__name__: getter}
-#     klass = type("Foo", (object,), attributes)
-#
-#     yield klass
+    @generate_true.register
+    def generate_property_p(property_predicate: PropertyPredicate) -> Iterator:
+        getter = property_predicate.getter
+
+        attributes = {getter.__name__: getter}
+        klass = type("Foo", (object,), attributes)
+
+        yield klass
 
 
 @generate_true.register
 def generate_set_of_p(
-    set_of_predicate: SetOfPredicate, *, min_size: int = 0, max_size: int = 10, order: bool = False
+    set_of_predicate: SetOfPredicate, *, length_p: Predicate = default_length_p, order: bool = False
 ) -> Iterator:
     predicate = set_of_predicate.predicate
 
+    valid_lengths = generate_true(length_p)
+
     while True:
-        length = random.randint(min_size, max_size)
+        length = next(valid_lengths)
         values = take(length, generate_true(predicate))
 
         yield from set_from_list(values, order)

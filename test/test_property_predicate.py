@@ -1,3 +1,4 @@
+import sys
 from dataclasses import dataclass
 
 import pytest
@@ -42,12 +43,13 @@ def test_property_p_explain(create_foo):
     assert explain(predicate, foo) == expected
 
 
-@pytest.mark.skip(reason="Property names were introduced in Python 3.13")
-def test_property_p_explain_missing(create_foo):
-    klass = create_foo(True)
+if sys.version_info.minor > 12:
 
-    predicate = property_p(klass.bar)
+    def test_property_p_explain_missing(create_foo):
+        klass = create_foo(True)
 
-    expected = {"reason": "Object int has no property bar", "result": False}
+        predicate = property_p(klass.bar)
 
-    assert explain(predicate, 1) == expected
+        expected = {"reason": "Object int has no property bar", "result": False}
+
+        assert explain(predicate, 1) == expected

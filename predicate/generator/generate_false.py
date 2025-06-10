@@ -4,6 +4,7 @@ from collections.abc import Iterable, Iterator
 from datetime import datetime, timedelta
 from functools import singledispatch
 from itertools import repeat
+from typing import Final
 from uuid import UUID
 
 from more_itertools import chunked, first, flatten, interleave, partial_product, random_permutation, take
@@ -16,6 +17,7 @@ from predicate.eq_predicate import EqPredicate
 from predicate.fn_predicate import FnPredicate
 from predicate.ge_predicate import GePredicate
 from predicate.generator.helpers import (
+    default_size_p,
     generate_anys,
     generate_ints,
     generate_strings,
@@ -47,9 +49,11 @@ from predicate.predicate import AndPredicate, NotPredicate, OrPredicate, Predica
 from predicate.range_predicate import GeLePredicate, GeLtPredicate, GtLePredicate, GtLtPredicate
 from predicate.set_of_predicate import SetOfPredicate
 from predicate.set_predicates import InPredicate, NotInPredicate
-from predicate.standard_predicates import AnyPredicate, has_key_p, is_dict_of_p, is_int_p
+from predicate.standard_predicates import AnyPredicate, ge_le_p, has_key_p, is_dict_of_p, is_int_p
 from predicate.tee_predicate import TeePredicate
 from predicate.tuple_of_predicate import TupleOfPredicate
+
+default_at_least_one_length_p: Final = ge_le_p(lower=1, upper=10)
 
 
 @singledispatch
@@ -59,19 +63,22 @@ def generate_false[T](predicate: Predicate[T], **kwargs) -> Iterator[T]:
 
 
 @generate_false.register
-def generate_all_p(all_predicate: AllPredicate, *, min_size: int = 1, max_size: int = 10) -> Iterator:
+def generate_all_p(all_predicate: AllPredicate, *, length_p: Predicate = default_at_least_one_length_p) -> Iterator:
     predicate = all_predicate.predicate
 
     while True:
-        yield generate_at_least_one_false(predicate, min_size=min_size, max_size=max_size)
+        yield generate_at_least_one_false(predicate, length_p=length_p)
 
 
 @generate_false.register
-def generate_any_p(any_predicate: AnyPredicate, min_size: int = 0, max_size: int = 10) -> Iterator:
+def generate_any_p(any_predicate: AnyPredicate, length_p: Predicate = default_size_p) -> Iterator:
     predicate = any_predicate.predicate
+    from predicate import generate_true
+
+    valid_lengths = generate_true(length_p)
 
     while True:
-        length = random.randint(min_size, max_size)
+        length = next(valid_lengths)
 
         false_values = take(length, generate_false(predicate))
 
@@ -361,11 +368,13 @@ def generate_dict_of_p(dict_of_predicate: DictOfPredicate) -> Iterator:
 
 
 @generate_false.register
-def generate_list_of_p(list_of_predicate: ListOfPredicate, *, min_size: int = 1, max_size: int = 10) -> Iterator:
+def generate_list_of_p(
+    list_of_predicate: ListOfPredicate, *, length_p: Predicate = default_at_least_one_length_p
+) -> Iterator:
     predicate = list_of_predicate.predicate
 
     while True:
-        yield list(generate_at_least_one_false(predicate, min_size=min_size, max_size=max_size))
+        yield list(generate_at_least_one_false(predicate, length_p=length_p))
 
 
 def bool_array_from_int(n: int) -> Iterable[bool]:
@@ -395,11 +404,13 @@ def generate_tuple_of_p(tuple_of_predicate: TupleOfPredicate) -> Iterator:
 
 
 @generate_false.register
-def generate_set_of_p(set_of_predicate: SetOfPredicate, *, min_size: int = 1, max_size: int = 10) -> Iterator:
+def generate_set_of_p(
+    set_of_predicate: SetOfPredicate, *, length_p: Predicate = default_at_least_one_length_p
+) -> Iterator:
     predicate = set_of_predicate.predicate
 
     while True:
-        result = set(generate_at_least_one_false(predicate, min_size=min_size, max_size=max_size))
+        result = set(generate_at_least_one_false(predicate, length_p=length_p))
         # This check is needed because {False, 0} and {True, 1} result in {False} and {True}
         if not set_of_predicate(result):
             yield result
@@ -421,10 +432,10 @@ def generate_xor(predicate: XorPredicate) -> Iterator:
         yield from random_first_from_iterables(left_and_right, not_right_and_not_left)
 
 
-def generate_at_least_one_false(predicate: Predicate, *, min_size: int, max_size: int) -> tuple:
+def generate_at_least_one_false(predicate: Predicate, *, length_p: Predicate = default_at_least_one_length_p) -> tuple:
     from predicate import generate_true
 
-    length = random.randint(min_size, max_size)
+    length = first(generate_true(length_p))
 
     nr_false_values = random.randint(1, length) if length > 1 else 1
     nr_true_values = length - nr_false_values
