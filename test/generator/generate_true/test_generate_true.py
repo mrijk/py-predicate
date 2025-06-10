@@ -140,7 +140,7 @@ def test_generate_tee():
 def test_generate_all(all_predicate):
     predicate = all_p(all_predicate)
 
-    assert_generated_true(predicate, min_size=0)
+    assert_generated_true(predicate)
 
 
 @pytest.mark.parametrize("value", [2, "foo", "3.14", "complex(1, 2)"])
