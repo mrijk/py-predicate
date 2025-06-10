@@ -46,7 +46,11 @@ def test_property_p_explain(create_foo):
 if sys.version_info.minor > 12:
 
     def test_property_p_explain_missing(create_foo):
-        klass = create_foo(True)
+        klass = create_foo(False)
+
+        @dataclass
+        class Foo:
+            pass
 
         predicate = property_p(klass.bar)
 
