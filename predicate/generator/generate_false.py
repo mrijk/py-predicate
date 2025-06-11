@@ -37,6 +37,7 @@ from predicate.has_length_predicate import HasLengthPredicate
 from predicate.has_path_predicate import HasPathPredicate
 from predicate.is_falsy_predicate import IsFalsyPredicate
 from predicate.is_instance_predicate import IsInstancePredicate
+from predicate.is_lambda_predicate import IsLambdaPredicate
 from predicate.is_none_predicate import IsNonePredicate
 from predicate.is_not_none_predicate import IsNotNonePredicate
 from predicate.is_truthy_predicate import IsTruthyPredicate
@@ -334,6 +335,12 @@ def generate_truthy(_predicate: IsTruthyPredicate) -> Iterator:
 
 @generate_false.register
 def generate_is_instance_p(predicate: IsInstancePredicate) -> Iterator:
+    not_predicate = NotPredicate(predicate=predicate)
+    yield from generate_anys(not_predicate)
+
+
+@generate_false.register
+def generate_is_lambda_p(predicate: IsLambdaPredicate) -> Iterator:
     not_predicate = NotPredicate(predicate=predicate)
     yield from generate_anys(not_predicate)
 

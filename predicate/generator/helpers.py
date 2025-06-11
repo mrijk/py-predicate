@@ -1,6 +1,7 @@
 import random
 import string
 import sys
+import types
 from collections.abc import Callable, Iterable
 from datetime import datetime, timedelta
 from itertools import cycle
@@ -12,7 +13,7 @@ from more_itertools import first, interleave, random_permutation, repeatfunc, ta
 
 from predicate.generator.generate_predicate import generate_predicate
 from predicate.predicate import Predicate
-from predicate.standard_predicates import ge_le_p, is_hashable_p, is_int_p, is_str_p
+from predicate.standard_predicates import eq_p, ge_le_p, is_hashable_p, is_int_p, is_str_p, regex_p
 
 
 def random_first_from_iterables(*iterables: Iterable) -> Iterator:
@@ -34,12 +35,107 @@ def set_from_list(value: list, order: bool = False) -> Iterator:
 
 
 def random_complex_numbers() -> Iterator:
-    yield from (complex(real, imaginary) for real, imaginary in zip(random_ints(), random_ints(), strict=False))
+    yield from (complex(real, imaginary) for real, imaginary in zip(random_floats(), random_floats(), strict=False))
 
 
 def random_callables() -> Iterator:
-    while True:
-        yield from (lambda x: x,)  # TODO: add more Callable's
+    yield from random_lambdas()
+
+
+def generate_lambda(arg_names: list[str]):
+    arg_count = len(arg_names)
+    arg_str = tuple(arg_names)
+
+    # Bytecode for "return 0"
+    bytecode = b"d\x00S\x00"  # LOAD_CONST 0; RETURN_VALUE
+
+    # Constants used in the function (0 is at index 0)
+    consts = (0,)
+
+    # Names used in the function (none here)
+    names = ()
+
+    # No local variables other than args
+    varnames = arg_str
+
+    # Flags
+    flags = 0x43  # OPTIMIZED | NEWLOCALS | NOFREE
+
+    # Line numbers etc.
+    filename = "<generated>"
+    name = "<lambda>"
+    firstlineno = 1
+    lnotab = b""
+
+    # Get correct CodeType constructor based on Python version
+    if sys.version_info >= (3, 11):
+        code = types.CodeType(
+            arg_count,  # co_argcount
+            0,  # co_posonlyargcount
+            0,  # co_kwonlyargcount
+            arg_count,  # co_nlocals
+            2,  # co_stacksize
+            flags,  # co_flags
+            bytecode,  # co_code
+            consts,  # co_consts
+            names,  # co_names
+            varnames,  # co_varnames
+            filename,  # co_filename
+            name,  # co_name
+            name,  # co_qualname
+            firstlineno,  # co_firstlineno
+            lnotab,  # co_linetable (Py3.11+)
+            b"",  # co_exceptiontable
+            (),  # co_freevars
+            (),  # co_cellvars
+        )
+    elif sys.version_info >= (3, 8):
+        code = types.CodeType(
+            arg_count,  # co_argcount
+            0,  # co_posonlyargcount
+            0,  # co_kwonlyargcount
+            arg_count,  # co_nlocals
+            2,  # co_stacksize
+            flags,  # co_flags
+            bytecode,  # co_code
+            consts,  # co_consts
+            names,  # co_names
+            varnames,  # co_varnames
+            filename,  # co_filename
+            name,  # co_name
+            firstlineno,  # co_firstlineno
+            lnotab,  # co_lnotab
+            (),  # co_freevars
+            (),  # co_cellvars
+        )
+    else:
+        code = types.CodeType(
+            arg_count,  # co_argcount
+            arg_count,  # co_nlocals
+            2,  # co_stacksize
+            flags,  # co_flags
+            bytecode,  # co_code
+            consts,  # co_consts
+            names,  # co_names
+            varnames,  # co_varnames
+            filename,  # co_filename
+            name,  # co_name
+            firstlineno,  # co_firstlineno
+            lnotab,  # co_lnotab
+            (),  # co_freevars
+            (),  # co_cellvars
+        )
+
+    return types.FunctionType(code, {})
+
+
+default_nr_of_parameters_p: Final = eq_p(1)
+
+
+def random_lambdas(nr_of_parameters_p: Predicate = default_nr_of_parameters_p) -> Iterator:
+    value_p = regex_p("[a-z]{2,3}")
+    valid_parameter_lists = random_lists(length_p=nr_of_parameters_p, value_p=value_p)
+    yield from (generate_lambda(list(arg_names)) for arg_names in valid_parameter_lists)
 
 
 default_size_p: Final = ge_le_p(lower=0, upper=5)
@@ -163,7 +259,7 @@ def random_lists(length_p: Predicate = default_length_p, value_p: Predicate = is
 
     valid_lengths = generate_true(length_p)
     while True:
-        if (length := next(valid_lengths)) > 0:
+        if (length := next(valid_lengths)) >= 0:
             yield take(length, generate_true(value_p))
 
 

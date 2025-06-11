@@ -42,6 +42,7 @@ from predicate.generator.helpers import (
     random_floats,
     random_ints,
     random_iterables,
+    random_lambdas,
     random_lists,
     random_predicates,
     random_sets,
@@ -56,6 +57,7 @@ from predicate.has_length_predicate import HasLengthPredicate
 from predicate.has_path_predicate import HasPathPredicate
 from predicate.is_falsy_predicate import IsFalsyPredicate
 from predicate.is_instance_predicate import IsInstancePredicate
+from predicate.is_lambda_predicate import IsLambdaPredicate
 from predicate.is_none_predicate import IsNonePredicate
 from predicate.is_not_none_predicate import IsNotNonePredicate
 from predicate.is_predicate_of_p import IsPredicateOfPredicate
@@ -77,7 +79,16 @@ from predicate.range_predicate import GeLePredicate, GeLtPredicate, GtLePredicat
 from predicate.regex_predicate import RegexPredicate
 from predicate.set_of_predicate import SetOfPredicate
 from predicate.set_predicates import InPredicate, IsRealSubsetPredicate, IsSubsetPredicate, NotInPredicate
-from predicate.standard_predicates import AllPredicate, ge_le_p, ge_p, is_dict_of_p, is_int_p, is_list_of_p, is_list_p
+from predicate.standard_predicates import (
+    AllPredicate,
+    eq_p,
+    ge_le_p,
+    ge_p,
+    is_dict_of_p,
+    is_int_p,
+    is_list_of_p,
+    is_list_p,
+)
 from predicate.tee_predicate import TeePredicate
 from predicate.tuple_of_predicate import TupleOfPredicate
 
@@ -442,6 +453,12 @@ def generate_is_instance_p(predicate: IsInstancePredicate, **kwargs) -> Iterator
         yield from random_predicates(**kwargs)
     else:
         raise ValueError(f"No generator found for {klass}")
+
+
+@generate_true.register
+def generate_is_lambda_p(predicate: IsLambdaPredicate) -> Iterator:
+    nr_of_parameters = predicate.nr_of_parameters
+    yield from random_lambdas(nr_of_parameters_p=eq_p(nr_of_parameters))
 
 
 @generate_true.register

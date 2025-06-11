@@ -1,6 +1,6 @@
 from more_itertools import take
 
-from predicate import generate_true
+from predicate import explain, generate_true
 
 
 def assert_generated_true(predicate, **kwargs):
@@ -8,4 +8,4 @@ def assert_generated_true(predicate, **kwargs):
     assert values
 
     for value in values:
-        assert predicate(value)
+        assert predicate(value), explain(predicate, value)
