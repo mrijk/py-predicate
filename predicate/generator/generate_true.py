@@ -458,7 +458,7 @@ def generate_is_instance_p(predicate: IsInstancePredicate, **kwargs) -> Iterator
 @generate_true.register
 def generate_is_lambda_p(predicate: IsLambdaPredicate) -> Iterator:
     nr_of_parameters = predicate.nr_of_parameters
-    yield from random_lambdas(nr_of_parameters_p=eq_p(nr_of_parameters or 1))
+    yield from random_lambdas(nr_of_parameters_p=eq_p(nr_of_parameters or 0))
 
 
 @generate_true.register
