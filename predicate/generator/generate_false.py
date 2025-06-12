@@ -345,11 +345,11 @@ def generate_is_lambda_p(predicate: IsLambdaPredicate) -> Iterator:
     if (nr_of_parameters := predicate.nr_of_parameters) is None:
         not_predicate = NotPredicate(predicate=predicate)
         yield from generate_anys(not_predicate)
-
-    lower = 0
-    upper = min(5, 2 * nr_of_parameters)
-    nr_of_parameters_p = ge_le_p(lower=lower, upper=upper) & ne_p(nr_of_parameters)
-    yield from random_lambdas(nr_of_parameters_p=nr_of_parameters_p)
+    else:
+        lower = 0
+        upper = min(5, 2 * nr_of_parameters)
+        nr_of_parameters_p = ge_le_p(lower=lower, upper=upper) & ne_p(nr_of_parameters)
+        yield from random_lambdas(nr_of_parameters_p=nr_of_parameters_p)
 
 
 @generate_false.register
