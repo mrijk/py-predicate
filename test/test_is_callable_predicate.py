@@ -1,9 +1,5 @@
 from predicate import explain
-from predicate.is_callable_predicate import IsCallablePredicate
-
-
-def is_callable_p(params, return_value) -> IsCallablePredicate:
-    return IsCallablePredicate(params, return_value)
+from predicate.is_callable_predicate import is_callable_p
 
 
 def test_is_callable():

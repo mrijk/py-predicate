@@ -29,6 +29,7 @@ from predicate.generator.helpers import (
     random_floats,
     random_ints,
     random_iterables,
+    random_lambdas,
     random_values_of_type,
 )
 from predicate.gt_predicate import GtPredicate
@@ -50,7 +51,7 @@ from predicate.predicate import AndPredicate, NotPredicate, OrPredicate, Predica
 from predicate.range_predicate import GeLePredicate, GeLtPredicate, GtLePredicate, GtLtPredicate
 from predicate.set_of_predicate import SetOfPredicate
 from predicate.set_predicates import InPredicate, NotInPredicate
-from predicate.standard_predicates import AnyPredicate, ge_le_p, has_key_p, is_dict_of_p, is_int_p
+from predicate.standard_predicates import AnyPredicate, ge_le_p, has_key_p, is_dict_of_p, is_int_p, ne_p
 from predicate.tee_predicate import TeePredicate
 from predicate.tuple_of_predicate import TupleOfPredicate
 
@@ -341,8 +342,14 @@ def generate_is_instance_p(predicate: IsInstancePredicate) -> Iterator:
 
 @generate_false.register
 def generate_is_lambda_p(predicate: IsLambdaPredicate) -> Iterator:
-    not_predicate = NotPredicate(predicate=predicate)
-    yield from generate_anys(not_predicate)
+    if (nr_of_parameters := predicate.nr_of_parameters) is None:
+        not_predicate = NotPredicate(predicate=predicate)
+        yield from generate_anys(not_predicate)
+
+    lower = 0
+    upper = min(5, 2 * nr_of_parameters)
+    nr_of_parameters_p = ge_le_p(lower=lower, upper=upper) & ne_p(nr_of_parameters)
+    yield from random_lambdas(nr_of_parameters_p=nr_of_parameters_p)
 
 
 @generate_false.register

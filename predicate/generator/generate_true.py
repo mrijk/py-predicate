@@ -49,6 +49,7 @@ from predicate.generator.helpers import (
     random_strings,
     random_tuples,
     random_uuids,
+    random_values_of_type,
     set_from_list,
 )
 from predicate.gt_predicate import GtPredicate
@@ -365,7 +366,8 @@ def generate_lt(predicate: LtPredicate) -> Iterator:
 
 @generate_true.register
 def generate_ne(predicate: NePredicate) -> Iterator:
-    yield from generate_anys(predicate)
+    klass = type(predicate.v)
+    yield from (value for value in random_values_of_type(klass=klass) if value != predicate.v)
 
 
 @generate_true.register
