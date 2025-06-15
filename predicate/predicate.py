@@ -16,7 +16,7 @@ class Predicate[T]:
 
     def __and__(self, predicate: "Predicate") -> "Predicate":
         """Return the 'and' predicate."""
-        return AndPredicate(left=self, right=predicate)
+        return AndPredicate(left=resolve_predicate(self), right=resolve_predicate(predicate))
 
     def __or__(self, predicate: "Predicate") -> "Predicate":
         """Return the 'or' predicate."""
@@ -36,7 +36,7 @@ class Predicate[T]:
 
     @property
     def count(self) -> int:
-        """Returns number of operators in a predicated. Used for optimization."""
+        """Returns number of operators in a predicate. Used for optimization."""
         return 0
 
     @property

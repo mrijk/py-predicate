@@ -1,3 +1,4 @@
+import math
 import random
 import string
 import sys
@@ -34,8 +35,14 @@ def set_from_list(value: list, order: bool = False) -> Iterator:
             yield result if order else set(random_permutation(result))
 
 
-def random_complex_numbers() -> Iterator:
-    yield from (complex(real, imaginary) for real, imaginary in zip(random_floats(), random_floats(), strict=False))
+def random_complex_numbers(radius: float = 1e6) -> Iterator:
+    valid_amplitudes = random_floats(lower=0.0, upper=radius)
+    valid_angles = random_floats(lower=0.0, upper=2 * math.pi)
+
+    def to_complex(amplitude: float, angle: float) -> complex:
+        return complex(real=amplitude * math.cos(angle), imag=amplitude * math.sin(angle))
+
+    yield from (to_complex(amplitude, angle) for amplitude, angle in zip(valid_amplitudes, valid_angles, strict=False))
 
 
 def random_callables() -> Iterator:
@@ -218,17 +225,19 @@ def random_strings(min_size: int = 0, max_size: int = 10) -> Iterator:
 
 
 def random_floats(lower: float = -1e-6, upper: float = 1e6) -> Iterator:
-    yield lower
-    yield upper
-    # TODO: maybe first generate_true some smaller float
+    def between(limit: float) -> Iterator[float]:
+        low = max(-limit, lower)
+        high = min(limit, upper)
+        if high >= low:
+            yield from (random.uniform(low, high) for _ in range(0, int(limit)))
+
     while True:
-        yield random.uniform(lower, upper)
+        yield from between(1.0)
+        yield from between(10.0)
+        yield from between(100.0)
 
 
 def random_ints(lower: int = -sys.maxsize, upper: int = sys.maxsize, **_kwargs) -> Iterator[int]:
-    # yield lower
-    # yield upper
-
     def between(limit: int) -> Iterator[int]:
         low = max(-limit, lower)
         high = min(limit, upper)
