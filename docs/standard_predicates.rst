@@ -214,6 +214,7 @@ This predicate tests if the value is of type ``complex``.
 
     assert not is_complex(1)
     assert is_complex(complex(1, 1))
+    assert is_complex(1 + 1j)
 
 is_container_p
 --------------
@@ -238,7 +239,10 @@ This predicate tests if the value is of type ``datetime``.
 
 .. code-block:: python
 
+    from datetime import datetime
     from predicate import is_datetime_p
+
+    assert is_datetime_p(datetime.now())
 
 is_dict_p
 ---------
@@ -300,7 +304,11 @@ is_finite_p
 -----------
 .. code-block:: python
 
+    import math
     from predicate import is_finite_p
+
+    assert not is_finite_p(math.inf)
+    assert is_finite_p(42)
 
 is_float_p
 ----------
@@ -339,8 +347,6 @@ This predicate tests if the value is infinite.
 
     assert not is_inf_p(3)
     assert is_inf_p(math.inf)
-
-
 
 is_instance_p
 -------------
@@ -404,6 +410,19 @@ This predicate tests if the value is of type ``list``.
 
     assert not is_list_p({1, 2, 3})
     assert is_list_p([1, 2, 3])
+
+is_nan_p
+--------
+
+.. code-block:: python
+
+    import math
+    from predicate import is_nan_p
+
+    assert not is_nan_p(1)
+    assert is_nan_p(math.nan)
+
+
 
 is_none_p
 ---------
@@ -478,6 +497,9 @@ This predicate tests if the value is of type ``str``.
 .. code-block:: python
 
     from predicate import is_str_p
+
+    assert not is_str_p(3.14)
+    assert is_str_p("foo")
 
 .. _is_truthy_p:
 

@@ -3,6 +3,7 @@ from collections.abc import Callable, Container, Iterable
 from dataclasses import dataclass
 from datetime import datetime
 from functools import partial
+from itertools import repeat
 from typing import Any, Final, Hashable, Iterator
 from uuid import UUID
 
@@ -328,6 +329,22 @@ def depth_op_p(depth: int, predicate: Callable[[int], Predicate]) -> Predicate[d
     return comp_p(dict_depth, predicate(depth))
 
 
+def generate_nan() -> Iterator:
+    yield from repeat(math.nan)
+
+
+def generate_inf() -> Iterator:
+    while True:
+        yield -math.inf
+        yield math.inf
+
+
+def _random_floats() -> Iterator:
+    from predicate.generator.helpers import random_floats
+
+    yield from random_floats()
+
+
 depth_eq_p = partial(depth_op_p, predicate=eq_p)
 """Returns if dict depth is equal to given depth, otherwise False."""
 
@@ -346,14 +363,15 @@ depth_ge_p = partial(depth_op_p, predicate=ge_p)
 depth_gt_p = partial(depth_op_p, predicate=gt_p)
 """Returns if dict depth is greater than given depth, otherwise False."""
 
-
-is_finite_p = fn_p(fn=math.isfinite)
+is_finite_p: Final[Predicate] = fn_p(fn=math.isfinite, generate_true_fn=_random_floats, generate_false_fn=generate_inf)
 """Return True if value is finite, otherwise False."""
 
-is_inf_p = fn_p(fn=math.isinf)
+is_inf_p: Final[Predicate] = fn_p(fn=math.isinf, generate_true_fn=generate_inf, generate_false_fn=_random_floats)
 """Return True if value is infinite, otherwise False."""
 
-is_nan_p = fn_p(fn=math.isnan)
+is_nan_p: Final[Predicate] = fn_p(
+    fn=math.isnan, generate_true_fn=partial(generate_nan, value=math.nan), generate_false_fn=_random_floats
+)
 """Return True if value is not a number, otherwise False."""
 
 
