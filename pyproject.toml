@@ -5,7 +5,7 @@ build-backend = "flit_core.buildapi"
 [project]
 name = "py_predicate"
 description = "Module to create composable predicates"
-version = "1.1"
+version = "1.2"
 authors = [{name = "Maurits Rijk", email = "maurits.rijk@gmail.com"}]
 classifiers = [
     "Intended Audience :: Information Technology",
