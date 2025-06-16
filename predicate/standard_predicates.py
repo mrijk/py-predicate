@@ -369,9 +369,7 @@ is_finite_p: Final[Predicate] = fn_p(fn=math.isfinite, generate_true_fn=_random_
 is_inf_p: Final[Predicate] = fn_p(fn=math.isinf, generate_true_fn=generate_inf, generate_false_fn=_random_floats)
 """Return True if value is infinite, otherwise False."""
 
-is_nan_p: Final[Predicate] = fn_p(
-    fn=math.isnan, generate_true_fn=partial(generate_nan, value=math.nan), generate_false_fn=_random_floats
-)
+is_nan_p: Final[Predicate] = fn_p(fn=math.isnan, generate_true_fn=generate_nan, generate_false_fn=_random_floats)
 """Return True if value is not a number, otherwise False."""
 
 
