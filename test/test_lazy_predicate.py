@@ -2,7 +2,7 @@ from datetime import datetime
 
 import pytest
 
-from predicate.standard_predicates import (
+from predicate import (
     all_p,
     comp_p,
     is_bool_p,

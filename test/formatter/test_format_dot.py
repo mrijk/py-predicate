@@ -8,35 +8,35 @@ from predicate import (
     comp_p,
     eq_p,
     fn_p,
+    ge_le_p,
+    ge_lt_p,
     ge_p,
+    gt_le_p,
+    gt_lt_p,
     gt_p,
     in_p,
+    is_dict_of_p,
     is_falsy_p,
     is_instance_p,
     is_list_p,
     is_none_p,
     is_str_p,
+    is_truthy_p,
+    is_tuple_of_p,
     lazy_p,
     le_p,
     lt_p,
     ne_p,
     not_in_p,
+    tee_p,
     to_dot,
 )
 from predicate.implies import Implies
 from predicate.named_predicate import NamedPredicate
 from predicate.set_predicates import is_real_subset_p, is_real_superset_p, is_subset_p, is_superset_p
 from predicate.standard_predicates import (
-    ge_le_p,
-    ge_lt_p,
-    gt_le_p,
-    gt_lt_p,
-    is_dict_of_p,
     is_int_p,
-    is_truthy_p,
-    is_tuple_of_p,
     root_p,
-    tee_p,
     this_p,
 )
 

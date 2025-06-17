@@ -22,3 +22,8 @@ class RegexPredicate[T](Predicate[T]):
     @override
     def explain_failure(self, x: str) -> dict:
         return {"reason": f"String {x} didn't match patter {self.regex.pattern}"}
+
+
+def regex_p(pattern: str) -> Predicate[str]:
+    """Return True if value matches regex, otherwise False."""
+    return RegexPredicate(pattern=pattern)

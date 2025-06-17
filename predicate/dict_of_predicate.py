@@ -53,7 +53,7 @@ class DictOfPredicate[T](Predicate[T]):
 
 
 def to_key_p(key_p: Predicate | str) -> Predicate:
-    from predicate.standard_predicates import eq_p
+    from predicate import eq_p
 
     match key_p:
         case str(s):
@@ -68,3 +68,9 @@ def from_key_p(key_p: Predicate) -> Predicate | str:
             return v
         case _:
             return key_p
+
+
+def is_dict_of_p(*predicates: tuple[Predicate | str, Predicate]) -> Predicate:
+    """Return True if value is a set, and for all elements in the set the predicate is True, otherwise False."""
+    # return is_set_p & all_p(predicate)
+    return DictOfPredicate(list(predicates))

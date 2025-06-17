@@ -23,3 +23,8 @@ class NePredicate[T](Predicate[T]):
     @override
     def explain_failure(self, x: T) -> dict:
         return {"reason": f"{x} is equal to {self.v!r}"}
+
+
+def ne_p[T](v: T) -> NePredicate[T]:
+    """Return True if the value is not equal to the constant, otherwise False."""
+    return NePredicate(v=v)

@@ -1,5 +1,16 @@
-from predicate import always_false_p, always_true_p, can_optimize, optimize
-from predicate.standard_predicates import all_p, any_p, eq_p, has_length_p, is_none_p, is_not_none_p, ne_p
+from predicate import (
+    all_p,
+    always_false_p,
+    always_true_p,
+    any_p,
+    can_optimize,
+    eq_p,
+    has_length_p,
+    is_none_p,
+    is_not_none_p,
+    ne_p,
+    optimize,
+)
 
 
 def test_optimize_all_true():

@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import override
+from typing import Final, override
 
 from predicate.predicate import Predicate
 
@@ -23,3 +23,18 @@ class EqPredicate[T](Predicate[T]):
     @override
     def explain_failure(self, x: T) -> dict:
         return {"reason": f"{x} is not equal to {self.v!r}"}
+
+
+def eq_p[T](v: T) -> EqPredicate[T]:
+    """Return True if the value is equal to the constant, otherwise False."""
+    return EqPredicate(v=v)
+
+
+zero_p: Final[EqPredicate] = eq_p(0)
+"""Returns True of the value is zero, otherwise False."""
+
+eq_true_p: Final[EqPredicate] = eq_p(True)
+"""Returns True if the value is True, otherwise False."""
+
+eq_false_p: Final[EqPredicate] = eq_p(False)
+"""Returns True if the value is False, otherwise False."""

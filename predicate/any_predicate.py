@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import Iterable, override
 
-from predicate.predicate import Predicate
+from predicate.predicate import Predicate, resolve_predicate
 
 
 @dataclass
@@ -31,3 +31,8 @@ class AnyPredicate[T](Predicate[T]):
     @override
     def explain_failure(self, iterable: Iterable[T]) -> dict:
         return {"reason": f"No item matches predicate {self.predicate!r}"}
+
+
+def any_p[T](predicate: Predicate[T]) -> AnyPredicate[T]:
+    """Return True if the predicate holds for any item in the iterable, otherwise False."""
+    return AnyPredicate(predicate=resolve_predicate(predicate))

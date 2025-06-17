@@ -32,3 +32,8 @@ def find_predicate_by_ref(frame, ref: str) -> Predicate | None:
     if next_frame := frame.f_back:
         return find_predicate_by_ref(next_frame, ref)
     return None
+
+
+def lazy_p(ref: str) -> LazyPredicate:
+    """Return True if the predicate holds for each item in the iterable, otherwise False."""
+    return LazyPredicate(ref=ref)

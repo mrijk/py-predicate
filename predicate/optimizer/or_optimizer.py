@@ -2,11 +2,11 @@ from predicate.all_predicate import AllPredicate
 from predicate.always_true_predicate import AlwaysTruePredicate, always_true_p
 from predicate.any_predicate import AnyPredicate
 from predicate.eq_predicate import EqPredicate
+from predicate.has_length_predicate import is_empty_p
 from predicate.implies import implies
 from predicate.optimizer.helpers import MaybeOptimized, NotOptimized, Optimized
 from predicate.predicate import AndPredicate, NotPredicate, OrPredicate, Predicate
 from predicate.set_predicates import InPredicate, NotInPredicate
-from predicate.standard_predicates import is_empty_p
 
 
 def optimize_or_predicate[T](predicate: OrPredicate[T]) -> MaybeOptimized[T]:

@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from typing import Iterable, override
 
 from predicate.helpers import first_false
-from predicate.predicate import Predicate
+from predicate.predicate import Predicate, resolve_predicate
 
 
 @dataclass
@@ -34,3 +34,8 @@ class AllPredicate[T](Predicate[T]):
         fail = first_false(iterable, self.predicate)
 
         return {"reason": f"Item '{fail}' didn't match predicate {self.predicate!r}"}
+
+
+def all_p[T](predicate: Predicate[T]) -> AllPredicate[T]:
+    """Return True if the predicate holds for each item in the iterable, otherwise False."""
+    return AllPredicate(predicate=resolve_predicate(predicate))

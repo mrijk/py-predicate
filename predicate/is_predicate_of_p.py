@@ -28,3 +28,7 @@ class IsPredicateOfPredicate[T](Predicate[T]):
                 return {"reason": f"{x} is not a predicate of type {self.predicate_klass.__name__!r}"}
             case _:
                 return {"reason": f"Value `{x}` is not a predicate"}
+
+
+def is_predicate_of_p(klass: type) -> Predicate:
+    return IsPredicateOfPredicate(predicate_klass=klass)

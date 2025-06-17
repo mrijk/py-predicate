@@ -5,6 +5,7 @@ from predicate.any_predicate import AnyPredicate
 from predicate.eq_predicate import EqPredicate
 from predicate.ge_predicate import GePredicate
 from predicate.gt_predicate import GtPredicate
+from predicate.is_instance_predicate import is_instance_p
 from predicate.le_predicate import LePredicate
 from predicate.lt_predicate import LtPredicate
 from predicate.ne_predicate import NePredicate
@@ -135,7 +136,6 @@ def generate_gt_predicates(max_depth: int, klass: type) -> Iterator:
 
 
 def generate_in_predicates(max_depth: int, klass: type) -> Iterator:
-    from predicate import is_instance_p
     from predicate.generator.helpers import random_iterables
 
     yield from (InPredicate(iterable) for iterable in random_iterables(value_p=is_instance_p(klass)))

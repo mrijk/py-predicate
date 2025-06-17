@@ -48,3 +48,8 @@ def match_rest(value: Any, rest_path: list[Predicate]) -> bool:
             return rest_path[0](value)
         case _:
             return len(rest_path) == 0
+
+
+def has_path_p(*predicates: Predicate) -> Predicate:
+    """Return True if value is a dict, and contains the path specified by the predicates, otherwise False."""
+    return HasPathPredicate(list(predicates))

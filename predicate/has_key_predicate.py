@@ -19,3 +19,8 @@ class HasKeyPredicate[T](Predicate[T]):
     @override
     def explain_failure(self, v: dict) -> dict:
         return {"reason": f"Key '{self.key}' is missing in {v}"}
+
+
+def has_key_p[T](key: T) -> HasKeyPredicate:
+    """Return True if dict contains key, otherwise False."""
+    return HasKeyPredicate(key=key)
