@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import override
+from typing import Final, override
 
 from predicate.predicate import ConstrainedT, Predicate
 
@@ -23,3 +23,12 @@ class LtPredicate[T](Predicate[T]):
     @override
     def explain_failure(self, x: T) -> dict:
         return {"reason": f"{x} is not less than {self.v!r}"}
+
+
+def lt_p(v: ConstrainedT) -> LtPredicate[ConstrainedT]:
+    """Return True if the value is less than the constant, otherwise False."""
+    return LtPredicate(v=v)
+
+
+neg_p: Final[LtPredicate] = lt_p(0)
+"""Returns True of the value is negative, otherwise False."""

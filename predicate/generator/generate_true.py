@@ -4,7 +4,7 @@ from collections.abc import Callable, Container, Iterable, Iterator
 from datetime import datetime, timedelta
 from functools import singledispatch
 from itertools import repeat
-from typing import Any, Final
+from typing import Any, Final, Hashable
 from uuid import UUID
 
 import exrex  # type: ignore
@@ -18,13 +18,14 @@ from more_itertools import (
 )
 
 from predicate import generate_false
+from predicate.all_predicate import AllPredicate
 from predicate.always_false_predicate import AlwaysFalsePredicate, always_false_p
 from predicate.always_true_predicate import AlwaysTruePredicate, always_true_p
 from predicate.any_predicate import AnyPredicate
-from predicate.dict_of_predicate import DictOfPredicate
-from predicate.eq_predicate import EqPredicate
+from predicate.dict_of_predicate import DictOfPredicate, is_dict_of_p
+from predicate.eq_predicate import EqPredicate, eq_p
 from predicate.fn_predicate import FnPredicate
-from predicate.ge_predicate import GePredicate
+from predicate.ge_predicate import GePredicate, ge_p
 from predicate.generator.helpers import (
     default_length_p,
     generate_anys,
@@ -40,6 +41,7 @@ from predicate.generator.helpers import (
     random_dicts,
     random_first_from_iterables,
     random_floats,
+    random_hashables,
     random_ints,
     random_iterables,
     random_lambdas,
@@ -64,7 +66,7 @@ from predicate.is_not_none_predicate import IsNotNonePredicate
 from predicate.is_predicate_of_p import IsPredicateOfPredicate
 from predicate.is_truthy_predicate import IsTruthyPredicate
 from predicate.le_predicate import LePredicate
-from predicate.list_of_predicate import ListOfPredicate
+from predicate.list_of_predicate import ListOfPredicate, is_list_of_p
 from predicate.lt_predicate import LtPredicate
 from predicate.ne_predicate import NePredicate
 from predicate.optimizer.predicate_optimizer import optimize
@@ -76,18 +78,12 @@ from predicate.predicate import (
     XorPredicate,
 )
 from predicate.property_predicate import PropertyPredicate
-from predicate.range_predicate import GeLePredicate, GeLtPredicate, GtLePredicate, GtLtPredicate
+from predicate.range_predicate import GeLePredicate, GeLtPredicate, GtLePredicate, GtLtPredicate, ge_le_p
 from predicate.regex_predicate import RegexPredicate
 from predicate.set_of_predicate import SetOfPredicate
 from predicate.set_predicates import InPredicate, IsRealSubsetPredicate, IsSubsetPredicate, NotInPredicate
 from predicate.standard_predicates import (
-    AllPredicate,
-    eq_p,
-    ge_le_p,
-    ge_p,
-    is_dict_of_p,
     is_int_p,
-    is_list_of_p,
     is_list_p,
 )
 from predicate.tee_predicate import TeePredicate
@@ -434,6 +430,7 @@ def generate_is_instance_p(predicate: IsInstancePredicate, **kwargs) -> Iterator
     type_registry: dict[Any, Callable[[], Iterator]] = {
         Callable: random_callables,
         Container: random_containers,
+        Hashable: random_hashables,
         Iterable: random_iterables,
         Predicate: random_predicates,
         UUID: random_uuids,

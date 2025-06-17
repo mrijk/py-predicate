@@ -1,5 +1,5 @@
-from predicate import explain
-from predicate.standard_predicates import eq_p, ge_p, has_path_p, is_int_p, is_list_p
+from predicate import eq_p, explain, ge_p, has_path_p
+from predicate.standard_predicates import is_int_p, is_list_p
 
 
 def test_has_path_predicate():

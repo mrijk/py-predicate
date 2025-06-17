@@ -82,3 +82,23 @@ class GtLtPredicate[T](RangePredicate[T]):
     @override
     def explain_failure(self, x: T) -> dict:
         return {"reason": f"{x!r} is not greater than {self.lower!r} and less than {self.upper!r}"}
+
+
+def ge_le_p(lower: ConstrainedT, upper: ConstrainedT) -> GeLePredicate[ConstrainedT]:
+    """Return True if the value is greater or equal than the constant, otherwise False."""
+    return GeLePredicate(lower=lower, upper=upper)
+
+
+def ge_lt_p(lower: ConstrainedT, upper: ConstrainedT) -> GeLtPredicate[ConstrainedT]:
+    """Return True if the value is greater or equal than the constant, otherwise False."""
+    return GeLtPredicate(lower=lower, upper=upper)
+
+
+def gt_le_p(lower: ConstrainedT, upper: ConstrainedT) -> GtLePredicate[ConstrainedT]:
+    """Return True if the value is greater or equal than the constant, otherwise False."""
+    return GtLePredicate(lower=lower, upper=upper)
+
+
+def gt_lt_p(lower: ConstrainedT, upper: ConstrainedT) -> GtLtPredicate[ConstrainedT]:
+    """Return True if the value is greater or equal than the constant, otherwise False."""
+    return GtLtPredicate(lower=lower, upper=upper)

@@ -1,5 +1,17 @@
-from predicate import always_false_p, always_true_p, can_optimize, ge_p, in_p, is_empty_p, not_in_p, optimize
-from predicate.standard_predicates import all_p, any_p, eq_p, ne_p
+from predicate import (
+    all_p,
+    always_false_p,
+    always_true_p,
+    any_p,
+    can_optimize,
+    eq_p,
+    ge_p,
+    in_p,
+    is_empty_p,
+    ne_p,
+    not_in_p,
+    optimize,
+)
 
 
 def test_or_optimize_true_left(p):

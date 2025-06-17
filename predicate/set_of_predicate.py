@@ -35,3 +35,8 @@ class SetOfPredicate[T](Predicate[T]):
                 return {"reason": f"Item '{fail}' didn't match predicate {self.predicate}"}
             case _:
                 return {"reason": f"{x} is not an instance of a set"}
+
+
+def is_set_of_p[T](predicate: Predicate[T]) -> Predicate[set[T]]:
+    """Return True if value is a set, and for all elements in the set the predicate is True, otherwise False."""
+    return SetOfPredicate(predicate)

@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import override
+from typing import Final, override
 
 from predicate.predicate import Predicate
 
@@ -17,3 +17,7 @@ class IsNonePredicate[T](Predicate[T]):
     @override
     def explain_failure(self, x: T) -> dict:
         return {"reason": f"{x} is not None"}
+
+
+is_none_p: Final[IsNonePredicate] = IsNonePredicate()
+"""Return True if value is None, otherwise False."""

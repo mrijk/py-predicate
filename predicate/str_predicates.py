@@ -1,7 +1,7 @@
 from collections.abc import Callable
 
+from predicate import fn_p
 from predicate.predicate import Predicate
-from predicate.standard_predicates import fn_p
 
 
 def create_is_str_p(fn: Callable) -> Predicate[str]:

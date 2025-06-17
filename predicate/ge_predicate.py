@@ -23,3 +23,8 @@ class GePredicate[T](Predicate[T]):
     @override
     def explain_failure(self, x: T) -> dict:
         return {"reason": f"{x} is not greater or equal to {self.v!r}"}
+
+
+def ge_p(v: ConstrainedT) -> GePredicate[ConstrainedT]:
+    """Return True if the value is greater or equal than the constant, otherwise False."""
+    return GePredicate(v=v)

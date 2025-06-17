@@ -1,5 +1,4 @@
-from predicate import always_false_p, always_true_p, can_optimize, in_p, optimize
-from predicate.standard_predicates import eq_p
+from predicate import always_false_p, always_true_p, can_optimize, eq_p, in_p, optimize
 
 
 def test_xor_optimize_false_true():

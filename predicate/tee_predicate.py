@@ -1,5 +1,5 @@
-from collections.abc import Callable
 from dataclasses import dataclass
+from typing import Callable
 
 from predicate.predicate import Predicate
 
@@ -16,3 +16,8 @@ class TeePredicate[T](Predicate[T]):
 
     def __repr__(self) -> str:
         return "tee_p"
+
+
+def tee_p[T](fn: Callable[[T], None]) -> Predicate[T]:
+    """Return the boolean value of the function call."""
+    return TeePredicate(fn=fn)

@@ -1,9 +1,9 @@
 from functools import partial
 from itertools import batched
 
-from predicate import is_tuple_of_p
+from predicate import all_p, ge_p, is_tuple_of_p
 from predicate.explain import explain
-from predicate.standard_predicates import all_p, comp_p, ge_p, is_int_p, is_str_p
+from predicate.standard_predicates import comp_p, is_int_p, is_str_p
 
 
 def test_comp_p():

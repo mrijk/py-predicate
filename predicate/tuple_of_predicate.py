@@ -27,3 +27,8 @@ class TupleOfPredicate[T](Predicate[T]):
         fail_p, fail_v = first((p, v) for p, v in zip(self.predicates, x, strict=False) if not p(v))
 
         return {"reason": f"Predicate {fail_p} failed for value {fail_v}"}
+
+
+def is_tuple_of_p(*predicates: Predicate) -> Predicate:
+    """Return True if value is a tuple, and for all elements in the tuple the predicate is True, otherwise False."""
+    return TupleOfPredicate(list(predicates))

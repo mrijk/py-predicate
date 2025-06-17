@@ -1,6 +1,5 @@
-from predicate import all_p, always_false_p, always_true_p, any_p, fn_p, is_falsy_p, ne_p, to_json
+from predicate import all_p, always_false_p, always_true_p, any_p, fn_p, is_falsy_p, is_truthy_p, ne_p, tee_p, to_json
 from predicate.named_predicate import NamedPredicate
-from predicate.standard_predicates import is_truthy_p, tee_p
 
 
 def test_format_json_false():

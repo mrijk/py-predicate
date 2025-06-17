@@ -12,9 +12,13 @@ from uuid import UUID, uuid4
 
 from more_itertools import first, interleave, random_permutation, repeatfunc, take
 
+from predicate.eq_predicate import eq_p
 from predicate.generator.generate_predicate import generate_predicate
+from predicate.is_instance_predicate import is_hashable_p
 from predicate.predicate import Predicate
-from predicate.standard_predicates import eq_p, ge_le_p, is_hashable_p, is_int_p, is_str_p, regex_p
+from predicate.range_predicate import ge_le_p
+from predicate.regex_predicate import regex_p
+from predicate.standard_predicates import is_int_p, is_str_p
 
 
 def random_first_from_iterables(*iterables: Iterable) -> Iterator:
@@ -217,6 +221,12 @@ def random_containers() -> Iterator:
     yield from cycle(([], {}))
 
 
+def random_hashables() -> Iterator:
+    yield from interleave(
+        random_bools(), random_ints(), random_strings(), random_floats(), random_datetimes(), random_uuids()
+    )
+
+
 def random_strings(min_size: int = 0, max_size: int = 10) -> Iterator:
     population = string.ascii_letters + string.digits
     while True:
@@ -276,7 +286,7 @@ def random_tuples(length_p: Predicate = default_length_p, value_p: Predicate = i
     yield from (tuple(random_list) for random_list in random_lists(length_p=length_p, value_p=value_p))
 
 
-def random_uuids() -> Iterator[UUID]:
+def random_uuids() -> Iterator:
     yield from repeatfunc(uuid4)
 
 

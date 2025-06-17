@@ -5,30 +5,26 @@ from more_itertools import first, gray_product, take
 from predicate import (
     always_false_p,
     always_true_p,
+    ge_p,
+    gt_p,
     is_datetime_p,
     is_falsy_p,
     is_float_p,
     is_int_p,
+    is_none_p,
     is_not_none_p,
     is_set_p,
     is_str_p,
     is_truthy_p,
-)
-from predicate.constructor.helpers import perfect_match, sort_by_match
-from predicate.constructor.mutate import mutations
-from predicate.predicate import Predicate
-from predicate.standard_predicates import (
-    ge_p,
-    gt_p,
-    is_bool_p,
-    is_dict_p,
-    is_list_p,
-    is_none_p,
     le_p,
     lt_p,
     ne_p,
-    zero_p,
 )
+from predicate.constructor.helpers import perfect_match, sort_by_match
+from predicate.constructor.mutate import mutations
+from predicate.eq_predicate import zero_p
+from predicate.is_instance_predicate import is_bool_p, is_dict_p, is_list_p
+from predicate.predicate import Predicate
 
 
 def construct(false_set: list, true_set: list, attempts: int = 30) -> Predicate | None:

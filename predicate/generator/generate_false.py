@@ -12,7 +12,8 @@ from more_itertools import chunked, first, flatten, interleave, partial_product,
 from predicate.all_predicate import AllPredicate
 from predicate.always_false_predicate import AlwaysFalsePredicate, always_false_p
 from predicate.always_true_predicate import AlwaysTruePredicate, always_true_p
-from predicate.dict_of_predicate import DictOfPredicate
+from predicate.any_predicate import AnyPredicate
+from predicate.dict_of_predicate import DictOfPredicate, is_dict_of_p
 from predicate.eq_predicate import EqPredicate
 from predicate.fn_predicate import FnPredicate
 from predicate.ge_predicate import GePredicate
@@ -33,7 +34,7 @@ from predicate.generator.helpers import (
     random_values_of_type,
 )
 from predicate.gt_predicate import GtPredicate
-from predicate.has_key_predicate import HasKeyPredicate
+from predicate.has_key_predicate import HasKeyPredicate, has_key_p
 from predicate.has_length_predicate import HasLengthPredicate
 from predicate.has_path_predicate import HasPathPredicate
 from predicate.is_falsy_predicate import IsFalsyPredicate
@@ -45,13 +46,13 @@ from predicate.is_truthy_predicate import IsTruthyPredicate
 from predicate.le_predicate import LePredicate
 from predicate.list_of_predicate import ListOfPredicate
 from predicate.lt_predicate import LtPredicate
-from predicate.ne_predicate import NePredicate
+from predicate.ne_predicate import NePredicate, ne_p
 from predicate.optimizer.predicate_optimizer import optimize
 from predicate.predicate import AndPredicate, NotPredicate, OrPredicate, Predicate, XorPredicate
-from predicate.range_predicate import GeLePredicate, GeLtPredicate, GtLePredicate, GtLtPredicate
+from predicate.range_predicate import GeLePredicate, GeLtPredicate, GtLePredicate, GtLtPredicate, ge_le_p
 from predicate.set_of_predicate import SetOfPredicate
 from predicate.set_predicates import InPredicate, NotInPredicate
-from predicate.standard_predicates import AnyPredicate, ge_le_p, has_key_p, is_dict_of_p, is_int_p, ne_p
+from predicate.standard_predicates import is_int_p
 from predicate.tee_predicate import TeePredicate
 from predicate.tuple_of_predicate import TupleOfPredicate
 

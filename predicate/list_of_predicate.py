@@ -39,3 +39,13 @@ class ListOfPredicate[T](Predicate[T]):
                 return {"reason": f"Item '{fail}' didn't match predicate {self.predicate}"}
             case _:
                 return {"reason": f"{x} is not an instance of a list"}
+
+
+def is_list_of_p[T](predicate: Predicate[T]) -> Predicate:
+    """Return True if value is a list, and for all elements in the list the predicate is True, otherwise False."""
+    return ListOfPredicate(predicate)
+
+
+def is_single_or_list_of_p[T](predicate: Predicate[T]) -> Predicate:
+    """Return True if value is a list or a single value, and for all elements in the list the predicate is True, otherwise False."""
+    return is_list_of_p(predicate) | predicate

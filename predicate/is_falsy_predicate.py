@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import override
+from typing import Final, override
 
 from predicate.predicate import Predicate
 
@@ -17,3 +17,7 @@ class IsFalsyPredicate[T](Predicate[T]):
     @override
     def explain_failure(self, x: T) -> dict:
         return {"reason": f"{x} is not a falsy value"}
+
+
+is_falsy_p: Final[IsFalsyPredicate] = IsFalsyPredicate()
+"""Returns True if the value is falsy, otherwise False."""

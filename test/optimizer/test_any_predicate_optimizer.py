@@ -1,5 +1,4 @@
-from predicate import always_false_p, always_true_p, can_optimize, optimize
-from predicate.standard_predicates import all_p, any_p, eq_p
+from predicate import all_p, always_false_p, always_true_p, any_p, can_optimize, eq_p, optimize
 
 
 def test_optimize_any_ne():

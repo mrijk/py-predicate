@@ -1,24 +1,32 @@
 import pytest
 from helpers import is_eq_p
 
-from predicate import always_false_p, always_true_p, ge_p, gt_p, in_p, is_empty_p, not_in_p
-from predicate.optimizer.predicate_optimizer import can_optimize, optimize
-from predicate.set_predicates import is_real_subset_p, is_real_superset_p, is_subset_p, is_superset_p
-from predicate.standard_predicates import (
+from predicate import (
     all_p,
+    always_false_p,
+    always_true_p,
     eq_p,
     fn_p,
     ge_le_p,
     ge_lt_p,
+    ge_p,
     gt_le_p,
     gt_lt_p,
-    is_int_p,
+    gt_p,
+    in_p,
+    is_empty_p,
     is_none_p,
     is_not_none_p,
-    is_str_p,
     le_p,
     lt_p,
     ne_p,
+    not_in_p,
+)
+from predicate.optimizer.predicate_optimizer import can_optimize, optimize
+from predicate.set_predicates import is_real_subset_p, is_real_superset_p, is_subset_p, is_superset_p
+from predicate.standard_predicates import (
+    is_int_p,
+    is_str_p,
 )
 
 

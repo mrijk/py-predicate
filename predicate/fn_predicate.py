@@ -25,3 +25,12 @@ class FnPredicate[T](Predicate[T]):
     @override
     def explain_failure(self, x: T) -> dict:
         return {"reason": f"Function returned False for value {x}"}
+
+
+def fn_p[T](
+    fn: Callable[[T], bool],
+    generate_false_fn: Callable[[], Iterator] = undefined,
+    generate_true_fn: Callable[[], Iterator] = undefined,
+) -> Predicate[T]:
+    """Return the boolean value of the function call."""
+    return FnPredicate(predicate_fn=fn, generate_false_fn=generate_false_fn, generate_true_fn=generate_true_fn)

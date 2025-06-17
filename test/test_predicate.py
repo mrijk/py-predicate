@@ -12,32 +12,32 @@ from predicate import (
     is_bool_p,
     is_callable_p,
     is_complex_p,
+    is_container_p,
     is_datetime_p,
     is_dict_p,
+    is_hashable_p,
     is_int_p,
     is_iterable_p,
+    is_list_of_p,
     is_list_p,
     is_predicate_p,
+    is_range_p,
     is_set_p,
     is_str_p,
     is_tuple_p,
     is_uuid_p,
-)
-from predicate.named_predicate import NamedPredicate
-from predicate.predicate import Predicate
-from predicate.standard_predicates import (
-    is_container_p,
-    is_finite_p,
-    is_hashable_p,
-    is_inf_p,
-    is_iterable_of_p,
-    is_list_of_p,
-    is_range_p,
-    is_single_or_iterable_of_p,
-    is_single_or_list_of_p,
     neg_p,
     pos_p,
     zero_p,
+)
+from predicate.list_of_predicate import is_single_or_list_of_p
+from predicate.named_predicate import NamedPredicate
+from predicate.predicate import Predicate
+from predicate.standard_predicates import (
+    is_finite_p,
+    is_inf_p,
+    is_iterable_of_p,
+    is_single_or_iterable_of_p,
 )
 
 
@@ -274,6 +274,7 @@ def test_neg_p(p):
     assert not neg_p(0)
     assert neg_p(-1)
     assert neg_p(-3.14)
+    assert neg_p(-math.inf)
 
 
 def test_pos_p(p):
@@ -281,6 +282,7 @@ def test_pos_p(p):
     assert not pos_p(-3.14)
     assert not pos_p(0)
     assert pos_p(1)
+    assert pos_p(math.inf)
 
 
 def test_is_finite_p():

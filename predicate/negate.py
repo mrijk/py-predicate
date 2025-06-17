@@ -3,15 +3,17 @@ from functools import singledispatch
 from predicate import (
     always_false_p,
     always_true_p,
+    is_falsy_p,
     is_none_p,
     is_not_none_p,
+    is_truthy_p,
 )
 from predicate.always_false_predicate import AlwaysFalsePredicate
 from predicate.always_true_predicate import AlwaysTruePredicate
 from predicate.eq_predicate import EqPredicate
 from predicate.ge_predicate import GePredicate
 from predicate.gt_predicate import GtPredicate
-from predicate.has_length_predicate import HasLengthPredicate
+from predicate.has_length_predicate import HasLengthPredicate, is_empty_p, is_not_empty_p
 from predicate.is_falsy_predicate import IsFalsyPredicate
 from predicate.is_none_predicate import IsNonePredicate
 from predicate.is_not_none_predicate import IsNotNonePredicate
@@ -24,7 +26,6 @@ from predicate.predicate import (
     Predicate,
 )
 from predicate.set_predicates import InPredicate, NotInPredicate
-from predicate.standard_predicates import is_empty_p, is_falsy_p, is_not_empty_p, is_truthy_p
 
 
 @singledispatch
