@@ -6,6 +6,7 @@ from predicate.all_predicate import all_p
 from predicate.always_false_predicate import always_false_p, never_p
 from predicate.always_true_predicate import always_p, always_true_p
 from predicate.any_predicate import any_p
+from predicate.comp_predicate import comp_p
 from predicate.dict_of_predicate import is_dict_of_p
 from predicate.eq_predicate import eq_false_p, eq_p, eq_true_p, zero_p
 from predicate.explain import explain
@@ -37,7 +38,9 @@ from predicate.is_instance_predicate import (
 from predicate.is_lambda_predicate import is_lambda_p, is_lambda_with_signature_p
 from predicate.is_none_predicate import is_none_p
 from predicate.is_not_none_predicate import is_not_none_p
+from predicate.is_predicate_of_p import is_predicate_of_p
 from predicate.is_truthy_predicate import is_truthy_p
+from predicate.lazy_predicate import lazy_p
 from predicate.le_predicate import le_p
 from predicate.list_of_predicate import is_list_of_p
 from predicate.lt_predicate import lt_p, neg_p
@@ -56,7 +59,6 @@ from predicate.set_predicates import (
     not_in_p,
 )
 from predicate.standard_predicates import (
-    comp_p,
     is_dict_p,
     is_even_p,
     is_finite_p,
@@ -67,9 +69,7 @@ from predicate.standard_predicates import (
     is_list_p,
     is_nan_p,
     is_odd_p,
-    is_predicate_of_p,
     is_str_p,
-    lazy_p,
     root_p,
     this_p,
 )

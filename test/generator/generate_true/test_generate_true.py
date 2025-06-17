@@ -43,6 +43,7 @@ from predicate import (
     is_none_p,
     is_not_empty_p,
     is_not_none_p,
+    is_predicate_of_p,
     is_predicate_p,
     is_set_of_p,
     is_set_p,
@@ -67,7 +68,6 @@ from predicate.standard_predicates import (
     is_even_p,
     is_list_p,
     is_odd_p,
-    is_predicate_of_p,
 )
 
 

@@ -3,29 +3,23 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from functools import partial
 from itertools import repeat
-from typing import Any, Final, Iterator
+from typing import Final, Iterator
 
 from predicate.all_predicate import all_p
-from predicate.comp_predicate import CompPredicate
+from predicate.comp_predicate import comp_p
 from predicate.eq_predicate import eq_p
 from predicate.fn_predicate import fn_p
 from predicate.ge_predicate import ge_p
 from predicate.gt_predicate import gt_p
 from predicate.is_instance_predicate import is_dict_p, is_float_p, is_int_p, is_iterable_p, is_list_p, is_str_p
 from predicate.is_none_predicate import is_none_p
-from predicate.is_predicate_of_p import IsPredicateOfPredicate
-from predicate.lazy_predicate import LazyPredicate
+from predicate.lazy_predicate import lazy_p
 from predicate.le_predicate import le_p
 from predicate.lt_predicate import lt_p
 from predicate.ne_predicate import ne_p
 from predicate.predicate import Predicate
 from predicate.root_predicate import RootPredicate
 from predicate.this_predicate import ThisPredicate
-
-
-def comp_p[T](fn: Callable[[Any], T], predicate: Predicate[T]) -> CompPredicate:
-    """Return a predicate, composed of a function and another predicate."""
-    return CompPredicate(fn=fn, predicate=predicate)
 
 
 def generate_even_numbers() -> Iterator[int]:
@@ -49,11 +43,6 @@ is_odd_p: Final[Predicate[int]] = fn_p(
 )
 
 
-def lazy_p(ref: str) -> LazyPredicate:
-    """Return True if the predicate holds for each item in the iterable, otherwise False."""
-    return LazyPredicate(ref=ref)
-
-
 def is_iterable_of_p[T](predicate: Predicate[T]) -> Predicate:
     """Return True if value is an iterable, and for all elements the predicate is True, otherwise False."""
     return is_iterable_p & all_p(predicate)
@@ -62,10 +51,6 @@ def is_iterable_of_p[T](predicate: Predicate[T]) -> Predicate:
 def is_single_or_iterable_of_p[T](predicate: Predicate[T]) -> Predicate:
     """Return True if value is an iterable or a single value, and for all elements the predicate is True, otherwise False."""
     return is_iterable_of_p(predicate) | predicate
-
-
-def is_predicate_of_p(klass: type) -> Predicate:
-    return IsPredicateOfPredicate(predicate_klass=klass)
 
 
 @dataclass

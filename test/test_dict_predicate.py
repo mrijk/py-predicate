@@ -1,8 +1,7 @@
-from predicate import has_key_p, is_dict_p, is_int_p, is_iterable_of_p
+from predicate import comp_p, has_key_p, is_dict_p, is_int_p, is_iterable_of_p
 from predicate.explain import explain
 from predicate.list_of_predicate import is_single_or_list_of_p
 from predicate.standard_predicates import (
-    comp_p,
     depth_eq_p,
     depth_ge_p,
     depth_gt_p,

@@ -1,8 +1,8 @@
 import pytest
 
-from predicate import all_p, any_p, explain, ge_p, is_bool_p, is_int_p, is_list_of_p, le_p, lt_p
+from predicate import all_p, any_p, explain, ge_p, is_bool_p, is_int_p, is_list_of_p, is_predicate_of_p, le_p, lt_p
 from predicate.predicate import Predicate
-from predicate.standard_predicates import is_predicate_of_p, is_str_p
+from predicate.standard_predicates import is_str_p
 
 
 @pytest.mark.parametrize(
