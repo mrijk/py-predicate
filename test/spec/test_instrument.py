@@ -1,22 +1,5 @@
 import pytest
 
-from predicate import is_int_p
-from predicate.spec.instrument import instrument_function
-from predicate.spec.spec import Spec
-
-
-@pytest.fixture(autouse=True)
-def instrument_buggy_function():
-    from spec.test_functions.max_int_with_bug import max_int_with_bug
-
-    spec: Spec = {
-        "args": {"x": is_int_p, "y": is_int_p},
-        "ret": is_int_p,
-        "fn": lambda x, y, ret: ret >= x and ret >= y,
-    }
-
-    instrument_function(max_int_with_bug, spec=spec)
-
 
 def test_instrument_ok():
     from spec.test_functions.max_int_with_bug import max_int_with_bug

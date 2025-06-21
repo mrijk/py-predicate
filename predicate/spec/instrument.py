@@ -34,7 +34,7 @@ def instrument_function(func: Callable, spec: Spec) -> Callable:
         return result
 
     # Attach metadata
-    wrapped.__spec__ = spec
+    wrapped.__spec__ = spec  # type: ignore
 
     module_name = func.__module__
     module = sys.modules.get(module_name)
