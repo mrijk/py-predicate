@@ -15,6 +15,7 @@ and many more features.
    standard_predicates
    lazy_predicates
    formatters
+   instrumentation
    optimization
    generation
    cli

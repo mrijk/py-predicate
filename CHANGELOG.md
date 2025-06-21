@@ -5,6 +5,7 @@
 Features:
 
 - First implementation of exercise
+- First implementation of instrument for run-time checking functions against predicates
 
 ## 1.1.0
 

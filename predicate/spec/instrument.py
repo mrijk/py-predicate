@@ -11,8 +11,20 @@ def instrument_function(func: Callable, spec: Spec) -> Callable:
 
     @wraps(func)
     def wrapped(*args, **kwargs):
-        # spec.check_inputs(args, kwargs, func)
+        from inspect import signature
+
+        bound = signature(func).bind(*args, **kwargs)
+        bound.apply_defaults()
+
         result = func(*args, **kwargs)
+
+        parameters = spec["args"]
+        for name, predicate in parameters.items():
+            if name in bound.arguments:
+                value = bound.arguments[name]
+                if not predicate(value):
+                    reason = explain(predicate, value)["reason"]
+                    raise ValueError(f"Parameter predicate for function {func_name} failed. Reason: {reason}")
 
         return_p = spec["ret"]
         if not return_p(result):
