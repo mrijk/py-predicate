@@ -7,7 +7,7 @@ from predicate.spec.spec import Spec
 
 @pytest.fixture(autouse=True)
 def instrument_buggy_function():
-    from spec.test_functions.func1 import max_int_with_bug
+    from spec.test_functions.max_int_with_bug import max_int_with_bug
 
     spec: Spec = {
         "args": {"x": is_int_p, "y": is_int_p},
@@ -19,7 +19,7 @@ def instrument_buggy_function():
 
 
 def test_instrument():
-    from spec.test_functions.func1 import max_int_with_bug
+    from spec.test_functions.max_int_with_bug import max_int_with_bug
 
     max_int_with_bug(4, 3)
 
@@ -32,7 +32,7 @@ def test_instrument():
 
 
 def test_instrument_using_func():
-    from spec.test_functions.func2 import uses_max_int_with_bug
+    from spec.test_functions.uses_max_int_with_bug import uses_max_int_with_bug
 
     with pytest.raises(ValueError) as exc:
         uses_max_int_with_bug(3, 13)
