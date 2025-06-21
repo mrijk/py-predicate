@@ -6,6 +6,9 @@
 
 py-predicate is a typed Python library to create composable predicates.
 
+These predicates can be used for generating test-cases (property based testing) and
+run-time instrumenting of functions against a specification based on predicates.
+
 # Getting started
 
 To get started, install the library with [pip](https://pip.pypa.io/en/stable/)
@@ -43,8 +46,13 @@ series of integers for which the predicate ``between_2_and_3`` is False. The ``g
 infinite (well, with lots of duplicates obviously) series of integers for which the predicate is True.
 
 ```python
-from predicate import generate_false, generate_true
+from predicate import generate_false, generate_true, ge_p, le_p
 from more_itertools import take
+
+ge_2 = ge_p(2)
+le_3 = le_p(3)
+
+between_2_and_3 = ge_2 & le_3
 
 take(5, generate_true(between_2_and_3))
 
