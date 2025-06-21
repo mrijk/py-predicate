@@ -1,14 +1,12 @@
 from collections.abc import Iterator
 from inspect import signature
-from typing import Callable, TypedDict
+from typing import Callable
 
 from more_itertools import take
 
 from predicate import explain, generate_true, is_instance_p
 from predicate.dict_of_predicate import is_dict_of_p
-from predicate.predicate import Predicate
-
-Spec = TypedDict("Spec", {"parameters": dict[str, Predicate], "returns": Predicate})
+from predicate.spec.spec import Spec
 
 
 def get_spec_from_annotation(f: Callable) -> Spec | None:
@@ -17,14 +15,14 @@ def get_spec_from_annotation(f: Callable) -> Spec | None:
     if sig.return_annotation == sig.empty:
         return None
 
-    spec: Spec = {"parameters": {}, "returns": is_instance_p(sig.return_annotation)}
+    spec: Spec = {"args": {}, "ret": is_instance_p(sig.return_annotation)}
 
     for key in sig.parameters:
         parameter = sig.parameters[key]
         if parameter.annotation == parameter.empty:
             return None
 
-        spec["parameters"][key] = is_instance_p(parameter.annotation)
+        spec["args"][key] = is_instance_p(parameter.annotation)
 
     return spec
 
@@ -32,14 +30,14 @@ def get_spec_from_annotation(f: Callable) -> Spec | None:
 def check_signature_against_spec(f: Callable, spec: Spec):
     sig = signature(f)
 
-    parameters = spec["parameters"]
+    parameters = spec["args"]
     for key, _ in parameters.items():
         if key not in sig.parameters:
             raise AssertionError(f"Parameter '{key}' not in function signature")
 
     # TODO: all parameters that are not annotated, should be in the spec
 
-    if sig.return_annotation == sig.empty and not spec.get("returns"):
+    if sig.return_annotation == sig.empty and not spec.get("ret"):
         raise AssertionError("Return annotation not in spec")
 
     for key in sig.parameters:
@@ -57,8 +55,8 @@ def exercise(f: Callable, spec: Spec | None = None, n: int = 10) -> Iterator[tup
     else:
         check_signature_against_spec(f, spec)
 
-    parameters = spec["parameters"]
-    return_p = spec["returns"]
+    parameters = spec["args"]
+    return_p = spec["ret"]
 
     predicates = tuple(parameters.items())
     predicate = is_dict_of_p(*predicates)
@@ -69,4 +67,9 @@ def exercise(f: Callable, spec: Spec | None = None, n: int = 10) -> Iterator[tup
         result = f(**value)
         if not return_p(result):
             raise AssertionError(f"Not conform spec: {explain(return_p, result)}")
+
+        if fn := spec.get("fn"):
+            if not fn(**value, ret=result):
+                raise AssertionError("Not conform spec, details tbd")
+
         yield tuple(value.values()), result
