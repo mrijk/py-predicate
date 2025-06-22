@@ -32,7 +32,7 @@ class IsSubclassPredicate[T](Predicate[T]):
                     for klass in klasses:
                         yield klass.__name__
                 case _:
-                    yield self.class_or_tuple.__name__
+                    yield self.class_or_tuple.__name__  # type: ignore
 
         klasses = join_with_or(list(class_names()))
 
