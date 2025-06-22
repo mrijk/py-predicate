@@ -4,15 +4,8 @@ from datetime import datetime
 from typing import Hashable, Iterator, override
 from uuid import UUID
 
+from predicate.helpers import join_with_or
 from predicate.predicate import Predicate
-
-
-def join_with_or(s: list[str]) -> str:
-    first = s[:-1]
-    last = s[-1]
-    if first:
-        return f"{', '.join(first)} or {last}"
-    return last
 
 
 @dataclass

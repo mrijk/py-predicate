@@ -2,14 +2,18 @@ from predicate import is_instance_p
 from predicate.explain import explain
 
 
-def test_is_instance_p():
+def test_is_instance_ok():
+    is_str_or_int_p = is_instance_p(str, int)
+
+    assert is_str_or_int_p(3)
+    assert is_str_or_int_p("3")
+
+
+def test_is_instance_fail():
     is_str_or_int_p = is_instance_p(str, int)
 
     assert not is_str_or_int_p(None)
     assert not is_str_or_int_p([3])
-
-    assert is_str_or_int_p(3)
-    assert is_str_or_int_p("3")
 
 
 def test_explain_single():

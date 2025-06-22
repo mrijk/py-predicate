@@ -3,9 +3,10 @@ from more_itertools import one
 from predicate.always_false_predicate import always_false_p
 from predicate.always_true_predicate import always_true_p
 from predicate.eq_predicate import EqPredicate
+from predicate.in_predicate import InPredicate
 from predicate.ne_predicate import NePredicate
+from predicate.not_in_predicate import NotInPredicate
 from predicate.optimizer.helpers import MaybeOptimized, NotOptimized, Optimized
-from predicate.set_predicates import InPredicate, NotInPredicate
 
 
 def optimize_in_predicate[T](predicate: InPredicate[T]) -> MaybeOptimized[T]:

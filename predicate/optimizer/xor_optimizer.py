@@ -1,6 +1,7 @@
 from predicate.always_false_predicate import AlwaysFalsePredicate, always_false_p
 from predicate.always_true_predicate import AlwaysTruePredicate, always_true_p
 from predicate.eq_predicate import EqPredicate
+from predicate.in_predicate import InPredicate
 from predicate.optimizer.helpers import MaybeOptimized, NotOptimized, Optimized
 from predicate.predicate import (
     AndPredicate,
@@ -8,7 +9,6 @@ from predicate.predicate import (
     OrPredicate,
     XorPredicate,
 )
-from predicate.set_predicates import InPredicate
 
 
 def optimize_xor_predicate[T](predicate: XorPredicate[T]) -> MaybeOptimized[T]:

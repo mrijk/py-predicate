@@ -6,6 +6,7 @@ from predicate.eq_predicate import EqPredicate
 from predicate.ge_predicate import GePredicate
 from predicate.gt_predicate import GtPredicate
 from predicate.implies_predicate import ImpliesPredicate
+from predicate.in_predicate import InPredicate
 from predicate.le_predicate import LePredicate
 from predicate.lt_predicate import LtPredicate
 from predicate.ne_predicate import NePredicate
@@ -18,7 +19,6 @@ from predicate.predicate import (
 )
 from predicate.range_predicate import GeLePredicate, GeLtPredicate, GtLePredicate, GtLtPredicate
 from predicate.set_predicates import (
-    InPredicate,
     IsRealSubsetPredicate,
     IsRealSupersetPredicate,
     IsSubsetPredicate,

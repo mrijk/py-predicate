@@ -4,9 +4,10 @@ from predicate.any_predicate import AnyPredicate
 from predicate.eq_predicate import EqPredicate
 from predicate.has_length_predicate import is_empty_p
 from predicate.implies import implies
+from predicate.in_predicate import InPredicate
+from predicate.not_in_predicate import NotInPredicate
 from predicate.optimizer.helpers import MaybeOptimized, NotOptimized, Optimized
 from predicate.predicate import AndPredicate, NotPredicate, OrPredicate, Predicate
-from predicate.set_predicates import InPredicate, NotInPredicate
 
 
 def optimize_or_predicate[T](predicate: OrPredicate[T]) -> MaybeOptimized[T]:

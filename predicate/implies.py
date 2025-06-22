@@ -7,18 +7,18 @@ from predicate.always_true_predicate import AlwaysTruePredicate
 from predicate.eq_predicate import EqPredicate
 from predicate.ge_predicate import GePredicate
 from predicate.gt_predicate import GtPredicate
+from predicate.in_predicate import InPredicate
 from predicate.ne_predicate import NePredicate
+from predicate.not_in_predicate import NotInPredicate
 from predicate.predicate import (
     AndPredicate,
     Predicate,
 )
 from predicate.set_predicates import (
-    InPredicate,
     IsRealSubsetPredicate,
     IsRealSupersetPredicate,
     IsSubsetPredicate,
     IsSupersetPredicate,
-    NotInPredicate,
 )
 
 

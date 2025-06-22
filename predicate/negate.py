@@ -14,6 +14,7 @@ from predicate.eq_predicate import EqPredicate
 from predicate.ge_predicate import GePredicate
 from predicate.gt_predicate import GtPredicate
 from predicate.has_length_predicate import HasLengthPredicate, is_empty_p, is_not_empty_p
+from predicate.in_predicate import InPredicate
 from predicate.is_falsy_predicate import IsFalsyPredicate
 from predicate.is_none_predicate import IsNonePredicate
 from predicate.is_not_none_predicate import IsNotNonePredicate
@@ -21,11 +22,11 @@ from predicate.is_truthy_predicate import IsTruthyPredicate
 from predicate.le_predicate import LePredicate
 from predicate.lt_predicate import LtPredicate
 from predicate.ne_predicate import NePredicate
+from predicate.not_in_predicate import NotInPredicate
 from predicate.predicate import (
     NotPredicate,
     Predicate,
 )
-from predicate.set_predicates import InPredicate, NotInPredicate
 
 
 @singledispatch

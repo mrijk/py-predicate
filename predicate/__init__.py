@@ -19,6 +19,7 @@ from predicate.gt_predicate import gt_p, pos_p
 from predicate.has_key_predicate import has_key_p
 from predicate.has_length_predicate import has_length_p, is_empty_p, is_not_empty_p
 from predicate.has_path_predicate import has_path_p
+from predicate.in_predicate import in_p
 from predicate.is_falsy_predicate import is_falsy_p
 from predicate.is_instance_predicate import (
     is_bool_p,
@@ -39,6 +40,7 @@ from predicate.is_lambda_predicate import is_lambda_p, is_lambda_with_signature_
 from predicate.is_none_predicate import is_none_p
 from predicate.is_not_none_predicate import is_not_none_p
 from predicate.is_predicate_of_p import is_predicate_of_p
+from predicate.is_subclass_predicate import is_enum_p
 from predicate.is_truthy_predicate import is_truthy_p
 from predicate.lazy_predicate import lazy_p
 from predicate.le_predicate import le_p
@@ -46,18 +48,19 @@ from predicate.list_of_predicate import is_list_of_p
 from predicate.lt_predicate import lt_p, neg_p
 from predicate.match_predicate import exactly_n, match_p, optional, plus, repeat, star
 from predicate.ne_predicate import ne_p
+from predicate.not_in_predicate import not_in_p
 from predicate.optimizer.predicate_optimizer import can_optimize, optimize
 from predicate.range_predicate import ge_le_p, ge_lt_p, gt_le_p, gt_lt_p
 from predicate.regex_predicate import regex_p
 from predicate.set_of_predicate import is_set_of_p
 from predicate.set_predicates import (
-    in_p,
     is_real_subset_p,
     is_real_superset_p,
     is_subset_p,
     is_superset_p,
-    not_in_p,
 )
+from predicate.spec.instrument import instrument_function
+from predicate.spec.spec import Spec
 from predicate.standard_predicates import (
     is_dict_p,
     is_even_p,
@@ -102,6 +105,7 @@ __all__ = [
     "has_length_p",
     "has_path_p",
     "in_p",
+    "instrument_function",
     "is_alnum_p",
     "is_alpha_p",
     "is_ascii_p",
@@ -114,6 +118,7 @@ __all__ = [
     "is_dict_of_p",
     "is_dict_p",
     "is_empty_p",
+    "is_enum_p",
     "is_even_p",
     "is_falsy_p",
     "is_finite_p",
@@ -173,6 +178,7 @@ __all__ = [
     "to_json",
     "to_latex",
     "zero_p",
+    "Spec",
 ]
 
 from predicate.str_predicates import (

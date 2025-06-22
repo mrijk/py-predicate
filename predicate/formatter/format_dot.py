@@ -17,6 +17,7 @@ from predicate.formatter.helpers import set_to_str
 from predicate.ge_predicate import GePredicate
 from predicate.gt_predicate import GtPredicate
 from predicate.implies import Implies
+from predicate.in_predicate import InPredicate
 from predicate.is_falsy_predicate import IsFalsyPredicate
 from predicate.is_instance_predicate import IsInstancePredicate
 from predicate.is_none_predicate import IsNonePredicate
@@ -26,6 +27,7 @@ from predicate.le_predicate import LePredicate
 from predicate.lt_predicate import LtPredicate
 from predicate.named_predicate import NamedPredicate
 from predicate.ne_predicate import NePredicate
+from predicate.not_in_predicate import NotInPredicate
 from predicate.optimizer.predicate_optimizer import optimize
 from predicate.predicate import (
     AndPredicate,
@@ -37,12 +39,10 @@ from predicate.predicate import (
 from predicate.range_predicate import GeLePredicate, GeLtPredicate, GtLePredicate, GtLtPredicate
 from predicate.root_predicate import RootPredicate, find_root_predicate
 from predicate.set_predicates import (
-    InPredicate,
     IsRealSubsetPredicate,
     IsRealSupersetPredicate,
     IsSubsetPredicate,
     IsSupersetPredicate,
-    NotInPredicate,
 )
 from predicate.tee_predicate import TeePredicate
 from predicate.this_predicate import ThisPredicate, find_this_predicate

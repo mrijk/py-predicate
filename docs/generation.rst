@@ -3,7 +3,7 @@ Generation
 
 Given a predicate, py-predicate is able to generate sample data that satisfy that predicate:
 
-NOTE: this feature was introduced in version 0.4 and is not complete yet.
+NOTE: some generators might still be missing.
 
 generate_true
 -------------

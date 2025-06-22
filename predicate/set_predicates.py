@@ -1,7 +1,4 @@
 from dataclasses import dataclass
-from typing import Any, Iterable, override
-
-from more_itertools import first
 
 from predicate.predicate import Predicate
 
@@ -58,54 +55,6 @@ class IsRealSupersetPredicate[T](Predicate[T]):
         return f"is_real_superset_p({self.v})"
 
 
-def class_from_set(v: set):
-    # TODO: v could have different types
-    types = (type(value) for value in v)
-    return first(types, Any)  # type: ignore
-
-
-@dataclass
-class InPredicate[T](Predicate[T]):
-    """A predicate class that models the 'in' predicate."""
-
-    v: set[T]
-
-    def __init__(self, v: Iterable[T]):
-        self.v = set(v)
-
-    def __call__(self, x: T) -> bool:
-        return x in self.v
-
-    def __repr__(self) -> str:
-        items = ", ".join(str(item) for item in self.v)
-        return f"in_p({items})"
-
-    @override
-    def get_klass(self) -> type:
-        return class_from_set(self.v)
-
-
-@dataclass
-class NotInPredicate[T](Predicate[T]):
-    """A predicate class that models the 'not in' predicate."""
-
-    v: set[T]
-
-    def __init__(self, v: Iterable[T]):
-        self.v = set(v)
-
-    def __call__(self, x: T) -> bool:
-        return x not in self.v
-
-    def __repr__(self) -> str:
-        items = ", ".join(str(item) for item in self.v)
-        return f"not_in_p({items})"
-
-    @override
-    def get_klass(self) -> type:
-        return class_from_set(self.v)
-
-
 def is_subset_p[T](v: set[T]) -> IsSubsetPredicate[T]:
     """Return True if the value is a subset, otherwise False."""
     return IsSubsetPredicate(v)
@@ -124,13 +73,3 @@ def is_superset_p[T](v: set[T]) -> IsSupersetPredicate[T]:
 def is_real_superset_p[T](v: set[T]) -> IsRealSupersetPredicate[T]:
     """Return True if the value is a real superset, otherwise False."""
     return IsRealSupersetPredicate(v)
-
-
-def in_p[T](*v: T) -> InPredicate[T]:
-    """Return True if the values are included in the set, otherwise False."""
-    return InPredicate(v=v)
-
-
-def not_in_p[T](*v: T) -> NotInPredicate[T]:
-    """Return True if the values are not in the set, otherwise False."""
-    return NotInPredicate(v=v)

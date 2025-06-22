@@ -6,13 +6,15 @@ from predicate.fn_predicate import FnPredicate
 from predicate.ge_predicate import GePredicate
 from predicate.gt_predicate import GtPredicate
 from predicate.implies import implies
+from predicate.in_predicate import InPredicate
 from predicate.is_instance_predicate import IsInstancePredicate
 from predicate.le_predicate import LePredicate
 from predicate.lt_predicate import LtPredicate
+from predicate.not_in_predicate import NotInPredicate
 from predicate.optimizer.helpers import MaybeOptimized, NotOptimized, Optimized
 from predicate.predicate import AndPredicate, NotPredicate, OrPredicate
 from predicate.range_predicate import GeLePredicate, GeLtPredicate, GtLePredicate, GtLtPredicate
-from predicate.set_predicates import InPredicate, IsSubsetPredicate, NotInPredicate
+from predicate.set_predicates import IsSubsetPredicate
 
 
 def optimize_and_predicate[T](predicate: AndPredicate[T]) -> MaybeOptimized[T]:

@@ -16,3 +16,11 @@ def first_false[T](iterable: Iterable[T], predicate: Predicate[T]) -> T:
 
 def predicates_repr(predicates: list[Predicate]) -> str:
     return ", ".join(repr(predicate) for predicate in predicates)
+
+
+def join_with_or(s: list[str]) -> str:
+    first = s[:-1]
+    last = s[-1]
+    if first:
+        return f"{', '.join(first)} or {last}"
+    return last

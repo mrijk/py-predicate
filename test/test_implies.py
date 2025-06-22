@@ -1,6 +1,6 @@
-from predicate import always_false_p, always_true_p, eq_p, ge_p, gt_p, in_p, ne_p
+from predicate import always_false_p, always_true_p, eq_p, ge_p, gt_p, in_p, ne_p, not_in_p
 from predicate.implies import implies
-from predicate.set_predicates import is_real_subset_p, is_real_superset_p, is_subset_p, is_superset_p, not_in_p
+from predicate.set_predicates import is_real_subset_p, is_real_superset_p, is_subset_p, is_superset_p
 
 
 def test_implies_false():
