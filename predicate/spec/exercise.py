@@ -72,4 +72,9 @@ def exercise(f: Callable, spec: Spec | None = None, n: int = 10) -> Iterator[tup
             if not fn(**value, ret=result):
                 raise AssertionError("Not conform spec, details tbd")
 
+        if fn_p := spec.get("fn_p"):
+            fn_p_result = fn_p(**value)
+            if not fn_p_result(result):
+                raise AssertionError("Not conform spec, details tbd")
+
         yield tuple(value.values()), result

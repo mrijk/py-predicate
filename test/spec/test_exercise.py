@@ -1,6 +1,6 @@
 import pytest
 
-from predicate import is_int_p
+from predicate import ge_p, is_int_p
 from predicate.spec.exercise import Spec, exercise
 
 
@@ -28,7 +28,45 @@ def test_exercise_with_fn_happy():
     assert result
 
 
-def test_exercise_missing_unannotated_parameter_in_spec():
+def test_exercise_with_fn_fail():
+    def max_int(x, y):
+        return x if x >= y else y - 1
+
+    spec: Spec = {
+        "args": {"x": is_int_p, "y": is_int_p},
+        "ret": is_int_p,
+        "fn": lambda x, y, ret: ret >= x and ret >= y,
+    }
+
+    with pytest.raises(AssertionError) as exc:
+        list(exercise(max_int, spec=spec))
+
+    assert exc.value.args[0] == "Not conform spec, details tbd"
+
+
+def test_exercise_with_fn_p_happy():
+    def max_int(x, y):
+        return x if x >= y else y
+
+    spec: Spec = {"args": {"x": is_int_p, "y": is_int_p}, "ret": is_int_p, "fn_p": lambda x, y: ge_p(x) & ge_p(y)}
+
+    result = list(exercise(max_int, spec=spec))
+    assert result
+
+
+def test_exercise_with_fn_p_fail():
+    def max_int(x, y):
+        return x if x >= y else y - 1
+
+    spec: Spec = {"args": {"x": is_int_p, "y": is_int_p}, "ret": is_int_p, "fn_p": lambda x, y: ge_p(x) & ge_p(y)}
+
+    with pytest.raises(AssertionError) as exc:
+        list(exercise(max_int, spec=spec))
+
+    assert exc.value.args[0] == "Not conform spec, details tbd"
+
+
+def test_exercise_missing_return_annotation_in_spec():
     def adder(x, y):
         return x + y
 
@@ -41,7 +79,7 @@ def test_exercise_missing_unannotated_parameter_in_spec():
     assert exc.value.args[0] == "Return annotation not in spec"
 
 
-def test_exercise_missing_return_in_spec():
+def test_exercise_unannotated_parameter_in_spec():
     def adder(x, y):
         return x + y
 
