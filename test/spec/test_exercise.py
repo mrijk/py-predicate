@@ -123,6 +123,22 @@ def test_exercise_wrong_return():
     assert exc.value.args[0] == "Not conform spec: {'result': False, 'reason': 'None is not an instance of type int'}"
 
 
+@pytest.mark.skip("Fix!")
+def test_exercise_with_partial_spec():
+    def adder(x: int, y) -> int:
+        return x + y
+
+    spec: Spec = {
+        "args": {
+            "y": is_int_p,
+        },
+        "ret": is_int_p,
+    }
+
+    result = list(exercise(adder, spec=spec))
+    assert result
+
+
 def test_exercise_without_spec():
     def adder(x: int, y: int) -> int:
         return x + y
