@@ -10,7 +10,7 @@ from predicate.comp_predicate import comp_p
 from predicate.dict_of_predicate import is_dict_of_p
 from predicate.eq_predicate import eq_false_p, eq_p, eq_true_p, zero_p
 from predicate.explain import explain
-from predicate.fn_predicate import fn_p
+from predicate.fn_predicate import fn_p, is_even_p, is_finite_p, is_inf_p, is_nan_p, is_odd_p
 from predicate.formatter import to_dot, to_json, to_latex
 from predicate.ge_predicate import ge_p
 from predicate.generator.generate_false import generate_false
@@ -64,15 +64,10 @@ from predicate.spec.instrument import instrument_function
 from predicate.spec.spec import Spec
 from predicate.standard_predicates import (
     is_dict_p,
-    is_even_p,
-    is_finite_p,
     is_float_p,
-    is_inf_p,
     is_int_p,
     is_iterable_of_p,
     is_list_p,
-    is_nan_p,
-    is_odd_p,
     is_str_p,
     root_p,
     this_p,

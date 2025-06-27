@@ -350,3 +350,12 @@ def generate_uuids(predicate: Predicate[UUID]) -> Iterator[UUID]:
 
 def generate_anys(predicate: Predicate) -> Iterator:
     yield from (item for item in random_anys() if predicate(item))
+
+
+def generate_even_numbers() -> Iterator[int]:
+    yield 0
+    yield from (value for value in random_ints() if value % 2 == 0)
+
+
+def generate_odd_numbers() -> Iterator[int]:
+    yield from (value for value in random_ints() if value % 2 != 0)

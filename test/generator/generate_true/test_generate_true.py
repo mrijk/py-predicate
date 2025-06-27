@@ -33,6 +33,7 @@ from predicate import (
     is_datetime_p,
     is_dict_of_p,
     is_empty_p,
+    is_even_p,
     is_falsy_p,
     is_float_p,
     is_instance_p,
@@ -43,6 +44,7 @@ from predicate import (
     is_none_p,
     is_not_empty_p,
     is_not_none_p,
+    is_odd_p,
     is_predicate_of_p,
     is_predicate_p,
     is_set_of_p,
@@ -65,9 +67,7 @@ from predicate import (
 from predicate.set_predicates import is_real_subset_p, is_subset_p
 from predicate.standard_predicates import (
     is_dict_p,
-    is_even_p,
     is_list_p,
-    is_odd_p,
 )
 
 

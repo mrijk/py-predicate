@@ -1,7 +1,10 @@
+import math
 from dataclasses import dataclass
-from typing import Callable, Iterator, override
+from typing import Callable, Final, Iterator, override
 
+from predicate.generator.helpers import generate_even_numbers, generate_odd_numbers, random_floats
 from predicate.predicate import Predicate
+from predicate.standard_predicates import generate_inf, generate_nan
 
 
 def undefined() -> Iterator:
@@ -34,3 +37,20 @@ def fn_p[T](
 ) -> Predicate[T]:
     """Return the boolean value of the function call."""
     return FnPredicate(predicate_fn=fn, generate_false_fn=generate_false_fn, generate_true_fn=generate_true_fn)
+
+
+is_even_p: Final[Predicate[int]] = fn_p(
+    lambda x: x % 2 == 0, generate_true_fn=generate_even_numbers, generate_false_fn=generate_odd_numbers
+)
+is_odd_p: Final[Predicate[int]] = fn_p(
+    lambda x: x % 2 != 0, generate_true_fn=generate_odd_numbers, generate_false_fn=generate_even_numbers
+)
+
+is_finite_p: Final[Predicate] = fn_p(fn=math.isfinite, generate_true_fn=random_floats, generate_false_fn=generate_inf)
+"""Return True if value is finite, otherwise False."""
+
+is_inf_p: Final[Predicate] = fn_p(fn=math.isinf, generate_true_fn=generate_inf, generate_false_fn=random_floats)
+"""Return True if value is infinite, otherwise False."""
+
+is_nan_p: Final[Predicate] = fn_p(fn=math.isnan, generate_true_fn=generate_nan, generate_false_fn=random_floats)
+"""Return True if value is not a number, otherwise False."""

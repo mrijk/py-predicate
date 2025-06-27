@@ -3,12 +3,11 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from functools import partial
 from itertools import repeat
-from typing import Final, Iterator
+from typing import Iterator
 
 from predicate.all_predicate import all_p
 from predicate.comp_predicate import comp_p
 from predicate.eq_predicate import eq_p
-from predicate.fn_predicate import fn_p
 from predicate.ge_predicate import ge_p
 from predicate.gt_predicate import gt_p
 from predicate.is_instance_predicate import is_dict_p, is_float_p, is_int_p, is_iterable_p, is_list_p, is_str_p
@@ -20,27 +19,6 @@ from predicate.ne_predicate import ne_p
 from predicate.predicate import Predicate
 from predicate.root_predicate import RootPredicate
 from predicate.this_predicate import ThisPredicate
-
-
-def generate_even_numbers() -> Iterator[int]:
-    from predicate.generator.helpers import random_ints
-
-    yield 0
-    yield from (value for value in random_ints() if value % 2 == 0)
-
-
-def generate_odd_numbers() -> Iterator[int]:
-    from predicate.generator.helpers import random_ints
-
-    yield from (value for value in random_ints() if value % 2 != 0)
-
-
-is_even_p: Final[Predicate[int]] = fn_p(
-    lambda x: x % 2 == 0, generate_true_fn=generate_even_numbers, generate_false_fn=generate_odd_numbers
-)
-is_odd_p: Final[Predicate[int]] = fn_p(
-    lambda x: x % 2 != 0, generate_true_fn=generate_odd_numbers, generate_false_fn=generate_even_numbers
-)
 
 
 def is_iterable_of_p[T](predicate: Predicate[T]) -> Predicate:
@@ -98,10 +76,10 @@ def generate_inf() -> Iterator:
         yield math.inf
 
 
-def _random_floats() -> Iterator:
-    from predicate.generator.helpers import random_floats
-
-    yield from random_floats()
+# def _random_floats() -> Iterator:
+#     from predicate.generator.helpers import random_floats
+#
+#     yield from random_floats()
 
 
 depth_eq_p = partial(depth_op_p, predicate=eq_p)
@@ -121,16 +99,6 @@ depth_ge_p = partial(depth_op_p, predicate=ge_p)
 
 depth_gt_p = partial(depth_op_p, predicate=gt_p)
 """Returns if dict depth is greater than given depth, otherwise False."""
-
-is_finite_p: Final[Predicate] = fn_p(fn=math.isfinite, generate_true_fn=_random_floats, generate_false_fn=generate_inf)
-"""Return True if value is finite, otherwise False."""
-
-is_inf_p: Final[Predicate] = fn_p(fn=math.isinf, generate_true_fn=generate_inf, generate_false_fn=_random_floats)
-"""Return True if value is infinite, otherwise False."""
-
-is_nan_p: Final[Predicate] = fn_p(fn=math.isnan, generate_true_fn=generate_nan, generate_false_fn=_random_floats)
-"""Return True if value is not a number, otherwise False."""
-
 
 # Construction of a lazy predicate to check for valid json
 
