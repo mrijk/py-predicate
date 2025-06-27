@@ -8,6 +8,9 @@ from predicate.eq_predicate import EqPredicate
 from predicate.ge_predicate import GePredicate
 from predicate.gt_predicate import GtPredicate
 from predicate.in_predicate import InPredicate
+from predicate.is_instance_predicate import IsInstancePredicate
+from predicate.le_predicate import LePredicate
+from predicate.lt_predicate import LtPredicate
 from predicate.ne_predicate import NePredicate
 from predicate.not_in_predicate import NotInPredicate
 from predicate.predicate import (
@@ -57,6 +60,8 @@ def _(predicate: GePredicate, other: Predicate) -> bool:
 @implies.register
 def _(predicate: GtPredicate, other: Predicate) -> bool:
     match other:
+        case IsInstancePredicate(instance_klass):
+            return predicate.klass == instance_klass[0]  # type: ignore
         case GePredicate(v):
             return predicate.v >= v
         case GtPredicate(v):
@@ -68,6 +73,8 @@ def _(predicate: GtPredicate, other: Predicate) -> bool:
 @implies.register
 def _(predicate: EqPredicate, other: Predicate) -> bool:
     match other:
+        case IsInstancePredicate(instance_klass):
+            return predicate.klass == instance_klass[0]  # type: ignore
         case EqPredicate(v):
             return predicate.v == v
         case NePredicate(v):
@@ -76,6 +83,10 @@ def _(predicate: EqPredicate, other: Predicate) -> bool:
             return predicate.v >= v
         case GtPredicate(v):
             return predicate.v > v
+        case LePredicate(v):
+            return predicate.v <= v
+        case LtPredicate(v):
+            return predicate.v < v
         case InPredicate(v):
             return predicate.v in v
         case NotInPredicate(v):
@@ -107,6 +118,15 @@ def _(predicate: InPredicate, other: Predicate) -> bool:
     match other:
         case InPredicate(v):
             return predicate.v.issubset(v)
+        case _:
+            return False
+
+
+@implies.register
+def _(predicate: IsInstancePredicate, other: Predicate) -> bool:
+    match other:
+        case IsInstancePredicate(instance_klass):
+            return predicate.instance_klass == instance_klass
         case _:
             return False
 

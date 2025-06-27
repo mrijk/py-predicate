@@ -4,7 +4,8 @@
 
 Features:
 
-- First implementation of exercise
+- Implementation of exercise
+- Many improvements to implies_p
 - First implementation of instrument for run-time checking functions against predicates
 
 ## 1.1.0

@@ -19,6 +19,7 @@ from predicate.gt_predicate import gt_p, pos_p
 from predicate.has_key_predicate import has_key_p
 from predicate.has_length_predicate import has_length_p, is_empty_p, is_not_empty_p
 from predicate.has_path_predicate import has_path_p
+from predicate.implies_predicate import implies_p
 from predicate.in_predicate import in_p
 from predicate.is_falsy_predicate import is_falsy_p
 from predicate.is_instance_predicate import (
@@ -104,6 +105,7 @@ __all__ = [
     "has_key_p",
     "has_length_p",
     "has_path_p",
+    "implies_p",
     "in_p",
     "instrument_function",
     "is_alnum_p",

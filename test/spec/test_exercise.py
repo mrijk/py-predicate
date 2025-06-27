@@ -1,6 +1,6 @@
 import pytest
 
-from predicate import ge_p, is_int_p
+from predicate import ge_p, is_int_p, is_str_p, pos_p
 from predicate.spec.exercise import Spec, exercise
 
 
@@ -123,7 +123,6 @@ def test_exercise_wrong_return():
     assert exc.value.args[0] == "Not conform spec: {'result': False, 'reason': 'None is not an instance of type int'}"
 
 
-@pytest.mark.skip("Fix!")
 def test_exercise_with_partial_spec():
     def adder(x: int, y) -> int:
         return x + y
@@ -137,6 +136,39 @@ def test_exercise_with_partial_spec():
 
     result = list(exercise(adder, spec=spec))
     assert result
+
+
+def test_exercise_with_constrained_spec():
+    def adder(x: int, y: int) -> int:
+        return x + y
+
+    spec: Spec = {
+        "args": {
+            "x": pos_p,
+            "y": is_int_p,
+        },
+        "ret": is_int_p,
+    }
+
+    result = list(exercise(adder, spec=spec))
+    assert result
+
+
+def test_exercise_with_constrained_spec_fail():
+    def adder(x: int, y: int) -> int:
+        return x + y
+
+    spec: Spec = {
+        "args": {
+            "x": is_int_p,
+            "y": is_int_p | is_str_p,
+        },
+        "ret": is_int_p,
+    }
+
+    with pytest.raises(AssertionError) as exc:
+        list(exercise(adder, spec=spec))
+    assert exc.value.args[0] == "Spec predicate is not a constrained annotation"
 
 
 def test_exercise_without_spec():

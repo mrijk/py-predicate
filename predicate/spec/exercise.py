@@ -6,6 +6,7 @@ from more_itertools import take
 
 from predicate import explain, generate_true, is_instance_p
 from predicate.dict_of_predicate import is_dict_of_p
+from predicate.implies import implies
 from predicate.spec.spec import Spec
 
 
@@ -35,16 +36,22 @@ def check_signature_against_spec(f: Callable, spec: Spec):
         if key not in sig.parameters:
             raise AssertionError(f"Parameter '{key}' not in function signature")
 
-    # TODO: all parameters that are not annotated, should be in the spec
-
     if sig.return_annotation == sig.empty and not spec.get("ret"):
         raise AssertionError("Return annotation not in spec")
 
     for key in sig.parameters:
         parameter = sig.parameters[key]
-        if parameter.annotation == parameter.empty:
+        annotation = parameter.annotation
+        if annotation == parameter.empty:
             if key not in parameters:
                 raise AssertionError(f"Unannotated parameter '{key}' not in spec")
+        else:
+            annotation_p = is_instance_p(annotation)
+            if key not in parameters:
+                parameters[key] = annotation_p
+            else:
+                if not implies(parameters[key], annotation_p):
+                    raise AssertionError("Spec predicate is not a constrained annotation")
 
 
 def exercise(f: Callable, spec: Spec | None = None, n: int = 10) -> Iterator[tuple]:
