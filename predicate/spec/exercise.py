@@ -1,11 +1,13 @@
 from collections.abc import Iterator
 from inspect import signature
-from typing import Callable
+from itertools import repeat
+from typing import Callable, TypeVar
 
 from more_itertools import take
 
-from predicate import explain, generate_true, is_instance_p
+from predicate import generate_true, is_instance_p
 from predicate.dict_of_predicate import is_dict_of_p
+from predicate.explain import explain
 from predicate.implies import implies
 from predicate.spec.spec import Spec
 
@@ -45,6 +47,9 @@ def check_signature_against_spec(f: Callable, spec: Spec):
         if annotation == parameter.empty:
             if key not in parameters:
                 raise AssertionError(f"Unannotated parameter '{key}' not in spec")
+        elif type(annotation) is TypeVar:
+            if key not in parameters:
+                raise AssertionError(f"Unannotated parameter '{key}' not in spec")
         else:
             annotation_p = is_instance_p(annotation)
             if key not in parameters:
@@ -65,10 +70,12 @@ def exercise(f: Callable, spec: Spec | None = None, n: int = 10) -> Iterator[tup
     parameters = spec["args"]
     return_p = spec["ret"]
 
-    predicates = tuple(parameters.items())
-    predicate = is_dict_of_p(*predicates)
+    if predicates := tuple(parameters.items()):
+        predicate = is_dict_of_p(*predicates)
 
-    values = take(n, generate_true(predicate))
+        values = take(n, generate_true(predicate))
+    else:
+        values = take(n, repeat({}))
 
     for value in values:
         result = f(**value)

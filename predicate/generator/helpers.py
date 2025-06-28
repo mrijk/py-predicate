@@ -254,6 +254,9 @@ def random_ints(lower: int = -sys.maxsize, upper: int = sys.maxsize, **_kwargs) 
         if high >= low:
             yield from (random.randint(low, high) for _ in range(0, limit))
 
+    if lower <= 0 <= upper:
+        yield 0
+
     while True:
         yield from between(1)
         yield from between(10)

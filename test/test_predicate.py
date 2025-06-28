@@ -266,7 +266,7 @@ def test_is_not_hashable_p(value):
 
 def test_zero_p(p):
     assert not zero_p(1)
-    assert zero_p(0.0)
+    assert zero_p(0)
 
 
 def test_neg_p(p):

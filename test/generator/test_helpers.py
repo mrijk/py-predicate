@@ -14,15 +14,19 @@ from predicate import (
     is_container_p,
     is_datetime_p,
     is_dict_p,
+    is_even_p,
     is_float_p,
     is_int_p,
     is_list_p,
+    is_odd_p,
     is_set_p,
     is_str_p,
     is_tuple_p,
     is_uuid_p,
 )
 from predicate.generator.helpers import (
+    generate_even_numbers,
+    generate_odd_numbers,
     random_anys,
     random_bools,
     random_complex_numbers,
@@ -247,3 +251,19 @@ def test_random_uuids():
     all_uuid = all_p(is_uuid_p)
 
     assert all_uuid(uuids)
+
+
+def test_even_numbers():
+    even_numbers = take(10, generate_even_numbers())
+
+    all_even = all_p(is_even_p)
+
+    assert all_even(even_numbers)
+
+
+def test_odd_numbers():
+    odd_numbers = take(10, generate_odd_numbers())
+
+    all_odd = all_p(is_odd_p)
+
+    assert all_odd(odd_numbers)

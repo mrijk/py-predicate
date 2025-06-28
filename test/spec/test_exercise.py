@@ -1,6 +1,6 @@
 import pytest
 
-from predicate import ge_p, is_int_p, is_str_p, pos_p
+from predicate import ge_p, is_bool_p, is_float_p, is_int_p, is_str_p, pos_p, zero_p
 from predicate.spec.exercise import Spec, exercise
 
 
@@ -11,6 +11,42 @@ def test_exercise_happy():
     spec: Spec = {"args": {"x": is_int_p, "y": is_int_p}, "ret": is_int_p}
 
     result = list(exercise(adder, spec=spec))
+    assert result
+
+
+def test_exercise_no_param_happy():
+    def adder():
+        return 42
+
+    spec: Spec = {"args": {}, "ret": is_int_p}
+
+    result = list(exercise(adder, spec=spec))
+    assert result
+
+
+def test_exercise_zero_p():
+    spec: Spec = {"args": {"x": is_int_p}, "ret": is_bool_p}
+
+    result = list(exercise(zero_p, spec=spec))
+
+    assert result
+
+
+def test_exercise_pos_p():
+    spec: Spec = {"args": {"x": is_int_p | is_float_p}, "ret": is_bool_p}
+
+    result = list(exercise(pos_p, spec=spec))
+
+    assert result
+
+
+def test_exercise_lambda():
+    a_lambda = lambda x: x  # noqa: E731
+
+    spec: Spec = {"args": {"x": is_int_p}, "ret": is_int_p}
+
+    result = list(exercise(a_lambda, spec=spec))
+
     assert result
 
 

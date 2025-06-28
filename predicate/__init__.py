@@ -60,6 +60,7 @@ from predicate.set_predicates import (
     is_subset_p,
     is_superset_p,
 )
+from predicate.spec.exercise import exercise
 from predicate.spec.instrument import instrument_function
 from predicate.spec.spec import Spec
 from predicate.standard_predicates import (
@@ -87,6 +88,7 @@ __all__ = [
     "eq_p",
     "eq_true_p",
     "exactly_n",
+    "exercise",
     "explain",
     "fn_p",
     "ge_le_p",
