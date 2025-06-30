@@ -545,7 +545,7 @@ def generate_tee(_predicate: TeePredicate) -> Iterator:
 
 @generate_true.register
 def generate_match_p(match_predicate: MatchPredicate) -> Iterator:
-    predicates = match_predicate.predicates
+    predicates: list[Predicate] = match_predicate.predicates  # type: ignore
 
     # TODO: not working yet for star, etc. operators
     yield from zip(*(generate_true(predicate) for predicate in predicates), strict=False)

@@ -18,8 +18,8 @@ class IsInstancePredicate[T](Predicate[T]):
         # This is different from standard Python behaviour: a False/True value is not an int!
         if isinstance(x, bool) and self.instance_klass[0] is int:  # type: ignore
             return False
-        if (origin := get_origin(self.instance_klass[0])) is not None:
-            return isinstance(x, origin)
+        if (origin := get_origin(self.instance_klass[0])) is not None:  # type: ignore
+            return isinstance(x, origin)  # type: ignore
         return isinstance(x, self.instance_klass)
 
     def __repr__(self) -> str:

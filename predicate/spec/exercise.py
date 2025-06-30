@@ -22,7 +22,7 @@ def get_return_predicate(sig: Signature) -> Predicate:
 
 
 def get_spec_from_class_annotation(f: Callable) -> Spec | None:
-    sig = signature(f.__call__)
+    sig = signature(f.__call__)  # type: ignore
 
     if sig.return_annotation == sig.empty:
         return None

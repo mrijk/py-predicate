@@ -474,7 +474,7 @@ def generate_tee(_predicate: TeePredicate) -> Iterator:
 def generate_match_p(match_predicate: MatchPredicate) -> Iterator:
     predicates = match_predicate.predicates
     first = predicates[0]  # TODO
-    false_values = generate_false(first)
+    false_values = generate_false(first)  # type: ignore
     while True:
         value = next(false_values)
         yield (value,)
