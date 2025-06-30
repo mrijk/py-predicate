@@ -1,6 +1,7 @@
 from typing import Any
 
 import pytest
+from helpers import exercise_predicate
 from more_itertools import take
 
 from predicate import always_false_p, explain
@@ -19,3 +20,8 @@ def test_always_false_p_klass():
 def test_always_false_p_explain():
     expected = {"reason": "Always returns False", "result": False}
     assert explain(always_false_p, None) == expected
+
+
+@pytest.mark.skip("TODO")
+def test_always_false_exercise():
+    exercise_predicate(always_false_p)

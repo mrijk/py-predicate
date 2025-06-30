@@ -1,7 +1,7 @@
 from collections.abc import Callable, Container, Iterable
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Hashable, Iterator, override
+from typing import Hashable, Iterator, get_origin, override
 from uuid import UUID
 
 from predicate.helpers import join_with_or
@@ -18,6 +18,8 @@ class IsInstancePredicate[T](Predicate[T]):
         # This is different from standard Python behaviour: a False/True value is not an int!
         if isinstance(x, bool) and self.instance_klass[0] is int:  # type: ignore
             return False
+        if (origin := get_origin(self.instance_klass[0])) is not None:
+            return isinstance(x, origin)
         return isinstance(x, self.instance_klass)
 
     def __repr__(self) -> str:

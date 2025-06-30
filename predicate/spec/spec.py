@@ -6,7 +6,7 @@ Spec = TypedDict(
     "Spec",
     {
         "args": dict[str, Predicate],
-        "ret": Predicate,
+        "ret": NotRequired[Predicate],
         "fn": NotRequired[Callable[..., bool]],
         "fn_p": NotRequired[Callable[..., Predicate]],
     },

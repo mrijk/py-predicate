@@ -50,6 +50,16 @@ def test_exercise_lambda():
     assert result
 
 
+def test_exercise_class_with_call():
+    class Foo:
+        def __call__(self, x: int) -> bool:
+            return True
+
+    result = list(exercise(Foo()))
+
+    assert result
+
+
 def test_exercise_with_fn_happy():
     def max_int(x, y):
         return x if x >= y else y

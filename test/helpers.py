@@ -1,4 +1,4 @@
-from predicate import is_instance_p
+from predicate import exercise, is_instance_p
 from predicate.all_predicate import AllPredicate
 from predicate.always_false_predicate import AlwaysFalsePredicate
 from predicate.always_true_predicate import AlwaysTruePredicate
@@ -18,3 +18,15 @@ is_xor_p = is_instance_p(XorPredicate)
 is_false_p = is_instance_p(AlwaysFalsePredicate)
 is_true_p = is_instance_p(AlwaysTruePredicate)
 is_eq_p = is_instance_p(EqPredicate)
+
+
+def exercise_predicate(predicate_f):
+    predicates = list(exercise(predicate_f))
+    assert predicates
+
+    for _, predicate in predicates:
+        data = list(exercise(predicate))
+        assert data
+
+        for param, result in data:
+            assert predicate(*param) == result

@@ -1,3 +1,5 @@
+from helpers import exercise_predicate
+
 from predicate import eq_p
 from predicate.explain import explain
 
@@ -21,3 +23,7 @@ def test_eq_explain():
 
     expected = {"reason": "3 is not equal to 2", "result": False}
     assert explain(predicate, 3) == expected
+
+
+def test_eq_exercise():
+    exercise_predicate(eq_p)

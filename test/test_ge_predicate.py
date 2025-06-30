@@ -1,6 +1,8 @@
 from datetime import datetime, timedelta
 from uuid import UUID
 
+from helpers import exercise_predicate
+
 from predicate import ge_p
 from predicate.explain import explain
 
@@ -60,3 +62,7 @@ def test_ge_explain():
 
     expected = {"reason": "1 is not greater or equal to 2", "result": False}
     assert explain(predicate, 1) == expected
+
+
+def test_ge_exercise():
+    exercise_predicate(ge_p)

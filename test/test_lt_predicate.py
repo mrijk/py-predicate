@@ -1,3 +1,5 @@
+from helpers import exercise_predicate
+
 from predicate import lt_p
 from predicate.explain import explain
 
@@ -14,3 +16,7 @@ def test_lt_explain():
 
     expected = {"reason": "2 is not less than 2", "result": False}
     assert explain(predicate, 2) == expected
+
+
+def test_lt_exercise():
+    exercise_predicate(lt_p)

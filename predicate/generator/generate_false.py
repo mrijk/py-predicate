@@ -47,6 +47,7 @@ from predicate.is_truthy_predicate import IsTruthyPredicate
 from predicate.le_predicate import LePredicate
 from predicate.list_of_predicate import ListOfPredicate
 from predicate.lt_predicate import LtPredicate
+from predicate.match_predicate import MatchPredicate
 from predicate.ne_predicate import NePredicate, ne_p
 from predicate.not_in_predicate import NotInPredicate
 from predicate.optimizer.predicate_optimizer import optimize
@@ -467,3 +468,13 @@ def generate_at_least_one_false(predicate: Predicate, *, length_p: Predicate = d
 @generate_false.register
 def generate_tee(_predicate: TeePredicate) -> Iterator:
     yield from []
+
+
+@generate_false.register
+def generate_match_p(match_predicate: MatchPredicate) -> Iterator:
+    predicates = match_predicate.predicates
+    first = predicates[0]  # TODO
+    false_values = generate_false(first)
+    while True:
+        value = next(false_values)
+        yield (value,)

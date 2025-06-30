@@ -69,11 +69,13 @@ from predicate.is_truthy_predicate import IsTruthyPredicate
 from predicate.le_predicate import LePredicate
 from predicate.list_of_predicate import ListOfPredicate, is_list_of_p
 from predicate.lt_predicate import LtPredicate
+from predicate.match_predicate import MatchPredicate
 from predicate.ne_predicate import NePredicate
 from predicate.not_in_predicate import NotInPredicate
 from predicate.optimizer.predicate_optimizer import optimize
 from predicate.predicate import (
     AndPredicate,
+    ConstrainedT,
     NotPredicate,
     OrPredicate,
     Predicate,
@@ -450,6 +452,9 @@ def generate_is_instance_p(predicate: IsInstancePredicate, **kwargs) -> Iterator
 
     if generator := type_registry.get(klass):
         yield from generator(**kwargs)
+    elif klass == ConstrainedT:
+        iterables = [random_ints()]
+        yield from random_first_from_iterables(*iterables)
     elif klass == Predicate:  # TODO
         yield from random_predicates(**kwargs)
     else:
@@ -536,3 +541,11 @@ def generate_xor(predicate: XorPredicate) -> Iterator:
 @generate_true.register
 def generate_tee(_predicate: TeePredicate) -> Iterator:
     yield from []
+
+
+@generate_true.register
+def generate_match_p(match_predicate: MatchPredicate) -> Iterator:
+    predicates = match_predicate.predicates
+
+    # TODO: not working yet for star, etc. operators
+    yield from zip(*(generate_true(predicate) for predicate in predicates), strict=False)

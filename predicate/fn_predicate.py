@@ -32,18 +32,18 @@ class FnPredicate[T](Predicate[T]):
 
 def fn_p[T](
     fn: Callable[[T], bool],
-    generate_false_fn: Callable[[], Iterator] = undefined,
-    generate_true_fn: Callable[[], Iterator] = undefined,
+    generate_false_fn: Callable[[], Iterator[T]] = undefined,
+    generate_true_fn: Callable[[], Iterator[T]] = undefined,
 ) -> Predicate[T]:
     """Return the boolean value of the function call."""
     return FnPredicate(predicate_fn=fn, generate_false_fn=generate_false_fn, generate_true_fn=generate_true_fn)
 
 
 is_even_p: Final[Predicate[int]] = fn_p(
-    lambda x: x % 2 == 0, generate_true_fn=generate_even_numbers, generate_false_fn=generate_odd_numbers
+    fn=lambda x: x % 2 == 0, generate_true_fn=generate_even_numbers, generate_false_fn=generate_odd_numbers
 )
 is_odd_p: Final[Predicate[int]] = fn_p(
-    lambda x: x % 2 != 0, generate_true_fn=generate_odd_numbers, generate_false_fn=generate_even_numbers
+    fn=lambda x: x % 2 != 0, generate_true_fn=generate_odd_numbers, generate_false_fn=generate_even_numbers
 )
 
 is_finite_p: Final[Predicate] = fn_p(fn=math.isfinite, generate_true_fn=random_floats, generate_false_fn=generate_inf)
