@@ -1,6 +1,7 @@
 import pytest
+from helpers import exercise_predicate
 
-from predicate import exercise, explain, is_falsy_p
+from predicate import explain, is_falsy_p
 
 
 @pytest.mark.parametrize("value", [False, None, 0, {}, "", (), []])
@@ -15,4 +16,4 @@ def test_is_falsy_p_explain():
 
 
 def test_is_falsy_exercise():
-    assert list(exercise(is_falsy_p))
+    exercise_predicate(is_falsy_p)

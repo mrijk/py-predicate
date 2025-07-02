@@ -13,7 +13,7 @@ class MatchPredicate[T](Predicate[T]):
     predicates: list[Callable]
 
     def __call__(self, iterable: Iterable[T]) -> bool:
-        return match(self.predicates, iterable)
+        return match(iterable, predicates=self.predicates)
 
     def __repr__(self) -> str:
         def callable_repr() -> Iterable[str]:
@@ -39,7 +39,7 @@ def match_p[T](*predicates: Callable) -> MatchPredicate[T]:
     return MatchPredicate(predicates=list(predicates))
 
 
-def match(predicates: list[Callable], iterable: Iterable) -> bool:
+def match(iterable: Iterable, *, predicates: list[Callable]) -> bool:
     predicate, *rest_predicates = predicates
     match predicate:
         case Predicate():
@@ -47,10 +47,10 @@ def match(predicates: list[Callable], iterable: Iterable) -> bool:
                 return False
             item, *rest = iterable
             if rest_predicates:
-                return predicate(item) and match(rest_predicates, rest)
+                return predicate(item) and match(rest, predicates=rest_predicates)
             return predicate(item)
         case _:
-            return predicate(rest_predicates, iterable)
+            return predicate(iterable, predicates=rest_predicates)
 
 
 def add_doc(docstring):
@@ -65,10 +65,14 @@ def repeat(m: int, n: int, predicate: Predicate) -> Callable:
     """Match exactly m to n instances of the given predicate."""
 
     @add_doc(f"repeat({m}, {n}, {predicate!r})")
-    def _repeat(predicates: list[Predicate], iterable: Iterable) -> bool:
+    def _repeat(
+        iterable: Iterable,
+        *,
+        predicates: list[Predicate],
+    ) -> bool:
         for n_ in range(n, m - 1, -1):
             f = exactly_n(n_, predicate)
-            if f(predicates, iterable):
+            if f(iterable, predicates=predicates):
                 return True
         return False
 
@@ -79,7 +83,11 @@ def exactly_n(n: int, predicate: Predicate) -> Callable:
     """Match exactly n instances of the given predicate."""
 
     @add_doc(f"exactly_n({n}, {predicate!r})")
-    def _exactly_n(predicates: list[Callable], iterable: Iterable) -> bool:
+    def _exactly_n(
+        iterable: Iterable,
+        *,
+        predicates: list[Callable],
+    ) -> bool:
         rest = iterable
         for _ in range(n):
             if not rest:
@@ -88,7 +96,7 @@ def exactly_n(n: int, predicate: Predicate) -> Callable:
             item, *rest = rest
             if not predicate(item):
                 return False
-        return match(predicates, rest) if predicates else True
+        return match(rest, predicates=predicates) if predicates else True
 
     return _exactly_n
 
@@ -97,12 +105,12 @@ def plus(predicate: Predicate) -> Callable:
     """Match at least one instance of the given predicate."""
 
     @add_doc(f"plus({predicate!r})")
-    def _plus(predicates: list[Callable], iterable: Iterable) -> bool:
+    def _plus(iterable: Iterable, *, predicates: list[Callable]) -> bool:
         if not iterable:
             return False
 
         item, *rest = iterable
-        return predicate(item) and star(predicate)(predicates, rest)
+        return predicate(item) and star(predicate)(rest, predicates=predicates)
 
     return _plus
 
@@ -111,17 +119,17 @@ def star(predicate: Predicate) -> Callable:
     """Match any instances of the given predicate."""
 
     @add_doc(f"star({predicate!r})")
-    def _star(predicates: list[Callable], iterable: Iterable) -> bool:
+    def _star(iterable: Iterable, *, predicates: list[Callable]) -> bool:
         if not iterable:
             return not predicates
         item, *rest = iterable
         if predicate(item):
-            if _star(predicates, rest):
+            if _star(rest, predicates=predicates):
                 return True
             if predicates:
-                matched = match(predicates, rest)
-                return match(predicates, iterable) if not matched else True  # backtrack
-        return match(predicates, iterable) if predicates else False
+                matched = match(rest, predicates=predicates)
+                return match(iterable, predicates=predicates) if not matched else True  # backtrack
+        return match(iterable, predicates=predicates) if predicates else False
 
     return _star
 
@@ -130,12 +138,12 @@ def optional(predicate: Predicate) -> Callable:
     """Match 0 or 1 instances of the given predicate."""
 
     @add_doc(f"optional({predicate!r})")
-    def _optional(predicates: list[Callable], iterable: Iterable) -> bool:
+    def _optional(iterable: Iterable, *, predicates: list[Callable]) -> bool:
         if not iterable:
             return True
         item, *rest = iterable
         if predicates:
-            return (predicate(item) and match(predicates, rest)) or match(predicates, iterable)
+            return (predicate(item) and match(rest, predicates=predicates)) or match(iterable, predicates=predicates)
         return predicate(item)
 
     return _optional

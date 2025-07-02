@@ -1,21 +1,15 @@
+import pytest
 from helpers import exercise_predicate
 
 from predicate import eq_p
 from predicate.explain import explain
 
 
-def test_eq_p_int():
-    eq_2 = eq_p(2)
-
-    assert not eq_2(1)
-    assert eq_2(2)
-
-
-def test_eq_p_str():
-    eq_foo = eq_p("foo")
-
-    assert not eq_foo("bar")
-    assert eq_foo("foo")
+@pytest.mark.parametrize("v, invalid", [(2, 3), ("foo", "bar")])
+def test_eq_p(v, invalid):
+    predicate = eq_p(v)
+    assert predicate(v)
+    assert not predicate(invalid)
 
 
 def test_eq_explain():

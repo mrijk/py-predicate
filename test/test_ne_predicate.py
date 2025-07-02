@@ -1,19 +1,15 @@
+import pytest
+from helpers import exercise_predicate
+
 from predicate import ne_p
 from predicate.explain import explain
 
 
-def test_ne_p_int():
-    ne_2 = ne_p(2)
-
-    assert not ne_2(2)
-    assert ne_2(1)
-
-
-def test_ne_p_str():
-    ne_foo = ne_p("foo")
-
-    assert not ne_foo("foo")
-    assert ne_foo("bar")
+@pytest.mark.parametrize("v, valid", [(2, 3), ("foo", "bar")])
+def test_ne_p(v, valid):
+    predicate = ne_p(v)
+    assert predicate(valid)
+    assert not predicate(v)
 
 
 def test_eq_explain():
@@ -21,3 +17,7 @@ def test_eq_explain():
 
     expected = {"reason": "foo is equal to 'foo'", "result": False}
     assert explain(predicate, "foo") == expected
+
+
+def test_ne_exercise():
+    exercise_predicate(ne_p)

@@ -8,7 +8,7 @@ from predicate.predicate import Predicate
 class AlwaysFalsePredicate(Predicate):
     """A predicate class that models the 'False' predicate."""
 
-    def __call__(self, *args, **kwargs):
+    def __call__(self, *args, **kwargs) -> bool:
         return False
 
     def __repr__(self) -> str:
