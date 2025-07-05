@@ -1,4 +1,6 @@
-from predicate import explain, fn_p, is_not_none_p
+import math
+
+from predicate import explain, fn_p, is_finite_p, is_inf_p, is_not_none_p
 
 
 def test_fn_p_with_lambda():
@@ -28,3 +30,16 @@ def test_fn_p_explain():
 
     expected = {"reason": "Function returned False for value 4", "result": False}
     assert explain(predicate, 4) == expected
+
+
+def test_is_finite_p():
+    assert not is_finite_p(math.inf)
+    assert is_finite_p(13)
+    assert is_finite_p(3.14)
+
+
+def test_is_inf_p():
+    assert not is_inf_p(13)
+
+    assert is_inf_p(-math.inf)
+    assert is_inf_p(math.inf)

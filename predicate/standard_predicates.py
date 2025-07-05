@@ -1,9 +1,6 @@
-import math
 from collections.abc import Callable
 from dataclasses import dataclass
 from functools import partial
-from itertools import repeat
-from typing import Iterator
 
 from predicate.all_predicate import all_p
 from predicate.comp_predicate import comp_p
@@ -64,22 +61,6 @@ def dict_depth(value: dict) -> int:
 
 def depth_op_p(depth: int, predicate: Callable[[int], Predicate]) -> Predicate[dict]:
     return comp_p(dict_depth, predicate(depth))
-
-
-def generate_nan() -> Iterator:
-    yield from repeat(math.nan)
-
-
-def generate_inf() -> Iterator:
-    while True:
-        yield -math.inf
-        yield math.inf
-
-
-# def _random_floats() -> Iterator:
-#     from predicate.generator.helpers import random_floats
-#
-#     yield from random_floats()
 
 
 depth_eq_p = partial(depth_op_p, predicate=eq_p)

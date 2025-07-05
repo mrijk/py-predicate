@@ -19,5 +19,25 @@ def test_eq_explain():
     assert explain(predicate, 3) == expected
 
 
+def test_eq_int():
+    eq_1 = eq_p(2)
+    eq_2 = eq_p(2)
+    eq_3 = eq_p(3)
+
+    assert eq_1 == eq_1
+    assert eq_1 == eq_2
+    assert eq_1 != eq_3
+
+
+def test_eq_str():
+    eq_1 = eq_p("foo")
+    eq_2 = eq_p("foo")
+    eq_3 = eq_p("bar")
+
+    assert eq_1 == eq_1
+    assert eq_1 == eq_2
+    assert eq_1 != eq_3
+
+
 def test_eq_exercise():
     exercise_predicate(eq_p)

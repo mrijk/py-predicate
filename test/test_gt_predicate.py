@@ -1,9 +1,10 @@
+import math
 from datetime import datetime, timedelta
 from uuid import UUID
 
 from helpers import exercise_predicate
 
-from predicate import gt_p
+from predicate import gt_p, pos_p
 from predicate.explain import explain
 
 
@@ -65,3 +66,11 @@ def test_gt_explain():
 
 def test_gt_exercise():
     exercise_predicate(gt_p)
+
+
+def test_pos_p():
+    assert not pos_p(-1)
+    assert not pos_p(-3.14)
+    assert not pos_p(0)
+    assert pos_p(1)
+    assert pos_p(math.inf)
