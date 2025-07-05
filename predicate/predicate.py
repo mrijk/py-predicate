@@ -47,12 +47,12 @@ class Predicate[T]:
     def get_klass(self) -> type:
         raise NotImplementedError
 
-    def explain(self, x: Any) -> dict:
-        if self(x):
+    def explain(self, x: Any, *args, **kwargs) -> dict:
+        if self(x, *args, **kwargs):
             return {"result": True}
         return {
             "result": False,
-        } | self.explain_failure(x)
+        } | self.explain_failure(x, *args, **kwargs)
 
     def explain_failure(self, x: Any) -> dict:
         raise NotImplementedError

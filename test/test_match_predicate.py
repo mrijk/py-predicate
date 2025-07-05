@@ -1,4 +1,4 @@
-from predicate import eq_p, is_float_p, is_int_p, is_str_p
+from predicate import eq_p, explain, is_float_p, is_int_p, is_str_p
 from predicate.match_predicate import exactly_n, match_p, optional, plus, repeat, star, wildcard
 
 
@@ -47,6 +47,14 @@ def test_match_optional():
     assert not predicate([1, 2])
     assert predicate(["foo"])
     assert predicate([1, "foo"])
+
+
+def test_match_optional_explain():
+    maybe_int = optional(is_int_p)
+    predicate = match_p(maybe_int, is_str_p)
+
+    expected = {"reason": {"reason": "2 is not an instance of type str", "result": False}, "result": False}
+    assert explain(predicate, [1, 2]) == expected
 
 
 def test_match_exactly_and_optional():

@@ -30,8 +30,7 @@ class MatchPredicate[T](Predicate[T]):
 
     @override
     def explain_failure(self, iterable: Iterable[T]) -> dict:
-        # TODO
-        return {"reason": "Tbd"}
+        return {"reason": reason(iterable, predicates=self.predicates)}
 
 
 def match_p[T](*predicates: Callable) -> MatchPredicate[T]:
@@ -39,9 +38,23 @@ def match_p[T](*predicates: Callable) -> MatchPredicate[T]:
     return MatchPredicate(predicates=list(predicates))
 
 
+def reason(iterable: Iterable, *, predicates: list[Callable] | list[Predicate]) -> dict:
+    predicate, *rest_predicates = predicates
+    match predicate:
+        case OptionalPredicate():
+            return predicate.explain(iterable, predicates=rest_predicates)
+        case Predicate():
+            item, *rest = iterable
+            return predicate.explain(item)
+        case _:
+            raise NotImplementedError
+
+
 def match(iterable: Iterable, *, predicates: list[Callable]) -> bool:
     predicate, *rest_predicates = predicates
     match predicate:
+        case OptionalPredicate():
+            return predicate(iterable, predicates=rest_predicates)
         case Predicate():
             if not iterable:
                 return False
@@ -134,19 +147,41 @@ def star(predicate: Predicate) -> Callable:
     return _star
 
 
-def optional(predicate: Predicate) -> Callable:
+@dataclass
+class OptionalPredicate[T](Predicate[T]):
     """Match 0 or 1 instances of the given predicate."""
 
-    @add_doc(f"optional({predicate!r})")
-    def _optional(iterable: Iterable, *, predicates: list[Callable]) -> bool:
+    predicate: Predicate
+
+    def __call__(self, iterable: Iterable, *, predicates: list[Callable]) -> bool:
         if not iterable:
             return True
         item, *rest = iterable
         if predicates:
-            return (predicate(item) and match(rest, predicates=predicates)) or match(iterable, predicates=predicates)
-        return predicate(item)
+            return (self.predicate(item) and match(rest, predicates=predicates)) or match(
+                iterable, predicates=predicates
+            )
+        return self.predicate(item)
 
-    return _optional
+    def __repr__(self) -> str:
+        return f"optional({self.predicate!r})"
+
+    @override
+    def explain_failure(self, iterable: Iterable[T], *, predicates: list[Predicate]) -> dict:  # type: ignore
+        item, *rest = iterable
+
+        if predicates:
+            if not self.predicate(item):
+                return reason(iterable, predicates=predicates)
+            if not match(rest, predicates=predicates):  # type: ignore
+                return reason(rest, predicates=predicates)
+
+        return self.predicate.explain_failure(item)
+
+
+def optional(predicate: Predicate) -> Callable:
+    """Match 0 or 1 instances of the given predicate."""
+    return OptionalPredicate(predicate=predicate)
 
 
 wildcard = star(always_true_p)
