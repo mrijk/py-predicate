@@ -1,6 +1,5 @@
 from dataclasses import dataclass
-from types import FunctionType
-from typing import Callable, Iterable, override
+from typing import Iterable, override
 
 from predicate import always_true_p
 from predicate.predicate import Predicate
@@ -10,22 +9,13 @@ from predicate.predicate import Predicate
 class MatchPredicate[T](Predicate[T]):
     """A predicate class that models 'match iterable' predicate."""
 
-    predicates: list[Callable]
+    predicates: list[Predicate]
 
     def __call__(self, iterable: Iterable[T]) -> bool:
         return match(iterable, predicates=self.predicates)
 
     def __repr__(self) -> str:
-        def callable_repr() -> Iterable[str]:
-            for predicate in self.predicates:
-                match predicate:
-                    case Predicate() as p:
-                        yield repr(p)
-                    case FunctionType() as f:
-                        yield f.__doc__ or "unknown()"
-
-        param = ", ".join(callable_repr())
-
+        param = ", ".join(repr(predicate) for predicate in self.predicates)
         return f"match_p({param})"
 
     @override
@@ -33,12 +23,12 @@ class MatchPredicate[T](Predicate[T]):
         return {"reason": reason(iterable, predicates=self.predicates)}
 
 
-def match_p[T](*predicates: Callable) -> MatchPredicate[T]:
+def match_p[T](*predicates: Predicate) -> MatchPredicate[T]:
     """Return True if the predicate holds for each item in the iterable, otherwise False."""
     return MatchPredicate(predicates=list(predicates))
 
 
-def reason(iterable: Iterable, *, predicates: list[Callable] | list[Predicate]) -> dict:
+def reason(iterable: Iterable, *, predicates: list[Predicate]) -> dict:
     predicate, *rest_predicates = predicates
     match predicate:
         case OptionalPredicate():
@@ -50,10 +40,10 @@ def reason(iterable: Iterable, *, predicates: list[Callable] | list[Predicate]) 
             raise NotImplementedError
 
 
-def match(iterable: Iterable, *, predicates: list[Callable]) -> bool:
+def match(iterable: Iterable, *, predicates: list[Predicate]) -> bool:
     predicate, *rest_predicates = predicates
     match predicate:
-        case OptionalPredicate():
+        case OptionalPredicate() | PlusPredicate() | StarPredicate() | ExactlyPredicate() | RepeatPredicate():
             return predicate(iterable, predicates=rest_predicates)
         case Predicate():
             if not iterable:
@@ -63,88 +53,107 @@ def match(iterable: Iterable, *, predicates: list[Callable]) -> bool:
                 return predicate(item) and match(rest, predicates=rest_predicates)
             return predicate(item)
         case _:
-            return predicate(iterable, predicates=rest_predicates)
+            raise NotImplementedError
 
 
-def add_doc(docstring):
-    def decorator(func):
-        func.__doc__ = docstring
-        return func
-
-    return decorator
-
-
-def repeat(m: int, n: int, predicate: Predicate) -> Callable:
+@dataclass
+class RepeatPredicate[T](Predicate[T]):
     """Match exactly m to n instances of the given predicate."""
 
-    @add_doc(f"repeat({m}, {n}, {predicate!r})")
-    def _repeat(
-        iterable: Iterable,
-        *,
-        predicates: list[Predicate],
-    ) -> bool:
-        for n_ in range(n, m - 1, -1):
-            f = exactly_n(n_, predicate)
+    m: int
+    n: int
+    predicate: Predicate
+
+    def __call__(self, iterable: Iterable, *, predicates: list[Predicate]) -> bool:
+        for n in range(self.n, self.m - 1, -1):
+            f = exactly_n(n, self.predicate)
             if f(iterable, predicates=predicates):
                 return True
         return False
 
-    return _repeat
+    def __repr__(self) -> str:
+        return f"repeat({self.m}, {self.n}, {self.predicate!r})"
 
 
-def exactly_n(n: int, predicate: Predicate) -> Callable:
+def repeat(m: int, n: int, predicate: Predicate) -> Predicate:
+    """Match exactly m to n instances of the given predicate."""
+    return RepeatPredicate(m=m, n=n, predicate=predicate)
+
+
+@dataclass
+class ExactlyPredicate[T](Predicate[T]):
     """Match exactly n instances of the given predicate."""
 
-    @add_doc(f"exactly_n({n}, {predicate!r})")
-    def _exactly_n(
-        iterable: Iterable,
-        *,
-        predicates: list[Callable],
-    ) -> bool:
+    n: int
+    predicate: Predicate
+
+    def __call__(self, iterable: Iterable, *, predicates: list[Predicate]) -> bool:
         rest = iterable
-        for _ in range(n):
+        for _ in range(self.n):
             if not rest:
                 return False
 
             item, *rest = rest
-            if not predicate(item):
+            if not self.predicate(item):
                 return False
         return match(rest, predicates=predicates) if predicates else True
 
-    return _exactly_n
+    def __repr__(self) -> str:
+        return f"exactly({self.n}, {self.predicate!r})"
 
 
-def plus(predicate: Predicate) -> Callable:
+def exactly_n(n: int, predicate: Predicate) -> Predicate:
+    """Match exactly n instances of the given predicate."""
+    return ExactlyPredicate(n=n, predicate=predicate)
+
+
+@dataclass
+class PlusPredicate[T](Predicate[T]):
     """Match at least one instance of the given predicate."""
 
-    @add_doc(f"plus({predicate!r})")
-    def _plus(iterable: Iterable, *, predicates: list[Callable]) -> bool:
+    predicate: Predicate
+
+    def __call__(self, iterable: Iterable, *, predicates: list[Predicate]) -> bool:
         if not iterable:
             return False
 
         item, *rest = iterable
-        return predicate(item) and star(predicate)(rest, predicates=predicates)
+        return self.predicate(item) and star(self.predicate)(rest, predicates=predicates)
 
-    return _plus
+    def __repr__(self) -> str:
+        return f"plus({self.predicate!r})"
 
 
-def star(predicate: Predicate) -> Callable:
+def plus(predicate: Predicate) -> Predicate:
+    """Match at least one instance of the given predicate."""
+    return PlusPredicate(predicate=predicate)
+
+
+@dataclass
+class StarPredicate[T](Predicate[T]):
     """Match any instances of the given predicate."""
 
-    @add_doc(f"star({predicate!r})")
-    def _star(iterable: Iterable, *, predicates: list[Callable]) -> bool:
+    predicate: Predicate
+
+    def __call__(self, iterable: Iterable, *, predicates: list[Predicate]) -> bool:
         if not iterable:
             return not predicates
         item, *rest = iterable
-        if predicate(item):
-            if _star(rest, predicates=predicates):
+        if self.predicate(item):
+            if self(rest, predicates=predicates):
                 return True
             if predicates:
                 matched = match(rest, predicates=predicates)
                 return match(iterable, predicates=predicates) if not matched else True  # backtrack
         return match(iterable, predicates=predicates) if predicates else False
 
-    return _star
+    def __repr__(self) -> str:
+        return f"star({self.predicate!r})"
+
+
+def star(predicate: Predicate) -> Predicate:
+    """Match any instances of the given predicate."""
+    return StarPredicate(predicate=predicate)
 
 
 @dataclass
@@ -153,7 +162,7 @@ class OptionalPredicate[T](Predicate[T]):
 
     predicate: Predicate
 
-    def __call__(self, iterable: Iterable, *, predicates: list[Callable]) -> bool:
+    def __call__(self, iterable: Iterable, *, predicates: list[Predicate]) -> bool:
         if not iterable:
             return True
         item, *rest = iterable
@@ -179,7 +188,7 @@ class OptionalPredicate[T](Predicate[T]):
         return self.predicate.explain_failure(item)
 
 
-def optional(predicate: Predicate) -> Callable:
+def optional(predicate: Predicate) -> Predicate:
     """Match 0 or 1 instances of the given predicate."""
     return OptionalPredicate(predicate=predicate)
 

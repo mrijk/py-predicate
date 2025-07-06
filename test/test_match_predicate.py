@@ -148,7 +148,7 @@ def test_match_exactly_with_not():
     assert not predicate(["foo", "bar", "foobar"])
     assert predicate(["foo", "bar"])
 
-    assert repr(predicate) == "match_p(exactly_n(2, is_str_p), optional(~is_str_p))"
+    assert repr(predicate) == "match_p(exactly(2, is_str_p), optional(~is_str_p))"
 
 
 def test_match_plus():
