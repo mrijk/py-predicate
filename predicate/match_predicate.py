@@ -31,11 +31,13 @@ def match_p[T](*predicates: Predicate) -> MatchPredicate[T]:
 def reason(iterable: Iterable, *, predicates: list[Predicate]) -> dict:
     predicate, *rest_predicates = predicates
     match predicate:
-        case OptionalPredicate():
+        case OptionalPredicate() | PlusPredicate() | StarPredicate() | ExactlyPredicate() | RepeatPredicate():
             return predicate.explain(iterable, predicates=rest_predicates)
         case Predicate():
             item, *rest = iterable
-            return predicate.explain(item)
+            if not predicate(item):
+                return predicate.explain(item)
+            return reason(rest, predicates=rest_predicates)
         case _:
             raise NotImplementedError
 
@@ -74,6 +76,10 @@ class RepeatPredicate[T](Predicate[T]):
     def __repr__(self) -> str:
         return f"repeat({self.m}, {self.n}, {self.predicate!r})"
 
+    @override
+    def explain_failure(self, iterable: Iterable[T], *, predicates: list[Predicate]) -> dict:  # type: ignore
+        return {"reason": f"Expected between {self.m} and {self.n} matches of predicate `{self.predicate!r}`"}
+
 
 def repeat(m: int, n: int, predicate: Predicate) -> Predicate:
     """Match exactly m to n instances of the given predicate."""
@@ -101,6 +107,19 @@ class ExactlyPredicate[T](Predicate[T]):
     def __repr__(self) -> str:
         return f"exactly({self.n}, {self.predicate!r})"
 
+    @override
+    def explain_failure(self, iterable: Iterable[T], *, predicates: list[Predicate]) -> dict:  # type: ignore
+        rest = iterable
+        for _ in range(self.n):
+            if not rest:
+                return {"reason": f"Not enough items in iterable, expected {self.n}"}
+
+            item, *rest = rest
+            if not self.predicate(item):
+                return self.predicate.explain(item)
+
+        return reason(rest, predicates=predicates)
+
 
 def exactly_n(n: int, predicate: Predicate) -> Predicate:
     """Match exactly n instances of the given predicate."""
@@ -122,6 +141,17 @@ class PlusPredicate[T](Predicate[T]):
 
     def __repr__(self) -> str:
         return f"plus({self.predicate!r})"
+
+    @override
+    def explain_failure(self, iterable: Iterable[T], *, predicates: list[Predicate]) -> dict:  # type: ignore
+        if not iterable:
+            return {"reason": f"Iterable should have at least one element to match against {self.predicate!r}"}
+
+        item, *rest = iterable
+        if not self.predicate(item):
+            return {"reason": f"tbd {self.predicate!r}"}
+
+        return {"reason": f"`{self.predicate!r}`"}
 
 
 def plus(predicate: Predicate) -> Predicate:
@@ -149,6 +179,10 @@ class StarPredicate[T](Predicate[T]):
 
     def __repr__(self) -> str:
         return f"star({self.predicate!r})"
+
+    @override
+    def explain_failure(self, iterable: Iterable[T], *, predicates: list[Predicate]) -> dict:  # type: ignore
+        return {"reason": f"tbd {self.predicate!r}"}
 
 
 def star(predicate: Predicate) -> Predicate:
