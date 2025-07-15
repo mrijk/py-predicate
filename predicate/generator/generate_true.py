@@ -572,13 +572,65 @@ def generate_match_p(match_predicate: MatchPredicate) -> Iterator:
 @generate_true.register
 def generate_exactly_n(exactly_predicate: ExactlyPredicate, *, predicates: list[Predicate]) -> Iterator:
     predicate = exactly_predicate.predicate
+
+    list_of_predicate = is_list_of_p(predicate=predicate)
+
     n = exactly_predicate.n
-    list_of_n_predicate = is_list_of_p(predicate=predicate)
+    length_p = eq_p(n)
 
     if predicates:
-        iter_first = generate_true(list_of_n_predicate, length_p=eq_p(n))
+        iter_first = generate_true(list_of_predicate, length_p=length_p)
         iter_rest = generate_true(MatchPredicate(predicates=predicates))
         while True:
             yield list(next(iter_first)) + list(next(iter_rest))
     else:
-        yield from generate_true(list_of_n_predicate, length_p=eq_p(n))
+        yield from generate_true(list_of_predicate, length_p=length_p)
+
+
+@generate_true.register
+def generate_repeat(repeat_predicate: RepeatPredicate, *, predicates: list[Predicate]) -> Iterator:
+    predicate = repeat_predicate.predicate
+
+    list_of_predicate = is_list_of_p(predicate=predicate)
+
+    m = repeat_predicate.m
+    n = repeat_predicate.n
+    length_p = ge_le_p(lower=m, upper=n)
+
+    if predicates:
+        iter_first = generate_true(list_of_predicate, length_p=length_p)
+        iter_rest = generate_true(MatchPredicate(predicates=predicates))
+        while True:
+            yield list(next(iter_first)) + list(next(iter_rest))
+    else:
+        yield from generate_true(is_list_of_p(predicate=predicate), length_p=length_p)
+
+
+@generate_true.register
+def generate_star(star_predicate: StarPredicate, *, predicates: list[Predicate]) -> Iterator:
+    predicate = star_predicate.predicate
+
+    m = 0
+    n = 10  # Some reasonable number
+
+    yield from generate_true(RepeatPredicate(m=m, n=n, predicate=predicate), predicates=predicates)
+
+
+@generate_true.register
+def generate_plus(plus_predicate: PlusPredicate, *, predicates: list[Predicate]) -> Iterator:
+    predicate = plus_predicate.predicate
+
+    m = 1
+    n = 10  # Some reasonable number
+
+    yield from generate_true(RepeatPredicate(m=m, n=n, predicate=predicate), predicates=predicates)
+
+
+@generate_true.register
+def generate_optional(optional_predicate: OptionalPredicate, *, predicates: list[Predicate]) -> Iterator:
+    predicate = optional_predicate.predicate
+
+    m = 0
+    n = 1
+
+    yield from generate_true(RepeatPredicate(m=m, n=n, predicate=predicate), predicates=predicates)
