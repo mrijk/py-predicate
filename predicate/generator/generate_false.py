@@ -489,7 +489,7 @@ def generate_match_p(match_predicate: MatchPredicate) -> Iterator:
         case Predicate():
             if rest_predicates:
                 iter_first = generate_false(predicate)
-                iter_rest = generate_false(MatchPredicate(predicates=rest_predicates))
+                iter_rest: Iterator = generate_false(MatchPredicate(predicates=rest_predicates))
                 while True:
                     yield [next(iter_first)] + list(next(iter_rest))
             else:
@@ -507,7 +507,7 @@ def generate_exactly_n(exactly_predicate: ExactlyPredicate, *, predicates: list[
 
     if predicates:
         iter_first = generate_false(list_of_predicate, length_p=length_p)
-        iter_rest = generate_false(MatchPredicate(predicates=predicates))
+        iter_rest: Iterator = generate_false(MatchPredicate(predicates=predicates))
         while True:
             yield list(next(iter_first)) + list(next(iter_rest))
     else:
