@@ -45,9 +45,16 @@ from predicate.is_none_predicate import IsNonePredicate
 from predicate.is_not_none_predicate import IsNotNonePredicate
 from predicate.is_truthy_predicate import IsTruthyPredicate
 from predicate.le_predicate import LePredicate
-from predicate.list_of_predicate import ListOfPredicate
+from predicate.list_of_predicate import ListOfPredicate, is_list_of_p
 from predicate.lt_predicate import LtPredicate
-from predicate.match_predicate import MatchPredicate
+from predicate.match_predicate import (
+    ExactlyPredicate,
+    MatchPredicate,
+    OptionalPredicate,
+    PlusPredicate,
+    RepeatPredicate,
+    StarPredicate,
+)
 from predicate.ne_predicate import NePredicate, ne_p
 from predicate.not_in_predicate import NotInPredicate
 from predicate.optimizer.predicate_optimizer import optimize
@@ -452,7 +459,7 @@ def generate_xor(predicate: XorPredicate) -> Iterator:
 def generate_at_least_one_false(predicate: Predicate, *, length_p: Predicate = default_at_least_one_length_p) -> tuple:
     from predicate import generate_true
 
-    length = first(generate_true(length_p))
+    length = max(first(generate_true(length_p)), 1)
 
     nr_false_values = random.randint(1, length) if length > 1 else 1
     nr_true_values = length - nr_false_values
@@ -473,8 +480,35 @@ def generate_tee(_predicate: TeePredicate) -> Iterator:
 @generate_false.register
 def generate_match_p(match_predicate: MatchPredicate) -> Iterator:
     predicates = match_predicate.predicates
-    first = predicates[0]  # TODO
-    false_values = generate_false(first)  # type: ignore
-    while True:
-        value = next(false_values)
-        yield (value,)
+
+    predicate, *rest_predicates = predicates
+
+    match predicate:
+        case OptionalPredicate() | PlusPredicate() | StarPredicate() | ExactlyPredicate() | RepeatPredicate():
+            yield from generate_false(predicate, predicates=rest_predicates)
+        case Predicate():
+            if rest_predicates:
+                iter_first = generate_false(predicate)
+                iter_rest = generate_false(MatchPredicate(predicates=rest_predicates))
+                while True:
+                    yield [next(iter_first)] + list(next(iter_rest))
+            else:
+                yield from zip(generate_false(predicate), strict=False)
+
+
+@generate_false.register
+def generate_exactly_n(exactly_predicate: ExactlyPredicate, *, predicates: list[Predicate]) -> Iterator:
+    predicate = exactly_predicate.predicate
+
+    list_of_predicate = is_list_of_p(predicate=predicate)
+
+    n = exactly_predicate.n
+    length_p = ne_p(n)
+
+    if predicates:
+        iter_first = generate_false(list_of_predicate, length_p=length_p)
+        iter_rest = generate_false(MatchPredicate(predicates=predicates))
+        while True:
+            yield list(next(iter_first)) + list(next(iter_rest))
+    else:
+        yield from generate_false(list_of_predicate, length_p=length_p)
