@@ -1,6 +1,7 @@
 import pytest
+from helpers import exercise_predicate
 
-from predicate import exercise, explain, is_truthy_p
+from predicate import explain, is_truthy_p
 
 
 @pytest.mark.parametrize("value", [True, not None, 13, {1}, "foo", (1,), [1]])
@@ -16,4 +17,4 @@ def test_is_truthy_p_explain(value):
 
 
 def test_is_truthy_exercise():
-    assert list(exercise(is_truthy_p))
+    exercise_predicate(is_truthy_p)

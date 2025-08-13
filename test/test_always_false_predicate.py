@@ -22,6 +22,5 @@ def test_always_false_p_explain():
     assert explain(always_false_p, None) == expected
 
 
-@pytest.mark.skip("TODO")
 def test_always_false_exercise():
     exercise_predicate(always_false_p)

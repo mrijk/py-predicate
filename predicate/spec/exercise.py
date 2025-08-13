@@ -1,5 +1,5 @@
 from collections.abc import Iterator
-from inspect import Signature, signature
+from inspect import Parameter, Signature, signature
 from itertools import repeat
 from types import FunctionType
 from typing import Callable, TypeVar
@@ -36,7 +36,14 @@ def get_spec_from_class_annotation(f: Callable) -> Spec | None:
         annotation = parameter.annotation
 
         if annotation == parameter.empty:
+            if parameter.kind == Parameter.VAR_POSITIONAL:
+                continue
+
+            if parameter.kind == Parameter.VAR_KEYWORD:
+                continue
+
             return None
+
         if isinstance(f, Predicate):
             try:
                 spec["args"][key] = is_instance_p(f.klass)

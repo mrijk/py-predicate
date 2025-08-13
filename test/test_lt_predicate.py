@@ -1,6 +1,8 @@
+import math
+
 from helpers import exercise_predicate
 
-from predicate import lt_p
+from predicate import lt_p, neg_p
 from predicate.explain import explain
 
 
@@ -20,3 +22,11 @@ def test_lt_explain():
 
 def test_lt_exercise():
     exercise_predicate(lt_p)
+
+
+def test_neg_p():
+    assert not neg_p(1)
+    assert not neg_p(0)
+    assert neg_p(-1)
+    assert neg_p(-3.14)
+    assert neg_p(-math.inf)

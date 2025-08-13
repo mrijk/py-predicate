@@ -1,10 +1,10 @@
 import math
 from dataclasses import dataclass
+from itertools import repeat
 from typing import Callable, Final, Iterator, override
 
 from predicate.generator.helpers import generate_even_numbers, generate_odd_numbers, random_floats
 from predicate.predicate import Predicate
-from predicate.standard_predicates import generate_inf, generate_nan
 
 
 def undefined() -> Iterator:
@@ -45,6 +45,17 @@ is_even_p: Final[Predicate[int]] = fn_p(
 is_odd_p: Final[Predicate[int]] = fn_p(
     fn=lambda x: x % 2 != 0, generate_true_fn=generate_odd_numbers, generate_false_fn=generate_even_numbers
 )
+
+
+def generate_nan() -> Iterator:
+    yield from repeat(math.nan)
+
+
+def generate_inf() -> Iterator:
+    while True:
+        yield -math.inf
+        yield math.inf
+
 
 is_finite_p: Final[Predicate] = fn_p(fn=math.isfinite, generate_true_fn=random_floats, generate_false_fn=generate_inf)
 """Return True if value is finite, otherwise False."""

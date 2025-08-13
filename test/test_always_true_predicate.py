@@ -17,6 +17,5 @@ def test_always_true_p_klass():
     assert always_true_p.klass is type(Any)
 
 
-@pytest.mark.skip("TODO")
-def test_always_false_exercise():
+def test_always_true_exercise():
     exercise_predicate(always_true_p)
