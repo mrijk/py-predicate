@@ -82,7 +82,7 @@ def foo(self) -> bool:
         eq_false_p,
         eq_true_p,
         has_key_p("foo"),
-        in_p(2, 3, 4),
+        in_p([2, 3, 4]),
         is_bool_p,
         is_callable_p,
         is_complex_p,
@@ -109,7 +109,7 @@ def foo(self) -> bool:
         is_int_p ^ is_str_p,
         is_uuid_p,
         ne_p(2),
-        not_in_p(2, "foo", uuid.uuid4()),
+        not_in_p([2, "foo", uuid.uuid4()]),
         regex_p("^foo"),
         neg_p,
         pos_p,
@@ -423,7 +423,7 @@ def test_generate_true_unknown_range(range_predicate):
 
 
 def test_generate_true_not_in_p_unknown():
-    predicate = not_in_p(None)
+    predicate = not_in_p({None})
     with pytest.raises(ValueError):
         take(5, generate_true(predicate))
 

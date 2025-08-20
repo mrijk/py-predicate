@@ -6,7 +6,8 @@ from predicate.optimizer.all_optimizer import optimize_all_predicate
 from predicate.optimizer.and_optimizer import optimize_and_predicate
 from predicate.optimizer.any_optimizer import optimize_any_predicate
 from predicate.optimizer.helpers import MaybeOptimized, NotOptimized, Optimized
-from predicate.optimizer.in_optimizer import optimize_in_predicate, optimize_not_in_predicate
+from predicate.optimizer.in_optimizer import optimize_in_predicate
+from predicate.optimizer.not_in_optimizer import optimize_not_in_predicate
 from predicate.optimizer.not_optimizer import optimize_not_predicate
 from predicate.optimizer.or_optimizer import optimize_or_predicate
 from predicate.optimizer.xor_optimizer import optimize_xor_predicate

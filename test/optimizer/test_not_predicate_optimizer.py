@@ -180,25 +180,25 @@ def test_not_optimize_any():
 
 
 def test_not_optimize_not_in():
-    not_in_234 = not_in_p(2, 3, 4)
+    not_in_234 = not_in_p({2, 3, 4})
     predicate = ~not_in_234
 
     assert can_optimize(predicate)
 
     optimized = optimize(predicate)
 
-    assert optimized == in_p(2, 3, 4)
+    assert optimized == in_p({2, 3, 4})
 
 
 def test_not_optimize_in():
-    in_234 = in_p(2, 3, 4)
+    in_234 = in_p({2, 3, 4})
     predicate = ~in_234
 
     assert can_optimize(predicate)
 
     optimized = optimize(predicate)
 
-    assert optimized == not_in_p(2, 3, 4)
+    assert optimized == not_in_p({2, 3, 4})
 
 
 def test_not_optimize_empty():

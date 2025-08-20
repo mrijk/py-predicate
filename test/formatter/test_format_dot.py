@@ -173,7 +173,7 @@ def test_format_dot_gt():
 
 
 def test_format_dot_in():
-    predicate = in_p(1, 2, 3)
+    predicate = in_p({1, 2, 3})
 
     dot = to_dot(predicate)
 
@@ -221,7 +221,7 @@ def test_format_dot_ne():
 
 
 def test_format_dot_not_in():
-    predicate = not_in_p(1, 2, 3)
+    predicate = not_in_p({1, 2, 3})
 
     dot = to_dot(predicate)
 

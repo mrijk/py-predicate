@@ -25,7 +25,7 @@ def test_generate_is_dict_with_keys_p():
 
 def test_generate_is_dict_with_value_p():
     predicate = is_dict_p
-    value_p = in_p("foo", "bar", "foobar")
+    value_p = in_p({"foo", "bar", "foobar"})
 
     values = take(5, generate_true(predicate, value_p=value_p))
 

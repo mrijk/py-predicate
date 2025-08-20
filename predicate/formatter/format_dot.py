@@ -1,6 +1,7 @@
 import inspect
 from functools import partial
 from itertools import count
+from typing import Iterable
 
 import graphviz  # type: ignore
 from more_itertools import first
@@ -133,7 +134,7 @@ def render(dot, predicate: Predicate, node_nr: count):
                 return add_node("gtle", label=f"{lower} ≤ x ≤ {upper}")
             case GtLtPredicate(upper, lower):
                 return add_node("gtlt", label=f"{lower} ≤ x < {upper}")
-            case InPredicate(v):
+            case InPredicate(v) if isinstance(v, Iterable):
                 return add_node("in", label=f"x ∈ {set_to_str(v)}")
             case DictOfPredicate(key_value_predicates):
                 node = add_node("dict_of", label="is_dict_of")
@@ -166,7 +167,7 @@ def render(dot, predicate: Predicate, node_nr: count):
                 return add_node("lt", label=f"x < {v}")
             case NamedPredicate(name):
                 return add_node("named", label=name)
-            case NotInPredicate(v):
+            case NotInPredicate(v) if isinstance(v, Iterable):
                 return add_node("in", label=f"x ∉ {set_to_str(v)}")
             case NePredicate(v):
                 return add_node("ne", label=f"x ≠ {v}")

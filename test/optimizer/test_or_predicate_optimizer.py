@@ -193,12 +193,12 @@ def test_optimize_multiple_eq():
 
     optimized = optimize(predicate)
 
-    assert optimized == in_p(2, 3)
+    assert optimized == in_p({2, 3})
 
 
 def test_optimize_in_and_in():
-    p = in_p(2, 3)
-    q = in_p(4, 5)
+    p = in_p({2, 3})
+    q = in_p({4, 5})
 
     predicate = p | q
 
@@ -206,8 +206,8 @@ def test_optimize_in_and_in():
 
 
 def test_optimize_in_and_not_in():
-    p = in_p(2, 3)
-    q = not_in_p(2, 3, 4, 5)
+    p = in_p({2, 3})
+    q = not_in_p({2, 3, 4, 5})
 
     predicate = p | q
 
@@ -215,12 +215,12 @@ def test_optimize_in_and_not_in():
 
     optimized = optimize(predicate)
 
-    assert optimized == not_in_p(4, 5)
+    assert optimized == not_in_p({4, 5})
 
 
 def test_optimize_in_and_not_in_single():
-    p = in_p(2)
-    q = not_in_p(2, 3)
+    p = in_p([2])
+    q = not_in_p({2, 3})
 
     predicate = p | q
 
@@ -232,8 +232,8 @@ def test_optimize_in_and_not_in_single():
 
 
 def test_optimize_in_and_not_in_empty():
-    p1 = in_p(3, 4, 5)
-    p2 = not_in_p(4, 5)
+    p1 = in_p({3, 4, 5})
+    p2 = not_in_p({4, 5})
 
     predicate = p1 | p2
 
@@ -246,7 +246,7 @@ def test_optimize_in_and_not_in_empty():
 
 def test_or_optimize_eq_or_in():
     p1 = eq_p(5)
-    p2 = in_p(2, 3, 4)
+    p2 = in_p({2, 3, 4})
 
     predicate = p1 | p2
 
@@ -254,11 +254,11 @@ def test_or_optimize_eq_or_in():
 
     optimized = optimize(predicate)
 
-    assert optimized == in_p(2, 3, 4, 5)
+    assert optimized == in_p({2, 3, 4, 5})
 
 
 def test_or_optimize_in_or_eq():
-    p = in_p(2, 3, 4)
+    p = in_p({2, 3, 4})
     q = eq_p(5)
 
     predicate = p | q
@@ -267,7 +267,7 @@ def test_or_optimize_in_or_eq():
 
     optimized = optimize(predicate)
 
-    assert optimized == in_p(2, 3, 4, 5)
+    assert optimized == in_p({2, 3, 4, 5})
 
 
 def test_optimize_nested_or(p, q):

@@ -74,7 +74,7 @@ from predicate.standard_predicates import (
         (has_length_p(eq_p(42)), "has_length_p(eq_p(42))"),
         (has_path_p(is_str_p), "has_path_p(is_str_p)"),
         (implies_p(ge_p(2)), "implies_p(ge_p(2))"),
-        (in_p(2, 3, 4), "in_p(2, 3, 4)"),
+        (in_p([2, 3, 4]), "in_p(2, 3, 4)"),
         (is_callable_p([int], bool), "is_callable_p([], bool)"),
         (is_empty_p, "has_length_p(eq_p(0))"),
         (is_lambda_p, "is_lambda_p"),
@@ -97,7 +97,7 @@ from predicate.standard_predicates import (
         (le_p(2), "le_p(2)"),
         (lt_p(2), "lt_p(2)"),
         (ne_p(2), "ne_p(2)"),
-        (not_in_p(2, 3, 4), "not_in_p(2, 3, 4)"),
+        (not_in_p([2, 3, 4]), "not_in_p(2, 3, 4)"),
         (regex_p("^foo.*bar$"), 'regex_p("^foo.*bar$")'),
         (tee_p(lambda x: None), "tee_p"),
         (this_p, "this_p"),
@@ -111,7 +111,7 @@ def test_repr_standard(predicate, representation):
 
 @pytest.mark.parametrize(
     ("predicate", "representation"),
-    [(always_false_p & in_p(2, 3, 4) & not_in_p(3), "always_false_p & in_p(2, 3, 4) & not_in_p(3)")],
+    [(always_false_p & in_p([2, 3, 4]) & not_in_p([3]), "always_false_p & in_p(2, 3, 4) & not_in_p(3)")],
 )
 def test_repr_combined(predicate, representation):
     assert repr(predicate) == representation

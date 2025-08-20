@@ -268,12 +268,13 @@ def generate_fn_p(predicate: FnPredicate) -> Iterator:
 @generate_false.register
 def generate_in(predicate: InPredicate) -> Iterator:
     # TODO: combine with generate_not_in true
-    for item in predicate.v:
-        match item:
-            case int():
-                yield from generate_ints(~predicate)
-            case str():
-                yield from generate_strings(~predicate)
+    if isinstance(predicate.v, Iterable):
+        for item in predicate.v:
+            match item:
+                case int():
+                    yield from generate_ints(~predicate)
+                case str():
+                    yield from generate_strings(~predicate)
 
 
 @generate_false.register
