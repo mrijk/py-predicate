@@ -1,5 +1,17 @@
 # CHANGELOG.md
 
+## 1.3.0 (unreleased)
+
+Features:
+
+- in_p predicate now works for all container classes (list, dict, tuple, range, etc)
+- is_subclass_p to test if a class is a subclass of another class
+- is_enum_p, is_int_enum_p and is_str_enum_p as special predicates of is_subclass_p
+
+Breaking changes:
+
+- in_p used to convert its parameters to a set. Now it only accepts a container class.
+
 ## 1.2.0
 
 Features:

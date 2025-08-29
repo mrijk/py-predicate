@@ -501,6 +501,18 @@ This predicate tests if the value is of type ``str``.
     assert not is_str_p(3.14)
     assert is_str_p("foo")
 
+is_subclass_p
+-------------
+
+This predicate tests if the value is a subclass of the class.
+
+.. code-block:: python
+
+    from predicate import is_subclass_p
+
+    p = is_subclass_p()
+
+
 .. _is_truthy_p:
 
 is_truthy_p
