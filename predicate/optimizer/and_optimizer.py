@@ -1,3 +1,5 @@
+from typing import Iterable
+
 from predicate.all_predicate import AllPredicate
 from predicate.always_false_predicate import AlwaysFalsePredicate, always_false_p
 from predicate.always_true_predicate import AlwaysTruePredicate, always_true_p
@@ -59,15 +61,17 @@ def optimize_and_predicate[T](predicate: AndPredicate[T]) -> MaybeOptimized[T]:
             return Optimized(always_true_p if predicate_fn(v) else always_false_p)
 
         # set optimizations
-        case InPredicate(v1), InPredicate(v2):
-            if v := v1 & v2:
+        case InPredicate(v1), InPredicate(v2) if isinstance(v1, Iterable) and isinstance(v2, Iterable):
+            if v := set(v1) & set(v2):
                 return Optimized(optimize(InPredicate(v=v)))
             return Optimized(always_false_p)
-        case InPredicate(v1), NotInPredicate(v2):
-            if v := v1 - v2:
+        case InPredicate(v1), NotInPredicate(v2) if isinstance(v1, Iterable) and isinstance(v2, Iterable):
+            if v := set(v1) - set(v2):
                 return Optimized(optimize(InPredicate(v=v)))
             return Optimized(always_false_p)
-        case NotInPredicate(v1), NotInPredicate(v2) if v := v1 | v2:
+        case NotInPredicate(v1), NotInPredicate(v2) if (
+            isinstance(v1, Iterable) and isinstance(v2, Iterable) and (v := set(v1) | set(v2))
+        ):
             return Optimized(optimize(NotInPredicate(v=v)))
 
         # recursive & optimizations

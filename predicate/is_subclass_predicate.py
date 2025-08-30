@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from enum import Enum
+from enum import Enum, IntEnum, StrEnum
 from types import UnionType
 from typing import Any, Final, Iterator, override
 
@@ -36,7 +36,7 @@ class IsSubclassPredicate[T](Predicate[T]):
 
         klasses = join_with_or(list(class_names()))
 
-        return {"reason": f"{x} is not an subclass of type {klasses}"}
+        return {"reason": f"{x} is not a subclass of type {klasses}"}
 
 
 def is_subclass_p(klass: type) -> Predicate:
@@ -46,3 +46,9 @@ def is_subclass_p(klass: type) -> Predicate:
 
 is_enum_p: Final[Predicate] = is_subclass_p(Enum)
 """Returns True if the value is an Enum, otherwise False."""
+
+is_int_enum_p: Final[Predicate] = is_subclass_p(IntEnum)
+"""Returns True if the value is an IntEnum, otherwise False."""
+
+is_str_enum_p: Final[Predicate] = is_subclass_p(StrEnum)
+"""Returns True if the value is a StrEnum, otherwise False."""

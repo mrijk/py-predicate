@@ -1,3 +1,5 @@
+from typing import Iterable
+
 from predicate.always_false_predicate import AlwaysFalsePredicate, always_false_p
 from predicate.always_true_predicate import AlwaysTruePredicate, always_true_p
 from predicate.eq_predicate import EqPredicate
@@ -27,10 +29,10 @@ def optimize_xor_predicate[T](predicate: XorPredicate[T]) -> MaybeOptimized[T]:
         case _, _ if left == right:  # p ^ p == False
             return Optimized(always_false_p)
 
-        case InPredicate(v1), InPredicate(v2):
-            return Optimized(optimize(InPredicate(v=v1 ^ v2)))
-        case InPredicate(v1), EqPredicate(v2):
-            return Optimized(optimize(InPredicate(v=v1 ^ {v2})))
+        case InPredicate(v1), InPredicate(v2) if isinstance(v1, Iterable) and isinstance(v2, Iterable):
+            return Optimized(optimize(InPredicate(v=set(v1) ^ set(v2))))
+        case InPredicate(v1), EqPredicate(v2) if isinstance(v1, Iterable):
+            return Optimized(optimize(InPredicate(v=set(v1) ^ {v2})))
 
         # recursive & optimizations
         case XorPredicate(xor_left, xor_right), _:

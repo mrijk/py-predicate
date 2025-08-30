@@ -1,3 +1,5 @@
+from typing import Iterable
+
 from predicate.all_predicate import AllPredicate
 from predicate.always_true_predicate import AlwaysTruePredicate, always_true_p
 from predicate.any_predicate import AnyPredicate
@@ -25,20 +27,22 @@ def optimize_or_predicate[T](predicate: OrPredicate[T]) -> MaybeOptimized[T]:
             return Optimized(predicate=always_true_p)  # p | ~p == True
 
         #
-        case InPredicate(v1), EqPredicate(v2) if v2 not in v1:
+        case InPredicate(v1), EqPredicate(v2) if v2 not in v1 and isinstance(v1, Iterable):
             return Optimized(InPredicate((*v1, v2)))
-        case EqPredicate(v1), InPredicate(v2) if v1 not in v2:
+        case EqPredicate(v1), InPredicate(v2) if v1 not in v2 and isinstance(v2, Iterable):
             return Optimized(InPredicate((*v2, v1)))
         case EqPredicate(v1), EqPredicate(v2) if v1 != v2:
             return Optimized(InPredicate((v1, v2)))
-        case EqPredicate(v1), NotInPredicate(v2) if v1 in v2:
-            return Optimized(optimize(NotInPredicate(v2 - {v1})))
+        case EqPredicate(v1), NotInPredicate(v2) if v1 in v2 and isinstance(v2, Iterable):
+            return Optimized(optimize(NotInPredicate(set(v2) - {v1})))
 
-        case InPredicate(v1), InPredicate(v2) if v := v1 | v2:
+        case InPredicate(v1), InPredicate(v2) if (
+            isinstance(v1, Iterable) and isinstance(v2, Iterable) and (v := set(v1) | set(v2))
+        ):
             return Optimized(optimize(InPredicate(v=v)))
 
-        case InPredicate(v1), NotInPredicate(v2):
-            if v := v2 - (v1 & v2):
+        case InPredicate(v1), NotInPredicate(v2) if isinstance(v1, Iterable) and isinstance(v2, Iterable):
+            if v := set(v2) - (set(v1) & set(v2)):
                 return Optimized(optimize(NotInPredicate(v=v)))
             return Optimized(always_true_p)
 

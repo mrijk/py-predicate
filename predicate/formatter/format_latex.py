@@ -1,3 +1,5 @@
+from typing import Iterable
+
 from predicate.all_predicate import AllPredicate
 from predicate.always_false_predicate import AlwaysFalsePredicate
 from predicate.always_true_predicate import AlwaysTruePredicate
@@ -26,7 +28,7 @@ from predicate.set_predicates import (
 )
 
 
-def set_to_latex_set(v: set) -> str:
+def set_to_latex_set(v: Iterable) -> str:
     items = ", ".join(str(item) for item in v)
     return f"\\{{{items}\\}}"
 
@@ -60,7 +62,7 @@ def to_latex(predicate: Predicate) -> str:
             return f"x \\gt {v}"
         case ImpliesPredicate(p):
             return f"p \\implies {to_latex(p)}"
-        case InPredicate(v):
+        case InPredicate(v) if isinstance(v, Iterable):
             return f"x \\in {set_to_latex_set(v)}"
         case IsRealSubsetPredicate(v):
             return f"x \\subseteq {set_to_latex_set(v)}"

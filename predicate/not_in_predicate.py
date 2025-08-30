@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Iterable, override
+from typing import Any, Container, Iterable, override
 
 from predicate.in_predicate import class_from_set
 from predicate.predicate import Predicate
@@ -9,23 +9,27 @@ from predicate.predicate import Predicate
 class NotInPredicate[T](Predicate[T]):
     """A predicate class that models the 'not in' predicate."""
 
-    v: set[T]
+    v: Container[T]
 
-    def __init__(self, v: Iterable[T]):
-        self.v = set(v)
+    def __init__(self, v: Container[T]):
+        self.v = v
 
     def __call__(self, x: T) -> bool:
         return x not in self.v
 
     def __repr__(self) -> str:
-        items = ", ".join(str(item) for item in self.v)
-        return f"not_in_p({items})"
+        if isinstance(self.v, Iterable):
+            items = ", ".join(str(item) for item in self.v)
+            return f"not_in_p({items})"
+        return f"not_in_p({self.v})"
 
     @override
     def get_klass(self) -> type:
-        return class_from_set(self.v)
+        if isinstance(self.v, Iterable):
+            return class_from_set(self.v)
+        return Any
 
 
-def not_in_p[T](*v: T) -> NotInPredicate[T]:
+def not_in_p[T](v: Container[T]) -> NotInPredicate[T]:
     """Return True if the values are not in the set, otherwise False."""
     return NotInPredicate(v=v)

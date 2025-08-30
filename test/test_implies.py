@@ -68,15 +68,15 @@ def test_implies_eq_gt():
 def test_implies_eq_in():
     p = eq_p(3)
 
-    assert not implies(p, in_p(2))
-    assert implies(p, in_p(3))
+    assert not implies(p, in_p({2}))
+    assert implies(p, in_p({3}))
 
 
 def test_implies_eq_not_in():
     p = eq_p(3)
 
-    assert not implies(p, not_in_p(3))
-    assert implies(p, not_in_p(2))
+    assert not implies(p, not_in_p({3}))
+    assert implies(p, not_in_p({2}))
 
 
 def test_implies_eq_ne():
@@ -118,7 +118,7 @@ def test_implies_is_real_super_false():
 
 
 def test_implies_in_in():
-    p = in_p(1, 2, 3)
+    p = in_p({1, 2, 3})
 
-    assert not implies(p, in_p(1, 2))
-    assert implies(p, in_p(1, 2, 3, 4))
+    assert not implies(p, in_p({1, 2}))
+    assert implies(p, in_p({1, 2, 3, 4}))

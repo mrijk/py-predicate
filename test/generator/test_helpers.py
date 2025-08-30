@@ -87,7 +87,7 @@ def test_random_dicts():
 
 
 def test_random_dicts_with_value_p():
-    value_p = in_p("foo", "bar", "foobar")
+    value_p = in_p({"foo", "bar", "foobar"})
     dicts = take(10, random_dicts(value_p=value_p))
 
     all_dict = all_p(is_dict_p)

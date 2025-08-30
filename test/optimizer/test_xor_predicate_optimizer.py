@@ -183,8 +183,8 @@ def test_xor_optimize_xor_right(p, q):
 
 
 def test_optimize_in_xor_in():
-    p1 = in_p(2, 3)
-    p2 = in_p(4, 5)
+    p1 = in_p({2, 3})
+    p2 = in_p({4, 5})
 
     predicate = p1 ^ p2
 
@@ -192,12 +192,12 @@ def test_optimize_in_xor_in():
 
     optimized = optimize(predicate)
 
-    assert optimized == in_p(2, 3, 4, 5)
+    assert optimized == in_p({2, 3, 4, 5})
 
 
 def test_optimize_in_xor_in_empty():
-    p1 = in_p(2, 3, 4)
-    p2 = in_p(2, 3, 4)
+    p1 = in_p({2, 3, 4})
+    p2 = in_p({2, 3, 4})
 
     predicate = p1 ^ p2
 
@@ -209,8 +209,8 @@ def test_optimize_in_xor_in_empty():
 
 
 def test_optimize_in_xor_in_single():
-    p1 = in_p(2, 3)
-    p2 = in_p(2)
+    p1 = in_p({2, 3})
+    p2 = in_p({2})
 
     predicate = p1 ^ p2
 

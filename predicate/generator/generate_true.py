@@ -350,8 +350,9 @@ def generate_fn_p(predicate: FnPredicate) -> Iterator:
 
 @generate_true.register
 def generate_in(predicate: InPredicate) -> Iterator:
-    while True:
-        yield from predicate.v
+    if isinstance(predicate.v, Iterable):
+        while True:
+            yield from predicate.v
 
 
 @generate_true.register
@@ -392,16 +393,17 @@ def generate_not(predicate: NotPredicate) -> Iterator:
 @generate_true.register
 def generate_not_in(predicate: NotInPredicate) -> Iterator:
     # TODO: not correct yet
-    for item in predicate.v:
-        match item:
-            case int():
-                yield from generate_ints(predicate)
-            case str():
-                yield from generate_strings(predicate)
-            case UUID():
-                yield from generate_uuids(predicate)
-            case _:
-                raise ValueError(f"Can't generate for type {type(item)}")
+    if isinstance(predicate.v, Iterable):
+        for item in predicate.v:
+            match item:
+                case int():
+                    yield from generate_ints(predicate)
+                case str():
+                    yield from generate_strings(predicate)
+                case UUID():
+                    yield from generate_uuids(predicate)
+                case _:
+                    raise ValueError(f"Can't generate for type {type(item)}")
 
 
 @generate_true.register

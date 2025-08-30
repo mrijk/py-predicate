@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from functools import singledispatch
-from typing import override
+from typing import Iterable, override
 
 from predicate.always_false_predicate import AlwaysFalsePredicate
 from predicate.always_true_predicate import AlwaysTruePredicate
@@ -116,8 +116,8 @@ def _(predicate: IsRealSupersetPredicate, other: Predicate) -> bool:
 @implies.register
 def _(predicate: InPredicate, other: Predicate) -> bool:
     match other:
-        case InPredicate(v):
-            return predicate.v.issubset(v)
+        case InPredicate(v) if isinstance(v, Iterable) and isinstance(predicate.v, Iterable):
+            return set(predicate.v).issubset(v)
         case _:
             return False
 

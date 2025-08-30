@@ -5,13 +5,13 @@ A collection of predicates that act on sets.
 
 in_p
 ~~~~
-Return True if the values are included in the set, otherwise False.
+Return True if the values are included in the container, otherwise False.
 
 .. code-block:: python
 
     from predicate import in_p
 
-    in_123 = in_p(1, 2, 3)
+    in_123 = in_p([1, 2, 3])
 
     assert not in_123(0)
     assert in_123(1)
@@ -75,13 +75,13 @@ Return True if the value is a real superset, otherwise False.
 
 not_in_p
 ~~~~~~~~
-Return True if the values are not in the set, otherwise False.
+Return True if the values are not in the container, otherwise False.
 
 .. code-block:: python
 
     from predicate import not_in_p
 
-    not_in_123 = not_in_p(1, 2, 3)
+    not_in_123 = not_in_p([1, 2, 3])
 
     assert not_in_123(0)
     assert not not_in_123(1)
