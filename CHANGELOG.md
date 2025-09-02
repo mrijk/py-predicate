@@ -7,6 +7,7 @@ Features:
 - in_p predicate now works for all container classes (list, dict, tuple, range, etc)
 - is_subclass_p to test if a class is a subclass of another class
 - is_enum_p, is_int_enum_p and is_str_enum_p as special predicates of is_subclass_p
+- count_p to test if an iterable has a number (also a predicate) of elements that satisfy a predicate
 
 Breaking changes:
 

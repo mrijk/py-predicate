@@ -7,6 +7,7 @@ from predicate.always_false_predicate import always_false_p, never_p
 from predicate.always_true_predicate import always_p, always_true_p
 from predicate.any_predicate import any_p
 from predicate.comp_predicate import comp_p
+from predicate.count_predicate import count_p
 from predicate.dict_of_predicate import is_dict_of_p
 from predicate.eq_predicate import eq_false_p, eq_p, eq_true_p, zero_p
 from predicate.explain import explain
@@ -84,6 +85,7 @@ __all__ = [
     "any_p",
     "can_optimize",
     "comp_p",
+    "count_p",
     "eq_false_p",
     "eq_p",
     "eq_true_p",
