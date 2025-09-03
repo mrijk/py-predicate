@@ -25,7 +25,7 @@ class CountPredicate[T](Predicate[T]):
         return {"reason": f"Expected count {self.length_p!r}, actual: {actual_length}"}
 
 
-def count_p[T](predicate: Predicate[T], length_p: Predicate[int]) -> Predicate[Iterable[T]]:
+def count_p[T](predicate: Predicate[T], length_p: Predicate[int]) -> Predicate[T]:
     """Return True if length of iterable is equal to value, otherwise False."""
     return CountPredicate(predicate=predicate, length_p=length_p)
 
