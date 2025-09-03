@@ -22,6 +22,7 @@ from predicate.all_predicate import AllPredicate
 from predicate.always_false_predicate import AlwaysFalsePredicate, always_false_p
 from predicate.always_true_predicate import AlwaysTruePredicate, always_true_p
 from predicate.any_predicate import AnyPredicate
+from predicate.count_predicate import CountPredicate
 from predicate.dict_of_predicate import DictOfPredicate, is_dict_of_p
 from predicate.eq_predicate import EqPredicate, eq_p
 from predicate.fn_predicate import FnPredicate
@@ -636,3 +637,12 @@ def generate_optional(optional_predicate: OptionalPredicate, *, predicates: list
     n = 1
 
     yield from generate_true(RepeatPredicate(m=m, n=n, predicate=predicate), predicates=predicates)
+
+
+@generate_true.register
+def generate_count(count_predicate: CountPredicate) -> Iterator:
+    predicate = count_predicate.predicate
+    length_p = count_predicate.length_p
+
+    # TODO: this is a minimal set. Also create iterables that contains some false items (which are not counted)
+    yield from generate_all_p(AllPredicate(predicate=predicate), length_p=length_p)
