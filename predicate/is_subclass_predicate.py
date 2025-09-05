@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from enum import Enum, IntEnum, StrEnum
 from types import UnionType
-from typing import Any, Final, Iterator, override
+from typing import Any, Final, Iterator, get_args, override
 
 from predicate.helpers import join_with_or
 from predicate.predicate import Predicate
@@ -17,8 +17,15 @@ class IsSubclassPredicate[T](Predicate[T]):
         return issubclass(x, self.class_or_tuple)
 
     def __repr__(self) -> str:
-        name = self.class_or_tuple[0].__name__  # type: ignore
-        return f"is_{name}_p"
+        match self.class_or_tuple:
+            case tuple() as klasses:
+                class_names = ", ".join(klass.__name__ for klass in klasses)
+                return f"is_subclass_p(({class_names}))"
+            case UnionType() as union_type:
+                class_names = "|".join(klass.__name__ for klass in get_args(union_type))
+                return f"is_subclass_p({class_names})"
+            case _ as klass:
+                return f"is_{klass.__name__.lower()}_p"
 
     @override
     def get_klass(self) -> type:
@@ -39,7 +46,7 @@ class IsSubclassPredicate[T](Predicate[T]):
         return {"reason": f"{x} is not a subclass of type {klasses}"}
 
 
-def is_subclass_p(klass: type) -> Predicate:
+def is_subclass_p(klass: type | UnionType | tuple[Any, ...]) -> Predicate:
     """Return True if value is an instance of one of the classes, otherwise False."""
     return IsSubclassPredicate(class_or_tuple=klass)
 

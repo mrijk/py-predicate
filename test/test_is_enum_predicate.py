@@ -1,6 +1,6 @@
 from enum import Enum, IntEnum, StrEnum, auto
 
-from predicate import is_enum_p, is_int_enum_p, is_str_enum_p
+from predicate import explain, is_enum_p, is_int_enum_p, is_str_enum_p
 
 
 def test_is_enum_p_ok():
@@ -15,6 +15,12 @@ def test_is_enum_p_ok():
 
 def test_is_enum_p_fail():
     assert not is_enum_p(int)
+
+
+def test_is_enum_p_explain():
+    expected = {"reason": "<class 'int'> is not a subclass of type Enum", "result": False}
+
+    assert explain(is_enum_p, int) == expected
 
 
 def test_is_int_enum():
@@ -35,3 +41,7 @@ def test_is_str_enum():
 
     assert is_enum_p(MyEnum)
     assert is_str_enum_p(MyEnum)
+
+
+def test_repr_enum():
+    assert repr(is_enum_p) == "is_enum_p"

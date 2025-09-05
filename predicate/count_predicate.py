@@ -1,8 +1,10 @@
 from dataclasses import dataclass
-from typing import Iterable, override
+from functools import partial
+from typing import Final, Iterable, override
 
 from more_itertools import ilen
 
+from predicate.eq_predicate import eq_p
 from predicate.predicate import Predicate
 
 
@@ -30,8 +32,8 @@ def count_p[T](predicate: Predicate[T], length_p: Predicate[int]) -> Predicate[T
     return CountPredicate(predicate=predicate, length_p=length_p)
 
 
-# is_empty_p: Final[Predicate[Iterable]] = has_length_p(zero_p)
-# """Predicate that returns True if the iterable is empty, otherwise False."""
-#
-# is_not_empty_p: Final[Predicate[Iterable]] = has_length_p(pos_p)
-# """Predicate that returns True if the iterable is not empty, otherwise False."""
+exactly_zero_p: Final[Predicate] = partial(count_p, length_p=eq_p(0))  # type: ignore
+"""Predicate that returns True if the iterable doesn't match the predicate, otherwise False."""
+
+exactly_one_p: Final[Predicate] = partial(count_p, length_p=eq_p(1))  # type: ignore
+"""Predicate that returns True if the iterable matches the predicate exactly once, otherwise False."""

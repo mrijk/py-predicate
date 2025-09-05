@@ -42,7 +42,7 @@ from predicate.is_lambda_predicate import is_lambda_p, is_lambda_with_signature_
 from predicate.is_none_predicate import is_none_p
 from predicate.is_not_none_predicate import is_not_none_p
 from predicate.is_predicate_of_p import is_predicate_of_p
-from predicate.is_subclass_predicate import is_enum_p, is_int_enum_p, is_str_enum_p
+from predicate.is_subclass_predicate import is_enum_p, is_int_enum_p, is_str_enum_p, is_subclass_p
 from predicate.is_truthy_predicate import is_truthy_p
 from predicate.lazy_predicate import lazy_p
 from predicate.le_predicate import le_p
@@ -149,7 +149,7 @@ __all__ = [
     "is_set_p",
     "is_str_p",
     "is_str_enum_p",
-    "is_subclass_predicate",
+    "is_subclass_p",
     "is_subset_p",
     "is_superset_p",
     "is_real_subset_p",
