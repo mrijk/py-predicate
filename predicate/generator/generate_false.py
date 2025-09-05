@@ -4,7 +4,8 @@ from collections.abc import Iterable, Iterator
 from datetime import datetime, timedelta
 from functools import singledispatch
 from itertools import repeat
-from typing import Final
+from types import UnionType
+from typing import Final, get_args
 from uuid import UUID
 
 from more_itertools import chunked, first, flatten, interleave, partial_product, random_permutation, take
@@ -44,6 +45,7 @@ from predicate.is_instance_predicate import IsInstancePredicate
 from predicate.is_lambda_predicate import IsLambdaPredicate
 from predicate.is_none_predicate import IsNonePredicate
 from predicate.is_not_none_predicate import IsNotNonePredicate
+from predicate.is_subclass_predicate import IsSubclassPredicate
 from predicate.is_truthy_predicate import IsTruthyPredicate
 from predicate.le_predicate import LePredicate
 from predicate.list_of_predicate import ListOfPredicate, is_list_of_p
@@ -523,3 +525,25 @@ def generate_count(count_predicate: CountPredicate) -> Iterator:
 
     # TODO: this is a minimal set. Also create iterables that contains some false items (which are not counted)
     yield from generate_all_p(AllPredicate(predicate=predicate), length_p=length_p)
+
+
+@generate_false.register
+def generate_is_subclass(is_subclass_predicate: IsSubclassPredicate) -> Iterator:
+    all_sub_classes = set(object.__subclasses__())
+
+    match is_subclass_predicate.class_or_tuple:
+        case tuple() as klasses:
+            subclasses = set(flatten(klass.__subclasses__() for klass in klasses))
+            if non_subclasses := all_sub_classes - subclasses:
+                while True:
+                    yield from non_subclasses
+        case UnionType() as union_type:
+            subclasses = set(flatten(klass.__subclasses__() for klass in get_args(union_type)))
+            if non_subclasses := all_sub_classes - subclasses:
+                while True:
+                    yield from non_subclasses
+        case _ as klass:
+            subclasses = set(klass.__subclasses__())
+            if non_subclasses := all_sub_classes - subclasses:
+                while True:
+                    yield from non_subclasses

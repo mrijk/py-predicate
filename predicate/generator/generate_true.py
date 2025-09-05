@@ -4,7 +4,8 @@ from collections.abc import Callable, Container, Iterable, Iterator
 from datetime import datetime, timedelta
 from functools import singledispatch
 from itertools import repeat
-from typing import Any, Final, Hashable
+from types import UnionType
+from typing import Any, Final, Hashable, get_args
 from uuid import UUID
 
 import exrex  # type: ignore
@@ -66,6 +67,7 @@ from predicate.is_lambda_predicate import IsLambdaPredicate
 from predicate.is_none_predicate import IsNonePredicate
 from predicate.is_not_none_predicate import IsNotNonePredicate
 from predicate.is_predicate_of_p import IsPredicateOfPredicate
+from predicate.is_subclass_predicate import IsSubclassPredicate
 from predicate.is_truthy_predicate import IsTruthyPredicate
 from predicate.le_predicate import LePredicate
 from predicate.list_of_predicate import ListOfPredicate, is_list_of_p
@@ -646,3 +648,20 @@ def generate_count(count_predicate: CountPredicate) -> Iterator:
 
     # TODO: this is a minimal set. Also create iterables that contains some false items (which are not counted)
     yield from generate_all_p(AllPredicate(predicate=predicate), length_p=length_p)
+
+
+@generate_true.register
+def generate_is_subclass(is_subclass_predicate: IsSubclassPredicate) -> Iterator:
+    match is_subclass_predicate.class_or_tuple:
+        case tuple() as klasses:
+            while True:
+                for klass in klasses:
+                    yield from klass.__subclasses__()
+        case UnionType() as union_type:
+            while True:
+                for klass in get_args(union_type):
+                    yield from klass.__subclasses__()
+        case _ as klass:
+            subclasses = klass.__subclasses__()
+            while True:
+                yield from subclasses
