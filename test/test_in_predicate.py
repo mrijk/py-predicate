@@ -1,4 +1,11 @@
+import pytest
+
 from predicate import in_p
+
+
+class Contains13:
+    def __contains__(self, item):
+        return item == 13
 
 
 def test_in_p():
@@ -9,10 +16,6 @@ def test_in_p():
 
 
 def test_in_p_with_class():
-    class Contains13:
-        def __contains__(self, item):
-            return item == 13
-
     p = in_p(Contains13())
 
     assert p(13)
@@ -31,3 +34,15 @@ def test_in_p_ne():
     q = in_p({"1", "2"})
 
     assert p != q
+
+
+@pytest.mark.parametrize(
+    "parameter, expected",
+    [
+        ([2, 3, 4], "in_p(2, 3, 4)"),
+        (Contains13(), "in_p(Contains13())"),
+    ],
+)
+def test_repr_in_p(parameter, expected):
+    predicate = in_p(parameter)
+    assert repr(predicate) == expected

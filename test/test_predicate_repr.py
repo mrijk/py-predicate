@@ -74,7 +74,6 @@ from predicate.standard_predicates import (
         (has_length_p(eq_p(42)), "has_length_p(eq_p(42))"),
         (has_path_p(is_str_p), "has_path_p(is_str_p)"),
         (implies_p(ge_p(2)), "implies_p(ge_p(2))"),
-        (in_p([2, 3, 4]), "in_p(2, 3, 4)"),
         (is_callable_p([int], bool), "is_callable_p([], bool)"),
         (is_empty_p, "has_length_p(eq_p(0))"),
         (is_lambda_p, "is_lambda_p"),

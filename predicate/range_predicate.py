@@ -10,8 +10,7 @@ class RangePredicate[T](Predicate[T]):
     """Abstract base class."""
 
     @abstractmethod
-    def __call__(self, x: T) -> bool:
-        pass
+    def __call__(self, x: T) -> bool: ...
 
     lower: ConstrainedT
     upper: ConstrainedT

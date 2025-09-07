@@ -28,7 +28,7 @@ class InPredicate[T](Predicate[T]):
         if isinstance(self.v, Iterable):
             items = ", ".join(str(item) for item in self.v)
             return f"in_p({items})"
-        return f"in_p({self.v})"
+        return f"in_p({self.v.__class__.__name__}())"
 
     def __eq__(self, other: object) -> bool:
         match other:
