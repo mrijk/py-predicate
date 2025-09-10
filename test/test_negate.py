@@ -1,7 +1,10 @@
+import pytest
+
 from predicate import (
     eq_p,
     ge_p,
     gt_p,
+    has_length_p,
     is_empty_p,
     is_falsy_p,
     is_none_p,
@@ -11,6 +14,8 @@ from predicate import (
     le_p,
     lt_p,
     ne_p,
+    pos_p,
+    zero_p,
 )
 from predicate.negate import negate
 
@@ -97,3 +102,32 @@ def test_negate_is_truthy_p():
     negated = negate(is_truthy_p)
 
     assert negated == is_falsy_p
+
+
+@pytest.mark.parametrize("length_p", [eq_p(0), zero_p])
+def test_negate_has_length_eq_0(length_p):
+    negated = negate(has_length_p(length_p=length_p))
+
+    assert negated == is_not_empty_p
+
+
+@pytest.mark.parametrize(
+    "length_p",
+    [
+        gt_p(0),
+        ge_p(1),
+        pos_p,
+    ],
+)
+def test_negate_has_length_gt(length_p):
+    negated = negate(has_length_p(length_p=length_p))
+
+    assert negated == is_empty_p
+
+
+def test_negate_has_length_not_possible():
+    length_p = gt_p(1)
+    predicate = has_length_p(length_p=length_p)
+    negated = negate(predicate)
+
+    assert negated == ~predicate

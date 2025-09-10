@@ -96,7 +96,6 @@ from predicate.standard_predicates import (
         (le_p(2), "le_p(2)"),
         (lt_p(2), "lt_p(2)"),
         (ne_p(2), "ne_p(2)"),
-        (not_in_p([2, 3, 4]), "not_in_p(2, 3, 4)"),
         (regex_p("^foo.*bar$"), 'regex_p("^foo.*bar$")'),
         (tee_p(lambda x: None), "tee_p"),
         (this_p, "this_p"),

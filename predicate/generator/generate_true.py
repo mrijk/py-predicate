@@ -356,6 +356,7 @@ def generate_in(predicate: InPredicate) -> Iterator:
     if isinstance(predicate.v, Iterable):
         while True:
             yield from predicate.v
+    raise ValueError(f"Can't generate true values for type {predicate.v.__class__.__name__}")
 
 
 @generate_true.register

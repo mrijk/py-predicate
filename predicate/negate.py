@@ -115,7 +115,9 @@ def negate_has_length(predicate: HasLengthPredicate) -> Predicate:
     match predicate.length_p:
         case EqPredicate(v) if v == 0:
             return is_not_empty_p
+        case GePredicate(v) if v == 1:
+            return is_empty_p
         case GtPredicate(v) if v == 0:
             return is_empty_p
         case _:
-            return predicate
+            return NotPredicate(predicate=predicate)

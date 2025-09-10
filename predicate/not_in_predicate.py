@@ -21,7 +21,7 @@ class NotInPredicate[T](Predicate[T]):
         if isinstance(self.v, Iterable):
             items = ", ".join(str(item) for item in self.v)
             return f"not_in_p({items})"
-        return f"not_in_p({self.v})"
+        return f"not_in_p({self.v.__class__.__name__}())"
 
     @override
     def get_klass(self) -> type:
