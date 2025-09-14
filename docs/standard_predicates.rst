@@ -43,6 +43,12 @@ This predicate ignores any arguments and always returns False:
 
 This might be the result of an optimization.
 
+always_p
+--------
+
+Synonym for always_true_p.
+
+
 always_true_p
 -------------
 
@@ -73,6 +79,26 @@ This predicate tests if for any element in an Iterable, the enclosed predicate i
     assert any_int((1, 2, 3))
     assert any_int([1, 2, 3])
     assert any_int([None, 2, 3])
+
+
+count_p
+-------
+
+The count_p accepts two paramters. The ``predicate`` is evaluated and adds 1 to the count if True,
+otherwise 0. The ``length_p`` evaluates the final count and is returned as the value of the
+count_p itself.
+
+In the next example we define a predicate that returns True if the number of elements in the
+iterable that are greater or equal 1, is exactly 1.
+
+.. code-block:: python
+
+    from predicate import count_p, ge_p, eq_p
+
+    predicate = count_p(predicate=ge_p(1), length_p=eq_p(1))
+
+    assert predicate([1])
+    assert not predicate([1, 3])
 
 
 eq_false_p
@@ -174,6 +200,23 @@ This predicate tests the length of an iterable against another predicate.
 
     assert not has_length_lt_2([1, 2, 3])
     assert has_length_lt_2({1})
+
+
+implies_p
+---------
+
+This predicate tests if one predicate implies another one.
+
+.. code-block:: python
+
+    from predicate import implies_p, ge_p
+
+    p = ge_p(2)
+    q = ge_p(3)
+
+    assert not implies(p, q)
+    assert implies(q, p)
+
 
 is_bool_p
 ---------
@@ -607,3 +650,15 @@ Predicate that always returns True, but is useful for handling side-effects.
     log = tee_p(print)
 
     all_lt_2 = all_p(log | lt_p(2))
+
+
+zero_p
+------
+
+Returns True of the value is zero, otherwise False.
+
+.. code-block:: python
+
+    from predicate import zero_p
+
+    assert zero_p(0)

@@ -78,6 +78,7 @@ from predicate.tee_predicate import tee_p
 from predicate.tuple_of_predicate import is_tuple_of_p
 
 __all__ = [
+    "Spec",
     "all_p",
     "always_false_p",
     "always_p",
@@ -128,8 +129,8 @@ __all__ = [
     "is_identifier_p",
     "is_inf_p",
     "is_instance_p",
-    "is_int_p",
     "is_int_enum_p",
+    "is_int_p",
     "is_iterable_of_p",
     "is_iterable_p",
     "is_lambda_p",
@@ -145,15 +146,15 @@ __all__ = [
     "is_predicate_of_p",
     "is_predicate_p",
     "is_range_p",
+    "is_real_subset_p",
+    "is_real_superset_p",
     "is_set_of_p",
     "is_set_p",
-    "is_str_p",
     "is_str_enum_p",
+    "is_str_p",
     "is_subclass_p",
     "is_subset_p",
     "is_superset_p",
-    "is_real_subset_p",
-    "is_real_superset_p",
     "is_title_p",
     "is_truthy_p",
     "is_tuple_of_p",
@@ -182,7 +183,6 @@ __all__ = [
     "to_json",
     "to_latex",
     "zero_p",
-    "Spec",
 ]
 
 from predicate.str_predicates import (
