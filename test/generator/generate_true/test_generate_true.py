@@ -35,11 +35,13 @@ from predicate import (
     is_even_p,
     is_falsy_p,
     is_float_p,
+    is_inf_p,
     is_instance_p,
     is_int_p,
     is_iterable_of_p,
     is_iterable_p,
     is_list_of_p,
+    is_nan_p,
     is_none_p,
     is_not_empty_p,
     is_not_none_p,
@@ -91,8 +93,10 @@ def foo(self) -> bool:
         is_empty_p,
         is_even_p,
         is_float_p,
+        is_inf_p,
         is_iterable_p,
         is_list_p,
+        is_nan_p,
         is_none_p,
         is_not_empty_p,
         is_not_none_p,
@@ -383,6 +387,13 @@ def test_generate_fn_p():
     predicate = fn_p(lambda x: x % 2, generate_true_fn=generate_true_fn)
 
     assert_generated_true(predicate)
+
+
+def test_generate_fn_with_missing_generate():
+    predicate = fn_p(lambda x: x % 2)
+
+    with pytest.raises(ValueError):
+        take(5, generate_true(predicate))
 
 
 def test_generate_true_unknown(unknown_p):

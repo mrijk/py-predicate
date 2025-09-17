@@ -113,10 +113,8 @@ def check_signature_against_spec(f: Callable, spec: Spec):
 def exercise(f: Callable, spec: Spec | None = None, n: int = 10) -> Iterator[tuple]:
     if isinstance(f, FunctionType):
         yield from exercise_function(f, spec, n)
-    elif callable(f):
-        yield from exercise_class(f, spec, n)
     else:
-        raise ValueError("Not implemented yet")
+        yield from exercise_class(f, spec, n)
 
 
 def exercise_class(f: Callable, spec: Spec | None, n: int) -> Iterator[tuple]:
