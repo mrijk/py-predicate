@@ -134,7 +134,7 @@ def test_exercise_no_types_defined():
 
 
 def test_exercise_generic_return_annotation():
-    def dup[T](x: int) -> T:
+    def dup[T](x: T) -> T:
         return x
 
     result = list(exercise(dup))
