@@ -46,6 +46,7 @@ from predicate import (
     is_not_empty_p,
     is_not_none_p,
     is_odd_p,
+    is_p,
     is_predicate_of_p,
     is_predicate_p,
     is_set_of_p,
@@ -148,6 +149,13 @@ def test_generate_all(all_predicate):
 @pytest.mark.parametrize("value", [2, "foo", "3.14", "complex(1, 2)"])
 def test_generate_eq(value):
     predicate = eq_p(value)
+
+    assert_generated_true(predicate)
+
+
+@pytest.mark.parametrize("value", [True])
+def test_generate_is(value):
+    predicate = is_p(value)
 
     assert_generated_true(predicate)
 
