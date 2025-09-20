@@ -1,8 +1,9 @@
 from abc import abstractmethod
 from dataclasses import dataclass
 from datetime import datetime
+from functools import partial
 from ipaddress import IPv4Address, IPv6Address
-from typing import Any, override
+from typing import Any, Callable, override
 from uuid import UUID
 
 
@@ -59,7 +60,7 @@ class Predicate[T]:
 
 
 def resolve_predicate[T](predicate: Predicate[T]) -> Predicate[T]:
-    from predicate.standard_predicates import PredicateFactory
+    from predicate.predicate_factory import PredicateFactory
 
     match predicate:
         case PredicateFactory() as factory:
@@ -279,6 +280,12 @@ class XorPredicate[T](Predicate[T]):
 
 
 type ConstrainedT[T: (int, str, float, datetime, UUID, IPv4Address, IPv6Address)] = T
+
+
+def predicate_partial[T](
+    func: Callable[[Predicate[T], Predicate[T]], Predicate[T]], /, *args, **kwargs
+) -> Callable[[Predicate[T]], Predicate[T]]:
+    return partial(func, *args, **kwargs)
 
 
 def and_p[T](left: Predicate[T], right: Predicate[T]):

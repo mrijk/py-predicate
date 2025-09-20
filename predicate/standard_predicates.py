@@ -1,5 +1,4 @@
 from collections.abc import Callable
-from dataclasses import dataclass
 from functools import partial
 
 from predicate.all_predicate import all_p
@@ -14,6 +13,7 @@ from predicate.le_predicate import le_p
 from predicate.lt_predicate import lt_p
 from predicate.ne_predicate import ne_p
 from predicate.predicate import Predicate
+from predicate.predicate_factory import PredicateFactory
 from predicate.root_predicate import RootPredicate
 from predicate.this_predicate import ThisPredicate
 
@@ -26,23 +26,6 @@ def is_iterable_of_p[T](predicate: Predicate[T]) -> Predicate:
 def is_single_or_iterable_of_p[T](predicate: Predicate[T]) -> Predicate:
     """Return True if value is an iterable or a single value, and for all elements the predicate is True, otherwise False."""
     return is_iterable_of_p(predicate) | predicate
-
-
-@dataclass
-class PredicateFactory[T](Predicate[T]):
-    """Test."""
-
-    factory: Callable[[], Predicate]
-
-    @property
-    def predicate(self) -> Predicate:
-        return self.factory()
-
-    def __call__(self, *args, **kwargs) -> bool:
-        raise ValueError("Don't call PredicateFactory directly")
-
-    def __repr__(self) -> str:
-        return repr(self.predicate)
 
 
 root_p: PredicateFactory = PredicateFactory(factory=RootPredicate)

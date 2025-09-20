@@ -1,9 +1,8 @@
 from dataclasses import dataclass
-from functools import partial
 from typing import Final, override
 
 from predicate import exception_p
-from predicate.predicate import Predicate, or_p
+from predicate.predicate import Predicate, or_p, predicate_partial
 
 
 @dataclass
@@ -25,10 +24,9 @@ is_none_p: Final[IsNonePredicate] = IsNonePredicate()
 """Return True if value is None, otherwise False."""
 
 
-none_is_true_p = partial(or_p, is_none_p)
+none_is_true_p = predicate_partial(or_p, is_none_p)
 """Return True if value is None, otherwise the result of the predicate."""
 
 
-def none_is_exception_p[T](predicate: Predicate[T]) -> Predicate[T]:
-    """Raise an exception if value is None, otherwise returns the result of the predicate."""
-    return (is_none_p & exception_p) | predicate
+none_is_exception_p = predicate_partial(or_p, is_none_p & exception_p)
+"""Raise an exception if value is None, otherwise returns the result of the predicate."""
