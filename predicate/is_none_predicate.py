@@ -3,8 +3,7 @@ from functools import partial
 from typing import Final, override
 
 from predicate import exception_p
-from predicate.is_not_none_predicate import is_not_none_p
-from predicate.predicate import Predicate, and_p, or_p
+from predicate.predicate import Predicate, or_p
 
 
 @dataclass
@@ -28,10 +27,6 @@ is_none_p: Final[IsNonePredicate] = IsNonePredicate()
 
 none_is_true_p = partial(or_p, is_none_p)
 """Return True if value is None, otherwise the result of the predicate."""
-
-
-none_is_false_p = partial(and_p, is_not_none_p)
-"""Return False if value is None, otherwise the result of the predicate."""
 
 
 def none_is_exception_p[T](predicate: Predicate[T]) -> Predicate[T]:

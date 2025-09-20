@@ -40,8 +40,8 @@ from predicate.is_instance_predicate import (
     is_uuid_p,
 )
 from predicate.is_lambda_predicate import is_lambda_p, is_lambda_with_signature_p
-from predicate.is_none_predicate import is_none_p, none_is_exception_p, none_is_false_p, none_is_true_p
-from predicate.is_not_none_predicate import is_not_none_p
+from predicate.is_none_predicate import is_none_p, none_is_exception_p, none_is_true_p
+from predicate.is_not_none_predicate import is_not_none_p, none_is_false_p
 from predicate.is_predicate import is_p
 from predicate.is_predicate_of_p import is_predicate_of_p
 from predicate.is_subclass_predicate import is_enum_p, is_int_enum_p, is_str_enum_p, is_subclass_p
