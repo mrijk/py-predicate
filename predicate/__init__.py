@@ -54,6 +54,7 @@ from predicate.match_predicate import exactly_n, match_p, optional, plus, repeat
 from predicate.ne_predicate import ne_p
 from predicate.not_in_predicate import not_in_p
 from predicate.optimizer.predicate_optimizer import can_optimize, optimize
+from predicate.predicate import and_p, or_p, xor_p
 from predicate.range_predicate import ge_le_p, ge_lt_p, gt_le_p, gt_lt_p
 from predicate.regex_predicate import regex_p
 from predicate.set_of_predicate import is_set_of_p
@@ -86,6 +87,7 @@ __all__ = [
     "always_false_p",
     "always_p",
     "always_true_p",
+    "and_p",
     "any_p",
     "can_optimize",
     "comp_p",
@@ -179,6 +181,7 @@ __all__ = [
     "not_in_p",
     "optimize",
     "optional",
+    "or_p",
     "plus",
     "pos_p",
     "regex_p",
@@ -190,6 +193,7 @@ __all__ = [
     "to_dot",
     "to_json",
     "to_latex",
+    "xor_p",
     "zero_p",
 ]
 

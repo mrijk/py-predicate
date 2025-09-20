@@ -279,3 +279,15 @@ class XorPredicate[T](Predicate[T]):
 
 
 type ConstrainedT[T: (int, str, float, datetime, UUID, IPv4Address, IPv6Address)] = T
+
+
+def and_p[T](left: Predicate[T], right: Predicate[T]):
+    return AndPredicate(left=left, right=right)
+
+
+def or_p[T](left: Predicate[T], right: Predicate[T]):
+    return OrPredicate(left=left, right=right)
+
+
+def xor_p[T](left: Predicate[T], right: Predicate[T]):
+    return XorPredicate(left=left, right=right)
