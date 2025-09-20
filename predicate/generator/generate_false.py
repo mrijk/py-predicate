@@ -3,7 +3,7 @@ import sys
 from collections.abc import Iterable, Iterator
 from datetime import datetime, timedelta
 from functools import singledispatch
-from itertools import repeat
+from itertools import cycle, repeat
 from types import UnionType
 from typing import Final, get_args
 from uuid import UUID
@@ -45,6 +45,7 @@ from predicate.is_instance_predicate import IsInstancePredicate
 from predicate.is_lambda_predicate import IsLambdaPredicate
 from predicate.is_none_predicate import IsNonePredicate
 from predicate.is_not_none_predicate import IsNotNonePredicate
+from predicate.is_predicate import IsPredicate
 from predicate.is_subclass_predicate import IsSubclassPredicate
 from predicate.is_truthy_predicate import IsTruthyPredicate
 from predicate.le_predicate import LePredicate
@@ -547,3 +548,11 @@ def generate_is_subclass(is_subclass_predicate: IsSubclassPredicate) -> Iterator
             if non_subclasses := all_sub_classes - subclasses:
                 while True:
                     yield from non_subclasses
+
+
+@generate_false.register
+def generate_is(is_predicate: IsPredicate) -> Iterator:
+    singletons = (True, False, None, Ellipsis, (), NotImplemented)
+    selection = [v for v in singletons if v is not is_predicate.v]
+
+    yield from cycle(selection)

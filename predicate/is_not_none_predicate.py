@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import Final, override
 
-from predicate.predicate import Predicate
+from predicate.predicate import Predicate, and_p, predicate_partial
 
 
 @dataclass
@@ -21,3 +21,7 @@ class IsNotNonePredicate[T](Predicate[T]):
 
 is_not_none_p: Final[IsNotNonePredicate] = IsNotNonePredicate()
 """Return True if value is not None, otherwise False."""
+
+
+none_is_false_p = predicate_partial(and_p, is_not_none_p)
+"""Return False if value is None, otherwise the result of the predicate."""

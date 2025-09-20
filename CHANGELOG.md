@@ -2,6 +2,11 @@
 
 ## 1.4.0 (unreleased)
 
+Features:
+
+- new convenience predicates none_is_false_p, none_is_exception and none_is_true_p to handle None values
+- new is_p to handle 'is' comparisons
+
 ## 1.3.0
 
 Features:

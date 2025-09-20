@@ -10,6 +10,7 @@ from predicate.comp_predicate import comp_p
 from predicate.count_predicate import count_p
 from predicate.dict_of_predicate import is_dict_of_p
 from predicate.eq_predicate import eq_false_p, eq_p, eq_true_p, zero_p
+from predicate.exception_predicate import PredicateError, exception_p
 from predicate.explain import explain
 from predicate.fn_predicate import fn_p, is_even_p, is_finite_p, is_inf_p, is_nan_p, is_odd_p
 from predicate.formatter import to_dot, to_json, to_latex
@@ -39,8 +40,9 @@ from predicate.is_instance_predicate import (
     is_uuid_p,
 )
 from predicate.is_lambda_predicate import is_lambda_p, is_lambda_with_signature_p
-from predicate.is_none_predicate import is_none_p
-from predicate.is_not_none_predicate import is_not_none_p
+from predicate.is_none_predicate import is_none_p, none_is_exception_p, none_is_true_p
+from predicate.is_not_none_predicate import is_not_none_p, none_is_false_p
+from predicate.is_predicate import is_p
 from predicate.is_predicate_of_p import is_predicate_of_p
 from predicate.is_subclass_predicate import is_enum_p, is_int_enum_p, is_str_enum_p, is_subclass_p
 from predicate.is_truthy_predicate import is_truthy_p
@@ -52,6 +54,7 @@ from predicate.match_predicate import exactly_n, match_p, optional, plus, repeat
 from predicate.ne_predicate import ne_p
 from predicate.not_in_predicate import not_in_p
 from predicate.optimizer.predicate_optimizer import can_optimize, optimize
+from predicate.predicate import and_p, or_p, xor_p
 from predicate.range_predicate import ge_le_p, ge_lt_p, gt_le_p, gt_lt_p
 from predicate.regex_predicate import regex_p
 from predicate.set_of_predicate import is_set_of_p
@@ -78,11 +81,13 @@ from predicate.tee_predicate import tee_p
 from predicate.tuple_of_predicate import is_tuple_of_p
 
 __all__ = [
+    "PredicateError",
     "Spec",
     "all_p",
     "always_false_p",
     "always_p",
     "always_true_p",
+    "and_p",
     "any_p",
     "can_optimize",
     "comp_p",
@@ -91,6 +96,7 @@ __all__ = [
     "eq_p",
     "eq_true_p",
     "exactly_n",
+    "exception_p",
     "exercise",
     "explain",
     "fn_p",
@@ -143,6 +149,7 @@ __all__ = [
     "is_not_empty_p",
     "is_not_none_p",
     "is_odd_p",
+    "is_p",
     "is_predicate_of_p",
     "is_predicate_p",
     "is_range_p",
@@ -168,9 +175,13 @@ __all__ = [
     "ne_p",
     "neg_p",
     "never_p",
+    "none_is_exception_p",
+    "none_is_false_p",
+    "none_is_true_p",
     "not_in_p",
     "optimize",
     "optional",
+    "or_p",
     "plus",
     "pos_p",
     "regex_p",
@@ -182,6 +193,7 @@ __all__ = [
     "to_dot",
     "to_json",
     "to_latex",
+    "xor_p",
     "zero_p",
 ]
 

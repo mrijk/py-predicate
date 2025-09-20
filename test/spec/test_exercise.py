@@ -125,6 +125,22 @@ def test_exercise_missing_return_annotation_in_spec():
     assert exc.value.args[0] == "Return annotation not in spec"
 
 
+def test_exercise_no_types_defined():
+    def dup(x):
+        return x
+
+    with pytest.raises(ValueError, match="Not implemented yet"):
+        list(exercise(dup))
+
+
+def test_exercise_generic_return_annotation():
+    def dup[T](x: T) -> T:
+        return x
+
+    result = list(exercise(dup))
+    assert result
+
+
 def test_exercise_unannotated_parameter_in_spec():
     def adder(x, y):
         return x + y
@@ -217,9 +233,17 @@ def test_exercise_with_constrained_spec_fail():
     assert exc.value.args[0] == "Spec predicate is not a constrained annotation"
 
 
-def test_exercise_without_spec():
+def test_exercise_annotated_without_spec():
     def adder(x: int, y: int) -> int:
         return x + y
 
     result = list(exercise(adder))
     assert result
+
+
+def test_exercise_partially_annotate_without_specd():
+    def adder(x: int, y) -> int:
+        return x + y
+
+    with pytest.raises(ValueError, match="Not implemented yet"):
+        list(exercise(adder))

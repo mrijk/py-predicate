@@ -1,4 +1,4 @@
-from collections.abc import Callable
+from typing import Callable
 
 from predicate import fn_p
 from predicate.predicate import Predicate

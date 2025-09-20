@@ -35,15 +35,18 @@ from predicate import (
     is_even_p,
     is_falsy_p,
     is_float_p,
+    is_inf_p,
     is_instance_p,
     is_int_p,
     is_iterable_of_p,
     is_iterable_p,
     is_list_of_p,
+    is_nan_p,
     is_none_p,
     is_not_empty_p,
     is_not_none_p,
     is_odd_p,
+    is_p,
     is_predicate_of_p,
     is_predicate_p,
     is_set_of_p,
@@ -91,8 +94,10 @@ def foo(self) -> bool:
         is_empty_p,
         is_even_p,
         is_float_p,
+        is_inf_p,
         is_iterable_p,
         is_list_p,
+        is_nan_p,
         is_none_p,
         is_not_empty_p,
         is_not_none_p,
@@ -144,6 +149,13 @@ def test_generate_all(all_predicate):
 @pytest.mark.parametrize("value", [2, "foo", "3.14", "complex(1, 2)"])
 def test_generate_eq(value):
     predicate = eq_p(value)
+
+    assert_generated_true(predicate)
+
+
+@pytest.mark.parametrize("value", [True])
+def test_generate_is(value):
+    predicate = is_p(value)
 
     assert_generated_true(predicate)
 
@@ -383,6 +395,13 @@ def test_generate_fn_p():
     predicate = fn_p(lambda x: x % 2, generate_true_fn=generate_true_fn)
 
     assert_generated_true(predicate)
+
+
+def test_generate_fn_with_missing_generate():
+    predicate = fn_p(lambda x: x % 2)
+
+    with pytest.raises(ValueError):
+        take(5, generate_true(predicate))
 
 
 def test_generate_true_unknown(unknown_p):

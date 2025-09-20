@@ -42,6 +42,17 @@ def test_has_path_predicate_with_list():
     assert predicate({"x": [{"y": 13}]})
 
 
+# def test_has_path_predicate_with_nested_x():
+#     has_x = eq_p("x")
+#     has_y = eq_p("y")
+#     ge_2 = ge_p(13)
+#
+#     predicate = has_path_p(plus(has_x), has_y, ge_2)
+#
+#     assert predicate({"x": {"y": 13}})
+#     assert predicate({"x": {"x": {"y": 13}}})
+
+
 def test_has_path_predicate_no_dict():
     predicate = has_path_p()
 
