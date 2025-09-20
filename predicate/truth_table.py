@@ -1,5 +1,5 @@
-from collections.abc import Iterable, Iterator
 from itertools import repeat
+from typing import Iterable, Iterator
 
 from more_itertools import gray_product
 

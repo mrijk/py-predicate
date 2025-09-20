@@ -1,5 +1,5 @@
-from collections.abc import Callable
 from functools import partial
+from typing import Callable
 
 from predicate.all_predicate import all_p
 from predicate.comp_predicate import comp_p

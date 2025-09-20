@@ -1,6 +1,6 @@
-from collections.abc import Iterator
 from functools import singledispatch
 from random import choice, randint
+from typing import Iterator
 
 from predicate import eq_p, ge_p, gt_p, le_p, lt_p, ne_p
 from predicate.eq_predicate import EqPredicate

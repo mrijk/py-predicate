@@ -1,5 +1,5 @@
-from collections.abc import Iterable
 from itertools import filterfalse
+from typing import Iterable
 
 from more_itertools import first
 

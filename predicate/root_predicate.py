@@ -1,7 +1,7 @@
 import inspect
-from collections.abc import Iterator
 from dataclasses import dataclass
 from functools import cached_property
+from typing import Iterator
 
 from predicate.predicate import Predicate
 

@@ -1,6 +1,6 @@
 import pytest
 
-from predicate import always_false_p, always_true_p, ge_p
+from predicate import always_false_p, always_true_p, ge_p, le_p
 from predicate.implies import Implies
 from predicate.named_predicate import NamedPredicate
 from predicate.parser import parse_expression
@@ -125,12 +125,11 @@ def test_parser_failure(p, q):
     assert predicate is None
 
 
-def test_parser_ge_p():
-    expression = "ge_p(2)"
-
+@pytest.mark.parametrize("expression, expected", [("ge_p(2)", ge_p(2)), ("le_p(2)", le_p(2))])
+def test_parser_ge_p(expression, expected):
     predicate = parse_expression(expression)
 
-    assert predicate == ge_p(2)
+    assert predicate == expected
 
 
 def test_parser_gt_p():

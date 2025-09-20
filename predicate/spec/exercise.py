@@ -1,8 +1,7 @@
-from collections.abc import Iterator
 from inspect import Parameter, Signature, signature
 from itertools import repeat
 from types import FunctionType
-from typing import Callable, TypeVar
+from typing import Callable, Iterator, TypeVar
 
 from more_itertools import take
 
