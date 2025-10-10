@@ -1,6 +1,11 @@
 from predicate import explain, is_p
 
 
+def test_is_p_repr():
+    predicate = is_p(False)
+    assert repr(predicate) == "is_p(False)"
+
+
 def test_is_p_false():
     predicate = is_p(False)
     assert predicate(False)

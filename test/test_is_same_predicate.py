@@ -1,6 +1,12 @@
 from predicate import eq_p, explain, is_same_p
 
 
+def test_is_same_p_repr():
+    predicate = is_same_p(eq_p(2))
+
+    assert repr(predicate) == "is_same_p(eq_p(2))"
+
+
 def test_is_same_p_same_name(p):
     predicate = is_same_p(p)
 

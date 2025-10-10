@@ -16,7 +16,7 @@ class IsSamePredicate[T](Predicate[T]):
         return is_same(self.predicate, predicate)
 
     def __repr__(self) -> str:
-        return "is_same_p"
+        return f"is_same_p({self.predicate!r})"
 
     @override
     def explain_failure(self, predicate: Predicate[T]) -> dict:

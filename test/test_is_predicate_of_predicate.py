@@ -21,6 +21,12 @@ def test_is_predicate_of_type(klass, valid, invalid):
     assert predicate(lt_p(valid))
 
 
+def test_is_predicate_repr():
+    predicate = is_predicate_of_p(int)
+
+    assert repr(predicate) == "is_predicate_of_p('int')"
+
+
 @pytest.mark.skip("Fix me!")
 @pytest.mark.parametrize("predicate", [all_p, any_p, is_list_of_p])
 @pytest.mark.parametrize(

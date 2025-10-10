@@ -8,6 +8,12 @@ def test_count():
     assert predicate([1])
 
 
+def test_count_repr():
+    predicate = count_p(predicate=ge_p(1), length_p=eq_p(1))
+
+    assert repr(predicate) == "count_p(ge_p(1), eq_p(1))"
+
+
 def test_count_false():
     predicate = count_p(predicate=ge_p(1), length_p=eq_p(1))
 
