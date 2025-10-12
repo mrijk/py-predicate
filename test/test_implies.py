@@ -1,4 +1,4 @@
-from predicate import always_false_p, always_true_p, eq_p, ge_p, gt_p, in_p, ne_p, not_in_p
+from predicate import always_false_p, always_true_p, eq_p, ge_p, gt_p, in_p, le_p, lt_p, ne_p, not_in_p
 from predicate.implies import implies
 from predicate.set_predicates import is_real_subset_p, is_real_superset_p, is_subset_p, is_superset_p
 
@@ -51,6 +51,13 @@ def test_implies_ge_eq():
     assert implies(p, ge_p(3))
 
 
+def test_implies_le_eq():
+    p = eq_p(3)
+
+    assert not implies(p, le_p(2))
+    assert implies(p, le_p(3))
+
+
 def test_implies_eq_eq():
     p = eq_p(3)
 
@@ -63,6 +70,13 @@ def test_implies_eq_gt():
 
     assert not implies(p, gt_p(3))
     assert implies(p, gt_p(2))
+
+
+def test_implies_eq_lt():
+    p = eq_p(3)
+
+    assert not implies(p, lt_p(3))
+    assert implies(p, lt_p(4))
 
 
 def test_implies_eq_in():

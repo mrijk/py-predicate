@@ -12,7 +12,7 @@ from predicate.predicate import Predicate
 class IsInstancePredicate[T](Predicate[T]):
     """A predicate class that models the 'isinstance' predicate."""
 
-    instance_klass: type | tuple
+    instance_klass: tuple
 
     def __call__(self, x: object) -> bool:
         # This is different from standard Python behaviour: a False/True value is not an int!
@@ -33,12 +33,8 @@ class IsInstancePredicate[T](Predicate[T]):
     @override
     def explain_failure(self, x: T) -> dict:
         def class_names() -> Iterator[str]:
-            match self.instance_klass:
-                case tuple() as klasses:
-                    for klass in klasses:
-                        yield klass.__name__
-                case _:
-                    yield self.instance_klass.__name__
+            for klass in self.instance_klass:
+                yield klass.__name__
 
         klasses = join_with_or(list(class_names()))
 
