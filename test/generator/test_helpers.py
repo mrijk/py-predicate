@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import Any
 
 import pytest
 from more_itertools import first, take
@@ -16,6 +17,8 @@ from predicate import (
     is_dict_p,
     is_even_p,
     is_float_p,
+    is_hashable_p,
+    is_instance_p,
     is_int_p,
     is_list_p,
     is_odd_p,
@@ -34,12 +37,14 @@ from predicate.generator.helpers import (
     random_datetimes,
     random_dicts,
     random_floats,
+    random_hashables,
     random_ints,
     random_lists,
     random_sets,
     random_strings,
     random_tuples,
     random_uuids,
+    random_values_of_type,
 )
 
 
@@ -113,6 +118,14 @@ def test_random_datetimes_with_limits():
     all_datetime = all_p(is_datetime_p)
 
     assert all_datetime(datetimes)
+
+
+def test_random_hashables():
+    hashables = take(10, random_hashables())
+
+    all_hashable = all_p(is_hashable_p)
+
+    assert all_hashable(hashables)
 
 
 def test_random_list():
@@ -267,3 +280,25 @@ def test_odd_numbers():
     all_odd = all_p(is_odd_p)
 
     assert all_odd(odd_numbers)
+
+
+@pytest.mark.parametrize("klass", [bool, datetime, int, float, str])
+def test_random_values_of_type(klass):
+    values = take(10, random_values_of_type(klass))
+
+    all_of_klass = all_p(is_instance_p(klass))
+
+    assert all_of_klass(values)
+
+
+def test_random_values_of_type_any():
+    values = take(10, random_values_of_type(Any))
+
+    all_any = all_p(is_bool_p | is_datetime_p | is_float_p | is_int_p | is_str_p)
+
+    assert all_any(values)
+
+
+def test_random_values_of_type_unknown():
+    with pytest.raises(ValueError, match="No generator found for <class 'complex'"):
+        take(10, random_values_of_type(complex))
