@@ -55,7 +55,7 @@ def test_and_contains(p, q, r):
     assert q in predicate
 
 
-def test_and_explain():
+def test_and_explain_left():
     p = gt_p(2)
     q = lt_p(4)
 
@@ -67,3 +67,18 @@ def test_and_explain():
     }
 
     assert explain(predicate, 2) == expected
+
+
+def test_and_explain_right():
+    p = gt_p(2)
+    q = lt_p(4)
+
+    predicate = p & q
+
+    expected = {
+        "left": {"explanation": {"result": True}, "result": True},
+        "right": {"explanation": {"reason": "4 is not less than 4", "result": False}, "result": False},
+        "result": False,
+    }
+
+    assert explain(predicate, 4) == expected

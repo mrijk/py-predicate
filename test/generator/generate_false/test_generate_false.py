@@ -82,6 +82,7 @@ from predicate import (
         is_even_p,
         is_falsy_p,
         is_float_p,
+        # is_hashable_p,
         is_iterable_p,
         is_list_p,
         is_none_p,

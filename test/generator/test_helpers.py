@@ -51,7 +51,7 @@ from predicate.generator.helpers import (
 def test_random_anys():
     anys = take(10, random_anys())
 
-    all_any = all_p(is_bool_p | is_datetime_p | is_float_p | is_int_p | is_str_p)
+    all_any = all_p(is_bool_p | is_datetime_p | is_float_p | is_int_p | is_str_p | is_dict_p)
 
     assert all_any(anys)
 
@@ -294,7 +294,7 @@ def test_random_values_of_type(klass):
 def test_random_values_of_type_any():
     values = take(10, random_values_of_type(Any))
 
-    all_any = all_p(is_bool_p | is_datetime_p | is_float_p | is_int_p | is_str_p)
+    all_any = all_p(is_bool_p | is_datetime_p | is_float_p | is_int_p | is_str_p | is_dict_p)
 
     assert all_any(values)
 
