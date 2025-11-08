@@ -52,6 +52,7 @@ from predicate.le_predicate import le_p
 from predicate.list_of_predicate import is_list_of_p
 from predicate.lt_predicate import lt_p, neg_p
 from predicate.match_predicate import exactly_n, match_p, optional, plus, repeat, star
+from predicate.mutual_recur_predicate import mutual_recur_p
 from predicate.ne_predicate import ne_p
 from predicate.not_in_predicate import not_in_p
 from predicate.optimizer.predicate_optimizer import can_optimize, optimize
@@ -178,6 +179,7 @@ __all__ = [
     "le_p",
     "lt_p",
     "match_p",
+    "mutual_recur_p",
     "ne_p",
     "neg_p",
     "never_p",
