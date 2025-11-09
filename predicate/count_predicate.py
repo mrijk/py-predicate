@@ -10,7 +10,7 @@ from predicate.predicate import Predicate
 
 @dataclass
 class CountPredicate[T](Predicate[T]):
-    """A predicate class that models the 'length' predicate."""
+    """A predicate class that models the 'count' predicate."""
 
     predicate: Predicate[T]
     length_p: Predicate[int]

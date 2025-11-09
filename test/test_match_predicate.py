@@ -1,5 +1,22 @@
-from predicate import eq_p, explain, is_float_p, is_int_p, is_str_p
-from predicate.match_predicate import exactly_n, match_p, optional, plus, repeat, star, wildcard
+import pytest
+
+from predicate import (
+    eq_p,
+    exactly_n,
+    explain,
+    ge_p,
+    is_float_p,
+    is_int_p,
+    is_str_p,
+    le_p,
+    optional,
+    plus,
+    recur_p,
+    repeat,
+    star,
+)
+from predicate.match_predicate import match_p
+from predicate.star_predicate import wildcard
 
 
 def test_match_first():
@@ -26,6 +43,16 @@ def test_match_first_two():
     assert explain(predicate, [42, 1, "bar"]) == expected
 
     assert repr(predicate) == "match_p(eq_p(42), is_str_p)"
+
+
+def test_match_with_iterable_predicate():
+    increasing = recur_p(predicate_n=ge_p)
+    decreasing = recur_p(predicate_n=le_p)
+
+    predicate = match_p(increasing, decreasing)
+
+    with pytest.raises(NotImplementedError):
+        predicate([1, 2, 3, 2, 1])
 
 
 def test_match_first_n():

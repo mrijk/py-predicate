@@ -26,6 +26,7 @@ from predicate.any_predicate import AnyPredicate
 from predicate.count_predicate import CountPredicate
 from predicate.dict_of_predicate import DictOfPredicate, is_dict_of_p
 from predicate.eq_predicate import EqPredicate, eq_p
+from predicate.exactly_predicate import ExactlyPredicate
 from predicate.fn_predicate import FnPredicate
 from predicate.ge_predicate import GePredicate, ge_p
 from predicate.generator.helpers import (
@@ -74,16 +75,13 @@ from predicate.le_predicate import LePredicate
 from predicate.list_of_predicate import ListOfPredicate, is_list_of_p
 from predicate.lt_predicate import LtPredicate
 from predicate.match_predicate import (
-    ExactlyPredicate,
     MatchPredicate,
-    OptionalPredicate,
-    PlusPredicate,
-    RepeatPredicate,
-    StarPredicate,
 )
 from predicate.ne_predicate import NePredicate
 from predicate.not_in_predicate import NotInPredicate
 from predicate.optimizer.predicate_optimizer import optimize
+from predicate.optional_predicate import OptionalPredicate
+from predicate.plus_predicate import PlusPredicate
 from predicate.predicate import (
     AndPredicate,
     ConstrainedT,
@@ -95,12 +93,14 @@ from predicate.predicate import (
 from predicate.property_predicate import PropertyPredicate
 from predicate.range_predicate import GeLePredicate, GeLtPredicate, GtLePredicate, GtLtPredicate, ge_le_p
 from predicate.regex_predicate import RegexPredicate
+from predicate.repeat_predicate import RepeatPredicate
 from predicate.set_of_predicate import SetOfPredicate
 from predicate.set_predicates import IsRealSubsetPredicate, IsSubsetPredicate
 from predicate.standard_predicates import (
     is_int_p,
     is_list_p,
 )
+from predicate.star_predicate import StarPredicate
 from predicate.tee_predicate import TeePredicate
 from predicate.tuple_of_predicate import TupleOfPredicate
 
