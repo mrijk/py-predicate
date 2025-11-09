@@ -10,6 +10,7 @@ from predicate.comp_predicate import comp_p
 from predicate.count_predicate import count_p, exactly_one_p, exactly_zero_p
 from predicate.dict_of_predicate import is_dict_of_p
 from predicate.eq_predicate import eq_false_p, eq_p, eq_true_p, zero_p
+from predicate.exactly_predicate import exactly_n
 from predicate.exception_predicate import PredicateError, exception_p
 from predicate.explain import explain
 from predicate.fn_predicate import fn_p, is_even_p, is_finite_p, is_inf_p, is_nan_p, is_odd_p
@@ -51,16 +52,19 @@ from predicate.lazy_predicate import lazy_p
 from predicate.le_predicate import le_p
 from predicate.list_of_predicate import is_list_of_p
 from predicate.lt_predicate import lt_p, neg_p
-from predicate.match_predicate import exactly_n, match_p, optional, plus, repeat, star
+from predicate.match_predicate import match_p
 from predicate.mutual_recur_predicate import mutual_recur_p
 from predicate.ne_predicate import ne_p
 from predicate.not_in_predicate import not_in_p
 from predicate.optimizer.predicate_optimizer import can_optimize, optimize
+from predicate.optional_predicate import optional
+from predicate.plus_predicate import plus
 from predicate.predicate import and_p, or_p, xor_p
 from predicate.range_predicate import ge_le_p, ge_lt_p, gt_le_p, gt_lt_p
 from predicate.recur_predicate import recur_p
 from predicate.reduce_predicate import reduce_p
 from predicate.regex_predicate import regex_p
+from predicate.repeat_predicate import repeat
 from predicate.set_of_predicate import is_set_of_p
 from predicate.set_predicates import (
     is_real_subset_p,
@@ -81,6 +85,7 @@ from predicate.standard_predicates import (
     root_p,
     this_p,
 )
+from predicate.star_predicate import star
 from predicate.tee_predicate import tee_p
 from predicate.tuple_of_predicate import is_tuple_of_p
 

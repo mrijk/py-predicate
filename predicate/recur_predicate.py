@@ -8,7 +8,7 @@ from predicate.predicate import Predicate
 
 
 @dataclass
-class RecurPredicate[T](Predicate[T]):
+class RecurPredicate[T](Predicate[Iterable[T]]):
     """A predicate class that models the 'recursive' predicate."""
 
     predicate_0: Predicate[T]
@@ -31,6 +31,6 @@ def recur_p[T](
     predicate_n: Callable[[T], Predicate[T]],
     predicate_0: Predicate[T] = always_true_p,
     predicate_1: Predicate[T] = always_true_p,
-) -> Predicate[T]:
+) -> Predicate[Iterable[T]]:
     """Return True if the recursively evaluated predicate is True, otherwise False."""
     return RecurPredicate(predicate_0=predicate_0, predicate_1=predicate_1, predicate_n=predicate_n)

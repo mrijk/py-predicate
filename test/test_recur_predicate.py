@@ -21,21 +21,6 @@ def test_recur_is_not_sorted_asc(iterable):
     assert not predicate(iterable)
 
 
-# def test_recur_zig_zag():
-#     predicate_up = mutual_recur_p(predicate_n=lambda x: (gt_p(x), predicate_down))
-#     predicate_down = mutual_recur_p(predicate_n=lambda x: (lt_p(x), predicate_up))
-#
-#     predicate = predicate_up | predicate_down
-#
-#     assert predicate([])
-#     assert predicate([1])
-#     assert predicate([1, 2])
-#     assert predicate([2, 1])
-#     assert predicate([1, 2, 1])
-#     assert predicate([2, 1, 2])
-#     assert not predicate([1, 2, 3])
-
-
 def test_inc_by_1():
     predicate = recur_p(predicate_n=lambda x: eq_p(x + 1))
 
