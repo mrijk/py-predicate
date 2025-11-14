@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Final, override
+from typing import Any, Final, Iterable, override
 
 from predicate.predicate import Predicate
 
@@ -23,6 +23,10 @@ class EqPredicate[T](Predicate[T]):
     @override
     def explain_failure(self, x: T) -> dict:
         return {"reason": f"{x} is not equal to {self.v!r}"}
+
+    @override
+    def consumes(self, iterable: Iterable[Any]) -> tuple[int, int]:
+        return self.consumes_single(iterable)
 
 
 def eq_p[T](v: T) -> EqPredicate[T]:

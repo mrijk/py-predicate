@@ -1,5 +1,3 @@
-import pytest
-
 from predicate import (
     eq_p,
     exactly_n,
@@ -49,10 +47,10 @@ def test_match_with_iterable_predicate():
     increasing = recur_p(predicate_n=ge_p)
     decreasing = recur_p(predicate_n=le_p)
 
-    predicate = match_p(increasing, decreasing)
+    predicate = match_p(increasing, decreasing, full_match=True)
 
-    with pytest.raises(NotImplementedError):
-        predicate([1, 2, 3, 2, 1])
+    assert predicate([1, 2, 3, 2, 1])
+    assert not predicate([3, 2, 1, 2, 3])
 
 
 def test_match_first_n():

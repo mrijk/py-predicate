@@ -3,8 +3,10 @@ from dataclasses import dataclass
 from datetime import datetime
 from functools import partial
 from ipaddress import IPv4Address, IPv6Address
-from typing import Any, Callable, override
+from typing import Any, Callable, Iterable, override
 from uuid import UUID
+
+from more_itertools import spy
 
 
 @dataclass
@@ -56,6 +58,13 @@ class Predicate[T]:
         } | self.explain_failure(x, *args, **kwargs)
 
     def explain_failure(self, x: Any) -> dict:
+        raise NotImplementedError
+
+    def consumes_single(self, iterable: Iterable[Any]) -> tuple[int, int]:
+        [item], _ = spy(iterable)
+        return (1, 1) if self(item) else (0, 0)
+
+    def consumes(self, iterable: Iterable[Any]) -> tuple[int, int]:
         raise NotImplementedError
 
 

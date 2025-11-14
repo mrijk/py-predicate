@@ -11,7 +11,7 @@ class ExactlyPredicate[T](Predicate[T]):
     n: int
     predicate: Predicate
 
-    def __call__(self, iterable: Iterable, *, predicates: list[Predicate]) -> bool:
+    def __call__(self, iterable: Iterable, *, predicates: list[Predicate], full_match: bool) -> bool:
         from predicate.match_predicate import match
 
         rest = iterable
@@ -22,13 +22,13 @@ class ExactlyPredicate[T](Predicate[T]):
             item, *rest = rest
             if not self.predicate(item):
                 return False
-        return match(rest, predicates=predicates) if predicates else True
+        return match(rest, predicates=predicates, full_match=full_match) if predicates else True
 
     def __repr__(self) -> str:
         return f"exactly({self.n}, {self.predicate!r})"
 
     @override
-    def explain_failure(self, iterable: Iterable[T], *, predicates: list[Predicate]) -> dict:  # type: ignore
+    def explain_failure(self, iterable: Iterable[T], *, predicates: list[Predicate], full_match: bool) -> dict:  # type: ignore
         from predicate.match_predicate import reason
 
         rest = iterable
@@ -40,7 +40,7 @@ class ExactlyPredicate[T](Predicate[T]):
             if not self.predicate(item):
                 return self.predicate.explain(item)
 
-        return reason(rest, predicates=predicates)
+        return reason(rest, predicates=predicates, full_match=full_match)
 
 
 def exactly_n(n: int, predicate: Predicate) -> Predicate:

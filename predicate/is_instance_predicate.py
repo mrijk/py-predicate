@@ -1,7 +1,7 @@
 from collections.abc import Callable, Container, Iterable
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Hashable, Iterator, get_origin, override
+from typing import Any, Hashable, Iterator, get_origin, override
 from uuid import UUID
 
 from predicate.helpers import join_with_or
@@ -39,6 +39,10 @@ class IsInstancePredicate[T](Predicate[T]):
         klasses = join_with_or(list(class_names()))
 
         return {"reason": f"{x} is not an instance of type {klasses}"}
+
+    @override
+    def consumes(self, iterable: Iterable[Any]) -> tuple[int, int]:
+        return self.consumes_single(iterable)
 
 
 def is_instance_p(*klass: type) -> Predicate:

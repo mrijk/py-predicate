@@ -1,5 +1,7 @@
-from predicate import all_p, eq_p, fn_p, is_int_p, is_str_p
-from predicate.explain import explain
+import pytest
+
+from predicate import all_p, eq_p, explain, fn_p, is_int_p, is_str_p
+from predicate.consumes import consumes
 
 
 def test_all():
@@ -31,3 +33,15 @@ def test_all_explain():
 
     expected = {"reason": "Item 'three' didn't match predicate is_int_p", "result": False}
     assert explain(predicate, [1, 2, "three"]) == expected
+
+
+@pytest.mark.parametrize(
+    "iterable, expected_start, expected_end", [([], 0, 0), (["foo"], 0, 0), ([1, 2], 0, 2), ((3, 4, 5, "foo", 6), 0, 3)]
+)
+def test_all_consumes(iterable, expected_start, expected_end):
+    predicate = all_p(is_int_p)
+
+    start, end = consumes(predicate, iterable)
+
+    assert start == expected_start
+    assert end == expected_end

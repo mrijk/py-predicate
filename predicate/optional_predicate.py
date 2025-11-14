@@ -10,15 +10,15 @@ class OptionalPredicate[T](Predicate[T]):
 
     predicate: Predicate
 
-    def __call__(self, iterable: Iterable, *, predicates: list[Predicate]) -> bool:
+    def __call__(self, iterable: Iterable, *, predicates: list[Predicate], full_match: bool) -> bool:
         if not iterable:
             return True
         item, *rest = iterable
         if predicates:
             from predicate.match_predicate import match
 
-            return (self.predicate(item) and match(rest, predicates=predicates)) or match(
-                iterable, predicates=predicates
+            return (self.predicate(item) and match(rest, predicates=predicates, full_match=full_match)) or match(
+                iterable, predicates=predicates, full_match=full_match
             )
         return self.predicate(item)
 
@@ -26,16 +26,16 @@ class OptionalPredicate[T](Predicate[T]):
         return f"optional({self.predicate!r})"
 
     @override
-    def explain_failure(self, iterable: Iterable[T], *, predicates: list[Predicate]) -> dict:  # type: ignore
+    def explain_failure(self, iterable: Iterable[T], *, predicates: list[Predicate], full_match: bool) -> dict:  # type: ignore
         item, *rest = iterable
 
         if predicates:
             from predicate.match_predicate import match, reason
 
             if not self.predicate(item):
-                return reason(iterable, predicates=predicates)
-            if not match(rest, predicates=predicates):  # type: ignore
-                return reason(rest, predicates=predicates)
+                return reason(iterable, predicates=predicates, full_match=full_match)
+            if not match(rest, predicates=predicates, full_match=full_match):  # type: ignore
+                return reason(rest, predicates=predicates, full_match=full_match)
 
         return self.predicate.explain_failure(item)
 
