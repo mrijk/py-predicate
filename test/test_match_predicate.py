@@ -1,8 +1,14 @@
+import pytest
+
 from predicate import (
+    all_p,
+    any_p,
+    count_p,
     eq_p,
     exactly_n,
     explain,
     ge_p,
+    has_length_p,
     is_float_p,
     is_int_p,
     is_str_p,
@@ -43,7 +49,7 @@ def test_match_first_two():
     assert repr(predicate) == "match_p(eq_p(42), is_str_p)"
 
 
-def test_match_with_iterable_predicate():
+def test_match_with_recur_predicate():
     increasing = recur_p(predicate_n=ge_p)
     decreasing = recur_p(predicate_n=le_p)
 
@@ -51,6 +57,42 @@ def test_match_with_iterable_predicate():
 
     assert predicate([1, 2, 3, 2, 1])
     assert not predicate([3, 2, 1, 2, 3])
+
+
+def test_match_with_all_predicate():
+    all_int = all_p(is_int_p)
+
+    predicate = match_p(all_int, full_match=True)
+
+    assert predicate([1, 2, 3, 2, 1])
+    assert not predicate([1, 2, "foo"])
+
+
+def test_match_with_any_predicate():
+    any_int = any_p(is_int_p)
+
+    predicate = match_p(any_int, full_match=True)
+
+    assert predicate(["foo", "bar", 3, "foobar"])
+    assert not predicate(["foo", "bar", 3.14, "foobar"])
+
+
+@pytest.mark.skip("TODO")
+def test_match_with_count_predicate():
+    ge_1_eq_1 = count_p(predicate=ge_p(1), length_p=eq_p(1))
+
+    predicate = match_p(ge_1_eq_1, full_match=True)
+
+    assert predicate([1])
+
+
+@pytest.mark.skip("TODO")
+def test_match_with_has_length_predicate():
+    has_length_3 = has_length_p(length_p=eq_p(3))
+
+    predicate = match_p(has_length_3, full_match=True)
+
+    assert predicate([1, 2, 3])
 
 
 def test_match_first_n():

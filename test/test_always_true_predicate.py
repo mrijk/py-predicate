@@ -5,6 +5,7 @@ from helpers import exercise_predicate
 from more_itertools import take
 
 from predicate import always_true_p
+from predicate.consumes import consumes
 from predicate.generator.helpers import random_anys
 
 
@@ -19,3 +20,11 @@ def test_always_true_p_klass():
 
 def test_always_true_exercise():
     exercise_predicate(always_true_p)
+
+
+@pytest.mark.parametrize("iterable", [["foo"], [1, 2], (3, 4, 5, "foo", 6)])
+def test_always_true_consumes(iterable):
+    start, end = consumes(always_true_p, iterable)
+
+    assert start == 0
+    assert end == 1

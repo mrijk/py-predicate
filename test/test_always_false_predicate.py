@@ -5,6 +5,7 @@ from helpers import exercise_predicate
 from more_itertools import take
 
 from predicate import always_false_p, explain
+from predicate.consumes import consumes
 from predicate.generator.helpers import random_anys
 
 
@@ -24,3 +25,11 @@ def test_always_false_p_explain():
 
 def test_always_false_exercise():
     exercise_predicate(always_false_p)
+
+
+@pytest.mark.parametrize("iterable", [[], ["foo"], [1, 2], (3, 4, 5, "foo", 6)])
+def test_always_false_consumes(iterable):
+    start, end = consumes(always_false_p, iterable)
+
+    assert start == 0
+    assert end == 0
