@@ -1,5 +1,6 @@
 import pytest
 from helpers import exercise_predicate
+from more_itertools import one
 
 from predicate import eq_p
 from predicate.consumes import consumes
@@ -44,11 +45,10 @@ def test_eq_exercise():
     exercise_predicate(eq_p)
 
 
-@pytest.mark.parametrize("iterable, expected_start, expected_end", [([], 0, 0), ([1, 2], 0, 0), ([2, 1], 1, 1)])
-def test_eq_consumes(iterable, expected_start, expected_end):
+@pytest.mark.parametrize("iterable, expected_end", [([], 0), ([1, 2], 0), ([2, 1], 1)])
+def test_eq_consumes(iterable, expected_end):
     predicate = eq_p(2)
 
-    start, end = consumes(predicate, iterable)
+    end = one(consumes(predicate, iterable))
 
-    assert start == expected_start
     assert end == expected_end

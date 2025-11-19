@@ -55,7 +55,10 @@ def match(iterable: Iterable, *, predicates: list[Predicate], full_match: bool) 
         case OptionalPredicate() | PlusPredicate() | StarPredicate() | ExactlyPredicate() | RepeatPredicate():
             return predicate(iterable, predicates=rest_predicates, full_match=full_match)
         case Predicate():
-            _, end = consumes(predicate, iterable)
+            consumed = list(consumes(predicate, iterable))
+
+            end = consumed[-1]
+
             if end >= 1 and rest_predicates:
                 it1, it2 = tee(iterable)
                 rest = list(islice(it2, end, None))

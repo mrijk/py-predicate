@@ -36,13 +36,14 @@ class AnyPredicate[T](Predicate[T]):
         return {"reason": f"No item matches predicate {self.predicate!r}"}
 
     @override
-    def consumes(self, iterable: Iterable[Any]) -> tuple[int, int]:
+    def consumes(self, iterable: Iterable[Any]) -> Iterable[int]:
         consumed = takewhile(~self.predicate, iterable)
         len_consumed = ilen(consumed)
         len_iterable = ilen(iterable)
         if len_consumed < len_iterable:
-            return len_consumed, len_iterable
-        return 0, 0
+            yield from range(len_consumed, len_iterable)
+        else:
+            yield 0
 
 
 def any_p[T](predicate: Predicate[T]) -> AnyPredicate[T]:

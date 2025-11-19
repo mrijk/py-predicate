@@ -48,7 +48,7 @@ def test_any_gap_3_or_more():
 def test_all_consumes(iterable, expected_start, expected_end):
     predicate = recur_p(predicate_n=ge_p)
 
-    start, end = consumes(predicate, iterable)
+    consumed = list(consumes(predicate, iterable))
+    expected_consumed = list(range(expected_start, expected_end + 1))
 
-    assert start == expected_start
-    assert end == expected_end
+    assert consumed == expected_consumed

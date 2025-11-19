@@ -41,8 +41,8 @@ class IsInstancePredicate[T](Predicate[T]):
         return {"reason": f"{x} is not an instance of type {klasses}"}
 
     @override
-    def consumes(self, iterable: Iterable[Any]) -> tuple[int, int]:
-        return self.consumes_single(iterable)
+    def consumes(self, iterable: Iterable[Any]) -> Iterable[int]:
+        yield from self.consumes_single(iterable)
 
 
 def is_instance_p(*klass: type) -> Predicate:

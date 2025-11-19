@@ -28,17 +28,17 @@ class RecurPredicate[T](Predicate[Iterable[T]]):
                 return all(self.predicate_n(a)(b) for a, b in pairwise(iterable))
 
     @override
-    def consumes(self, iterable: Iterable[T]) -> tuple[int, int]:
+    def consumes(self, iterable: Iterable[T]) -> Iterable[int]:
         head, _ = spy(iterable, 2)
 
         match head:
             case []:
-                return 0, 0
+                yield 0
             case [x]:
-                return (1, 1) if self.predicate_1(x) else (0, 0)
+                yield 1 if self.predicate_1(x) else 0
             case _:
                 consumed = takewhile(lambda pair: self.predicate_n(pair[0])(pair[1]), pairwise(iterable))
-                return 1, ilen(consumed) + 1
+                yield from range(1, ilen(consumed) + 1)
 
 
 def recur_p[T](

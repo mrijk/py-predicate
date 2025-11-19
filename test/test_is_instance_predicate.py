@@ -1,4 +1,5 @@
 import pytest
+from more_itertools import one
 
 from predicate import is_instance_p
 from predicate.consumes import consumes
@@ -32,13 +33,10 @@ def test_explain():
     assert explain(predicate, None) == expected
 
 
-@pytest.mark.parametrize(
-    "iterable, expected_start, expected_end", [([], 0, 0), ([3.14], 0, 0), (["foo"], 1, 1), ([1, 2], 1, 1)]
-)
-def test_is_instance_consumes(iterable, expected_start, expected_end):
+@pytest.mark.parametrize("iterable, expected_end", [([], 0), ([3.14], 0), (["foo"], 1), ([1, 2], 1)])
+def test_is_instance_consumes(iterable, expected_end):
     predicate = is_instance_p(str, int)
 
-    start, end = consumes(predicate, iterable)
+    end = one(consumes(predicate, iterable))
 
-    assert start == expected_start
     assert end == expected_end

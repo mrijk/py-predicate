@@ -35,13 +35,11 @@ def test_all_explain():
     assert explain(predicate, [1, 2, "three"]) == expected
 
 
-@pytest.mark.parametrize(
-    "iterable, expected_start, expected_end", [([], 0, 0), (["foo"], 0, 0), ([1, 2], 0, 2), ((3, 4, 5, "foo", 6), 0, 3)]
-)
-def test_all_consumes(iterable, expected_start, expected_end):
+@pytest.mark.parametrize("iterable, expected_end", [([], 0), (["foo"], 0), ([1, 2], 2), ((3, 4, 5, "foo", 6), 3)])
+def test_all_consumes(iterable, expected_end):
     predicate = all_p(is_int_p)
 
-    start, end = consumes(predicate, iterable)
+    consumed = list(consumes(predicate, iterable))
+    expected_consumed = list(range(0, expected_end + 1))
 
-    assert start == expected_start
-    assert end == expected_end
+    assert consumed == expected_consumed

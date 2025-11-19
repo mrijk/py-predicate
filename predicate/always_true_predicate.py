@@ -15,8 +15,8 @@ class AlwaysTruePredicate(Predicate):
         return "always_true_p"
 
     @override
-    def consumes(self, iterable: Iterable[Any]) -> tuple[int, int]:
-        return 0, 1
+    def consumes(self, iterable: Iterable[Any]) -> Iterable[int]:
+        yield 1
 
     @override
     def get_klass(self) -> type:
