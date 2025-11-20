@@ -1,5 +1,8 @@
 from dataclasses import dataclass
-from typing import Iterable, override
+from itertools import takewhile
+from typing import Any, Iterable, Iterator, override
+
+from more_itertools import ilen
 
 from predicate.helpers import first_false
 from predicate.predicate import Predicate, resolve_predicate
@@ -34,6 +37,11 @@ class AllPredicate[T](Predicate[T]):
         fail = first_false(iterable, self.predicate)
 
         return {"reason": f"Item '{fail}' didn't match predicate {self.predicate!r}"}
+
+    @override
+    def consumes(self, iterable: Iterable[Any]) -> Iterator[int]:
+        consumed = takewhile(self.predicate, iterable)
+        yield from range(0, ilen(consumed) + 1)
 
 
 def all_p[T](predicate: Predicate[T]) -> AllPredicate[T]:

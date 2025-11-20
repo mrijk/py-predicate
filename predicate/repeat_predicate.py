@@ -12,12 +12,12 @@ class RepeatPredicate[T](Predicate[T]):
     n: int
     predicate: Predicate
 
-    def __call__(self, iterable: Iterable, *, predicates: list[Predicate]) -> bool:
+    def __call__(self, iterable: Iterable, *, predicates: list[Predicate], full_match: bool) -> bool:
         from predicate import exactly_n
 
         for n in range(self.n, self.m - 1, -1):
             f = exactly_n(n, self.predicate)
-            if f(iterable, predicates=predicates):
+            if f(iterable, predicates=predicates, full_match=full_match):
                 return True
         return False
 
@@ -25,7 +25,7 @@ class RepeatPredicate[T](Predicate[T]):
         return f"repeat({self.m}, {self.n}, {self.predicate!r})"
 
     @override
-    def explain_failure(self, iterable: Iterable[T], *, predicates: list[Predicate]) -> dict:  # type: ignore
+    def explain_failure(self, iterable: Iterable[T], *, predicates: list[Predicate], full_match: bool) -> dict:  # type: ignore
         return {"reason": f"Expected between {self.m} and {self.n} matches of predicate `{self.predicate!r}`"}
 
 

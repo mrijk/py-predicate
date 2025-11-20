@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Final, Iterable, override
+from typing import Any, Final, Iterable, Iterator, override
 
 from more_itertools import ilen
 
@@ -23,6 +23,10 @@ class HasLengthPredicate[T](Predicate[T]):
     @override
     def explain_failure(self, iterable: Iterable[T]) -> dict:
         return {"reason": f"Expected length {self.length_p!r}, actual: {ilen(iterable)}"}
+
+    @override
+    def consumes(self, iterable: Iterable[Any]) -> Iterator[int]:
+        yield 0  # TODO
 
 
 def has_length_p(length_p: Predicate[int]) -> Predicate[Iterable]:

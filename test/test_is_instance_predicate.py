@@ -1,4 +1,8 @@
+import pytest
+from more_itertools import one
+
 from predicate import is_instance_p
+from predicate.consumes import consumes
 from predicate.explain import explain
 
 
@@ -27,3 +31,12 @@ def test_explain():
 
     expected = {"reason": "None is not an instance of type str, int or float", "result": False}
     assert explain(predicate, None) == expected
+
+
+@pytest.mark.parametrize("iterable, expected_end", [([], 0), ([3.14], 0), (["foo"], 1), ([1, 2], 1)])
+def test_is_instance_consumes(iterable, expected_end):
+    predicate = is_instance_p(str, int)
+
+    end = one(consumes(predicate, iterable))
+
+    assert end == expected_end

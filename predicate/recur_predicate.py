@@ -1,7 +1,8 @@
 from dataclasses import dataclass
-from typing import Callable, Iterable
+from itertools import takewhile
+from typing import Callable, Iterable, Iterator, override
 
-from more_itertools import pairwise, spy
+from more_itertools import ilen, pairwise, spy
 
 from predicate import always_true_p
 from predicate.predicate import Predicate
@@ -25,6 +26,20 @@ class RecurPredicate[T](Predicate[Iterable[T]]):
                 return self.predicate_1(x)
             case _:
                 return all(self.predicate_n(a)(b) for a, b in pairwise(iterable))
+
+    @override
+    def consumes(self, iterable: Iterable[T]) -> Iterator[int]:
+        head, _ = spy(iterable, 2)
+
+        match head:
+            case []:
+                yield 0
+            case [x]:
+                yield 0
+                yield 1 if self.predicate_1(x) else 0
+            case _:
+                consumed = takewhile(lambda pair: self.predicate_n(pair[0])(pair[1]), pairwise(iterable))
+                yield from range(0, ilen(consumed) + 2)
 
 
 def recur_p[T](

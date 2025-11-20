@@ -11,25 +11,27 @@ class StarPredicate[T](Predicate[T]):
 
     predicate: Predicate
 
-    def __call__(self, iterable: Iterable, *, predicates: list[Predicate]) -> bool:
+    def __call__(self, iterable: Iterable, *, predicates: list[Predicate], full_match: bool) -> bool:
         from predicate.match_predicate import match
 
         if not iterable:
             return not predicates
         item, *rest = iterable
         if self.predicate(item):
-            if self(rest, predicates=predicates):
+            if self(rest, predicates=predicates, full_match=full_match):
                 return True
             if predicates:
-                matched = match(rest, predicates=predicates)
-                return match(iterable, predicates=predicates) if not matched else True  # backtrack
-        return match(iterable, predicates=predicates) if predicates else False
+                matched = match(rest, predicates=predicates, full_match=full_match)
+                return (
+                    match(iterable, predicates=predicates, full_match=full_match) if not matched else True
+                )  # backtrack
+        return match(iterable, predicates=predicates, full_match=full_match) if predicates else False
 
     def __repr__(self) -> str:
         return f"star({self.predicate!r})"
 
     @override
-    def explain_failure(self, iterable: Iterable[T], *, predicates: list[Predicate]) -> dict:  # type: ignore
+    def explain_failure(self, iterable: Iterable[T], *, predicates: list[Predicate], full_match: bool) -> dict:  # type: ignore
         return {"reason": f"tbd {self.predicate!r}"}
 
 

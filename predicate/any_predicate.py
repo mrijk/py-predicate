@@ -1,5 +1,8 @@
 from dataclasses import dataclass
-from typing import Iterable, override
+from itertools import takewhile
+from typing import Any, Iterable, Iterator, override
+
+from more_itertools import ilen
 
 from predicate.predicate import Predicate, resolve_predicate
 
@@ -31,6 +34,16 @@ class AnyPredicate[T](Predicate[T]):
     @override
     def explain_failure(self, iterable: Iterable[T]) -> dict:
         return {"reason": f"No item matches predicate {self.predicate!r}"}
+
+    @override
+    def consumes(self, iterable: Iterable[Any]) -> Iterator[int]:
+        consumed = takewhile(~self.predicate, iterable)
+        len_consumed = ilen(consumed)
+        len_iterable = ilen(iterable)
+        if len_consumed < len_iterable:
+            yield from range(len_consumed, len_iterable + 1)
+        else:
+            yield 0
 
 
 def any_p[T](predicate: Predicate[T]) -> AnyPredicate[T]:

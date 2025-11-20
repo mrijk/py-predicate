@@ -1,6 +1,7 @@
 import pytest
 
 from predicate import eq_p, ge_p, gt_lt_p, recur_p
+from predicate.consumes import consumes
 
 
 @pytest.mark.parametrize("iterable", [[], (), [1], (1,), [1, 2, 3], (1, 2, 3), range(200)])
@@ -39,3 +40,15 @@ def test_any_gap_3_or_more():
     assert not predicate([1, 3])
     assert predicate([1, 4])
     assert predicate([4, 1])
+
+
+@pytest.mark.parametrize(
+    "iterable, expected_start, expected_end", [([], 0, 0), (["1"], 0, 1), ([1, 2], 0, 2), ((3, 4, 5, 6, 3, 2), 0, 4)]
+)
+def test_all_consumes(iterable, expected_start, expected_end):
+    predicate = recur_p(predicate_n=ge_p)
+
+    consumed = list(consumes(predicate, iterable))
+    expected_consumed = list(range(expected_start, expected_end + 1))
+
+    assert consumed == expected_consumed
