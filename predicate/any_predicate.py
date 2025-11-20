@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from itertools import takewhile
-from typing import Any, Iterable, override
+from typing import Any, Iterable, Iterator, override
 
 from more_itertools import ilen
 
@@ -36,7 +36,7 @@ class AnyPredicate[T](Predicate[T]):
         return {"reason": f"No item matches predicate {self.predicate!r}"}
 
     @override
-    def consumes(self, iterable: Iterable[Any]) -> Iterable[int]:
+    def consumes(self, iterable: Iterable[Any]) -> Iterator[int]:
         consumed = takewhile(~self.predicate, iterable)
         len_consumed = ilen(consumed)
         len_iterable = ilen(iterable)

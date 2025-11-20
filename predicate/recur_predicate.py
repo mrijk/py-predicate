@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from itertools import takewhile
-from typing import Callable, Iterable, override
+from typing import Callable, Iterable, Iterator, override
 
 from more_itertools import ilen, pairwise, spy
 
@@ -28,7 +28,7 @@ class RecurPredicate[T](Predicate[Iterable[T]]):
                 return all(self.predicate_n(a)(b) for a, b in pairwise(iterable))
 
     @override
-    def consumes(self, iterable: Iterable[T]) -> Iterable[int]:
+    def consumes(self, iterable: Iterable[T]) -> Iterator[int]:
         head, _ = spy(iterable, 2)
 
         match head:
