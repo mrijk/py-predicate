@@ -35,10 +35,11 @@ class RecurPredicate[T](Predicate[Iterable[T]]):
             case []:
                 yield 0
             case [x]:
+                yield 0
                 yield 1 if self.predicate_1(x) else 0
             case _:
                 consumed = takewhile(lambda pair: self.predicate_n(pair[0])(pair[1]), pairwise(iterable))
-                yield from range(1, ilen(consumed) + 1)
+                yield from range(0, ilen(consumed) + 2)
 
 
 def recur_p[T](

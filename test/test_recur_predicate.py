@@ -43,7 +43,7 @@ def test_any_gap_3_or_more():
 
 
 @pytest.mark.parametrize(
-    "iterable, expected_start, expected_end", [([], 0, 0), (["1"], 1, 1), ([1, 2], 1, 2), ((3, 4, 5, 6, 3, 2), 1, 4)]
+    "iterable, expected_start, expected_end", [([], 0, 0), (["1"], 0, 1), ([1, 2], 0, 2), ((3, 4, 5, 6, 3, 2), 0, 4)]
 )
 def test_all_consumes(iterable, expected_start, expected_end):
     predicate = recur_p(predicate_n=ge_p)

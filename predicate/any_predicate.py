@@ -41,7 +41,7 @@ class AnyPredicate[T](Predicate[T]):
         len_consumed = ilen(consumed)
         len_iterable = ilen(iterable)
         if len_consumed < len_iterable:
-            yield from range(len_consumed, len_iterable)
+            yield from range(len_consumed, len_iterable + 1)
         else:
             yield 0
 
