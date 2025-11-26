@@ -1,11 +1,14 @@
 # CHANGELOG.md
 
-## 1.4.0 (unreleased)
+## 1.4.0
 
 Features:
 
 - new convenience predicates none_is_false_p, none_is_exception and none_is_true_p to handle None values
 - new is_p to handle 'is' comparisons
+- new recur_p to create recursive predicates
+- new mutual_recur_p to create mutual recursive predicates
+- match_p now also accepts predicates that act on iterables
 
 ## 1.3.0
 

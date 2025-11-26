@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from itertools import islice
 from typing import Any, Final, Iterable, Iterator, override
 
 from more_itertools import ilen
@@ -26,7 +27,10 @@ class HasLengthPredicate[T](Predicate[T]):
 
     @override
     def consumes(self, iterable: Iterable[Any]) -> Iterator[int]:
-        yield 0  # TODO
+        for end in range(0, ilen(iterable) + 1):
+            rest = islice(iterable, 0, end)
+            if self(rest):
+                yield end
 
 
 def has_length_p(length_p: Predicate[int]) -> Predicate[Iterable]:

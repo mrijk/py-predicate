@@ -77,6 +77,16 @@ def test_match_with_any_predicate():
     assert not predicate(["foo", "bar", 3.14, "foobar"])
 
 
+@pytest.mark.skip("TODO: a match_p can contain one or more other match_p's")
+def test_match_with_match_predicate():
+    all_int = all_p(is_int_p)
+    all_int_match = match_p(all_int)
+
+    predicate = match_p(all_int_match, full_match=True)
+
+    assert predicate([1, 2, 3, 2, 1])
+
+
 @pytest.mark.skip("TODO")
 def test_match_with_count_predicate():
     ge_1_eq_1 = count_p(predicate=ge_p(1), length_p=eq_p(1))
@@ -86,13 +96,14 @@ def test_match_with_count_predicate():
     assert predicate([1])
 
 
-@pytest.mark.skip("TODO")
 def test_match_with_has_length_predicate():
     has_length_3 = has_length_p(length_p=eq_p(3))
 
     predicate = match_p(has_length_3, full_match=True)
 
     assert predicate([1, 2, 3])
+    assert not predicate([])
+    assert not predicate([1, 2, 3, 4])
 
 
 def test_match_first_n():

@@ -1,6 +1,9 @@
 from unittest.mock import Mock
 
+from more_itertools import one
+
 from predicate import all_p, ge_p, tee_p
+from predicate.consumes import consumes
 
 
 def test_tee():
@@ -14,3 +17,12 @@ def test_tee():
     assert predicate(range(2, 5))
 
     assert log_fn.call_count == 3
+
+
+def test_tee_consumes():
+    log_fn = Mock()
+    predicate = tee_p(fn=log_fn)
+
+    end = one(consumes(predicate, [1, 2, 3]))
+
+    assert end == 0

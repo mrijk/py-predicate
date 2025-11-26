@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Callable
+from typing import Any, Callable, Iterable, Iterator, override
 
 from predicate.predicate import Predicate
 
@@ -16,6 +16,10 @@ class TeePredicate[T](Predicate[T]):
 
     def __repr__(self) -> str:
         return "tee_p"
+
+    @override
+    def consumes(self, iterable: Iterable[Any]) -> Iterator[int]:
+        yield 0
 
 
 def tee_p[T](fn: Callable[[T], None]) -> Predicate[T]:
