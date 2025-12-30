@@ -31,4 +31,4 @@ class TupleOfPredicate[T](Predicate[T]):
 
 def is_tuple_of_p(*predicates: Predicate) -> Predicate:
     """Return True if value is a tuple, and for all elements in the tuple the predicate is True, otherwise False."""
-    return TupleOfPredicate(list(predicates))
+    return TupleOfPredicate(predicates=list(predicates))
