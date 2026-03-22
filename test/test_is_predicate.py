@@ -39,4 +39,4 @@ def test_is_p_explain():
 
 
 def test_is_p_klass():
-    assert is_p(42).klass == int
+    assert is_p(42).klass is int
