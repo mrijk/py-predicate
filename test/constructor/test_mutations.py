@@ -15,13 +15,16 @@ def test_mutate_eq_p():
     assert all_different(result)
 
 
-@pytest.mark.parametrize("predicate", [
-    eq_p("foo"),
-    ne_p("foo"),
-    ge_p("foo"),
-    gt_p("foo"),
-    le_p("foo"),
-    lt_p("foo"),
-])
+@pytest.mark.parametrize(
+    "predicate",
+    [
+        eq_p("foo"),
+        ne_p("foo"),
+        ge_p("foo"),
+        gt_p("foo"),
+        le_p("foo"),
+        lt_p("foo"),
+    ],
+)
 def test_mutate_non_int(predicate):
     assert list(mutations(predicate, false_set=["bar"], true_set=["foo"])) == []
