@@ -528,23 +528,31 @@ def generate_count(count_predicate: CountPredicate) -> Iterator:
     yield from generate_all_p(AllPredicate(predicate=predicate), length_p=length_p)
 
 
+def _subclasses(klass: type) -> set:
+    import warnings
+
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", DeprecationWarning)
+        return set(klass.__subclasses__())
+
+
 @generate_false.register
 def generate_is_subclass(is_subclass_predicate: IsSubclassPredicate) -> Iterator:
-    all_sub_classes = set(object.__subclasses__())
+    all_sub_classes = _subclasses(object)
 
     match is_subclass_predicate.class_or_tuple:
         case tuple() as klasses:
-            subclasses = set(flatten(klass.__subclasses__() for klass in klasses))
+            subclasses = set(flatten(_subclasses(klass) for klass in klasses))
             if non_subclasses := all_sub_classes - subclasses:
                 while True:
                     yield from non_subclasses
         case UnionType() as union_type:
-            subclasses = set(flatten(klass.__subclasses__() for klass in get_args(union_type)))
+            subclasses = set(flatten(_subclasses(klass) for klass in get_args(union_type)))
             if non_subclasses := all_sub_classes - subclasses:
                 while True:
                     yield from non_subclasses
         case _ as klass:
-            subclasses = set(klass.__subclasses__())
+            subclasses = _subclasses(klass)
             if non_subclasses := all_sub_classes - subclasses:
                 while True:
                     yield from non_subclasses
