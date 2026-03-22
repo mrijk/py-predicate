@@ -62,7 +62,7 @@ from predicate.standard_predicates import (
         (~always_false_p, "~always_false_p"),
         (all_p(eq_p(2)), "all_p(eq_p(2))"),
         (any_p(eq_p(2)), "any_p(eq_p(2))"),
-        (comp_p(lambda x: x, eq_p(2)), "comp_p(eq_p(2))"),
+        (comp_p(lambda x: x, eq_p(2)), "comp_p(<lambda>, eq_p(2))"),
         (eq_p(2), "eq_p(2)"),
         (exception_p, "exception_p"),
         (fn_p(lambda x: x), "fn_p(predicate_fn=<lambda>)"),
