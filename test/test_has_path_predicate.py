@@ -72,5 +72,5 @@ def test_has_path_predicate_no_match_explain():
     y_is_13 = eq_p(13)
     predicate = has_path_p(has_x, has_y, y_is_13)
 
-    expected = {"reason": "Dictionary {'y': 13} didn't match path", "result": False}
+    expected = {"reason": "No key matching eq_p('x') found at path position 0", "result": False}
     assert explain(predicate, {"y": 13}) == expected
