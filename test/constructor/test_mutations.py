@@ -1,3 +1,5 @@
+import pytest
+
 from predicate import all_p, eq_p, ge_p, gt_p, is_instance_p, le_p, lt_p, ne_p
 from predicate.constructor.mutate import mutations
 from predicate.eq_predicate import EqPredicate
@@ -13,25 +15,13 @@ def test_mutate_eq_p():
     assert all_different(result)
 
 
-def test_mutate_eq_p_non_int():
-    assert list(mutations(eq_p("foo"), false_set=["bar"], true_set=["foo"])) == []
-
-
-def test_mutate_ne_p_non_int():
-    assert list(mutations(ne_p("foo"), false_set=["foo"], true_set=["bar"])) == []
-
-
-def test_mutate_ge_p_non_int():
-    assert list(mutations(ge_p("foo"), false_set=[], true_set=["bar"])) == []
-
-
-def test_mutate_gt_p_non_int():
-    assert list(mutations(gt_p("foo"), false_set=[], true_set=["bar"])) == []
-
-
-def test_mutate_le_p_non_int():
-    assert list(mutations(le_p("foo"), false_set=[], true_set=["bar"])) == []
-
-
-def test_mutate_lt_p_non_int():
-    assert list(mutations(lt_p("foo"), false_set=[], true_set=["bar"])) == []
+@pytest.mark.parametrize("predicate", [
+    eq_p("foo"),
+    ne_p("foo"),
+    ge_p("foo"),
+    gt_p("foo"),
+    le_p("foo"),
+    lt_p("foo"),
+])
+def test_mutate_non_int(predicate):
+    assert list(mutations(predicate, false_set=["bar"], true_set=["foo"])) == []
