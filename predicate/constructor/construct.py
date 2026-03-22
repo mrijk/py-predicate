@@ -7,10 +7,13 @@ from predicate import (
     always_true_p,
     ge_p,
     gt_p,
+    is_bool_p,
     is_datetime_p,
+    is_dict_p,
     is_falsy_p,
     is_float_p,
     is_int_p,
+    is_list_p,
     is_none_p,
     is_not_none_p,
     is_set_p,
@@ -19,11 +22,10 @@ from predicate import (
     le_p,
     lt_p,
     ne_p,
+    zero_p,
 )
 from predicate.constructor.helpers import perfect_match, sort_by_match
 from predicate.constructor.mutate import mutations
-from predicate.eq_predicate import zero_p
-from predicate.is_instance_predicate import is_bool_p, is_dict_p, is_list_p
 from predicate.predicate import Predicate
 
 
@@ -57,7 +59,6 @@ def create_mutations(candidates: list[Predicate], false_set: list, true_set: lis
 
 
 def initial_predicates() -> Iterator[Predicate]:
-    # TODO: probably import from __init__
     yield always_false_p
     yield always_true_p
     yield ge_p(0)
