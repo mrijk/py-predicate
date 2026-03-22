@@ -33,3 +33,10 @@ def test_is_list_of_explain_not_a_list():
 
     expected = {"reason": "3 is not an instance of a list", "result": False}
     assert explain(predicate, 3) == expected
+
+
+def test_is_list_of_klass():
+    from predicate import is_int_p
+
+    predicate = is_list_of_p(is_int_p)
+    assert predicate.klass is not None

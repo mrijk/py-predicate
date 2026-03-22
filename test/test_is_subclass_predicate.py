@@ -56,3 +56,7 @@ def test_repr_enum(parameter, expected):
     predicate = is_subclass_p(parameter)
 
     assert repr(predicate) == expected
+
+
+def test_is_subclass_klass():
+    assert is_subclass_p(int).klass is int

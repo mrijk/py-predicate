@@ -217,3 +217,39 @@ def test_is_not_hashable_p(value):
 def test_zero_p():
     assert not zero_p(1)
     assert zero_p(0)
+
+
+def test_base_predicate_explain_failure():
+    p = Predicate()
+    with pytest.raises(NotImplementedError):
+        p.explain_failure(1)
+
+
+def test_not_predicate_contains():
+    assert is_int_p in ~(is_int_p & is_str_p)
+
+
+def test_xor_predicate_explain_failure():
+    from predicate import explain, ge_p, le_p
+
+    predicate = ge_p(2) ^ le_p(4)
+    # x=3: both ge_p(2) and le_p(4) are True → XOR is False
+    result = explain(predicate, 3)
+    assert result["result"] is False
+    assert "left" in result
+    assert "right" in result
+
+
+def test_xor_predicate_contains():
+    assert is_int_p in (is_int_p ^ is_str_p)
+
+
+def test_xor_p_factory():
+    from predicate import ge_p
+    from predicate.predicate import xor_p
+
+    predicate = xor_p(ge_p(2), ge_p(4))
+    assert predicate(2)
+    assert predicate(3)
+    assert not predicate(4)
+    assert not predicate(1)

@@ -8,6 +8,7 @@ from predicate import (
     ge_p,
     in_p,
     is_empty_p,
+    le_p,
     ne_p,
     not_in_p,
     optimize,
@@ -308,3 +309,12 @@ def test_or_optimize_any_or_all(p):
     optimized = optimize(predicate)
 
     assert optimized == is_empty_p | any_p(p)
+
+
+def test_or_optimize_right_is_or():
+    # p | (q | r): right is OrPredicate → triggers case _, OrPredicate() swap
+    predicate = ge_p(2) | (ge_p(3) | le_p(1))
+
+    result = optimize(predicate)
+
+    assert result is not None

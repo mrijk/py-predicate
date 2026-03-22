@@ -46,3 +46,10 @@ def test_in_p_ne():
 def test_repr_in_p(parameter, expected):
     predicate = in_p(parameter)
     assert repr(predicate) == expected
+
+
+def test_in_p_klass_non_iterable():
+    from typing import Any
+
+    predicate = in_p(Contains13())
+    assert predicate.klass is Any
