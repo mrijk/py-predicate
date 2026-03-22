@@ -1,5 +1,5 @@
-from dataclasses import dataclass
 from collections.abc import Sized
+from dataclasses import dataclass
 from typing import Any, Container, Iterable, override
 
 from predicate.predicate import Predicate
