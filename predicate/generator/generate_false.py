@@ -34,6 +34,7 @@ from predicate.generator.helpers import (
     random_ints,
     random_iterables,
     random_lambdas,
+    random_non_hashables,
     random_values_of_type,
 )
 from predicate.gt_predicate import GtPredicate
@@ -351,6 +352,11 @@ def generate_truthy(_predicate: IsTruthyPredicate) -> Iterator:
 
 @generate_false.register
 def generate_is_instance_p(predicate: IsInstancePredicate) -> Iterator:
+    from typing import Hashable
+
+    if predicate.instance_klass[0] is Hashable:
+        yield from random_non_hashables()
+        return
     not_predicate = NotPredicate(predicate=predicate)
     yield from generate_anys(not_predicate)
 

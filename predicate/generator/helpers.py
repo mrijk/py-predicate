@@ -227,6 +227,10 @@ def random_hashables() -> Iterator:
     )
 
 
+def random_non_hashables() -> Iterator:
+    yield from interleave(random_lists(), random_dicts())
+
+
 def random_strings(min_size: int = 0, max_size: int = 10) -> Iterator:
     population = string.ascii_letters + string.digits
     while True:
