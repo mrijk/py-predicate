@@ -1,4 +1,4 @@
-from predicate import always_false_p, always_true_p, can_optimize, eq_p, in_p, optimize
+from predicate import always_false_p, always_true_p, can_optimize, eq_p, ge_p, in_p, optimize
 
 
 def test_xor_optimize_false_true():
@@ -219,3 +219,21 @@ def test_optimize_in_xor_in_single():
     optimized = optimize(predicate)
 
     assert optimized == eq_p(3)
+
+
+def test_xor_optimize_right_xor():
+    # p ^ (q ^ r): right is XorPredicate → swaps and re-optimizes
+    predicate = ge_p(2) ^ (ge_p(3) ^ ge_p(4))
+
+    optimized = optimize(predicate)
+
+    assert optimized is not None
+
+
+def test_xor_optimize_nested_not_optimizable():
+    # (p ^ q) ^ r where neither sub-xor can be further simplified
+    predicate = (ge_p(2) ^ ge_p(3)) ^ ge_p(4)
+
+    # should not raise; result may or may not be optimized
+    result = optimize(predicate)
+    assert result is not None

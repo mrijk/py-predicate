@@ -40,3 +40,7 @@ def test_is_instance_consumes(iterable, expected_end):
     end = one(consumes(predicate, iterable))
 
     assert end == expected_end
+
+
+def test_is_instance_klass():
+    assert is_instance_p(int).klass == (int,)

@@ -283,3 +283,28 @@ def test_match_plus_and_str():
     assert not predicate([1])
 
     assert repr(predicate) == "match_p(plus(is_int_p), is_str_p)"
+
+
+def test_match_plus_explain_failing_first_item():
+    predicate = match_p(plus(is_int_p))
+
+    expected = {"reason": {"reason": "tbd is_int_p", "result": False}, "result": False}
+    assert explain(predicate, ["foo"]) == expected
+
+
+def test_match_optional_explain_item_not_matching():
+    # item doesn't match optional's predicate and fallback also fails
+    predicate = match_p(optional(is_int_p), is_str_p)
+
+    assert not predicate([3.14, 5])
+    result = explain(predicate, [3.14, 5])
+    assert result["result"] is False
+
+
+def test_match_optional_explain_no_following_predicates():
+    # optional with no following predicates, item doesn't match
+    predicate = match_p(optional(is_int_p))
+
+    assert not predicate(["foo"])
+    result = explain(predicate, ["foo"])
+    assert result["result"] is False

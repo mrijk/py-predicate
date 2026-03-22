@@ -2,6 +2,10 @@ from predicate import any_p, is_int_p
 from predicate.explain import explain
 
 
+def test_any_count():
+    assert any_p(is_int_p).count == 1
+
+
 def test_any():
     any_int = any_p(is_int_p)
 

@@ -36,3 +36,7 @@ def test_is_p_explain():
 
     expected = {"reason": "{} does not refer to {}", "result": False}
     assert explain(predicate, {}) == expected
+
+
+def test_is_p_klass():
+    assert is_p(42).klass == int

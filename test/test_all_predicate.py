@@ -4,6 +4,10 @@ from predicate import all_p, eq_p, explain, fn_p, is_int_p, is_str_p
 from predicate.consumes import consumes
 
 
+def test_all_count():
+    assert all_p(is_int_p).count == 1
+
+
 def test_all():
     all_int = all_p(is_int_p)
 
