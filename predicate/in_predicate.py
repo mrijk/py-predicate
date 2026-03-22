@@ -1,15 +1,15 @@
 from dataclasses import dataclass
+from collections.abc import Sized
 from typing import Any, Container, Iterable, override
-
-from more_itertools import first
 
 from predicate.predicate import Predicate
 
 
 def class_from_set(v: Iterable):
-    # TODO: v could have different types
-    types = (type(value) for value in v)
-    return first(types, Any)  # type: ignore
+    types = {type(value) for value in v}
+    if len(types) == 1:
+        return next(iter(types))
+    return Any
 
 
 @dataclass
@@ -33,7 +33,8 @@ class InPredicate[T](Predicate[T]):
     def __eq__(self, other: object) -> bool:
         match other:
             case InPredicate(v) if isinstance(self.v, Iterable) and isinstance(v, Iterable):
-                # TODO: don't do this when self.v or v are large!
+                if isinstance(self.v, Sized) and isinstance(v, Sized) and (len(self.v) > 1000 or len(v) > 1000):
+                    return self.v == v
                 return set(self.v) == set(v)
             case _:
                 return False
