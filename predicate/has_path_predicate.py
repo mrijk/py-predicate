@@ -25,7 +25,14 @@ class HasPathPredicate[T](Predicate[T]):
     def explain_failure(self, x: Any) -> dict:
         match x:
             case dict():
-                # TODO: more details about first part of path that didn't match
+                current = x
+                for i, p in enumerate(self.path):
+                    if not isinstance(current, dict):
+                        return {"reason": f"Expected a dict at path position {i}, got {type(current).__name__}"}
+                    keys = [k for k in current if p(k)]
+                    if not keys:
+                        return {"reason": f"No key matching {p!r} found at path position {i}"}
+                    current = current[keys[0]]
                 return {"reason": f"Dictionary {x} didn't match path"}
             case _:
                 return {"reason": f"Value {x} is not a dict"}
