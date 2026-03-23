@@ -4,6 +4,7 @@ from itertools import count
 from typing import Iterable
 
 import graphviz  # type: ignore
+from graphviz import Digraph
 from more_itertools import first
 
 from predicate.all_predicate import AllPredicate
@@ -23,6 +24,7 @@ from predicate.is_falsy_predicate import IsFalsyPredicate
 from predicate.is_instance_predicate import IsInstancePredicate
 from predicate.is_none_predicate import IsNonePredicate
 from predicate.is_truthy_predicate import IsTruthyPredicate
+from predicate.juxt_predicate import JuxtPredicate
 from predicate.lazy_predicate import LazyPredicate, find_predicate_by_ref
 from predicate.le_predicate import LePredicate
 from predicate.lt_predicate import LtPredicate
@@ -72,7 +74,7 @@ def to_dot(predicate: Predicate, predicate_string: str | None = None, show_optim
     return dot
 
 
-def render(dot, predicate: Predicate, node_nr: count):
+def render(dot: Digraph, predicate: Predicate, node_nr: count):
     node_predicate_mapping: dict[str, Predicate] = {}
 
     def _add_node(name: str, *, label: str, predicate: Predicate | None) -> str:
@@ -159,6 +161,17 @@ def render(dot, predicate: Predicate, node_nr: count):
                 return add_node("real_superset", label=f"x ⊃ {set_to_str(v)}")
             case IsSupersetPredicate(v):
                 return add_node("superset", label=f"x ⊇ {set_to_str(v)}")
+            case JuxtPredicate(predicates=predicates, evaluate=evaluate):
+                graph_attr = {"label": "juxt", "color": "blue", "style": "filled", "fillcolor": "lightblue"}
+                with dot.subgraph(name="cluster_0", graph_attr=graph_attr) as graph:
+                    for predicate in predicates:
+                        node = next(node_nr)
+                        name = "repr_p"
+                        unique_name = f"{name}_{node}"
+                        graph.node(unique_name, label=repr(predicate))
+                        graph.edge(unique_name, "evaluate")
+                    graph.node("evaluate", label=repr(evaluate))
+                    return None
             case LazyPredicate(ref):
                 return add_node("lazy", label=ref)
             case LePredicate(v):
