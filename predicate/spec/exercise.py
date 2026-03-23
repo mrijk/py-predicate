@@ -1,7 +1,7 @@
 from inspect import Parameter, Signature, signature
 from itertools import repeat
 from types import FunctionType
-from typing import Callable, Iterator, TypeVar
+from typing import Callable, Iterator, TypeVar, get_origin
 
 from more_itertools import take
 
@@ -46,8 +46,9 @@ def get_spec_from_class_annotation(f: Callable) -> Spec | None:
         if isinstance(f, Predicate):
             try:
                 spec["args"][key] = is_instance_p(f.klass)
-            except NotImplementedError:  # TODO this is ugly!
-                spec["args"][key] = always_true_p
+            except NotImplementedError:
+                origin = get_origin(annotation)
+                spec["args"][key] = is_instance_p(origin) if origin is not None else always_true_p
         elif type(annotation) is TypeVar:
             spec["args"][key] = always_true_p
         else:

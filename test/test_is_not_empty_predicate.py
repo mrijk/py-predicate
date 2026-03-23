@@ -1,4 +1,3 @@
-import pytest
 from helpers import exercise_predicate
 
 from predicate import is_not_empty_p
@@ -20,6 +19,5 @@ def test_is_not_empty_explain():
     assert explain(is_not_empty_p, []) == expected
 
 
-@pytest.mark.skip("TODO")
 def test_is_not_empty_exercise():
     exercise_predicate(is_not_empty_p)
