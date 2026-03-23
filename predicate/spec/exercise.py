@@ -1,7 +1,7 @@
-from inspect import Parameter, Signature, signature
+from inspect import Parameter, Signature, iscoroutinefunction, signature
 from itertools import repeat
 from types import FunctionType
-from typing import Callable, Iterator, TypeVar, get_origin
+from typing import AsyncIterator, Callable, Iterator, TypeVar, get_origin
 
 from more_itertools import take
 
@@ -110,11 +110,12 @@ def check_signature_against_spec(f: Callable, spec: Spec):
                     raise AssertionError("Spec predicate is not a constrained annotation")
 
 
-def exercise(f: Callable, spec: Spec | None = None, n: int = 10) -> Iterator[tuple]:
-    if isinstance(f, FunctionType):
-        yield from exercise_function(f, spec, n)
-    else:
-        yield from exercise_class(f, spec, n)
+def exercise(f: Callable, spec: Spec | None = None, n: int = 10) -> Iterator[tuple] | AsyncIterator[tuple]:
+    is_func = isinstance(f, FunctionType)
+    is_async = iscoroutinefunction(f) if is_func else iscoroutinefunction(f.__call__)  # type: ignore[operator]
+    if is_async:
+        return async_exercise_function(f, spec, n) if is_func else async_exercise_class(f, spec, n)
+    return exercise_function(f, spec, n) if is_func else exercise_class(f, spec, n)
 
 
 def exercise_class(f: Callable, spec: Spec | None, n: int) -> Iterator[tuple]:
@@ -172,6 +173,74 @@ def exercise_function(f: Callable, spec: Spec | None, n: int) -> Iterator[tuple]
 
     for value in values:
         result = f(**value)
+        if not return_p(result):
+            raise AssertionError(f"Not conform spec: {explain(return_p, result)}")
+
+        if fn := spec.get("fn"):
+            if not fn(**value, ret=result):
+                raise AssertionError("Not conform spec, details tbd")
+
+        if fn_p := spec.get("fn_p"):
+            fn_p_result = fn_p(**value)
+            if not fn_p_result(result):
+                raise AssertionError("Not conform spec, details tbd")
+
+        yield tuple(value.values()), result
+
+
+async def async_exercise_class(f: Callable, spec: Spec | None, n: int) -> AsyncIterator[tuple]:
+    if not spec:
+        if not (spec_from_annotation := get_spec_from_class_annotation(f)):
+            raise ValueError("Not implemented yet")
+        spec = spec_from_annotation
+    else:
+        check_signature_against_spec(f, spec)
+
+    parameters = spec["args"]
+    return_p = spec["ret"]
+
+    if predicates := tuple(parameters.items()):
+        predicate = is_dict_of_p(*predicates)
+        values = take(n, generate_true(predicate))
+    else:
+        values = take(n, repeat({}))
+
+    for value in values:
+        result = await f(**value)
+        if not return_p(result):
+            raise AssertionError(f"Not conform spec: {explain(return_p, result)}")
+
+        if fn := spec.get("fn"):
+            if not fn(**value, ret=result):
+                raise AssertionError("Not conform spec, details tbd")
+
+        if fn_p := spec.get("fn_p"):
+            fn_p_result = fn_p(**value)
+            if not fn_p_result(result):
+                raise AssertionError("Not conform spec, details tbd")
+
+        yield tuple(value.values()), result
+
+
+async def async_exercise_function(f: Callable, spec: Spec | None, n: int) -> AsyncIterator[tuple]:
+    if not spec:
+        if not (spec_from_annotation := get_spec_from_function_annotation(f)):
+            raise ValueError("Not implemented yet")
+        spec = spec_from_annotation
+    else:
+        check_signature_against_spec(f, spec)
+
+    parameters = spec["args"]
+    return_p = spec["ret"]
+
+    if predicates := tuple(parameters.items()):
+        predicate = is_dict_of_p(*predicates)
+        values = take(n, generate_true(predicate))
+    else:
+        values = take(n, repeat({}))
+
+    for value in values:
+        result = await f(**value)
         if not return_p(result):
             raise AssertionError(f"Not conform spec: {explain(return_p, result)}")
 

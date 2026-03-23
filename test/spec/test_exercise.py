@@ -247,3 +247,54 @@ def test_exercise_partially_annotate_without_specd():
 
     with pytest.raises(ValueError, match="Not implemented yet"):
         list(exercise(adder))
+
+
+@pytest.mark.asyncio
+async def test_exercise_async_happy():
+    async def adder(x: int, y: int) -> int:
+        return x + y
+
+    result = [r async for r in exercise(adder)]
+    assert result
+
+
+@pytest.mark.asyncio
+async def test_exercise_async_with_spec():
+    async def adder(x, y):
+        return x + y
+
+    spec: Spec = {"args": {"x": is_int_p, "y": is_int_p}, "ret": is_int_p}
+
+    result = [r async for r in exercise(adder, spec=spec)]
+    assert result
+
+
+@pytest.mark.asyncio
+async def test_exercise_async_no_params():
+    async def answer() -> int:
+        return 42
+
+    spec: Spec = {"args": {}, "ret": is_int_p}
+
+    result = [r async for r in exercise(answer, spec=spec)]
+    assert result
+
+
+@pytest.mark.asyncio
+async def test_exercise_async_wrong_return():
+    async def adder(x: int, y: int) -> int:
+        return None  # type: ignore[return-value]
+
+    with pytest.raises(AssertionError):
+        async for _ in exercise(adder):
+            pass
+
+
+@pytest.mark.asyncio
+async def test_exercise_async_class_with_call():
+    class AsyncAdder:
+        async def __call__(self, x: int) -> int:
+            return x + 1
+
+    result = [r async for r in exercise(AsyncAdder())]
+    assert result
