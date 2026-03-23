@@ -48,6 +48,17 @@ def optimize_and_predicate[T](predicate: AndPredicate[T]) -> MaybeOptimized[T]:
             return Optimized(GtLePredicate(lower=v1, upper=v2))
         case GtPredicate(v1), LtPredicate(v2) if v1 < v2:
             return Optimized(GtLtPredicate(lower=v1, upper=v2))
+        # reversed comparison operands
+        case LePredicate(v2), GePredicate(v1) if v1 < v2:
+            return Optimized(GeLePredicate(lower=v1, upper=v2))
+        case LePredicate(v2), GePredicate(v1) if v1 == v2:
+            return Optimized(EqPredicate(v=v1))
+        case LePredicate(v2), GtPredicate(v1) if v1 < v2:
+            return Optimized(GtLePredicate(lower=v1, upper=v2))
+        case LtPredicate(v2), GePredicate(v1) if v1 < v2:
+            return Optimized(GeLtPredicate(lower=v1, upper=v2))
+        case LtPredicate(v2), GtPredicate(v1) if v1 < v2:
+            return Optimized(GtLtPredicate(lower=v1, upper=v2))
 
         # misc optimizations
         case AllPredicate(left_all), AllPredicate(right_all):
