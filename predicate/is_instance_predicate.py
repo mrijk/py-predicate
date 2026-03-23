@@ -1,6 +1,7 @@
-from collections.abc import Callable, Container, Iterable
+from collections.abc import Callable, Container, Iterable, Mapping, Sequence
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import date, datetime, time, timedelta
+from pathlib import PurePath
 from typing import Any, Hashable, Iterator, get_origin, override
 from uuid import UUID
 
@@ -103,3 +104,27 @@ is_tuple_p = is_instance_p(tuple)
 
 is_uuid_p = is_instance_p(UUID)
 """Returns True if the value is a UUID, otherwise False."""
+
+is_bytes_p = is_instance_p(bytes)
+"""Returns True if the value is bytes, otherwise False."""
+
+is_date_p = is_instance_p(date)
+"""Returns True if the value is a date (or datetime), otherwise False."""
+
+is_frozenset_p = is_instance_p(frozenset)
+"""Returns True if the value is a frozenset, otherwise False."""
+
+is_mapping_p = is_instance_p(Mapping)
+"""Returns True if the value is a Mapping (dict, etc.), otherwise False."""
+
+is_path_p = is_instance_p(PurePath)
+"""Returns True if the value is a pathlib.Path (or any PurePath subclass), otherwise False."""
+
+is_sequence_p = is_instance_p(Sequence)
+"""Returns True if the value is a Sequence (list, tuple, str, etc.), otherwise False."""
+
+is_time_p = is_instance_p(time)
+"""Returns True if the value is a time, otherwise False."""
+
+is_timedelta_p = is_instance_p(timedelta)
+"""Returns True if the value is a timedelta, otherwise False."""
