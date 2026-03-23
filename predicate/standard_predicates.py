@@ -6,7 +6,15 @@ from predicate.comp_predicate import comp_p
 from predicate.eq_predicate import eq_p
 from predicate.ge_predicate import ge_p
 from predicate.gt_predicate import gt_p
-from predicate.is_instance_predicate import is_dict_p, is_float_p, is_int_p, is_iterable_p, is_list_p, is_str_p
+from predicate.is_instance_predicate import (
+    is_complex_p,
+    is_dict_p,
+    is_float_p,
+    is_int_p,
+    is_iterable_p,
+    is_list_p,
+    is_str_p,
+)
 from predicate.is_none_predicate import is_none_p
 from predicate.lazy_predicate import lazy_p
 from predicate.le_predicate import le_p
@@ -16,6 +24,9 @@ from predicate.predicate import Predicate
 from predicate.predicate_factory import PredicateFactory
 from predicate.root_predicate import RootPredicate
 from predicate.this_predicate import ThisPredicate
+
+is_number_p = is_int_p | is_float_p | is_complex_p
+"""Returns True if the value is a number (int, float, or complex, but not bool), otherwise False."""
 
 
 def is_iterable_of_p[T](predicate: Predicate[T]) -> Predicate:

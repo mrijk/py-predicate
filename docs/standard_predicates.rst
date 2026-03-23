@@ -231,6 +231,20 @@ This predicate tests if the value is of type ``bool``. Only True if the value is
     assert is_bool_p(True)
 
 
+is_bytes_p
+----------
+
+This predicate tests if the value is of type ``bytes``.
+
+.. code-block:: python
+
+    from predicate import is_bytes_p
+
+    assert not is_bytes_p("hello")
+    assert not is_bytes_p(bytearray(b"hello"))
+    assert is_bytes_p(b"hello")
+    assert is_bytes_p(b"")
+
 is_callable_p
 -------------
 
@@ -274,6 +288,23 @@ This predicate tests if the value is of type ``Container``.
     assert is_container_p({"one": 1, "two": 2, "three": 3})
     assert is_container_p("one")  # a string is also a container!
 
+
+is_date_p
+---------
+
+This predicate tests if the value is of type ``date``.
+
+Note that ``datetime`` is a subclass of ``date``, so ``datetime`` values also match.
+If you need to distinguish, combine with ``~is_datetime_p``.
+
+.. code-block:: python
+
+    from datetime import date, datetime
+    from predicate import is_date_p
+
+    assert is_date_p(date.today())
+    assert is_date_p(datetime.now())  # datetime is a subclass of date
+    assert not is_date_p("2024-01-01")
 
 is_datetime_p
 -------------
@@ -366,6 +397,19 @@ This predicate tests if the value is of type ``float``.
     assert is_float_p(3.14)
 
 
+is_frozenset_p
+--------------
+
+This predicate tests if the value is of type ``frozenset``.
+
+.. code-block:: python
+
+    from predicate import is_frozenset_p
+
+    assert not is_frozenset_p({1, 2, 3})  # a set, not a frozenset
+    assert is_frozenset_p(frozenset({1, 2, 3}))
+    assert is_frozenset_p(frozenset())
+
 is_hashable_p
 -------------
 
@@ -454,6 +498,20 @@ This predicate tests if the value is of type ``list``.
     assert not is_list_p({1, 2, 3})
     assert is_list_p([1, 2, 3])
 
+is_mapping_p
+------------
+
+This predicate tests if the value is a ``Mapping`` (i.e. any dict-like type).
+
+.. code-block:: python
+
+    from collections import OrderedDict
+    from predicate import is_mapping_p
+
+    assert is_mapping_p({"key": "value"})
+    assert is_mapping_p(OrderedDict())
+    assert not is_mapping_p([("key", "value")])
+
 is_nan_p
 --------
 
@@ -486,6 +544,37 @@ is_not_none_p
     assert not is_not_none_p(None)
     assert is_not_none_p(13)
 
+is_number_p
+-----------
+
+This predicate tests if the value is a number (``int``, ``float``, or ``complex``).
+``bool`` values are excluded, consistent with how ``is_int_p`` works.
+
+.. code-block:: python
+
+    from predicate import is_number_p
+
+    assert is_number_p(42)
+    assert is_number_p(3.14)
+    assert is_number_p(1 + 2j)
+    assert not is_number_p(True)  # bool is excluded
+    assert not is_number_p("42")
+
+is_path_p
+---------
+
+This predicate tests if the value is a ``pathlib`` path.
+Matches ``Path``, ``PurePosixPath``, ``PureWindowsPath``, and any other ``PurePath`` subclass.
+
+.. code-block:: python
+
+    from pathlib import Path, PurePosixPath
+    from predicate import is_path_p
+
+    assert is_path_p(Path("/tmp/file.txt"))
+    assert is_path_p(PurePosixPath("/etc/hosts"))
+    assert not is_path_p("/tmp/file.txt")  # a plain string is not a path
+
 is_predicate_p
 --------------
 
@@ -506,6 +595,23 @@ This predicate tests if value is a range.
 
     assert not is_range_p(0)
     assert is_range_p(range(5))
+
+is_sequence_p
+-------------
+
+This predicate tests if the value is a ``Sequence`` (list, tuple, str, bytes, range, etc.).
+Note that ``dict`` and ``set`` are *not* sequences.
+
+.. code-block:: python
+
+    from predicate import is_sequence_p
+
+    assert is_sequence_p([1, 2, 3])
+    assert is_sequence_p((1, 2))
+    assert is_sequence_p("hello")  # str is a sequence
+    assert is_sequence_p(range(5))
+    assert not is_sequence_p({1, 2, 3})
+    assert not is_sequence_p({"key": "value"})
 
 is_set_of_p
 -----------
@@ -555,6 +661,34 @@ This predicate tests if the value is a subclass of the class.
 
     p = is_subclass_p()
 
+
+is_time_p
+---------
+
+This predicate tests if the value is of type ``datetime.time``.
+
+.. code-block:: python
+
+    from datetime import time
+    from predicate import is_time_p
+
+    assert is_time_p(time(12, 30))
+    assert is_time_p(time(0, 0, 0))
+    assert not is_time_p("12:30")
+
+is_timedelta_p
+--------------
+
+This predicate tests if the value is of type ``datetime.timedelta``.
+
+.. code-block:: python
+
+    from datetime import timedelta
+    from predicate import is_timedelta_p
+
+    assert is_timedelta_p(timedelta(days=1))
+    assert is_timedelta_p(timedelta(seconds=3600))
+    assert not is_timedelta_p(3600)
 
 .. _is_truthy_p:
 
