@@ -1,4 +1,16 @@
-from predicate import always_false_p, always_true_p, can_optimize, eq_p, ge_p, in_p, optimize
+from predicate import (
+    always_false_p,
+    always_true_p,
+    can_optimize,
+    eq_p,
+    ge_lt_p,
+    ge_p,
+    gt_le_p,
+    in_p,
+    le_p,
+    lt_p,
+    optimize,
+)
 
 
 def test_xor_optimize_false_true():
@@ -219,6 +231,62 @@ def test_optimize_in_xor_in_single():
     optimized = optimize(predicate)
 
     assert optimized == eq_p(3)
+
+
+def test_xor_optimize_left_implies_right():
+    # ge(3) ^ ge(2): ge(3) implies ge(2), so result is ~ge(3) & ge(2) = ge_lt(2, 3)
+
+    predicate = ge_p(3) ^ ge_p(2)
+
+    assert can_optimize(predicate)
+
+    optimized = optimize(predicate)
+
+    assert optimized == ge_lt_p(lower=2, upper=3)
+
+
+def test_xor_optimize_right_implies_left():
+    # ge(2) ^ ge(3): ge(3) implies ge(2), so result is ge(2) & ~ge(3) = ge_lt(2, 3)
+
+    predicate = ge_p(2) ^ ge_p(3)
+
+    assert can_optimize(predicate)
+
+    optimized = optimize(predicate)
+
+    assert optimized == ge_lt_p(lower=2, upper=3)
+
+
+def test_xor_optimize_le_left_implies_right():
+    # le(2) ^ le(5): le(2) implies le(5), so result is ~le(2) & le(5) = gt_le(2, 5)
+
+    predicate = le_p(2) ^ le_p(5)
+
+    assert can_optimize(predicate)
+
+    optimized = optimize(predicate)
+
+    assert optimized == gt_le_p(lower=2, upper=5)
+
+
+def test_xor_optimize_lt_left_implies_right():
+    # lt(2) ^ lt(5): lt(2) implies lt(5), so result is ~lt(2) & lt(5) = ge_lt(2, 5)
+
+    predicate = lt_p(2) ^ lt_p(5)
+
+    assert can_optimize(predicate)
+
+    optimized = optimize(predicate)
+
+    assert optimized == ge_lt_p(lower=2, upper=5)
+
+
+def test_xor_optimize_ge_le_implies():
+    # ge(3) ^ le(5): neither implies the other, should not use this rule
+
+    predicate = ge_p(3) ^ le_p(5)
+
+    assert not can_optimize(predicate)
 
 
 def test_xor_optimize_right_xor():

@@ -3,6 +3,7 @@ from typing import Iterable
 from predicate.always_false_predicate import AlwaysFalsePredicate, always_false_p
 from predicate.always_true_predicate import AlwaysTruePredicate, always_true_p
 from predicate.eq_predicate import EqPredicate
+from predicate.implies import implies
 from predicate.in_predicate import InPredicate
 from predicate.optimizer.helpers import MaybeOptimized, NotOptimized, Optimized
 from predicate.predicate import (
@@ -77,5 +78,9 @@ def optimize_xor_predicate[T](predicate: XorPredicate[T]) -> MaybeOptimized[T]:
             return Optimized(left_p ^ right_p)
         case _, _ if left == negate(right):  # ~p ^ p == True
             return Optimized(always_true_p)
+        case _, _ if implies(left, right):  # p ^ q == ~p & q when p => q
+            return Optimized(optimize(~left & right))
+        case _, _ if implies(right, left):  # p ^ q == p & ~q when q => p
+            return Optimized(optimize(left & ~right))
         case _:
             return Optimized(left ^ right) if (left != predicate.left or right != predicate.right) else NotOptimized()
