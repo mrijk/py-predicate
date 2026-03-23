@@ -71,6 +71,28 @@ def _(predicate: GtPredicate, other: Predicate) -> bool:
 
 
 @implies.register
+def _(predicate: LePredicate, other: Predicate) -> bool:
+    match other:
+        case LePredicate(v):
+            return predicate.v <= v
+        case LtPredicate(v):
+            return predicate.v < v
+        case _:
+            return False
+
+
+@implies.register
+def _(predicate: LtPredicate, other: Predicate) -> bool:
+    match other:
+        case LePredicate(v):
+            return predicate.v <= v
+        case LtPredicate(v):
+            return predicate.v <= v
+        case _:
+            return False
+
+
+@implies.register
 def _(predicate: EqPredicate, other: Predicate) -> bool:
     match other:
         case IsInstancePredicate(instance_klass):

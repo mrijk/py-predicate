@@ -266,6 +266,28 @@ def test_optimize_eq_v1_ge_v2():
     assert optimized == p1
 
 
+def test_optimize_le_v1_le_v2():
+    # le(v1) & le(v2) == le(min(v1, v2))
+    predicate = le_p(5) & le_p(2)
+
+    assert can_optimize(predicate)
+
+    optimized = optimize(predicate)
+
+    assert optimized == le_p(2)
+
+
+def test_optimize_lt_v1_lt_v2():
+    # lt(v1) & lt(v2) == lt(min(v1, v2))
+    predicate = lt_p(5) & lt_p(2)
+
+    assert can_optimize(predicate)
+
+    optimized = optimize(predicate)
+
+    assert optimized == lt_p(2)
+
+
 def test_optimize_ge_v1_le_v2():
     ge_2 = ge_p(2)
     le_3 = le_p(3)
