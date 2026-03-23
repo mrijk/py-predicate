@@ -1,5 +1,11 @@
 # CHANGELOG.md
 
+## 1.5.0 (unreleased)
+
+Features:
+
+- new juxt_p that handles juxtaposition of predicates
+
 ## 1.4.0
 
 Features:

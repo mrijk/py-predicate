@@ -48,6 +48,7 @@ from predicate.is_predicate_of_p import is_predicate_of_p
 from predicate.is_same_predicate import is_same_p
 from predicate.is_subclass_predicate import is_enum_p, is_int_enum_p, is_str_enum_p, is_subclass_p
 from predicate.is_truthy_predicate import is_truthy_p
+from predicate.juxt_predicate import juxt_p
 from predicate.lazy_predicate import lazy_p
 from predicate.le_predicate import le_p
 from predicate.list_of_predicate import is_list_of_p
@@ -180,6 +181,7 @@ __all__ = [
     "is_tuple_p",
     "is_upper_p",
     "is_uuid_p",
+    "juxt_p",
     "lazy_p",
     "le_p",
     "lt_p",
