@@ -1,4 +1,16 @@
-from predicate import all_p, always_false_p, always_true_p, any_p, fn_p, is_falsy_p, is_truthy_p, ne_p, tee_p, to_json
+from predicate import (
+    all_p,
+    always_false_p,
+    always_true_p,
+    any_p,
+    fn_p,
+    is_falsy_p,
+    is_truthy_p,
+    juxt_p,
+    ne_p,
+    tee_p,
+    to_json,
+)
 from predicate.named_predicate import NamedPredicate
 
 
@@ -117,6 +129,19 @@ def test_format_json_tee():
     json = to_json(predicate)
 
     assert json == {"tee": None}
+
+
+def test_format_json_juxt():
+    predicate = juxt_p(always_true_p, always_false_p, evaluate=all_p(always_true_p))
+
+    json = to_json(predicate)
+
+    assert json == {
+        "juxt": {
+            "predicates": [{"true": True}, {"false": False}],
+            "evaluate": {"all": {"predicate": {"true": True}}},
+        }
+    }
 
 
 def test_format_unknown(unknown_p):

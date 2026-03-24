@@ -7,6 +7,7 @@ from predicate.any_predicate import AnyPredicate
 from predicate.fn_predicate import FnPredicate
 from predicate.is_falsy_predicate import IsFalsyPredicate
 from predicate.is_truthy_predicate import IsTruthyPredicate
+from predicate.juxt_predicate import JuxtPredicate
 from predicate.named_predicate import NamedPredicate
 from predicate.ne_predicate import NePredicate
 from predicate.predicate import (
@@ -37,6 +38,8 @@ def to_json(predicate: Predicate) -> dict[str, Any]:
             case FnPredicate(predicate_fn):
                 name = predicate_fn.__code__.co_name
                 return "fn", {"name": name}
+            case JuxtPredicate(predicates=predicates, evaluate=evaluate):
+                return "juxt", {"predicates": [to_json(p) for p in predicates], "evaluate": to_json(evaluate)}
             case IsFalsyPredicate():
                 return "is_falsy", None
             case NamedPredicate(name):
