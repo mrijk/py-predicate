@@ -15,6 +15,7 @@ from predicate.ne_predicate import NePredicate
 from predicate.not_in_predicate import NotInPredicate
 from predicate.predicate import (
     AndPredicate,
+    OrPredicate,
     Predicate,
 )
 from predicate.set_predicates import (
@@ -28,6 +29,12 @@ from predicate.set_predicates import (
 @singledispatch
 def implies(predicate: Predicate, other: Predicate) -> bool:
     """Return True if predicate implies another predicate, otherwise False."""
+    if predicate == other:
+        return True
+    if isinstance(other, AndPredicate):
+        return implies(predicate, other.left) and implies(predicate, other.right)
+    if isinstance(other, OrPredicate):
+        return implies(predicate, other.left) or implies(predicate, other.right)
     return False
 
 
@@ -66,6 +73,8 @@ def _(predicate: GtPredicate, other: Predicate) -> bool:
             return predicate.v >= v
         case GtPredicate(v):
             return predicate.v >= v
+        case NePredicate(v):
+            return predicate.v >= v
         case _:
             return False
 
@@ -87,6 +96,8 @@ def _(predicate: LtPredicate, other: Predicate) -> bool:
         case LePredicate(v):
             return predicate.v <= v
         case LtPredicate(v):
+            return predicate.v <= v
+        case NePredicate(v):
             return predicate.v <= v
         case _:
             return False

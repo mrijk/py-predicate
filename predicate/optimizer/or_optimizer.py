@@ -4,9 +4,13 @@ from predicate.all_predicate import AllPredicate
 from predicate.always_true_predicate import AlwaysTruePredicate, always_true_p
 from predicate.any_predicate import AnyPredicate
 from predicate.eq_predicate import EqPredicate
+from predicate.ge_predicate import GePredicate
+from predicate.gt_predicate import GtPredicate
 from predicate.has_length_predicate import is_empty_p
 from predicate.implies import implies
 from predicate.in_predicate import InPredicate
+from predicate.le_predicate import LePredicate
+from predicate.lt_predicate import LtPredicate
 from predicate.not_in_predicate import NotInPredicate
 from predicate.optimizer.helpers import MaybeOptimized, NotOptimized, Optimized
 from predicate.predicate import AndPredicate, NotPredicate, OrPredicate, Predicate
@@ -36,6 +40,15 @@ def optimize_or_predicate[T](predicate: OrPredicate[T]) -> MaybeOptimized[T]:
         case EqPredicate(v1), NotInPredicate(v2) if v1 in v2 and isinstance(v2, Iterable):
             return Optimized(optimize(NotInPredicate(set(v2) - {v1})))
 
+        case EqPredicate(v1), GtPredicate(v2) if v1 == v2:  # eq(v) | gt(v) == ge(v)
+            return Optimized(GePredicate(v=v1))
+        case GtPredicate(v1), EqPredicate(v2) if v1 == v2:  # gt(v) | eq(v) == ge(v)
+            return Optimized(GePredicate(v=v1))
+        case EqPredicate(v1), LtPredicate(v2) if v1 == v2:  # eq(v) | lt(v) == le(v)
+            return Optimized(LePredicate(v=v1))
+        case LtPredicate(v1), EqPredicate(v2) if v1 == v2:  # lt(v) | eq(v) == le(v)
+            return Optimized(LePredicate(v=v1))
+
         case InPredicate(v1), InPredicate(v2) if (
             isinstance(v1, Iterable) and isinstance(v2, Iterable) and (v := set(v1) | set(v2))
         ):
@@ -44,6 +57,15 @@ def optimize_or_predicate[T](predicate: OrPredicate[T]) -> MaybeOptimized[T]:
         case InPredicate(v1), NotInPredicate(v2) if isinstance(v1, Iterable) and isinstance(v2, Iterable):
             if v := set(v2) - (set(v1) & set(v2)):
                 return Optimized(optimize(NotInPredicate(v=v)))
+            return Optimized(always_true_p)
+
+        case NotInPredicate(v1), NotInPredicate(v2) if isinstance(v1, Iterable) and isinstance(v2, Iterable):
+            # not_in(A) | not_in(B) == not_in(A ∩ B)
+            return Optimized(optimize(NotInPredicate(v=set(v1) & set(v2))))
+
+        case GePredicate(v1), LePredicate(v2) if v1 <= v2:  # ge(a) | le(b) == True when a <= b
+            return Optimized(always_true_p)
+        case LePredicate(v1), GePredicate(v2) if v2 <= v1:  # le(a) | ge(b) == True when b <= a
             return Optimized(always_true_p)
 
         #

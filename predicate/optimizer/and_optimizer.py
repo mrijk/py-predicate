@@ -14,7 +14,7 @@ from predicate.le_predicate import LePredicate
 from predicate.lt_predicate import LtPredicate
 from predicate.not_in_predicate import NotInPredicate
 from predicate.optimizer.helpers import MaybeOptimized, NotOptimized, Optimized
-from predicate.predicate import AndPredicate, NotPredicate, OrPredicate
+from predicate.predicate import AndPredicate, NotPredicate, OrPredicate, XorPredicate
 from predicate.range_predicate import GeLePredicate, GeLtPredicate, GtLePredicate, GtLtPredicate
 from predicate.set_predicates import IsSubsetPredicate
 
@@ -99,12 +99,21 @@ def optimize_and_predicate[T](predicate: AndPredicate[T]) -> MaybeOptimized[T]:
         case _, AndPredicate():
             return optimize_and_predicate(AndPredicate(right, left))
 
+        case XorPredicate(xor_left, xor_right), _ if xor_left == right:
+            return Optimized(optimize(right & ~xor_right))  # (p ^ q) & p == p & ~q
+        case XorPredicate(xor_left, xor_right), _ if xor_right == right:
+            return Optimized(optimize(~xor_left & right))  # (p ^ q) & q == ~p & q
+        case _, XorPredicate():
+            return optimize_and_predicate(AndPredicate(left=right, right=left))
+
         case OrPredicate(or_left, or_right), _:
             match or_left, or_right:
                 case NotPredicate(not_predicate), _ if not_predicate == right:  # (~p | q) & p == q & p
                     return Optimized(AndPredicate(left=or_right, right=right))
                 case _, NotPredicate(not_predicate) if not_predicate == right:  # (q | ~p) & p == q & p
                     return Optimized(AndPredicate(left=or_left, right=right))
+            if implies(right, left):  # p & (p | q) == p  [absorption]
+                return Optimized(right)
 
         case _, OrPredicate():
             return optimize_and_predicate(AndPredicate(left=right, right=left))
