@@ -6,9 +6,11 @@ from predicate import (
     can_optimize,
     eq_p,
     ge_p,
+    gt_p,
     in_p,
     is_empty_p,
     le_p,
+    lt_p,
     ne_p,
     not_in_p,
     optimize,
@@ -318,3 +320,131 @@ def test_or_optimize_right_is_or():
     result = optimize(predicate)
 
     assert result is not None
+
+
+def test_optimize_ge_or_le_always_true():
+    # ge(2) | le(5) = True when lower <= upper
+
+    predicate = ge_p(2) | le_p(5)
+
+    assert can_optimize(predicate)
+
+    optimized = optimize(predicate)
+
+    assert optimized == always_true_p
+
+
+def test_optimize_ge_or_le_equal_bounds():
+    # ge(3) | le(3) = True (every x is either >= 3 or <= 3)
+
+    predicate = ge_p(3) | le_p(3)
+
+    assert can_optimize(predicate)
+
+    optimized = optimize(predicate)
+
+    assert optimized == always_true_p
+
+
+def test_optimize_le_or_ge_always_true():
+    # le(5) | ge(2) = True when lower <= upper (symmetric)
+
+    predicate = le_p(5) | ge_p(2)
+
+    assert can_optimize(predicate)
+
+    optimized = optimize(predicate)
+
+    assert optimized == always_true_p
+
+
+def test_optimize_ge_or_le_not_always_true():
+    # ge(5) | le(2) is NOT always true (e.g. x=3 fails both)
+
+    predicate = ge_p(5) | le_p(2)
+
+    assert not can_optimize(predicate)
+
+
+def test_optimize_eq_or_gt():
+    # eq(5) | gt(5) = ge(5)
+
+    predicate = eq_p(5) | gt_p(5)
+
+    assert can_optimize(predicate)
+
+    optimized = optimize(predicate)
+
+    assert optimized == ge_p(5)
+
+
+def test_optimize_gt_or_eq():
+    # gt(5) | eq(5) = ge(5)
+
+    predicate = gt_p(5) | eq_p(5)
+
+    assert can_optimize(predicate)
+
+    optimized = optimize(predicate)
+
+    assert optimized == ge_p(5)
+
+
+def test_optimize_eq_or_lt():
+    # eq(5) | lt(5) = le(5)
+
+    predicate = eq_p(5) | lt_p(5)
+
+    assert can_optimize(predicate)
+
+    optimized = optimize(predicate)
+
+    assert optimized == le_p(5)
+
+
+def test_optimize_lt_or_eq():
+    # lt(5) | eq(5) = le(5)
+
+    predicate = lt_p(5) | eq_p(5)
+
+    assert can_optimize(predicate)
+
+    optimized = optimize(predicate)
+
+    assert optimized == le_p(5)
+
+
+def test_optimize_not_in_or_not_in():
+    # not_in({1, 2}) | not_in({2, 3}) = not_in({2})
+
+    predicate = not_in_p({1, 2}) | not_in_p({2, 3})
+
+    assert can_optimize(predicate)
+
+    optimized = optimize(predicate)
+
+    assert optimized == ne_p(2)
+
+
+def test_optimize_not_in_or_not_in_disjoint():
+    # not_in({1, 2}) | not_in({3, 4}) = always_true  [disjoint sets → empty intersection]
+
+    predicate = not_in_p({1, 2}) | not_in_p({3, 4})
+
+    assert can_optimize(predicate)
+
+    optimized = optimize(predicate)
+
+    assert optimized == always_true_p
+
+
+def test_optimize_not_in_or_not_in_same():
+    # not_in({1, 2}) | not_in({1, 2}) = not_in({1, 2})  [identical sets]
+
+    predicate = not_in_p({1, 2}) | not_in_p({1, 2})
+
+    assert can_optimize(predicate)
+
+    optimized = optimize(predicate)
+
+    assert optimized == not_in_p({1, 2})

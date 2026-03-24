@@ -767,3 +767,123 @@ def test_optimize_is_subset_subset_empty():
     optimized = optimize(predicate)
 
     assert optimized == always_false_p
+
+
+def test_optimize_ne_and_gt():
+    # ne(5) & gt(5) = gt(5)  [gt implies ne]
+
+    predicate = ne_p(5) & gt_p(5)
+
+    assert can_optimize(predicate)
+
+    optimized = optimize(predicate)
+
+    assert optimized == gt_p(5)
+
+
+def test_optimize_gt_and_ne():
+    # gt(5) & ne(5) = gt(5)  [gt implies ne, symmetric]
+
+    predicate = gt_p(5) & ne_p(5)
+
+    assert can_optimize(predicate)
+
+    optimized = optimize(predicate)
+
+    assert optimized == gt_p(5)
+
+
+def test_optimize_ne_and_lt():
+    # ne(5) & lt(5) = lt(5)  [lt implies ne]
+
+    predicate = ne_p(5) & lt_p(5)
+
+    assert can_optimize(predicate)
+
+    optimized = optimize(predicate)
+
+    assert optimized == lt_p(5)
+
+
+def test_optimize_lt_and_ne():
+    # lt(5) & ne(5) = lt(5)  [lt implies ne, symmetric]
+
+    predicate = lt_p(5) & ne_p(5)
+
+    assert can_optimize(predicate)
+
+    optimized = optimize(predicate)
+
+    assert optimized == lt_p(5)
+
+
+def test_optimize_absorption_and_or(p, q):
+    # p & (p | q) = p  [absorption]
+
+    predicate = p & (p | q)
+
+    assert can_optimize(predicate)
+
+    optimized = optimize(predicate)
+
+    assert optimized == p
+
+
+def test_optimize_absorption_or_and(p, q):
+    # (p | q) & p = p  [absorption, symmetric]
+
+    predicate = (p | q) & p
+
+    assert can_optimize(predicate)
+
+    optimized = optimize(predicate)
+
+    assert optimized == p
+
+
+def test_optimize_xor_and_left(p, q):
+    # (p ^ q) & p = p & ~q
+
+    predicate = (p ^ q) & p
+
+    assert can_optimize(predicate)
+
+    optimized = optimize(predicate)
+
+    assert optimized == p & ~q
+
+
+def test_optimize_xor_and_right(p, q):
+    # (p ^ q) & q = ~p & q
+
+    predicate = (p ^ q) & q
+
+    assert can_optimize(predicate)
+
+    optimized = optimize(predicate)
+
+    assert optimized == ~p & q
+
+
+def test_optimize_and_xor_left(p, q):
+    # p & (p ^ q) = p & ~q  [symmetric]
+
+    predicate = p & (p ^ q)
+
+    assert can_optimize(predicate)
+
+    optimized = optimize(predicate)
+
+    assert optimized == p & ~q
+
+
+def test_optimize_and_xor_right(p, q):
+    # q & (p ^ q) = ~p & q  [symmetric]
+
+    predicate = q & (p ^ q)
+
+    assert can_optimize(predicate)
+
+    optimized = optimize(predicate)
+
+    assert optimized == ~p & q
