@@ -5,6 +5,20 @@
 Features:
 
 - new juxt_p that handles juxtaposition of predicates
+- new type check predicates: is_bytes_p, is_date_p, is_frozenset_p, is_mapping_p, is_number_p, is_path_p, is_sequence_p, is_time_p, is_timedelta_p
+- async support for exercise
+- generator support for is_hashable_p
+- implies-based optimization in xor_optimizer
+- optimize le_p & le_p and lt_p & lt_p in and_optimizer
+
+Bugfixes:
+
+- fix exercise for predicates with generic Iterable annotation
+- fix DeprecationWarning for _UnionGenericAlias in generate_is_subclass
+- fix mixed types handling in class_from_set and add size guard in InPredicate.__eq__
+- report which path step failed in has_path_p explain_failure
+- include function name in comp_p repr
+- fix imports of is_bool_p, is_dict_p, is_list_p, zero_p from __init__
 
 ## 1.4.0
 
