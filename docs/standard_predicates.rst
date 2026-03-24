@@ -376,12 +376,16 @@ This predicate tests for falsy values, for example False, "", {}, [], 0, etc.
 
 is_finite_p
 -----------
+
+This predicate tests if the value is a finite number (i.e. not infinite and not NaN).
+
 .. code-block:: python
 
     import math
     from predicate import is_finite_p
 
     assert not is_finite_p(math.inf)
+    assert not is_finite_p(math.nan)
     assert is_finite_p(42)
 
 is_float_p
@@ -437,9 +441,18 @@ This predicate tests if the value is infinite.
 
 is_instance_p
 -------------
+
+This predicate tests if the value is an instance of one or more given classes.
+
 .. code-block:: python
 
     from predicate import is_instance_p
+
+    is_int_or_str = is_instance_p(int, str)
+
+    assert is_int_or_str(42)
+    assert is_int_or_str("hello")
+    assert not is_int_or_str(3.14)
 
 is_int_p
 --------
@@ -457,9 +470,17 @@ This predicate tests if the value is of type ``int``.
 is_iterable_of_p
 ----------------
 
+This predicate tests if the value is an ``Iterable`` and all its elements satisfy the given predicate.
+
 .. code-block:: python
 
-    from predicate import is_iterable_of_p
+    from predicate import is_iterable_of_p, is_int_p
+
+    all_ints = is_iterable_of_p(is_int_p)
+
+    assert all_ints([1, 2, 3])
+    assert all_ints((1,))
+    assert not all_ints([1, "two", 3])
 
 is_iterable_p
 -------------
@@ -469,6 +490,10 @@ This predicate tests if the value is of type ``Iterable``.
 .. code-block:: python
 
     from predicate import is_iterable_p
+
+    assert is_iterable_p([1, 2, 3])
+    assert is_iterable_p("hello")
+    assert not is_iterable_p(42)
 
 is_list_of_p
 ------------
@@ -515,6 +540,8 @@ This predicate tests if the value is a ``Mapping`` (i.e. any dict-like type).
 is_nan_p
 --------
 
+This predicate tests if the value is ``NaN`` (not a number).
+
 .. code-block:: python
 
     import math
@@ -527,6 +554,9 @@ is_nan_p
 
 is_none_p
 ---------
+
+This predicate tests if the value is ``None``.
+
 .. code-block:: python
 
     from predicate import is_none_p
@@ -537,6 +567,9 @@ is_none_p
 
 is_not_none_p
 -------------
+
+This predicate tests if the value is not ``None``.
+
 .. code-block:: python
 
     from predicate import is_not_none_p
@@ -582,7 +615,10 @@ This predicate tests if the value is of type ``Predicate``.
 
 .. code-block:: python
 
-    from predicate import is_predicate_p
+    from predicate import is_predicate_p, eq_p
+
+    assert is_predicate_p(eq_p(1))
+    assert not is_predicate_p(42)
 
 is_range_p
 ----------
@@ -638,6 +674,10 @@ This predicate tests if the value is of type ``set``.
 
     from predicate import is_set_p
 
+    assert is_set_p({1, 2, 3})
+    assert not is_set_p([1, 2, 3])
+    assert not is_set_p(frozenset({1, 2, 3}))
+
 is_str_p
 --------
 
@@ -653,13 +693,16 @@ This predicate tests if the value is of type ``str``.
 is_subclass_p
 -------------
 
-This predicate tests if the value is a subclass of the class.
+This predicate tests if a class is a subclass of the given class.
 
 .. code-block:: python
 
     from predicate import is_subclass_p
 
-    p = is_subclass_p()
+    is_int_subclass = is_subclass_p(int)
+
+    assert is_int_subclass(bool)  # bool is a subclass of int
+    assert not is_int_subclass(str)
 
 
 is_time_p
@@ -706,9 +749,19 @@ This predicate tests for truthy values, for example True, "foo", {"foo"}, [1], 1
 
 is_tuple_of_p
 -------------
+
+This predicate tests if the value is a tuple of a specific structure, where each element matches
+the corresponding predicate.
+
 .. code-block:: python
 
-    from predicate import is_tuple_of_p
+    from predicate import is_tuple_of_p, is_int_p, is_str_p
+
+    is_int_str_pair = is_tuple_of_p(is_int_p, is_str_p)
+
+    assert is_int_str_pair((1, "hello"))
+    assert not is_int_str_pair((1, 2))
+    assert not is_int_str_pair((1, "hello", "extra"))
 
 is_tuple_p
 ----------
@@ -719,14 +772,23 @@ This predicate tests if the value is of type ``tuple``.
 
     from predicate import is_tuple_p
 
+    assert is_tuple_p((1, 2, 3))
+    assert is_tuple_p(())
+    assert not is_tuple_p([1, 2, 3])
+
 is_uuid_p
 ---------
 
-This predicate tests if the value is of type ``uuid``.
+This predicate tests if the value is of type ``UUID``.
 
 .. code-block:: python
 
+    from uuid import UUID, uuid4
     from predicate import is_uuid_p
+
+    assert is_uuid_p(uuid4())
+    assert is_uuid_p(UUID("12345678-1234-5678-1234-567812345678"))
+    assert not is_uuid_p("12345678-1234-5678-1234-567812345678")
 
 juxt_p
 ------
