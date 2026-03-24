@@ -728,6 +728,50 @@ This predicate tests if the value is of type ``uuid``.
 
     from predicate import is_uuid_p
 
+juxt_p
+------
+
+This predicate applies multiple predicates to the same value, collects the boolean results, and then evaluates
+those results with an ``evaluate`` predicate.
+
+In the simplest case, check if a value satisfies exactly two of four predicates:
+
+.. code-block:: python
+
+    from predicate import count_p, eq_p, is_int_p, is_str_p, juxt_p
+
+    p1 = is_int_p
+    p2 = is_str_p
+    p3 = eq_p(2)
+    p4 = eq_p("foo")
+
+    two_true = count_p(predicate=eq_p(True), length_p=eq_p(2))
+
+    predicate = juxt_p(p1, p2, p3, p4, evaluate=two_true)
+
+    assert predicate(2)  # is_int_p and eq_p(2) are both True
+    assert predicate("foo")  # is_str_p and eq_p("foo") are both True
+    assert not predicate(1)  # only is_int_p is True
+
+``juxt_p`` also works with predicates that themselves accept iterables, enabling compound checks on the
+same input in a single predicate:
+
+.. code-block:: python
+
+    from predicate import all_p, count_p, eq_p, exactly_one_p, is_int_p, juxt_p
+
+    all_int = all_p(is_int_p)
+    three_zeros = count_p(predicate=eq_p(0), length_p=eq_p(3))
+    one_true = exactly_one_p(predicate=eq_p(True))
+
+    predicate = juxt_p(all_int, three_zeros, evaluate=one_true)
+
+    assert predicate([1, 2, 3, 4])  # all ints, not 3 zeros → exactly one True
+    assert not predicate(
+        [1, 0, 2, 0, 3, 0]
+    )  # all ints and 3 zeros → both True, so one_true fails
+
+
 le_p
 ----
 

@@ -21,5 +21,5 @@ class JuxtPredicate[T](Predicate[T]):
 
 
 def juxt_p(*predicates: Predicate, evaluate: Predicate[Iterable[bool]]) -> Predicate:
-    """Return True if tbd."""
+    """Apply each predicate to the same value, then evaluate the boolean results with the evaluate predicate."""
     return JuxtPredicate(predicates=list(predicates), evaluate=evaluate)
