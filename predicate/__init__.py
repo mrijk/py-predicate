@@ -1,6 +1,6 @@
 """The py-predicate module."""
 
-__version__ = "0.0.1"
+__version__ = "1.6.0"
 
 from predicate.all_predicate import all_p
 from predicate.always_false_predicate import always_false_p, never_p

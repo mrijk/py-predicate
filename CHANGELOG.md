@@ -1,6 +1,8 @@
 # CHANGELOG.md
 
-## 1.5.0 (unreleased)
+## 1.6.0 (unreleased)
+
+## 1.5.0
 
 Features:
 
