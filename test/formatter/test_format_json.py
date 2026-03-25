@@ -12,6 +12,7 @@ from predicate import (
     gt_lt_p,
     gt_p,
     is_falsy_p,
+    is_instance_p,
     is_int_p,
     is_truthy_p,
     juxt_p,
@@ -155,49 +156,91 @@ def test_format_json_juxt():
 
 
 def test_format_json_eq():
-    assert to_json(eq_p(5)) == {"eq": {"v": 5}}
+    predicate = eq_p(5)
+
+    json = to_json(predicate)
+
+    assert json == {"eq": {"v": 5}}
 
 
 def test_format_json_ge():
-    assert to_json(ge_p(2)) == {"ge": {"v": 2}}
+    predicate = ge_p(2)
+
+    json = to_json(predicate)
+
+    assert json == {"ge": {"v": 2}}
 
 
 def test_format_json_gt():
-    assert to_json(gt_p(2)) == {"gt": {"v": 2}}
+    predicate = gt_p(2)
+
+    json = to_json(predicate)
+
+    assert json == {"gt": {"v": 2}}
 
 
 def test_format_json_le():
-    assert to_json(le_p(10)) == {"le": {"v": 10}}
+    predicate = le_p(10)
+
+    json = to_json(predicate)
+
+    assert json == {"le": {"v": 10}}
 
 
 def test_format_json_lt():
-    assert to_json(lt_p(10)) == {"lt": {"v": 10}}
+    predicate = lt_p(10)
+
+    json = to_json(predicate)
+
+    assert json == {"lt": {"v": 10}}
 
 
 def test_format_json_ge_le():
-    assert to_json(ge_le_p(1, 10)) == {"ge_le": {"lower": 1, "upper": 10}}
+    predicate = ge_le_p(1, 10)
+
+    json = to_json(predicate)
+
+    assert json == {"ge_le": {"lower": 1, "upper": 10}}
 
 
 def test_format_json_ge_lt():
-    assert to_json(ge_lt_p(1, 10)) == {"ge_lt": {"lower": 1, "upper": 10}}
+    predicate = ge_lt_p(1, 10)
+
+    json = to_json(predicate)
+
+    assert json == {"ge_lt": {"lower": 1, "upper": 10}}
 
 
 def test_format_json_gt_le():
-    assert to_json(gt_le_p(1, 10)) == {"gt_le": {"lower": 1, "upper": 10}}
+    predicate = gt_le_p(1, 10)
+
+    json = to_json(predicate)
+
+    assert json == {"gt_le": {"lower": 1, "upper": 10}}
 
 
 def test_format_json_gt_lt():
-    assert to_json(gt_lt_p(1, 10)) == {"gt_lt": {"lower": 1, "upper": 10}}
+    predicate = gt_lt_p(1, 10)
+
+    json = to_json(predicate)
+
+    assert json == {"gt_lt": {"lower": 1, "upper": 10}}
 
 
 def test_format_json_is_instance_single():
-    assert to_json(is_int_p) == {"is_instance": {"klass": ["int"]}}
+    predicate = is_int_p
+
+    json = to_json(predicate)
+
+    assert json == {"is_instance": {"klass": ["int"]}}
 
 
 def test_format_json_is_instance_multiple():
-    from predicate import is_instance_p
+    predicate = is_instance_p(int, str)
 
-    assert to_json(is_instance_p(int, str)) == {"is_instance": {"klass": ["int", "str"]}}
+    json = to_json(predicate)
+
+    assert json == {"is_instance": {"klass": ["int", "str"]}}
 
 
 def test_format_unknown(unknown_p):
