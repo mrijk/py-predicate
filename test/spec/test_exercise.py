@@ -129,7 +129,7 @@ def test_exercise_class_with_fn_p_fail():
 
     with pytest.raises(AssertionError) as exc:
         list(exercise(Doubler(), spec=spec))
-    assert exc.value.args[0] == "Not conform spec, details tbd"
+    assert exc.value.args[0].startswith("Not conform spec:")
 
 
 # --- check_signature_against_spec: infer ret from return annotation ---
@@ -250,7 +250,7 @@ def test_exercise_with_fn_p_fail():
     with pytest.raises(AssertionError) as exc:
         list(exercise(max_int, spec=spec))
 
-    assert exc.value.args[0] == "Not conform spec, details tbd"
+    assert exc.value.args[0].startswith("Not conform spec:")
 
 
 def test_exercise_missing_return_annotation_in_spec():
@@ -534,7 +534,7 @@ async def test_exercise_async_class_with_fn_p_fail():
     with pytest.raises(AssertionError) as exc:
         async for _ in exercise(AsyncDoubler(), spec=spec):
             pass
-    assert exc.value.args[0] == "Not conform spec, details tbd"
+    assert exc.value.args[0].startswith("Not conform spec:")
 
 
 @pytest.mark.asyncio
@@ -600,4 +600,4 @@ async def test_exercise_async_function_with_fn_p_fail():
     with pytest.raises(AssertionError) as exc:
         async for _ in exercise(max_int, spec=spec):
             pass
-    assert exc.value.args[0] == "Not conform spec, details tbd"
+    assert exc.value.args[0].startswith("Not conform spec:")
