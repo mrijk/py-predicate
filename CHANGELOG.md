@@ -2,6 +2,10 @@
 
 ## 1.6.0 (unreleased)
 
+Features:
+
+- export ends_with_p, starts_with_p, is_digit_p, is_numeric_p, is_printable_p, is_space_p from main namespace
+
 ## 1.5.0
 
 Features:
