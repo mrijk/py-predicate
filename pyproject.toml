@@ -59,9 +59,6 @@ dev = [
 [tool.flit.module]
 name = "predicate"
 
-[tool.ruff.format]
-line-length = 120
-
 [tool.ruff]
 lint.ignore = [
     "C901",
