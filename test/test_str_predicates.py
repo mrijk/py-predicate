@@ -1,10 +1,12 @@
-from predicate.str_predicates import (
+from predicate import (
     ends_with_p,
     is_alnum_p,
     is_alpha_p,
     is_decimal_p,
     is_digit_p,
     is_lower_p,
+    is_numeric_p,
+    is_printable_p,
     is_space_p,
     is_title_p,
     is_upper_p,
@@ -52,6 +54,17 @@ def test_is_title_p():
 def test_is_upper_p():
     assert not is_upper_p("Foo")
     assert is_upper_p("FOO")
+
+
+def test_is_numeric_p():
+    assert not is_numeric_p("foo")
+    assert is_numeric_p("123")
+
+
+def test_is_printable_p():
+    assert not is_printable_p("hello\x00")
+    assert is_printable_p("hello")
+    assert is_printable_p("")
 
 
 def test_ends_with_p():
