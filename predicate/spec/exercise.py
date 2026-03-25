@@ -118,139 +118,82 @@ def exercise(f: Callable, spec: Spec | None = None, n: int = 10) -> Iterator[tup
     return exercise_function(f, spec, n) if is_func else exercise_class(f, spec, n)
 
 
-def exercise_class(f: Callable, spec: Spec | None, n: int) -> Iterator[tuple]:
+def _resolve_class_spec(f: Callable, spec: Spec | None) -> Spec:
     if not spec:
         if not (spec_from_annotation := get_spec_from_class_annotation(f)):
             raise ValueError("Not implemented yet")
-        spec = spec_from_annotation
-    else:
-        check_signature_against_spec(f, spec)
+        return spec_from_annotation
+    check_signature_against_spec(f, spec)
+    return spec
 
-    parameters = spec["args"]
-    return_p = spec["ret"]
 
-    if predicates := tuple(parameters.items()):
-        predicate = is_dict_of_p(*predicates)
-
-        values = take(n, generate_true(predicate))
-    else:
-        values = take(n, repeat({}))
+def exercise_class(f: Callable, spec: Spec | None, n: int) -> Iterator[tuple]:
+    spec = _resolve_class_spec(f, spec)
+    return_p, values = _generate_values(spec, n)
 
     for value in values:
         result = f(**value)
-        if not return_p(result):
-            raise AssertionError(f"Not conform spec: {explain(return_p, result)}")
-
-        if fn := spec.get("fn"):
-            if not fn(**value, ret=result):
-                raise AssertionError("Not conform spec, details tbd")
-
-        if fn_p := spec.get("fn_p"):
-            fn_p_result = fn_p(**value)
-            if not fn_p_result(result):
-                raise AssertionError("Not conform spec, details tbd")
-
+        _verify_result(spec, return_p, value, result)
         yield tuple(value.values()), result
 
 
-def exercise_function(f: Callable, spec: Spec | None, n: int) -> Iterator[tuple]:
+def _resolve_function_spec(f: Callable, spec: Spec | None) -> Spec:
     if not spec:
         if not (spec_from_annotation := get_spec_from_function_annotation(f)):
             raise ValueError("Not implemented yet")
-        spec = spec_from_annotation
-    else:
-        check_signature_against_spec(f, spec)
+        return spec_from_annotation
+    check_signature_against_spec(f, spec)
+    return spec
 
+
+def _generate_values(spec: Spec, n: int) -> tuple:
     parameters = spec["args"]
     return_p = spec["ret"]
-
     if predicates := tuple(parameters.items()):
-        predicate = is_dict_of_p(*predicates)
-
-        values = take(n, generate_true(predicate))
+        values = take(n, generate_true(is_dict_of_p(*predicates)))
     else:
         values = take(n, repeat({}))
+    return return_p, values
+
+
+def _verify_result(spec: Spec, return_p: Predicate, value: dict, result) -> None:
+    if not return_p(result):
+        raise AssertionError(f"Not conform spec: {explain(return_p, result)}")
+
+    if fn := spec.get("fn"):
+        if not fn(**value, ret=result):
+            raise AssertionError("Not conform spec, details tbd")
+
+    if fn_p := spec.get("fn_p"):
+        if not fn_p(**value)(result):
+            raise AssertionError("Not conform spec, details tbd")
+
+
+def exercise_function(f: Callable, spec: Spec | None, n: int) -> Iterator[tuple]:
+    spec = _resolve_function_spec(f, spec)
+    return_p, values = _generate_values(spec, n)
 
     for value in values:
         result = f(**value)
-        if not return_p(result):
-            raise AssertionError(f"Not conform spec: {explain(return_p, result)}")
-
-        if fn := spec.get("fn"):
-            if not fn(**value, ret=result):
-                raise AssertionError("Not conform spec, details tbd")
-
-        if fn_p := spec.get("fn_p"):
-            fn_p_result = fn_p(**value)
-            if not fn_p_result(result):
-                raise AssertionError("Not conform spec, details tbd")
-
+        _verify_result(spec, return_p, value, result)
         yield tuple(value.values()), result
 
 
 async def async_exercise_class(f: Callable, spec: Spec | None, n: int) -> AsyncIterator[tuple]:
-    if not spec:
-        if not (spec_from_annotation := get_spec_from_class_annotation(f)):
-            raise ValueError("Not implemented yet")
-        spec = spec_from_annotation
-    else:
-        check_signature_against_spec(f, spec)
-
-    parameters = spec["args"]
-    return_p = spec["ret"]
-
-    if predicates := tuple(parameters.items()):
-        predicate = is_dict_of_p(*predicates)
-        values = take(n, generate_true(predicate))
-    else:
-        values = take(n, repeat({}))
+    spec = _resolve_class_spec(f, spec)
+    return_p, values = _generate_values(spec, n)
 
     for value in values:
         result = await f(**value)
-        if not return_p(result):
-            raise AssertionError(f"Not conform spec: {explain(return_p, result)}")
-
-        if fn := spec.get("fn"):
-            if not fn(**value, ret=result):
-                raise AssertionError("Not conform spec, details tbd")
-
-        if fn_p := spec.get("fn_p"):
-            fn_p_result = fn_p(**value)
-            if not fn_p_result(result):
-                raise AssertionError("Not conform spec, details tbd")
-
+        _verify_result(spec, return_p, value, result)
         yield tuple(value.values()), result
 
 
 async def async_exercise_function(f: Callable, spec: Spec | None, n: int) -> AsyncIterator[tuple]:
-    if not spec:
-        if not (spec_from_annotation := get_spec_from_function_annotation(f)):
-            raise ValueError("Not implemented yet")
-        spec = spec_from_annotation
-    else:
-        check_signature_against_spec(f, spec)
-
-    parameters = spec["args"]
-    return_p = spec["ret"]
-
-    if predicates := tuple(parameters.items()):
-        predicate = is_dict_of_p(*predicates)
-        values = take(n, generate_true(predicate))
-    else:
-        values = take(n, repeat({}))
+    spec = _resolve_function_spec(f, spec)
+    return_p, values = _generate_values(spec, n)
 
     for value in values:
         result = await f(**value)
-        if not return_p(result):
-            raise AssertionError(f"Not conform spec: {explain(return_p, result)}")
-
-        if fn := spec.get("fn"):
-            if not fn(**value, ret=result):
-                raise AssertionError("Not conform spec, details tbd")
-
-        if fn_p := spec.get("fn_p"):
-            fn_p_result = fn_p(**value)
-            if not fn_p_result(result):
-                raise AssertionError("Not conform spec, details tbd")
-
+        _verify_result(spec, return_p, value, result)
         yield tuple(value.values()), result
