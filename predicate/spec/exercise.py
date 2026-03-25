@@ -174,8 +174,9 @@ def _verify_result(spec: Spec, return_p: Predicate, value: dict, result) -> None
             raise AssertionError("Not conform spec, details tbd")
 
     if fn_p := spec.get("fn_p"):
-        if not fn_p(**value)(result):
-            raise AssertionError("Not conform spec, details tbd")
+        fn_p_result = fn_p(**value)
+        if not fn_p_result(result):
+            raise AssertionError(f"Not conform spec: {explain(fn_p_result, result)}")
 
 
 def exercise_function(f: Callable, spec: Spec | None, n: int) -> Iterator[tuple]:
