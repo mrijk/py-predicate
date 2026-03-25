@@ -3,10 +3,20 @@ from predicate import (
     always_false_p,
     always_true_p,
     any_p,
+    eq_p,
     fn_p,
+    ge_le_p,
+    ge_lt_p,
+    ge_p,
+    gt_le_p,
+    gt_lt_p,
+    gt_p,
     is_falsy_p,
+    is_int_p,
     is_truthy_p,
     juxt_p,
+    le_p,
+    lt_p,
     ne_p,
     tee_p,
     to_json,
@@ -142,6 +152,52 @@ def test_format_json_juxt():
             "evaluate": {"all": {"predicate": {"true": True}}},
         }
     }
+
+
+def test_format_json_eq():
+    assert to_json(eq_p(5)) == {"eq": {"v": 5}}
+
+
+def test_format_json_ge():
+    assert to_json(ge_p(2)) == {"ge": {"v": 2}}
+
+
+def test_format_json_gt():
+    assert to_json(gt_p(2)) == {"gt": {"v": 2}}
+
+
+def test_format_json_le():
+    assert to_json(le_p(10)) == {"le": {"v": 10}}
+
+
+def test_format_json_lt():
+    assert to_json(lt_p(10)) == {"lt": {"v": 10}}
+
+
+def test_format_json_ge_le():
+    assert to_json(ge_le_p(1, 10)) == {"ge_le": {"lower": 1, "upper": 10}}
+
+
+def test_format_json_ge_lt():
+    assert to_json(ge_lt_p(1, 10)) == {"ge_lt": {"lower": 1, "upper": 10}}
+
+
+def test_format_json_gt_le():
+    assert to_json(gt_le_p(1, 10)) == {"gt_le": {"lower": 1, "upper": 10}}
+
+
+def test_format_json_gt_lt():
+    assert to_json(gt_lt_p(1, 10)) == {"gt_lt": {"lower": 1, "upper": 10}}
+
+
+def test_format_json_is_instance_single():
+    assert to_json(is_int_p) == {"is_instance": {"klass": ["int"]}}
+
+
+def test_format_json_is_instance_multiple():
+    from predicate import is_instance_p
+
+    assert to_json(is_instance_p(int, str)) == {"is_instance": {"klass": ["int", "str"]}}
 
 
 def test_format_unknown(unknown_p):
