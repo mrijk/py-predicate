@@ -26,7 +26,7 @@ different predicates. This is exactly what ``is_tuple_of_p`` does for us. Let's 
 
     from predicate import any_p, in_p, is_truthy_p, is_tuple_of_p, is_uuid_p
 
-    foo_or_bar = in_p("foo", "bar")
+    foo_or_bar = in_p({"foo", "bar"})
     valid_tuple = is_tuple_of_p(is_uuid_p, foo_or_bar, is_truthy_p)
 
     predicate = any_p(valid_tuple)
