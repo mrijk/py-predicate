@@ -100,7 +100,6 @@ def test_xor_optimize_not_left(p):
 
 
 def test_xor_optimize_not_2(p, q):
-
     not_same = p & q
 
     assert not can_optimize(not_same)
@@ -303,5 +302,23 @@ def test_xor_optimize_nested_not_optimizable():
     predicate = (ge_p(2) ^ ge_p(3)) ^ ge_p(4)
 
     # should not raise; result may or may not be optimized
+    result = optimize(predicate)
+    assert result is not None
+
+
+def test_xor_left_xor_both_inner_fail():
+    # (p ^ q) ^ r where neither inner cross-xor optimizes — covers the nested NotOptimized() path
+    from predicate.standard_predicates import is_float_p, is_int_p, is_str_p
+
+    predicate = (is_int_p ^ is_str_p) ^ is_float_p
+    result = optimize(predicate)
+    assert result is not None
+
+
+def test_xor_right_xor_no_optimize():
+    # p ^ (q ^ r) where q ^ r stays a XorPredicate after optimize — covers _, XorPredicate() case
+    from predicate.standard_predicates import is_int_p, is_str_p
+
+    predicate = ge_p(2) ^ (is_int_p ^ is_str_p)
     result = optimize(predicate)
     assert result is not None

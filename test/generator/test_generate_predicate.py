@@ -121,3 +121,11 @@ def test_generate_set_of_predicate(klass):
     for predicate in predicates:
         assert isinstance(predicate, predicate_type)
         assert is_klass_predicate(predicate)
+
+
+def test_generate_any_predicates_depth_zero():
+    assert list(take(3, generate_any_predicates(max_depth=0, klass=int))) == []
+
+
+def test_generate_set_of_predicates_depth_zero():
+    assert list(take(3, generate_set_of_predicates(max_depth=0, klass=int))) == []

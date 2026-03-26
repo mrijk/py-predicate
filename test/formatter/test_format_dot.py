@@ -319,3 +319,13 @@ def test_format_dot_laz_unknown():
 def test_format_dot_unknown(unknown_p):
     with pytest.raises(ValueError):
         to_dot(unknown_p)
+
+
+def test_format_dot_juxt():
+    from predicate import exactly_one_p, juxt_p
+
+    predicate = juxt_p(is_int_p, is_str_p, evaluate=exactly_one_p(predicate=eq_p(True)))
+
+    dot = to_dot(predicate)
+
+    assert dot

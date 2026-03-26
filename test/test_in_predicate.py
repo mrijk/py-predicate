@@ -53,3 +53,14 @@ def test_in_p_klass_non_iterable():
 
     predicate = in_p(Contains13())
     assert predicate.klass is Any
+
+
+def test_in_p_klass_iterable():
+    predicate = in_p([1, 2, 3])
+    assert predicate.klass is int
+
+
+def test_in_p_eq_large():
+    # Equality check for sets with > 1000 items uses direct == comparison
+    large = list(range(1001))
+    assert in_p(large) == in_p(large)
