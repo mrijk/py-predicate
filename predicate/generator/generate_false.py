@@ -347,7 +347,7 @@ def generate_not_none(_predicate: IsNotNonePredicate) -> Iterator:
 
 @generate_false.register
 def generate_truthy(_predicate: IsTruthyPredicate) -> Iterator:
-    yield from (False, 0, (), "", {})
+    yield from cycle((False, 0, (), "", {}))
 
 
 @generate_false.register
