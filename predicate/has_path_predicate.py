@@ -33,7 +33,7 @@ class HasPathPredicate[T](Predicate[T]):
                     if not keys:
                         return {"reason": f"No key matching {p!r} found at path position {i}"}
                     current = current[keys[0]]
-                return {"reason": f"Dictionary {x} didn't match path"}
+                return {"reason": f"Dictionary {x} didn't match path"}  # pragma: no cover
             case _:
                 return {"reason": f"Value {x} is not a dict"}
 
