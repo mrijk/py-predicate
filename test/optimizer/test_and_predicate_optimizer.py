@@ -887,3 +887,27 @@ def test_optimize_and_xor_right(p, q):
     optimized = optimize(predicate)
 
     assert optimized == ~p & q
+
+
+def test_optimize_le_ge_reversed():
+    # le(v2) & ge(v1) => ge_le(v1, v2)  — reversed operand order
+
+    assert optimize(le_p(3) & ge_p(1)) == ge_le_p(lower=1, upper=3)
+
+
+def test_optimize_le_gt_reversed():
+    # le(v2) & gt(v1) => gt_le(v1, v2)  — reversed operand order
+
+    assert optimize(le_p(3) & gt_p(1)) == gt_le_p(lower=1, upper=3)
+
+
+def test_optimize_lt_ge_reversed():
+    # lt(v2) & ge(v1) => ge_lt(v1, v2)  — reversed operand order
+
+    assert optimize(lt_p(3) & ge_p(1)) == ge_lt_p(lower=1, upper=3)
+
+
+def test_optimize_lt_gt_reversed():
+    # lt(v2) & gt(v1) => gt_lt(v1, v2)  — reversed operand order
+
+    assert optimize(lt_p(3) & gt_p(1)) == gt_lt_p(lower=1, upper=3)

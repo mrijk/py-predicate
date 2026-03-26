@@ -47,6 +47,7 @@ from predicate import (
     is_none_p,
     is_not_empty_p,
     is_not_none_p,
+    is_number_p,
     is_odd_p,
     is_p,
     is_predicate_of_p,
@@ -103,6 +104,7 @@ def foo(self) -> bool:
         is_list_p,
         is_nan_p,
         is_none_p,
+        is_number_p,
         is_not_empty_p,
         is_not_none_p,
         is_odd_p,
@@ -134,6 +136,17 @@ def test_generate_true(predicate):
 def test_generate_true_or(predicate_pair):
     predicate_1, predicate_2 = predicate_pair
     predicate = predicate_1 | predicate_2
+    assert_generated_true(predicate)
+
+
+@pytest.mark.parametrize(
+    "predicate",
+    [
+        not_in_p(["foo", "bar"]),
+        not_in_p([uuid.uuid4(), uuid.uuid4()]),
+    ],
+)
+def test_generate_true_not_in_type(predicate):
     assert_generated_true(predicate)
 
 

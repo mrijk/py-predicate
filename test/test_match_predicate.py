@@ -308,3 +308,21 @@ def test_match_optional_explain_no_following_predicates():
     assert not predicate(["foo"])
     result = explain(predicate, ["foo"])
     assert result["result"] is False
+
+
+def test_match_explain_optional_repetition_predicate():
+    # explain() path through reason() with OptionalPredicate (lines 48-49 of match_predicate.py)
+    predicate = match_p(optional(is_int_p), is_str_p)
+
+    assert not predicate([1, 2, "foo"])
+    result = explain(predicate, [1, 2, "foo"])
+    assert result["result"] is False
+
+
+def test_match_explain_plus_repetition_predicate():
+    # explain() path through reason() with PlusPredicate (lines 48-49 of match_predicate.py)
+    predicate = match_p(plus(is_int_p), is_str_p)
+
+    assert not predicate([1, 2])
+    result = explain(predicate, [1, 2])
+    assert result["result"] is False

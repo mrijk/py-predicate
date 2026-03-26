@@ -25,6 +25,7 @@ from predicate import (
     has_key_p,
     in_p,
     is_bool_p,
+    is_bytes_p,
     is_callable_p,
     is_complex_p,
     is_container_p,
@@ -35,23 +36,31 @@ from predicate import (
     is_even_p,
     is_falsy_p,
     is_float_p,
+    is_frozenset_p,
     is_hashable_p,
+    is_inf_p,
     is_int_p,
     is_iterable_of_p,
     is_iterable_p,
     is_list_of_p,
     is_list_p,
+    is_mapping_p,
+    is_nan_p,
     is_none_p,
     is_not_empty_p,
     is_not_none_p,
+    is_number_p,
     is_odd_p,
     is_p,
     is_predicate_p,
+    is_sequence_p,
     is_set_of_p,
     is_set_p,
     is_str_p,
+    is_timedelta_p,
     is_truthy_p,
     is_tuple_of_p,
+    is_tuple_p,
     is_uuid_p,
     le_p,
     lt_p,
@@ -74,6 +83,7 @@ from predicate import (
         has_key_p("foo"),
         in_p([2, 3, 4]),
         is_bool_p,
+        is_bytes_p,
         is_callable_p,
         is_complex_p,
         is_container_p,
@@ -83,18 +93,26 @@ from predicate import (
         is_even_p,
         is_falsy_p,
         is_float_p,
+        is_frozenset_p,
         is_hashable_p,
+        is_inf_p,
         is_iterable_p,
         is_list_p,
+        is_mapping_p,
+        is_nan_p,
         is_none_p,
         is_not_empty_p,
         is_not_none_p,
+        is_number_p,
         is_odd_p,
         is_predicate_p,
+        is_sequence_p,
         is_truthy_p,
         is_int_p,
         is_set_p,
         is_str_p,
+        is_timedelta_p,
+        is_tuple_p,
         is_uuid_p,
         ne_p(2),
         not_in_p([2, "foo", 4]),
@@ -424,3 +442,18 @@ def test_generate_false_unknown_range(range_predicate):
     predicate = range_predicate(lower="bar", upper="foo")
     with pytest.raises(ValueError):
         take(5, generate_false(predicate))
+
+
+def test_generate_false_xor_always_true():
+    # XOR that optimizes to always_true_p — generate_false yields nothing
+    predicate = is_int_p ^ ~is_int_p
+
+    values = list(take(5, generate_false(predicate)))
+    assert values == []
+
+
+def test_generate_false_xor_overlapping():
+    # XOR where AND doesn't optimize to always_false_p — covers the left_and_right path
+    predicate = ge_p(2) ^ gt_p(5)
+
+    assert_generated_false(predicate)
