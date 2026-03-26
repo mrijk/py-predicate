@@ -25,7 +25,7 @@ We will define a matcher that matches an iterable on an ``int``, followed by a `
 ``match_p`` accepts all the predicates (including ``match_p`` itself!) defined in py-predicate,
 and applies them one by one to the Iterable.
 
-This is convenient, but the real power of his approach can be seen once we start using regex operators.
+This is convenient, but the real power of this approach can be seen once we start using regex operators.
 
 The ``optional`` operator
 -------------------------
@@ -71,7 +71,7 @@ In this example we want to match a list that should start with zero or more inte
 The ``plus`` operator
 ---------------------
 
-This is an implementation of the + (polus) that indicates that either 1 or more matches of the
+This is an implementation of the + (plus) that indicates that either 1 or more matches of the
 predicate should evaluate to True.
 
 In the following example we want to match on at least one integer, followed by at least one string:
@@ -83,7 +83,7 @@ In the following example we want to match on at least one integer, followed by a
     one_or_more_ints = plus(is_int_p)
     one_or_more_strings = plus(is_str_p)
 
-    predicate = match_p(one_or_more_ints, one_or_more_ints)
+    predicate = match_p(one_or_more_ints, one_or_more_strings)
 
     predicate([2])  # False
     predicate(["foo"])  # False
