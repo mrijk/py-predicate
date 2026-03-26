@@ -3,7 +3,7 @@ import sys
 from collections.abc import Callable, Container, Iterable, Iterator
 from datetime import datetime, timedelta
 from functools import singledispatch
-from itertools import repeat
+from itertools import cycle, repeat
 from types import UnionType
 from typing import Any, Final, Hashable, get_args
 from uuid import UUID
@@ -428,12 +428,12 @@ def generate_regex(predicate: RegexPredicate) -> Iterator:
 
 @generate_true.register
 def generate_falsy(_predicate: IsFalsyPredicate) -> Iterator:
-    yield from (False, 0, (), "", {})
+    yield from cycle((False, 0, (), "", {}))
 
 
 @generate_true.register
 def generate_truthy(_predicate: IsTruthyPredicate) -> Iterator:
-    yield from (True, 1, "true", {1}, 3.14)
+    yield from cycle((True, 1, "true", frozenset({1}), 3.14))
 
 
 @generate_true.register

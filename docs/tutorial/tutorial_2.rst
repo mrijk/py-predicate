@@ -40,3 +40,12 @@ Now you are ready to check your new predicate against the requirements, for exam
     predicate([(uuid4(), "foo", 1)])  # True: 1 is a truthy value
     predicate([(uuid4(), "meh", 1)])  # False: missing "foo" or "bar"
     predicate([("not_a_uuid", "foo", 1)])  # False: missing uuid
+
+You can also generate example values that satisfy the predicate, using ``generate_true``:
+
+.. code-block:: python
+
+    from predicate import generate_true
+    from more_itertools import take
+
+    values = take(3, generate_true(predicate))

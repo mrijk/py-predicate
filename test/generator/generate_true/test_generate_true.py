@@ -25,6 +25,7 @@ from predicate import (
     gt_p,
     has_key_p,
     has_length_p,
+    in_p,
     is_bool_p,
     is_callable_p,
     is_complex_p,
@@ -82,6 +83,7 @@ def foo(self) -> bool:
     "predicate",
     [
         any_p(is_uuid_p),
+        any_p(is_tuple_of_p(is_uuid_p, in_p({"foo", "bar"}), is_truthy_p)),
         eq_false_p,
         eq_true_p,
         has_key_p("foo"),
@@ -346,6 +348,7 @@ def test_predicate_of(klass):
         (is_int_p,),
         (is_str_p,),
         (is_int_p, is_int_p),
+        (is_uuid_p, in_p({"foo", "bar"}), is_truthy_p),
     ],
 )
 def test_tuple_of(tuple_types_p):
