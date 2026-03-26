@@ -74,3 +74,19 @@ def test_has_path_predicate_no_match_explain():
 
     expected = {"reason": "No key matching eq_p('x') found at path position 0", "result": False}
     assert explain(predicate, {"y": 13}) == expected
+
+
+def test_has_path_predicate_repr():
+    has_x = eq_p("x")
+    predicate = has_path_p(has_x)
+
+    assert repr(predicate) == "has_path_p(eq_p('x'))"
+
+
+def test_has_path_predicate_non_dict_intermediate_explain():
+    has_x = eq_p("x")
+    has_y = eq_p("y")
+    predicate = has_path_p(has_x, has_y)
+
+    expected = {"reason": "Expected a dict at path position 1, got int", "result": False}
+    assert explain(predicate, {"x": 13}) == expected
