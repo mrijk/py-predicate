@@ -19,8 +19,8 @@ Let's start with the first requirement. This is similar to what we saw in tutori
 The ``any_p`` predicate is similar to the ``all_p`` predicate: it accepts one parameter (which is a predicate) and
 returns true iff at least one value satisfies this predicate.
 
-Now lets turn to the other requirements. If it's a tuple, we need to check the elements in this tuple against three
-different predicates. This is exactly what ``is_tuple_of_p`` does for us. Lets show the code first:
+Now let's turn to the other requirements. If it's a tuple, we need to check the elements in this tuple against three
+different predicates. This is exactly what ``is_tuple_of_p`` does for us. Let's show the code first:
 
 .. code-block:: python
 

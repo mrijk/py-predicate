@@ -4,7 +4,7 @@ Tutorial 1
 Task: define a predicate expression that given a list of values, returns True if:
 
 #. all values are either strings or integers
-#. if the value is an integer, than it should be less than 5
+#. if the value is an integer, then it should be less than 5
 #. if the value is a string, it should start with foo
 
 This will show a couple of concepts and useful standard predicates.
@@ -23,7 +23,7 @@ In the example above we import 3 predicates. The ``all_p`` accepts one parameter
 
 We combine the ``is_int_p`` and ``is_str_p`` with the ``|`` operator, resulting in a new predicate.
 
-This is sufficient for the first requirement. Now lets restrict the allowed value of the integer to less than 5:
+This is sufficient for the first requirement. Now let's restrict the allowed value of the integer to less than 5:
 
 .. code-block:: python
 
@@ -55,7 +55,7 @@ Now you are ready to check your new predicate against the requirements, for exam
 
     predicate([1, "foo"])  # True
     predicate([1, "foo", None])  # False, None is not valid
-    predicate([5, "foo"])  # False, 5 is to big
+    predicate([5, "foo"])  # False, 5 is too big
     predicate([1, "bar"])  # False, "bar" doesn't begin with "foo"
 
 Let's now reuse this predicate to generate some sample values:
