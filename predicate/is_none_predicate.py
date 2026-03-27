@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Final, override
+from typing import Final, TypeGuard, override
 
 from predicate import exception_p
 from predicate.predicate import Predicate, or_p, predicate_partial
@@ -9,7 +9,7 @@ from predicate.predicate import Predicate, or_p, predicate_partial
 class IsNonePredicate[T](Predicate[T]):
     """A predicate class that models the 'is none' predicate."""
 
-    def __call__(self, x: T) -> bool:
+    def __call__(self, x: object) -> TypeGuard[None]:
         return x is None
 
     def __repr__(self) -> str:

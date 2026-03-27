@@ -1,7 +1,8 @@
+import sys
 from inspect import Parameter, Signature, iscoroutinefunction, signature
 from itertools import repeat
 from types import FunctionType
-from typing import AsyncIterator, Callable, Iterator, TypeVar, get_origin
+from typing import AsyncIterator, Callable, Iterator, TypeGuard, TypeVar, get_origin
 
 from more_itertools import take
 
@@ -12,11 +13,19 @@ from predicate.implies import implies
 from predicate.predicate import Predicate
 from predicate.spec.spec import Spec
 
+_type_narrowing_origins: set = {TypeGuard}
+if sys.version_info >= (3, 13):
+    from typing import TypeIs
+
+    _type_narrowing_origins.add(TypeIs)
+
 
 def get_return_predicate(sig: Signature) -> Predicate:
     annotation = sig.return_annotation
     if type(annotation) is TypeVar:
         return always_true_p
+    if get_origin(annotation) in _type_narrowing_origins:
+        return always_true_p  # TypeGuard/TypeIs is bool at runtime
     return is_instance_p(annotation)
 
 

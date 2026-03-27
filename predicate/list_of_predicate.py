@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Any, override
+from typing import Any, TypeGuard, override
 
 from predicate.helpers import first_false
 from predicate.predicate import Predicate, resolve_predicate
@@ -14,7 +14,7 @@ class ListOfPredicate[T](Predicate[T]):
     def __init__(self, predicate: Predicate[T]):
         self.predicate = resolve_predicate(predicate)
 
-    def __call__(self, x: Any) -> bool:
+    def __call__(self, x: Any) -> TypeGuard[list[T]]:
         match x:
             case list() as l:
                 return all(self.predicate(item) for item in l)
@@ -41,7 +41,7 @@ class ListOfPredicate[T](Predicate[T]):
                 return {"reason": f"{x} is not an instance of a list"}
 
 
-def is_list_of_p[T](predicate: Predicate[T]) -> Predicate:
+def is_list_of_p[T](predicate: Predicate[T]) -> "ListOfPredicate[T]":
     """Return True if value is a list, and for all elements in the list the predicate is True, otherwise False."""
     return ListOfPredicate(predicate)
 
