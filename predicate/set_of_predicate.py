@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import override
+from typing import Any, TypeGuard, override
 
 from predicate.helpers import all_true, first_false
 from predicate.predicate import Predicate
@@ -11,7 +11,7 @@ class SetOfPredicate[T](Predicate[T]):
 
     predicate: Predicate
 
-    def __call__(self, x: set[T]) -> bool:
+    def __call__(self, x: Any) -> TypeGuard[set[T]]:
         match x:
             case set() as s:
                 return all_true(s, self.predicate)
@@ -37,6 +37,6 @@ class SetOfPredicate[T](Predicate[T]):
                 return {"reason": f"{x} is not an instance of a set"}
 
 
-def is_set_of_p[T](predicate: Predicate[T]) -> Predicate[set[T]]:
+def is_set_of_p[T](predicate: Predicate[T]) -> "SetOfPredicate[T]":
     """Return True if value is a set, and for all elements in the set the predicate is True, otherwise False."""
     return SetOfPredicate(predicate)
