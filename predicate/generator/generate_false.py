@@ -15,7 +15,7 @@ from predicate.always_false_predicate import AlwaysFalsePredicate, always_false_
 from predicate.always_true_predicate import AlwaysTruePredicate, always_true_p
 from predicate.any_predicate import AnyPredicate
 from predicate.count_predicate import CountPredicate
-from predicate.dict_of_predicate import DictOfPredicate, is_dict_of_p
+from predicate.dict_of_predicate import DictOfPredicate
 from predicate.eq_predicate import EqPredicate
 from predicate.exactly_predicate import ExactlyPredicate
 from predicate.fn_predicate import FnPredicate
@@ -137,17 +137,23 @@ def generate_has_length(predicate: HasLengthPredicate, *, value_p=is_int_p) -> I
 
 @generate_false.register
 def generate_has_path(predicate: HasPathPredicate) -> Iterator:
-    path = predicate.path
-    root = first(path)
-
     from predicate import generate_true
 
-    valid_keys = generate_true(root)
+    yield {}
 
-    while True:
-        valid_key = next(valid_keys)
-        dict_of = is_dict_of_p((valid_key, always_false_p))
-        yield from generate_false(dict_of)
+    path = predicate.path
+    root_p = path[0]
+    rest_path = path[1:]
+
+    if rest_path:
+        valid_keys = generate_true(root_p)
+        false_rest_values = generate_false(HasPathPredicate(path=rest_path))
+        while True:
+            yield {next(valid_keys): next(false_rest_values)}
+    else:
+        false_keys = generate_false(root_p)
+        while True:
+            yield {next(false_keys): None}
 
 
 @generate_false.register
