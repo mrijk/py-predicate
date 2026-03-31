@@ -1,3 +1,5 @@
+import pytest
+
 from predicate import (
     all_p,
     always_false_p,
@@ -158,16 +160,17 @@ def test_format_json_fn_builtin():
     assert "source" not in json["fn"]
 
 
-def test_format_json_fn_is_even_p():
-    json = to_json(is_even_p)
+@pytest.mark.parametrize(
+    ("predicate", "source"),
+    [
+        (is_even_p, "lambda x: x % 2 == 0"),
+        (is_odd_p, "lambda x: x % 2 != 0"),
+    ],
+)
+def test_format_json_fn_parity(predicate, source):
+    json = to_json(predicate)
 
-    assert json["fn"]["source"] == "lambda x: x % 2 == 0"
-
-
-def test_format_json_fn_is_odd_p():
-    json = to_json(is_odd_p)
-
-    assert json["fn"]["source"] == "lambda x: x % 2 != 0"
+    assert json["fn"]["source"] == source
 
 
 def test_format_json_is_falsy():

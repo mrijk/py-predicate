@@ -3,6 +3,8 @@ import inspect
 import textwrap
 from typing import Callable
 
+from more_itertools import first, one
+
 
 def get_fn_source(fn: Callable) -> dict[str, str]:
     """Return serializable info about fn's source."""
@@ -31,11 +33,11 @@ def get_fn_source(fn: Callable) -> dict[str, str]:
     if not candidates:
         return {}
     if len(candidates) == 1:
-        chosen = candidates[0]
+        chosen = one(candidates)
     else:
         body_col = _get_body_col(fn)
         exact = [n for n in candidates if body_col is not None and n.body.col_offset == body_col]
-        chosen = exact[0] if exact else candidates[0]
+        chosen = first(exact, default=first(candidates))
 
     return {"source": ast.unparse(chosen)}
 
@@ -50,6 +52,6 @@ def _builtin_info(fn: Callable) -> dict[str, str]:
 def _get_body_col(fn: Callable) -> int | None:
     try:
         cols = [col for _, _, col, _ in fn.__code__.co_positions() if col]
-        return cols[0] if cols else None
+        return first(cols, default=None)
     except AttributeError:
         return None
