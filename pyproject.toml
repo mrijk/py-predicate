@@ -90,6 +90,7 @@ ban-relative-imports = "all"
 [tool.mutmut]
 paths_to_mutate = ["predicate/"]
 tests_dir = ["test/"]
+pytest_add_cli_args = ["--ignore=test/spec"]
 
 [tool.mypy]
 
