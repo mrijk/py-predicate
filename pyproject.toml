@@ -31,6 +31,7 @@ dependencies = [
     "graphviz",
     "lark",
     "more-itertools",
+    "pyyaml",
     "typer",
 ]
 readme = "README.md"
