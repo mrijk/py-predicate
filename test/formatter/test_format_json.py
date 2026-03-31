@@ -1,3 +1,5 @@
+import pytest
+
 from predicate import (
     all_p,
     always_false_p,
@@ -19,12 +21,14 @@ from predicate import (
     implies_p,
     in_p,
     is_dict_of_p,
+    is_even_p,
     is_falsy_p,
     is_instance_p,
     is_int_p,
     is_list_of_p,
     is_none_p,
     is_not_none_p,
+    is_odd_p,
     is_real_subset_p,
     is_real_superset_p,
     is_set_of_p,
@@ -131,7 +135,42 @@ def test_format_json_fn():
 
     json = to_json(predicate)
 
-    assert json == {"fn": {"name": "<lambda>"}}
+    assert json == {"fn": {"name": "<lambda>", "source": "lambda x: x"}}
+
+
+def test_format_json_fn_named_function():
+    def is_positive(x: int) -> bool:
+        return x > 0
+
+    predicate = fn_p(is_positive)
+    json = to_json(predicate)
+
+    assert json["fn"]["name"] == "is_positive"
+    assert "return x > 0" in json["fn"]["source"]
+
+
+def test_format_json_fn_builtin():
+    import math
+
+    predicate = fn_p(math.isfinite)
+    json = to_json(predicate)
+
+    assert json["fn"]["name"] == "isfinite"
+    assert json["fn"]["qualname"] == "math.isfinite"
+    assert "source" not in json["fn"]
+
+
+@pytest.mark.parametrize(
+    ("predicate", "source"),
+    [
+        (is_even_p, "lambda x: x % 2 == 0"),
+        (is_odd_p, "lambda x: x % 2 != 0"),
+    ],
+)
+def test_format_json_fn_parity(predicate, source):
+    json = to_json(predicate)
+
+    assert json["fn"]["source"] == source
 
 
 def test_format_json_is_falsy():

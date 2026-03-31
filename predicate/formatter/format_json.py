@@ -11,6 +11,7 @@ from predicate.dict_of_predicate import DictOfPredicate
 from predicate.eq_predicate import EqPredicate
 from predicate.exactly_predicate import ExactlyPredicate
 from predicate.fn_predicate import FnPredicate
+from predicate.formatter.fn_source import get_fn_source
 from predicate.ge_predicate import GePredicate
 from predicate.gt_predicate import GtPredicate
 from predicate.has_key_predicate import HasKeyPredicate
@@ -78,8 +79,10 @@ def to_json(predicate: Predicate) -> dict[str, Any]:
             case ExactlyPredicate(n, predicate):
                 return "exactly", {"n": n, "predicate": to_json(predicate)}
             case FnPredicate(predicate_fn):
-                name = predicate_fn.__code__.co_name
-                return "fn", {"name": name}
+                name = getattr(predicate_fn, "__name__", str(predicate_fn))
+                fn_info: dict[str, Any] = {"name": name}
+                fn_info.update(get_fn_source(predicate_fn))
+                return "fn", fn_info
             case HasKeyPredicate(key):
                 return "has_key", {"key": key}
             case HasLengthPredicate(length_p):
