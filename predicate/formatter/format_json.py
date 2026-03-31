@@ -1,5 +1,6 @@
+from collections.abc import Iterable
 from types import UnionType
-from typing import Any, get_args
+from typing import Any, cast, get_args
 
 from predicate.all_predicate import AllPredicate
 from predicate.always_false_predicate import AlwaysFalsePredicate
@@ -88,7 +89,7 @@ def to_json(predicate: Predicate) -> dict[str, Any]:
             case ImpliesPredicate(predicate):
                 return "implies", {"predicate": to_json(predicate)}
             case InPredicate(v):
-                return "in", {"v": list(v)}
+                return "in", {"v": list(cast(Iterable, v))}
             case IsFalsyPredicate():
                 return "is_falsy", None
             case IsInstancePredicate(instance_klass):
@@ -145,7 +146,7 @@ def to_json(predicate: Predicate) -> dict[str, Any]:
             case NePredicate(v):
                 return "ne", {"v": v}
             case NotInPredicate(v):
-                return "not_in", {"v": list(v)}
+                return "not_in", {"v": list(cast(Iterable, v))}
             case NotPredicate(not_predicate):
                 return "not", {"predicate": to_json(not_predicate)}
             case OptionalPredicate(predicate):
