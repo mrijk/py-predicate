@@ -11,9 +11,11 @@ from predicate import (
     gt_le_p,
     gt_lt_p,
     gt_p,
+    is_even_p,
     is_falsy_p,
     is_instance_p,
     is_int_p,
+    is_odd_p,
     is_truthy_p,
     juxt_p,
     le_p,
@@ -107,7 +109,41 @@ def test_format_json_fn():
 
     json = to_json(predicate)
 
-    assert json == {"fn": {"name": "<lambda>"}}
+    assert json == {"fn": {"name": "<lambda>", "source": "lambda x: x"}}
+
+
+def test_format_json_fn_named_function():
+    def is_positive(x: int) -> bool:
+        return x > 0
+
+    predicate = fn_p(is_positive)
+    json = to_json(predicate)
+
+    assert json["fn"]["name"] == "is_positive"
+    assert "return x > 0" in json["fn"]["source"]
+
+
+def test_format_json_fn_builtin():
+    import math
+
+    predicate = fn_p(math.isfinite)
+    json = to_json(predicate)
+
+    assert json["fn"]["name"] == "isfinite"
+    assert json["fn"]["qualname"] == "math.isfinite"
+    assert "source" not in json["fn"]
+
+
+def test_format_json_fn_is_even_p():
+    json = to_json(is_even_p)
+
+    assert json["fn"]["source"] == "lambda x: x % 2 == 0"
+
+
+def test_format_json_fn_is_odd_p():
+    json = to_json(is_odd_p)
+
+    assert json["fn"]["source"] == "lambda x: x % 2 != 0"
 
 
 def test_format_json_is_falsy():

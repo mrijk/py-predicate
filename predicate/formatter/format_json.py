@@ -6,6 +6,7 @@ from predicate.always_true_predicate import AlwaysTruePredicate
 from predicate.any_predicate import AnyPredicate
 from predicate.eq_predicate import EqPredicate
 from predicate.fn_predicate import FnPredicate
+from predicate.formatter.fn_source import get_fn_source
 from predicate.ge_predicate import GePredicate
 from predicate.gt_predicate import GtPredicate
 from predicate.is_falsy_predicate import IsFalsyPredicate
@@ -45,8 +46,10 @@ def to_json(predicate: Predicate) -> dict[str, Any]:
             case EqPredicate(v):
                 return "eq", {"v": v}
             case FnPredicate(predicate_fn):
-                name = predicate_fn.__code__.co_name
-                return "fn", {"name": name}
+                name = getattr(predicate_fn, "__name__", str(predicate_fn))
+                fn_info: dict[str, Any] = {"name": name}
+                fn_info.update(get_fn_source(predicate_fn))
+                return "fn", fn_info
             case JuxtPredicate(predicates=predicates, evaluate=evaluate):
                 return "juxt", {"predicates": [to_json(p) for p in predicates], "evaluate": to_json(evaluate)}
             case GeLePredicate(lower, upper):
