@@ -88,9 +88,8 @@ ban-relative-imports = "all"
 "test/*" = ["D101", "D400", "D415",  "S101"]
 
 [tool.mutmut]
-paths_to_mutate = "predicate/"
-tests_dir = "test/"
-runner = "python -m pytest"
+paths_to_mutate = ["predicate/"]
+tests_dir = ["test/"]
 
 [tool.mypy]
 
