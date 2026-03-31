@@ -1,5 +1,6 @@
 import sys
 from functools import wraps
+from inspect import unwrap
 from typing import Callable
 
 from predicate import explain
@@ -7,6 +8,7 @@ from predicate.spec.spec import Spec
 
 
 def instrument_function(func: Callable, spec: Spec) -> Callable:
+    func = unwrap(func)
     func_name = func.__name__
 
     @wraps(func)
