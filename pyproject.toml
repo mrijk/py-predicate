@@ -50,6 +50,7 @@ test = [
     "pytest-benchmark",
     "pytest-cov",
     "ruff",
+    "types-PyYAML",
 ]
 dev = [
     "bumpversion",
