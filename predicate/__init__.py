@@ -14,7 +14,7 @@ from predicate.exactly_predicate import exactly_n
 from predicate.exception_predicate import PredicateError, exception_p
 from predicate.explain import explain
 from predicate.fn_predicate import fn_p, is_even_p, is_finite_p, is_inf_p, is_nan_p, is_odd_p
-from predicate.formatter import to_dot, to_json, to_latex
+from predicate.formatter import to_dot, to_json, to_latex, to_yaml
 from predicate.ge_predicate import ge_p
 from predicate.generator.generate_false import generate_false
 from predicate.generator.generate_true import generate_true
@@ -234,6 +234,7 @@ __all__ = [
     "to_dot",
     "to_json",
     "to_latex",
+    "to_yaml",
     "xor_p",
     "zero_p",
 ]
