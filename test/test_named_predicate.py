@@ -32,3 +32,11 @@ def test_to_named_predicate_same():
     predicate = to_named_predicate(p | q)
 
     assert predicate == NamedPredicate(name="p1") | NamedPredicate(name="p1")
+
+
+def test_to_named_predicate_not():
+    eq_2 = eq_p(2)
+
+    predicate = to_named_predicate(~eq_2)
+
+    assert predicate == ~NamedPredicate(name="p1")

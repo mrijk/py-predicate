@@ -1,0 +1,36 @@
+name: Mutation Testing
+
+on:
+  schedule:
+    - cron: "0 3 * * 1"  # Every Monday at 03:00 UTC
+  workflow_dispatch:      # Allow manual trigger
+
+jobs:
+  mutmut:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.12"
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install flit
+          flit install --deps develop --symlink
+      - name: Run mutmut
+        run: mutmut run
+      - name: Show results
+        if: always()
+        run: mutmut results
+      - name: Generate HTML report
+        if: always()
+        run: mutmut html
+      - name: Upload mutation report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mutation-report
+          path: html/
