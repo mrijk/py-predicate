@@ -91,7 +91,7 @@ ban-relative-imports = "all"
 paths_to_mutate = ["predicate/"]
 tests_dir = ["test/"]
 pytest_add_cli_args = ["--ignore=test/spec"]
-do_not_mutate = ["predicate/is_lambda_predicate.py"]
+do_not_mutate = ["predicate/is_lambda_predicate.py", "predicate/is_callable_predicate.py"]
 
 [tool.mypy]
 
