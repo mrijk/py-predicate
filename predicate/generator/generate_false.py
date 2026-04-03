@@ -8,7 +8,7 @@ from types import UnionType
 from typing import Final, get_args
 from uuid import UUID
 
-from more_itertools import chunked, first, flatten, interleave, random_permutation, take
+from more_itertools import first, flatten, interleave, random_permutation, take
 
 from predicate.all_predicate import AllPredicate
 from predicate.always_false_predicate import AlwaysFalsePredicate, always_false_p
@@ -400,15 +400,24 @@ def generate_or(predicate: OrPredicate) -> Iterator:
 
 @generate_false.register
 def generate_dict_of_p(dict_of_predicate: DictOfPredicate) -> Iterator:
+    from predicate import generate_true
+
     key_value_predicates = dict_of_predicate.key_value_predicates
+    length = len(key_value_predicates)
+    max_number = 2**length - 1
+    generators = [
+        ((generate_false(key_p), generate_false(value_p)), (generate_true(key_p), generate_true(value_p)))
+        for key_p, value_p in key_value_predicates
+    ]
 
-    # TODO: generate mix of both false (at least 1) and true
-    candidates = zip(
-        *flatten(((generate_false(key_p), generate_false(value_p)) for key_p, value_p in key_value_predicates)),
-        strict=False,
-    )
-
-    yield from (dict(chunked(candidate, 2)) for candidate in candidates)
+    while True:
+        n = random.randint(1, max_number)
+        values = take(length, bool_array_from_int(n))
+        pairs = []
+        for (false_gens, true_gens), use_true in zip(generators, values, strict=False):
+            key_gen, val_gen = true_gens if use_true else false_gens
+            pairs.append((next(key_gen), next(val_gen)))
+        yield dict(pairs)
 
 
 @generate_false.register
