@@ -13,18 +13,18 @@ from predicate.predicate import Predicate
 class IsInstancePredicate[T](Predicate[T]):
     """A predicate class that models the 'isinstance' predicate."""
 
-    instance_klass: tuple
+    instance_klass: tuple[type, ...]
 
     def __call__(self, x: object) -> TypeGuard[T]:
         # This is different from standard Python behavior: a False/True value is not an int!
-        if isinstance(x, bool) and self.instance_klass[0] is int:  # type: ignore
+        if isinstance(x, bool) and self.instance_klass[0] is int:
             return False
-        if (origin := get_origin(self.instance_klass[0])) is not None:  # type: ignore
-            return isinstance(x, origin)  # type: ignore
+        if (origin := get_origin(self.instance_klass[0])) is not None:
+            return isinstance(x, origin)  # type: ignore[arg-type]
         return isinstance(x, self.instance_klass)
 
     def __repr__(self) -> str:
-        name = self.instance_klass[0].__name__  # type: ignore
+        name = self.instance_klass[0].__name__
         return f"is_{name}_p"
 
     @override

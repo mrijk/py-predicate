@@ -149,7 +149,7 @@ def render(dot: Digraph, predicate: Predicate, node_nr: count):
             case Implies(left, right):
                 return add_node_left_right("implies", label="=>", left=left, right=right)
             case IsInstancePredicate(klass):
-                name = klass[0].__name__  # type: ignore
+                name = klass[0].__name__
                 return add_node("instance", label=f"is_{name}_p")
             case IsNonePredicate():
                 return add_node("none", label="x = None")

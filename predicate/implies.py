@@ -68,7 +68,7 @@ def _(predicate: GePredicate, other: Predicate) -> bool:
 def _(predicate: GtPredicate, other: Predicate) -> bool:
     match other:
         case IsInstancePredicate(instance_klass):
-            return predicate.klass == instance_klass[0]  # type: ignore
+            return predicate.klass == instance_klass[0]
         case GePredicate(v):
             return predicate.v >= v
         case GtPredicate(v):
@@ -107,7 +107,7 @@ def _(predicate: LtPredicate, other: Predicate) -> bool:
 def _(predicate: EqPredicate, other: Predicate) -> bool:
     match other:
         case IsInstancePredicate(instance_klass):
-            return predicate.klass == instance_klass[0]  # type: ignore
+            return predicate.klass == instance_klass[0]
         case EqPredicate(v):
             return predicate.v == v
         case NePredicate(v):

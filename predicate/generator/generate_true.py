@@ -443,7 +443,7 @@ def generate_predicate_of(predicate: IsPredicateOfPredicate, **kwargs) -> Iterat
 
 @generate_true.register
 def generate_is_instance_p(predicate: IsInstancePredicate, **kwargs) -> Iterator:
-    klass = predicate.instance_klass[0]  # type: ignore
+    klass = predicate.instance_klass[0]
 
     type_registry: dict[Any, Callable[[], Iterator]] = {
         Callable: random_callables,
