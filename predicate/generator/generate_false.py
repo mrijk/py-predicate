@@ -413,11 +413,11 @@ def generate_dict_of_p(dict_of_predicate: DictOfPredicate) -> Iterator:
     while True:
         n = random.randint(1, max_number)
         values = take(length, bool_array_from_int(n))
-        pairs = []
-        for (false_gens, true_gens), use_true in zip(generators, values, strict=False):
-            key_gen, val_gen = true_gens if use_true else false_gens
-            pairs.append((next(key_gen), next(val_gen)))
-        yield dict(pairs)
+        yield {
+            next(key_gen): next(val_gen)
+            for (false_gens, true_gens), use_true in zip(generators, values, strict=False)
+            for key_gen, val_gen in [true_gens if use_true else false_gens]
+        }
 
 
 @generate_false.register
