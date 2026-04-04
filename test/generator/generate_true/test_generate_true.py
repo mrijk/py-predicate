@@ -128,13 +128,11 @@ def foo(self) -> bool:
         is_subset_p({1, 2, 3}),
     ],
 )
-@pytest.mark.skip
 def test_generate_true(predicate):
     assert_generated_true(predicate)
 
 
 @pytest.mark.parametrize("predicate_pair", combinations_of_2())
-@pytest.mark.skip
 def test_generate_true_or(predicate_pair):
     predicate_1, predicate_2 = predicate_pair
     predicate = predicate_1 | predicate_2
@@ -148,7 +146,6 @@ def test_generate_true_or(predicate_pair):
         not_in_p([uuid.uuid4(), uuid.uuid4()]),
     ],
 )
-@pytest.mark.skip
 def test_generate_true_not_in_type(predicate):
     assert_generated_true(predicate)
 
@@ -425,7 +422,6 @@ def test_generate_fn_with_missing_generate():
         take(5, generate_true(predicate))
 
 
-@pytest.mark.skip
 def test_generate_true_unknown(unknown_p):
     with pytest.raises(ValueError):
         take(5, generate_true(unknown_p))
@@ -440,7 +436,6 @@ def test_generate_true_unknown(unknown_p):
         lt_p,
     ],
 )
-@pytest.mark.skip
 def test_generate_true_unknown_compare(compare_predicate):
     predicate = compare_predicate(v=None)
     with pytest.raises(ValueError):
@@ -456,21 +451,18 @@ def test_generate_true_unknown_compare(compare_predicate):
         gt_lt_p,
     ],
 )
-@pytest.mark.skip
 def test_generate_true_unknown_range(range_predicate):
     predicate = range_predicate(lower="bar", upper="foo")
     with pytest.raises(ValueError):
         take(5, generate_true(predicate))
 
 
-@pytest.mark.skip
 def test_generate_true_not_in_p_unknown():
     predicate = not_in_p({None})
     with pytest.raises(ValueError):
         take(5, generate_true(predicate))
 
 
-@pytest.mark.skip
 def test_generate_true_is_instance_unknown():
     predicate = is_instance_p(IPv4Network)
     with pytest.raises(ValueError, match="No generator found"):
