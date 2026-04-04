@@ -63,14 +63,13 @@ def optimize_xor_predicate[T](predicate: XorPredicate[T]) -> MaybeOptimized[T]:
         #
 
         case _, OrPredicate(or_left, or_right) if left == or_left:
-            # TODO: this is not correct!
-            return Optimized(or_right)
+            return Optimized(optimize(~left & or_right))  # p ^ (p | q) = ~p & q
         case _, OrPredicate(or_left, or_right) if left == or_right:
-            return Optimized(or_left)
+            return Optimized(optimize(~left & or_left))  # p ^ (q | p) = ~p & q
         case OrPredicate(or_left, or_right), _ if right == or_left:
-            return Optimized(or_right)
+            return Optimized(optimize(or_right & ~right))  # (p | q) ^ p = q & ~p
         case OrPredicate(or_left, or_right), _ if right == or_right:
-            return Optimized(or_left)
+            return Optimized(optimize(or_left & ~right))  # (q | p) ^ p = q & ~p
 
         #
 
