@@ -4,7 +4,6 @@ from predicate import ge_p, is_int_p, is_str_p, pos_p
 from predicate.spec.exercise import Spec, exercise
 
 
-@pytest.mark.skip
 def test_exercise_happy():
     def adder(x, y):
         return x + y
@@ -15,7 +14,6 @@ def test_exercise_happy():
     assert result
 
 
-@pytest.mark.skip
 def test_exercise_no_param_happy():
     def adder():
         return 42
@@ -26,7 +24,6 @@ def test_exercise_no_param_happy():
     assert result
 
 
-@pytest.mark.skip
 def test_exercise_lambda():
     a_lambda = lambda x: x  # noqa: E731
 
@@ -37,7 +34,6 @@ def test_exercise_lambda():
     assert result
 
 
-@pytest.mark.skip
 def test_exercise_with_fn_happy():
     def max_int(x, y):
         return x if x >= y else y
@@ -52,7 +48,6 @@ def test_exercise_with_fn_happy():
     assert result
 
 
-@pytest.mark.skip
 def test_exercise_with_fn_fail():
     def max_int(x, y):
         return x if x >= y else y - 1
@@ -69,7 +64,6 @@ def test_exercise_with_fn_fail():
     assert exc.value.args[0] == "Not conform spec, details tbd"
 
 
-@pytest.mark.skip
 def test_exercise_with_fn_p_happy():
     def max_int(x, y):
         return x if x >= y else y
@@ -80,7 +74,6 @@ def test_exercise_with_fn_p_happy():
     assert result
 
 
-@pytest.mark.skip
 def test_exercise_with_fn_p_fail():
     def max_int(x, y):
         return x if x >= y else y - 1
@@ -93,7 +86,6 @@ def test_exercise_with_fn_p_fail():
     assert exc.value.args[0].startswith("Not conform spec:")
 
 
-@pytest.mark.skip
 def test_exercise_missing_return_annotation_in_spec():
     def adder(x, y):
         return x + y
@@ -107,7 +99,6 @@ def test_exercise_missing_return_annotation_in_spec():
     assert exc.value.args[0] == "Return annotation not in spec"
 
 
-@pytest.mark.skip
 def test_exercise_no_types_defined():
     def dup(x):
         return x
@@ -116,7 +107,6 @@ def test_exercise_no_types_defined():
         list(exercise(dup))
 
 
-@pytest.mark.skip
 def test_exercise_generic_return_annotation():
     def dup[T](x: T) -> T:
         return x
@@ -125,7 +115,6 @@ def test_exercise_generic_return_annotation():
     assert result
 
 
-@pytest.mark.skip
 def test_exercise_unannotated_parameter_in_spec():
     def adder(x, y):
         return x + y
@@ -142,7 +131,6 @@ def test_exercise_unannotated_parameter_in_spec():
     assert exc.value.args[0] == "Unannotated parameter 'y' not in spec"
 
 
-@pytest.mark.skip
 def test_exercise_wrong_parameter_name():
     def adder(x, y):
         return x + y
@@ -154,7 +142,6 @@ def test_exercise_wrong_parameter_name():
     assert exc.value.args[0] == "Parameter 'z' not in function signature"
 
 
-@pytest.mark.skip
 def test_exercise_wrong_return():
     def adder(x, y):
         return None  # Not an int!
@@ -172,7 +159,6 @@ def test_exercise_wrong_return():
     assert exc.value.args[0] == "Not conform spec: {'result': False, 'reason': 'None is not an instance of type int'}"
 
 
-@pytest.mark.skip
 def test_exercise_with_partial_spec():
     def adder(x: int, y) -> int:
         return x + y
@@ -188,7 +174,6 @@ def test_exercise_with_partial_spec():
     assert result
 
 
-@pytest.mark.skip
 def test_exercise_with_constrained_spec():
     def adder(x: int, y: int) -> int:
         return x + y
@@ -205,7 +190,6 @@ def test_exercise_with_constrained_spec():
     assert result
 
 
-@pytest.mark.skip
 def test_exercise_with_constrained_spec_fail():
     def adder(x: int, y: int) -> int:
         return x + y
@@ -223,7 +207,6 @@ def test_exercise_with_constrained_spec_fail():
     assert exc.value.args[0] == "Spec predicate is not a constrained annotation"
 
 
-@pytest.mark.skip
 def test_exercise_annotated_without_spec():
     def adder(x: int, y: int) -> int:
         return x + y
@@ -232,7 +215,6 @@ def test_exercise_annotated_without_spec():
     assert result
 
 
-@pytest.mark.skip
 def test_exercise_partially_annotate_without_specd():
     def adder(x: int, y) -> int:
         return x + y
@@ -241,7 +223,6 @@ def test_exercise_partially_annotate_without_specd():
         list(exercise(adder))
 
 
-@pytest.mark.skip
 def test_exercise_infer_ret_from_annotation():
     def adder(x, y) -> int:
         return x + y

@@ -54,14 +54,12 @@ from predicate.standard_predicates import (
         is_real_superset_p({1, 2, 3}),
     ],
 )
-@pytest.mark.skip
 def test_format_dot(predicate):
     dot = to_dot(predicate, "test")
 
     assert dot
 
 
-@pytest.mark.skip
 def test_format_dot_and():
     predicate = always_true_p & always_false_p
 
@@ -70,7 +68,6 @@ def test_format_dot_and():
     assert dot
 
 
-@pytest.mark.skip
 def test_format_dot_or():
     predicate = always_true_p | always_false_p
 
@@ -79,7 +76,6 @@ def test_format_dot_or():
     assert dot
 
 
-@pytest.mark.skip
 def test_format_dot_xor():
     predicate = always_true_p ^ always_false_p
 
@@ -88,7 +84,6 @@ def test_format_dot_xor():
     assert dot
 
 
-@pytest.mark.skip
 def test_format_dot_all():
     predicate = all_p(predicate=always_true_p)
 
@@ -97,7 +92,6 @@ def test_format_dot_all():
     assert dot
 
 
-@pytest.mark.skip
 def test_format_dot_any():
     predicate = any_p(predicate=always_true_p)
 
@@ -106,7 +100,6 @@ def test_format_dot_any():
     assert dot
 
 
-@pytest.mark.skip
 def test_format_dot_implies(p, q):
     predicate = Implies(p, q)
 
@@ -115,7 +108,6 @@ def test_format_dot_implies(p, q):
     assert dot
 
 
-@pytest.mark.skip
 def test_format_dot_not():
     predicate = ~always_true_p
 
@@ -124,7 +116,6 @@ def test_format_dot_not():
     assert dot
 
 
-@pytest.mark.skip
 def test_format_dot_eq():
     predicate = eq_p(13)
 
@@ -133,7 +124,6 @@ def test_format_dot_eq():
     assert dot
 
 
-@pytest.mark.skip
 def test_format_dot_ge():
     predicate = ge_p(13)
 
@@ -142,7 +132,6 @@ def test_format_dot_ge():
     assert dot
 
 
-@pytest.mark.skip
 def test_format_dot_ge_le():
     predicate = ge_le_p(13, 42)
 
@@ -151,7 +140,6 @@ def test_format_dot_ge_le():
     assert dot
 
 
-@pytest.mark.skip
 def test_format_dot_ge_lt():
     predicate = ge_lt_p(13, 42)
 
@@ -160,7 +148,6 @@ def test_format_dot_ge_lt():
     assert dot
 
 
-@pytest.mark.skip
 def test_format_dot_gt_le():
     predicate = gt_le_p(13, 42)
 
@@ -169,7 +156,6 @@ def test_format_dot_gt_le():
     assert dot
 
 
-@pytest.mark.skip
 def test_format_dot_gt_lt():
     predicate = gt_lt_p(13, 42)
 
@@ -178,7 +164,6 @@ def test_format_dot_gt_lt():
     assert dot
 
 
-@pytest.mark.skip
 def test_format_dot_gt():
     predicate = gt_p(13)
 
@@ -187,7 +172,6 @@ def test_format_dot_gt():
     assert dot
 
 
-@pytest.mark.skip
 def test_format_dot_in():
     predicate = in_p({1, 2, 3})
 
@@ -196,7 +180,6 @@ def test_format_dot_in():
     assert dot
 
 
-@pytest.mark.skip
 def test_format_dot_dict_of():
     predicate = is_dict_of_p((is_str_p, is_int_p))
 
@@ -205,7 +188,6 @@ def test_format_dot_dict_of():
     assert dot
 
 
-@pytest.mark.skip
 def test_format_dot_tuple_of():
     predicate = is_tuple_of_p(is_str_p, is_int_p)
 
@@ -214,7 +196,6 @@ def test_format_dot_tuple_of():
     assert dot
 
 
-@pytest.mark.skip
 def test_format_dot_le():
     predicate = le_p(13)
 
@@ -223,7 +204,6 @@ def test_format_dot_le():
     assert dot
 
 
-@pytest.mark.skip
 def test_format_dot_lt():
     predicate = lt_p(13)
 
@@ -232,7 +212,6 @@ def test_format_dot_lt():
     assert dot
 
 
-@pytest.mark.skip
 def test_format_dot_ne():
     predicate = ne_p(13)
 
@@ -241,7 +220,6 @@ def test_format_dot_ne():
     assert dot
 
 
-@pytest.mark.skip
 def test_format_dot_not_in():
     predicate = not_in_p({1, 2, 3})
 
@@ -250,7 +228,6 @@ def test_format_dot_not_in():
     assert dot
 
 
-@pytest.mark.skip
 def test_format_dot_is_none():
     predicate = is_none_p
 
@@ -259,7 +236,6 @@ def test_format_dot_is_none():
     assert dot
 
 
-@pytest.mark.skip
 def test_format_dot_show_optimized():
     predicate = always_true_p & always_false_p
 
@@ -268,7 +244,6 @@ def test_format_dot_show_optimized():
     assert dot
 
 
-@pytest.mark.skip
 def test_format_dot_fn():
     predicate = fn_p(lambda x: x)
 
@@ -277,7 +252,6 @@ def test_format_dot_fn():
     assert dot
 
 
-@pytest.mark.skip
 def test_format_dot_comp_p():
     predicate = comp_p(lambda x: 2 * x, predicate=ge_p(2))
 
@@ -286,7 +260,6 @@ def test_format_dot_comp_p():
     assert dot
 
 
-@pytest.mark.skip
 def test_format_dot_named():
     predicate = NamedPredicate(name="p")
 
@@ -295,7 +268,6 @@ def test_format_dot_named():
     assert dot
 
 
-@pytest.mark.skip
 def test_format_dot_is_instance():
     predicate = is_instance_p(str)
 
@@ -304,7 +276,6 @@ def test_format_dot_is_instance():
     assert dot
 
 
-@pytest.mark.skip
 def test_format_dot_lazy():
     str_or_list_of_str = is_str_p | (is_list_p & all_p(lazy_p("str_or_list_of_str")))
 
@@ -313,7 +284,6 @@ def test_format_dot_lazy():
     assert dot
 
 
-@pytest.mark.skip
 def test_format_dot_root():
     str_or_list_of_str = is_str_p | (is_list_p & all_p(root_p))
 
@@ -322,7 +292,6 @@ def test_format_dot_root():
     assert dot
 
 
-@pytest.mark.skip
 def test_format_dot_this():
     str_or_list_of_str = is_str_p | (is_list_p & all_p(this_p))
 
@@ -331,7 +300,6 @@ def test_format_dot_this():
     assert dot
 
 
-@pytest.mark.skip
 def test_format_dot_tee():
     predicate = tee_p(fn=lambda _: None)
 
@@ -340,7 +308,6 @@ def test_format_dot_tee():
     assert dot
 
 
-@pytest.mark.skip
 def test_format_dot_laz_unknown():
     str_or_list_of_str = is_str_p | (is_list_p & all_p(lazy_p("str_or_list_of_str_unknown_ref")))
 
@@ -349,13 +316,11 @@ def test_format_dot_laz_unknown():
     assert dot
 
 
-@pytest.mark.skip
 def test_format_dot_unknown(unknown_p):
     with pytest.raises(ValueError):
         to_dot(unknown_p)
 
 
-@pytest.mark.skip
 def test_format_dot_juxt():
     from predicate import exactly_one_p, juxt_p
 

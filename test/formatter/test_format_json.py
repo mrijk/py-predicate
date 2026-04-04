@@ -53,7 +53,6 @@ from predicate.is_same_predicate import is_same_p
 from predicate.named_predicate import NamedPredicate
 
 
-@pytest.mark.skip
 def test_format_json_false():
     predicate = always_false_p
 
@@ -62,7 +61,6 @@ def test_format_json_false():
     assert json == {"false": False}
 
 
-@pytest.mark.skip
 def test_format_json_true():
     predicate = always_true_p
 
@@ -71,7 +69,6 @@ def test_format_json_true():
     assert json == {"true": True}
 
 
-@pytest.mark.skip
 def test_format_json_and():
     predicate = always_true_p & always_false_p
 
@@ -80,7 +77,6 @@ def test_format_json_and():
     assert json == {"and": {"left": {"true": True}, "right": {"false": False}}}
 
 
-@pytest.mark.skip
 def test_format_json_or():
     predicate = always_true_p | always_false_p
 
@@ -89,7 +85,6 @@ def test_format_json_or():
     assert json == {"or": {"left": {"true": True}, "right": {"false": False}}}
 
 
-@pytest.mark.skip
 def test_format_json_xor():
     predicate = always_true_p ^ always_false_p
 
@@ -103,7 +98,6 @@ def test_format_json_xor():
     }
 
 
-@pytest.mark.skip
 def test_format_json_all():
     predicate = all_p(predicate=always_true_p)
 
@@ -112,7 +106,6 @@ def test_format_json_all():
     assert json == {"all": {"predicate": {"true": True}}}
 
 
-@pytest.mark.skip
 def test_format_json_any():
     predicate = any_p(predicate=always_true_p)
 
@@ -121,7 +114,6 @@ def test_format_json_any():
     assert json == {"any": {"predicate": {"true": True}}}
 
 
-@pytest.mark.skip
 def test_format_json_not():
     predicate = ~always_true_p
 
@@ -130,7 +122,6 @@ def test_format_json_not():
     assert json == {"not": {"predicate": {"true": True}}}
 
 
-@pytest.mark.skip
 def test_format_json_ne():
     predicate = ne_p(13)
 
@@ -139,7 +130,6 @@ def test_format_json_ne():
     assert json == {"ne": {"v": 13}}
 
 
-@pytest.mark.skip
 def test_format_json_fn():
     predicate = fn_p(lambda x: x)
 
@@ -148,7 +138,6 @@ def test_format_json_fn():
     assert json == {"fn": {"name": "<lambda>", "source": "lambda x: x"}}
 
 
-@pytest.mark.skip
 def test_format_json_fn_named_function():
     def is_positive(x: int) -> bool:
         return x > 0
@@ -160,7 +149,6 @@ def test_format_json_fn_named_function():
     assert "return x > 0" in json["fn"]["source"]
 
 
-@pytest.mark.skip
 def test_format_json_fn_builtin():
     import math
 
@@ -179,14 +167,12 @@ def test_format_json_fn_builtin():
         (is_odd_p, "lambda x: x % 2 != 0"),
     ],
 )
-@pytest.mark.skip
 def test_format_json_fn_parity(predicate, source):
     json = to_json(predicate)
 
     assert json["fn"]["source"] == source
 
 
-@pytest.mark.skip
 def test_format_json_is_falsy():
     predicate = is_falsy_p
 
@@ -195,7 +181,6 @@ def test_format_json_is_falsy():
     assert json == {"is_falsy": None}
 
 
-@pytest.mark.skip
 def test_format_json_is_truthy():
     predicate = is_truthy_p
 
@@ -204,7 +189,6 @@ def test_format_json_is_truthy():
     assert json == {"is_truthy": None}
 
 
-@pytest.mark.skip
 def test_format_json_named():
     predicate = NamedPredicate(name="foo")
 
@@ -213,7 +197,6 @@ def test_format_json_named():
     assert json == {"variable": "foo"}
 
 
-@pytest.mark.skip
 def test_format_json_tee():
     predicate = tee_p(fn=lambda _: None)
 
@@ -222,7 +205,6 @@ def test_format_json_tee():
     assert json == {"tee": None}
 
 
-@pytest.mark.skip
 def test_format_json_juxt():
     predicate = juxt_p(always_true_p, always_false_p, evaluate=all_p(always_true_p))
 
@@ -236,7 +218,6 @@ def test_format_json_juxt():
     }
 
 
-@pytest.mark.skip
 def test_format_json_eq():
     predicate = eq_p(5)
 
@@ -245,7 +226,6 @@ def test_format_json_eq():
     assert json == {"eq": {"v": 5}}
 
 
-@pytest.mark.skip
 def test_format_json_ge():
     predicate = ge_p(2)
 
@@ -254,7 +234,6 @@ def test_format_json_ge():
     assert json == {"ge": {"v": 2}}
 
 
-@pytest.mark.skip
 def test_format_json_gt():
     predicate = gt_p(2)
 
@@ -263,7 +242,6 @@ def test_format_json_gt():
     assert json == {"gt": {"v": 2}}
 
 
-@pytest.mark.skip
 def test_format_json_le():
     predicate = le_p(10)
 
@@ -272,7 +250,6 @@ def test_format_json_le():
     assert json == {"le": {"v": 10}}
 
 
-@pytest.mark.skip
 def test_format_json_lt():
     predicate = lt_p(10)
 
@@ -281,7 +258,6 @@ def test_format_json_lt():
     assert json == {"lt": {"v": 10}}
 
 
-@pytest.mark.skip
 def test_format_json_ge_le():
     predicate = ge_le_p(1, 10)
 
@@ -290,7 +266,6 @@ def test_format_json_ge_le():
     assert json == {"ge_le": {"lower": 1, "upper": 10}}
 
 
-@pytest.mark.skip
 def test_format_json_ge_lt():
     predicate = ge_lt_p(1, 10)
 
@@ -299,7 +274,6 @@ def test_format_json_ge_lt():
     assert json == {"ge_lt": {"lower": 1, "upper": 10}}
 
 
-@pytest.mark.skip
 def test_format_json_gt_le():
     predicate = gt_le_p(1, 10)
 
@@ -308,7 +282,6 @@ def test_format_json_gt_le():
     assert json == {"gt_le": {"lower": 1, "upper": 10}}
 
 
-@pytest.mark.skip
 def test_format_json_gt_lt():
     predicate = gt_lt_p(1, 10)
 
@@ -317,7 +290,6 @@ def test_format_json_gt_lt():
     assert json == {"gt_lt": {"lower": 1, "upper": 10}}
 
 
-@pytest.mark.skip
 def test_format_json_is_instance_single():
     predicate = is_int_p
 
@@ -326,7 +298,6 @@ def test_format_json_is_instance_single():
     assert json == {"is_instance": {"klass": ["int"]}}
 
 
-@pytest.mark.skip
 def test_format_json_is_instance_multiple():
     predicate = is_instance_p(int, str)
 
@@ -335,28 +306,24 @@ def test_format_json_is_instance_multiple():
     assert json == {"is_instance": {"klass": ["int", "str"]}}
 
 
-@pytest.mark.skip
 def test_format_unknown(unknown_p):
     json = to_json(unknown_p)
 
     assert json == {"unknown": {}}
 
 
-@pytest.mark.skip
 def test_format_json_is_none():
     json = to_json(is_none_p)
 
     assert json == {"is_none": None}
 
 
-@pytest.mark.skip
 def test_format_json_is_not_none():
     json = to_json(is_not_none_p)
 
     assert json == {"is_not_none": None}
 
 
-@pytest.mark.skip
 def test_format_json_has_key():
     predicate = has_key_p("name")
 
@@ -365,7 +332,6 @@ def test_format_json_has_key():
     assert json == {"has_key": {"key": "name"}}
 
 
-@pytest.mark.skip
 def test_format_json_regex():
     predicate = regex_p(r"\d+")
 
@@ -374,7 +340,6 @@ def test_format_json_regex():
     assert json == {"regex": {"pattern": r"\d+"}}
 
 
-@pytest.mark.skip
 def test_format_json_implies():
     predicate = implies_p(always_true_p)
 
@@ -383,7 +348,6 @@ def test_format_json_implies():
     assert json == {"implies": {"predicate": {"true": True}}}
 
 
-@pytest.mark.skip
 def test_format_json_has_length():
     predicate = has_length_p(eq_p(3))
 
@@ -392,7 +356,6 @@ def test_format_json_has_length():
     assert json == {"has_length": {"length_p": {"eq": {"v": 3}}}}
 
 
-@pytest.mark.skip
 def test_format_json_count():
     predicate = count_p(is_int_p, eq_p(2))
 
@@ -401,7 +364,6 @@ def test_format_json_count():
     assert json == {"count": {"predicate": {"is_instance": {"klass": ["int"]}}, "length_p": {"eq": {"v": 2}}}}
 
 
-@pytest.mark.skip
 def test_format_json_list_of():
     predicate = is_list_of_p(is_int_p)
 
@@ -410,7 +372,6 @@ def test_format_json_list_of():
     assert json == {"list_of": {"predicate": {"is_instance": {"klass": ["int"]}}}}
 
 
-@pytest.mark.skip
 def test_format_json_set_of():
     predicate = is_set_of_p(is_int_p)
 
@@ -419,7 +380,6 @@ def test_format_json_set_of():
     assert json == {"set_of": {"predicate": {"is_instance": {"klass": ["int"]}}}}
 
 
-@pytest.mark.skip
 def test_format_json_optional():
     predicate = optional(is_int_p)
 
@@ -428,7 +388,6 @@ def test_format_json_optional():
     assert json == {"optional": {"predicate": {"is_instance": {"klass": ["int"]}}}}
 
 
-@pytest.mark.skip
 def test_format_json_exactly():
     predicate = exactly_n(3, is_int_p)
 
@@ -437,7 +396,6 @@ def test_format_json_exactly():
     assert json == {"exactly": {"n": 3, "predicate": {"is_instance": {"klass": ["int"]}}}}
 
 
-@pytest.mark.skip
 def test_format_json_tuple_of():
     predicate = is_tuple_of_p(is_int_p, is_str_p)
 
@@ -453,7 +411,6 @@ def test_format_json_tuple_of():
     }
 
 
-@pytest.mark.skip
 def test_format_json_has_path():
     predicate = has_path_p(eq_p("a"), eq_p("b"))
 
@@ -462,7 +419,6 @@ def test_format_json_has_path():
     assert json == {"has_path": {"path": [{"eq": {"v": "a"}}, {"eq": {"v": "b"}}]}}
 
 
-@pytest.mark.skip
 def test_format_json_match():
     predicate = match_p(is_int_p, is_str_p)
 
@@ -479,7 +435,6 @@ def test_format_json_match():
     }
 
 
-@pytest.mark.skip
 def test_format_json_is_subclass_single():
     predicate = is_subclass_p(int)
 
@@ -488,7 +443,6 @@ def test_format_json_is_subclass_single():
     assert json == {"is_subclass": {"klass": ["int"]}}
 
 
-@pytest.mark.skip
 def test_format_json_is_subclass_union():
     predicate = is_subclass_p(int | str)
 
@@ -497,7 +451,6 @@ def test_format_json_is_subclass_union():
     assert json == {"is_subclass": {"klass": ["int", "str"]}}
 
 
-@pytest.mark.skip
 def test_format_json_is_subset():
     predicate = is_subset_p({1, 2, 3})
 
@@ -506,7 +459,6 @@ def test_format_json_is_subset():
     assert json == {"is_subset": {"v": sorted([1, 2, 3])}}
 
 
-@pytest.mark.skip
 def test_format_json_is_real_subset():
     predicate = is_real_subset_p({1, 2, 3})
 
@@ -515,7 +467,6 @@ def test_format_json_is_real_subset():
     assert json == {"is_real_subset": {"v": sorted([1, 2, 3])}}
 
 
-@pytest.mark.skip
 def test_format_json_is_superset():
     predicate = is_superset_p({1, 2, 3})
 
@@ -524,7 +475,6 @@ def test_format_json_is_superset():
     assert json == {"is_superset": {"v": sorted([1, 2, 3])}}
 
 
-@pytest.mark.skip
 def test_format_json_is_real_superset():
     predicate = is_real_superset_p({1, 2, 3})
 
@@ -533,7 +483,6 @@ def test_format_json_is_real_superset():
     assert json == {"is_real_superset": {"v": sorted([1, 2, 3])}}
 
 
-@pytest.mark.skip
 def test_format_json_in():
     predicate = in_p([1, 2, 3])
 
@@ -542,7 +491,6 @@ def test_format_json_in():
     assert json == {"in": {"v": [1, 2, 3]}}
 
 
-@pytest.mark.skip
 def test_format_json_not_in():
     predicate = not_in_p([1, 2, 3])
 
@@ -551,7 +499,6 @@ def test_format_json_not_in():
     assert json == {"not_in": {"v": [1, 2, 3]}}
 
 
-@pytest.mark.skip
 def test_format_json_dict_of():
     predicate = is_dict_of_p(("name", is_str_p))
 
@@ -560,7 +507,6 @@ def test_format_json_dict_of():
     assert json == {"dict_of": {"kv": [[{"eq": {"v": "name"}}, {"is_instance": {"klass": ["str"]}}]]}}
 
 
-@pytest.mark.skip
 def test_format_json_is_same():
     predicate = is_same_p(always_true_p)
 
