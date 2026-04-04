@@ -50,6 +50,7 @@ from predicate.is_not_none_predicate import IsNotNonePredicate
 from predicate.is_predicate import IsPredicate
 from predicate.is_subclass_predicate import IsSubclassPredicate
 from predicate.is_truthy_predicate import IsTruthyPredicate
+from predicate.juxt_predicate import JuxtPredicate
 from predicate.le_predicate import LePredicate
 from predicate.list_of_predicate import ListOfPredicate, is_list_of_p
 from predicate.lt_predicate import LtPredicate
@@ -487,6 +488,11 @@ def generate_at_least_one_false(predicate: Predicate, *, length_p: Predicate = d
     combined_values = false_values + true_values
 
     return random_permutation(combined_values)
+
+
+@generate_false.register
+def generate_juxt_p(predicate: JuxtPredicate) -> Iterator:
+    yield from (item for item in random_anys() if not predicate(item))
 
 
 @generate_false.register
