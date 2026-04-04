@@ -8,7 +8,7 @@ from types import UnionType
 from typing import Final, get_args
 from uuid import UUID
 
-from more_itertools import chunked, first, flatten, interleave, partial_product, random_permutation, take
+from more_itertools import chunked, first, flatten, interleave, random_permutation, take
 
 from predicate.all_predicate import AllPredicate
 from predicate.always_false_predicate import AlwaysFalsePredicate, always_false_p
@@ -441,9 +441,7 @@ def generate_tuple_of_p(tuple_of_predicate: TupleOfPredicate) -> Iterator:
     while True:
         n = random.randint(1, max_number)
         values = take(length, (bool_array_from_int(n)))
-        selected = (generator[value] for generator, value in zip(generators, values, strict=False))
-
-        yield first(partial_product(*selected))
+        yield tuple(next(generator[value]) for generator, value in zip(generators, values, strict=False))
 
 
 @generate_false.register
