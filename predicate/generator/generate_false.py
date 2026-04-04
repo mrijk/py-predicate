@@ -376,17 +376,25 @@ def generate_is_lambda_p(predicate: IsLambdaPredicate) -> Iterator:
 @generate_false.register
 def generate_or(predicate: OrPredicate) -> Iterator:
     attempts = 100
+    _sentinel = object()
 
-    try_left = (item for item in take(attempts, generate_false(predicate.left)) if not predicate.right(item))
-    try_right = (item for item in take(attempts, generate_false(predicate.right)) if not predicate.left(item))
+    first_left = next(
+        (item for item in take(attempts, generate_false(predicate.left)) if not predicate.right(item)), _sentinel
+    )
+    first_right = next(
+        (item for item in take(attempts, generate_false(predicate.right)) if not predicate.left(item)), _sentinel
+    )
 
-    range_1 = (item for item in generate_false(predicate.left) if not predicate.right(item)) if try_left else ()
-    range_2 = (item for item in generate_false(predicate.right) if not predicate.left(item)) if try_right else ()
+    iterables = []
+    if first_left is not _sentinel:
+        iterables.append(item for item in generate_false(predicate.left) if not predicate.right(item))
+    if first_right is not _sentinel:
+        iterables.append(item for item in generate_false(predicate.right) if not predicate.left(item))
 
-    if range_1 or range_2:
-        yield from random_first_from_iterables(range_1, range_2)
+    if not iterables:
+        raise ValueError(f"Couldn't generate values that satisfy {predicate}")
 
-    raise ValueError(f"Couldn't generate values that statisfy {predicate}")
+    yield from random_first_from_iterables(*iterables)
 
 
 @generate_false.register
