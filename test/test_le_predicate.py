@@ -1,11 +1,9 @@
-import pytest
 from helpers import exercise_predicate
 
 from predicate import le_p
 from predicate.explain import explain
 
 
-@pytest.mark.skip
 def test_le_p():
     le_2 = le_p(2)
 
@@ -14,7 +12,6 @@ def test_le_p():
     assert le_2(2)
 
 
-@pytest.mark.skip
 def test_le_explain():
     predicate = le_p(2)
 
@@ -22,6 +19,5 @@ def test_le_explain():
     assert explain(predicate, 3) == expected
 
 
-@pytest.mark.skip
 def test_le_exercise():
     exercise_predicate(le_p)

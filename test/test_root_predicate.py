@@ -3,7 +3,6 @@ import pytest
 from predicate import explain, is_int_p, is_list_of_p, is_str_p, root_p
 
 
-@pytest.mark.skip
 def test_root_predicate():
     str_or_list_of_str = is_str_p | is_list_of_p(root_p)
 
@@ -11,7 +10,6 @@ def test_root_predicate():
     assert not str_or_list_of_str([1])
 
 
-@pytest.mark.skip
 def test_root_predicate_with_different_root():
     str_or_list_of_str = is_str_p | is_list_of_p(root_p)
 
@@ -24,13 +22,11 @@ def test_root_predicate_with_different_root():
     assert str_or_list_of_str(["foo", ["foo", ["foo"], "bar"]])
 
 
-@pytest.mark.skip
 def test_root_predicate_dont_call():
     with pytest.raises(ValueError):
         root_p(13)
 
 
-@pytest.mark.skip
 def test_root_explain():
     str_or_list_of_str = is_str_p | is_list_of_p(root_p)
 

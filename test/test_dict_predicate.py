@@ -1,5 +1,3 @@
-import pytest
-
 from predicate import comp_p, has_key_p, is_dict_p, is_int_p, is_iterable_of_p
 from predicate.explain import explain
 from predicate.list_of_predicate import is_single_or_list_of_p
@@ -14,7 +12,6 @@ from predicate.standard_predicates import (
 )
 
 
-@pytest.mark.skip
 def test_has_key_p():
     has_key_x = has_key_p("x")
 
@@ -23,7 +20,6 @@ def test_has_key_p():
     assert has_key_x({"x": 13})
 
 
-@pytest.mark.skip
 def test_has_key_explain():
     predicate = has_key_p("x")
 
@@ -31,7 +27,6 @@ def test_has_key_explain():
     assert explain(predicate, {"y": 13}) == expected
 
 
-@pytest.mark.skip
 def test_depth_eq_p():
     depth_eq_3 = depth_eq_p(3)
 
@@ -42,7 +37,6 @@ def test_depth_eq_p():
     assert depth_eq_3({"x": {"y": 5}})
 
 
-@pytest.mark.skip
 def test_depth_ne_p():
     depth_ne_3 = depth_ne_p(3)
 
@@ -52,7 +46,6 @@ def test_depth_ne_p():
     assert not depth_ne_3({"x": {"y": 5}})
 
 
-@pytest.mark.skip
 def test_depth_le_p():
     depth_le_3 = depth_le_p(3)
 
@@ -62,7 +55,6 @@ def test_depth_le_p():
     assert not depth_le_3({"x": {"y": {"z": 5}}})
 
 
-@pytest.mark.skip
 def test_depth_lt_p():
     depth_lt_3 = depth_lt_p(3)
 
@@ -72,7 +64,6 @@ def test_depth_lt_p():
     assert not depth_lt_3({"x": {"y": {"z": 5}}})
 
 
-@pytest.mark.skip
 def test_depth_ge_p():
     depth_ge_3 = depth_ge_p(3)
 
@@ -82,7 +73,6 @@ def test_depth_ge_p():
     assert depth_ge_3({"x": {"y": {"z": 5}}})
 
 
-@pytest.mark.skip
 def test_depth_gt_p():
     depth_gt_3 = depth_gt_p(3)
 
@@ -96,7 +86,6 @@ def dict_values(x: dict):
     return x.values()
 
 
-@pytest.mark.skip
 def test_dict_with_only_int_leaves():
     valid_value_p = is_single_or_list_of_p(is_int_p | root_p)
     valid_values_p = is_iterable_of_p(valid_value_p)

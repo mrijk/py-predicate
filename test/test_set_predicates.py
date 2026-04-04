@@ -1,9 +1,6 @@
-import pytest
-
 from predicate.set_predicates import is_real_subset_p, is_real_superset_p, is_subset_p, is_superset_p
 
 
-@pytest.mark.skip
 def test_is_subset():
     predicate = is_subset_p({1, 2, 3})
 
@@ -13,7 +10,6 @@ def test_is_subset():
     assert not predicate({1, 2, 3, 4})
 
 
-@pytest.mark.skip
 def test_is_real_subset():
     predicate = is_real_subset_p({1, 2, 3})
 
@@ -22,7 +18,6 @@ def test_is_real_subset():
     assert not predicate({1, 2, 3})
 
 
-@pytest.mark.skip
 def test_is_superset():
     predicate = is_superset_p({1, 2, 3})
 
@@ -31,7 +26,6 @@ def test_is_superset():
     assert predicate({1, 2, 3, 4})
 
 
-@pytest.mark.skip
 def test_is_real_superset():
     predicate = is_real_superset_p({1, 2, 3})
 

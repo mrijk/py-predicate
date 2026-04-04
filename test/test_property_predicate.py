@@ -21,7 +21,6 @@ def create_foo():
     return _create_foo
 
 
-@pytest.mark.skip
 def test_property_p(create_foo):
     klass = create_foo(True)
 
@@ -32,7 +31,6 @@ def test_property_p(create_foo):
     assert predicate(foo)
 
 
-@pytest.mark.skip
 def test_property_p_explain(create_foo):
     klass = create_foo(False)
 

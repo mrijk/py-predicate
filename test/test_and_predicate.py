@@ -1,11 +1,9 @@
-import pytest
 from helpers import is_and_p
 
 from predicate import ge_p, gt_p, le_p, lt_p
 from predicate.explain import explain
 
 
-@pytest.mark.skip
 def test_and():
     ge_2 = ge_p(2)
     le_3 = le_p(3)
@@ -20,7 +18,6 @@ def test_and():
     assert between_2_and_3(3)
 
 
-@pytest.mark.skip
 def test_and_commutative():
     #  p & q == q & p
     gt_2 = gt_p(2)
@@ -37,7 +34,6 @@ def test_and_commutative():
     assert p_2(3)
 
 
-@pytest.mark.skip
 def test_and_eq(p, q):
     # p & q == q & p
     p = gt_p(2)
@@ -46,13 +42,11 @@ def test_and_eq(p, q):
     assert p & q == q & p
 
 
-@pytest.mark.skip
 def test_and_associative(p, q, r):
     # assert (p & q) & r == p & (q & r)
     pass
 
 
-@pytest.mark.skip
 def test_and_contains(p, q, r):
     predicate = p & q
 
@@ -61,7 +55,6 @@ def test_and_contains(p, q, r):
     assert q in predicate
 
 
-@pytest.mark.skip
 def test_and_explain_left():
     p = gt_p(2)
     q = lt_p(4)
@@ -76,7 +69,6 @@ def test_and_explain_left():
     assert explain(predicate, 2) == expected
 
 
-@pytest.mark.skip
 def test_and_explain_right():
     p = gt_p(2)
     q = lt_p(4)

@@ -1,9 +1,6 @@
-import pytest
-
 from predicate import ge_p
 
 
-@pytest.mark.skip
 def test_xor():
     # p ^ q
     ge_2 = ge_p(2)
@@ -16,7 +13,6 @@ def test_xor():
     assert predicate(2)
 
 
-@pytest.mark.skip
 def test_xor_commutative():
     # p ^ q == q ^ p
     ge_2 = ge_p(2)
@@ -35,6 +31,5 @@ def test_xor_commutative():
     assert ge_4_xor_ge_4(2)
 
 
-@pytest.mark.skip
 def test_xor_eq(p, q):
     assert p ^ q == q ^ p

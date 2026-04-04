@@ -21,7 +21,6 @@ def r():
     return NamedPredicate(name="r")
 
 
-@pytest.mark.skip
 def test_parser_false():
     expression = "false"
 
@@ -30,7 +29,6 @@ def test_parser_false():
     assert predicate == always_false_p
 
 
-@pytest.mark.skip
 def test_parser_true():
     expression = "true"
 
@@ -39,7 +37,6 @@ def test_parser_true():
     assert predicate == always_true_p
 
 
-@pytest.mark.skip
 def test_parse_not():
     expression = "~true"
 
@@ -48,7 +45,6 @@ def test_parse_not():
     assert predicate == ~always_true_p
 
 
-@pytest.mark.skip
 def test_parse_and():
     expression = "true & false"
 
@@ -57,7 +53,6 @@ def test_parse_and():
     assert predicate == always_true_p & always_false_p
 
 
-@pytest.mark.skip
 def test_parse_or():
     expression = "true | false"
 
@@ -66,7 +61,6 @@ def test_parse_or():
     assert predicate == always_true_p | always_false_p
 
 
-@pytest.mark.skip
 def test_parse_xor():
     expression = "true ^ false"
 
@@ -75,7 +69,6 @@ def test_parse_xor():
     assert predicate == always_true_p ^ always_false_p
 
 
-@pytest.mark.skip
 def test_parse_and_or():
     expression = "true | false & true"
 
@@ -84,7 +77,6 @@ def test_parse_and_or():
     assert predicate == always_true_p | always_false_p & always_true_p
 
 
-@pytest.mark.skip
 def test_parser_named(p):
     expression = "p"
 
@@ -93,7 +85,6 @@ def test_parser_named(p):
     assert predicate == p
 
 
-@pytest.mark.skip
 def test_parser_not(p):
     expression = "~p"
 
@@ -102,7 +93,6 @@ def test_parser_not(p):
     assert predicate == ~p
 
 
-@pytest.mark.skip
 def test_parser_xor(p, q):
     expression = "p ^ q"
 
@@ -111,7 +101,6 @@ def test_parser_xor(p, q):
     assert predicate == p ^ q
 
 
-@pytest.mark.skip
 def test_parser_grouped(p, q, r):
     expression = "p & (q | r)"
 
@@ -120,7 +109,6 @@ def test_parser_grouped(p, q, r):
     assert predicate == p & (q | r)
 
 
-@pytest.mark.skip
 def test_parser_implies(p, q):
     expression = "p => q"
 
@@ -129,7 +117,6 @@ def test_parser_implies(p, q):
     assert predicate == Implies(p, q)
 
 
-@pytest.mark.skip
 def test_parser_failure(p, q):
     expression = "p ^"
 
@@ -139,14 +126,12 @@ def test_parser_failure(p, q):
 
 
 @pytest.mark.parametrize("expression, expected", [("ge_p(2)", ge_p(2)), ("le_p(2)", le_p(2))])
-@pytest.mark.skip
 def test_parser_ge_p(expression, expected):
     predicate = parse_expression(expression)
 
     assert predicate == expected
 
 
-@pytest.mark.skip
 def test_parser_gt_p():
     expression = "gt_p(2)"
 

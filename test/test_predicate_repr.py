@@ -105,7 +105,6 @@ from predicate.standard_predicates import (
         (is_ipv4_network_global_p, "property_p()"),
     ],
 )
-@pytest.mark.skip
 def test_repr_standard(predicate, representation):
     assert repr(predicate) == representation
 
@@ -114,6 +113,5 @@ def test_repr_standard(predicate, representation):
     ("predicate", "representation"),
     [(always_false_p & in_p([2, 3, 4]) & not_in_p([3]), "always_false_p & in_p(2, 3, 4) & not_in_p(3)")],
 )
-@pytest.mark.skip
 def test_repr_combined(predicate, representation):
     assert repr(predicate) == representation

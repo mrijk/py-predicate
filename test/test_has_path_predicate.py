@@ -1,10 +1,7 @@
-import pytest
-
 from predicate import eq_p, explain, ge_p, has_path_p
 from predicate.standard_predicates import is_int_p, is_list_p
 
 
-@pytest.mark.skip
 def test_has_path_predicate():
     has_x = eq_p("x")
     predicate = has_path_p(has_x)
@@ -14,7 +11,6 @@ def test_has_path_predicate():
     assert predicate({"x": 13})
 
 
-@pytest.mark.skip
 def test_has_path_predicate_with_value():
     has_x = eq_p("x")
     predicate = has_path_p(has_x, is_int_p)
@@ -25,7 +21,6 @@ def test_has_path_predicate_with_value():
     assert predicate({"x": 13})
 
 
-@pytest.mark.skip
 def test_has_path_predicate_nested():
     has_x = eq_p("x")
     has_y = eq_p("y")
@@ -37,7 +32,6 @@ def test_has_path_predicate_nested():
     assert predicate({"x": {"y": 13}})
 
 
-@pytest.mark.skip
 def test_has_path_predicate_with_list():
     has_x = eq_p("x")
     has_y = eq_p("y")
@@ -59,14 +53,12 @@ def test_has_path_predicate_with_list():
 #     assert predicate({"x": {"x": {"y": 13}}})
 
 
-@pytest.mark.skip
 def test_has_path_predicate_no_dict():
     predicate = has_path_p()
 
     assert not predicate("foo")
 
 
-@pytest.mark.skip
 def test_has_path_predicate_no_dict_explain():
     predicate = has_path_p()
 
@@ -74,7 +66,6 @@ def test_has_path_predicate_no_dict_explain():
     assert explain(predicate, "foo") == expected
 
 
-@pytest.mark.skip
 def test_has_path_predicate_no_match_explain():
     has_x = eq_p("x")
     has_y = eq_p("y")
@@ -85,7 +76,6 @@ def test_has_path_predicate_no_match_explain():
     assert explain(predicate, {"y": 13}) == expected
 
 
-@pytest.mark.skip
 def test_has_path_predicate_repr():
     has_x = eq_p("x")
     predicate = has_path_p(has_x)
@@ -93,7 +83,6 @@ def test_has_path_predicate_repr():
     assert repr(predicate) == "has_path_p(eq_p('x'))"
 
 
-@pytest.mark.skip
 def test_has_path_predicate_non_dict_intermediate_explain():
     has_x = eq_p("x")
     has_y = eq_p("y")

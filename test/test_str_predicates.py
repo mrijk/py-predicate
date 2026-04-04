@@ -1,5 +1,3 @@
-import pytest
-
 from predicate import (
     ends_with_p,
     is_alnum_p,
@@ -16,70 +14,59 @@ from predicate import (
 )
 
 
-@pytest.mark.skip
 def test_is_alnum_p():
     assert not is_alnum_p("foo-1")
     assert is_alnum_p("foo1")
     assert is_alnum_p("foo")
 
 
-@pytest.mark.skip
 def test_is_alpha_p():
     assert not is_alpha_p("foo1")
     assert is_alpha_p("foo")
 
 
-@pytest.mark.skip
 def test_is_decimal_p():
     assert not is_decimal_p("foo")
     assert is_decimal_p("123")
 
 
-@pytest.mark.skip
 def test_is_digit_p():
     assert not is_digit_p("Foo")
     assert is_digit_p("123")
 
 
-@pytest.mark.skip
 def test_is_lower_p():
     assert not is_lower_p("Foo")
     assert is_lower_p("foo")
 
 
-@pytest.mark.skip
 def test_is_space_p():
     assert is_space_p(" ")
     assert is_space_p("\t")
 
 
-@pytest.mark.skip
 def test_is_title_p():
     assert not is_title_p("foo")
     assert not is_title_p("FOO")
     assert is_title_p("Foo")
 
 
-@pytest.mark.skip
 def test_is_upper_p():
     assert not is_upper_p("Foo")
     assert is_upper_p("FOO")
 
 
-@pytest.mark.skip
 def test_is_numeric_p():
     assert not is_numeric_p("foo")
     assert is_numeric_p("123")
 
 
-@pytest.mark.skip
 def test_is_printable_p():
     assert not is_printable_p("hello\x00")
     assert is_printable_p("hello")
     assert is_printable_p("")
 
 
-@pytest.mark.skip
 def test_ends_with_p():
     predicate = ends_with_p("foo")
 
@@ -87,7 +74,6 @@ def test_ends_with_p():
     assert predicate("barfoo")
 
 
-@pytest.mark.skip
 def test_starts_with_p():
     predicate = starts_with_p("foo")
 

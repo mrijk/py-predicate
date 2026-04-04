@@ -1,9 +1,6 @@
-import pytest
-
 from predicate import explain, regex_p
 
 
-@pytest.mark.skip
 def test_regex_predicate():
     predicate = regex_p("^foo.*bar$")
 
@@ -15,7 +12,6 @@ def test_regex_predicate():
     assert predicate("foooooobar")
 
 
-@pytest.mark.skip
 def test_regex_p_explain():
     predicate = regex_p("^foo.*bar$")
 

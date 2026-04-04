@@ -1,11 +1,8 @@
 import sys
 
-import pytest
-
 from predicate import always_true_p, eq_p, ge_p, is_superset_p, reduce_p
 
 
-@pytest.mark.skip
 def test_reduce_is_sorted_asc():
     predicate = reduce_p(fn=lambda acc, x: (x, ge_p(acc)), initial=-sys.maxsize - 1)
 
@@ -15,7 +12,6 @@ def test_reduce_is_sorted_asc():
     assert not predicate([2, 1])
 
 
-@pytest.mark.skip
 def test_is_interval_3():
     predicate = reduce_p(fn=lambda acc, x: (x, eq_p(acc + 3) if acc else always_true_p), initial=None)
 
@@ -25,7 +21,6 @@ def test_is_interval_3():
     assert not predicate([1, 3])
 
 
-@pytest.mark.skip
 def test_is_subset():
     predicate = reduce_p(fn=lambda acc, x: (x, is_superset_p(acc)), initial=set())
 

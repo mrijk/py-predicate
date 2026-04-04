@@ -1,10 +1,7 @@
-import pytest
-
 from predicate import explain, is_int_p, is_list_of_p, is_none_p, is_set_of_p, is_str_p
 from predicate.in_predicate_predicate import in_predicate_p
 
 
-@pytest.mark.skip
 def test_in_predicate_predicate():
     tree = is_str_p | is_list_of_p(is_int_p) | is_set_of_p(is_none_p)
 
@@ -17,7 +14,6 @@ def test_in_predicate_predicate():
     assert in_tree(is_list_of_p(is_int_p))
 
 
-@pytest.mark.skip
 def test_in_predicate_predicate_unordered(p, q, r):
     tree = p & q & r
 
@@ -27,7 +23,6 @@ def test_in_predicate_predicate_unordered(p, q, r):
     assert in_tree(q & p)
 
 
-@pytest.mark.skip
 def test_in_predicate_predicate_repr():
     tree = is_str_p | is_list_of_p(is_int_p) | is_set_of_p(is_none_p)
 
@@ -36,7 +31,6 @@ def test_in_predicate_predicate_repr():
     assert repr(in_tree) == "in_predicate_p(is_str_p | is_list_of_p(is_int_p) | is_set_of_p(is_none_p))"
 
 
-@pytest.mark.skip
 def test_in_predicate_predicate_explain():
     tree = is_str_p | is_int_p
 

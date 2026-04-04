@@ -1,9 +1,6 @@
-import pytest
-
 from predicate import explain, ge_p, is_bool_p, is_dict_of_p, is_int_p, is_str_p, is_tuple_of_p
 
 
-@pytest.mark.skip
 def test_is_tuple_of_p():
     predicate = is_tuple_of_p(is_str_p, is_int_p & ge_p(2), is_bool_p)
 
@@ -15,7 +12,6 @@ def test_is_tuple_of_p():
     assert predicate(("foo", 2, False))
 
 
-@pytest.mark.skip
 def test_is_tuple_of_with_dict_p():
     predicate = is_tuple_of_p(is_int_p, is_dict_of_p(("n", is_int_p), ("s", is_str_p)))
 
@@ -23,7 +19,6 @@ def test_is_tuple_of_with_dict_p():
     assert predicate((13, {"n": 13, "s": "foo"}))
 
 
-@pytest.mark.skip
 def test_is_tuple_of_explain_incorrect_length():
     predicate = is_tuple_of_p(is_str_p, is_int_p & ge_p(2), is_bool_p)
 
@@ -31,7 +26,6 @@ def test_is_tuple_of_explain_incorrect_length():
     assert explain(predicate, ("foo", 1)) == expected
 
 
-@pytest.mark.skip
 def test_is_tuple_of_explain_incorrect_value():
     predicate = is_tuple_of_p(is_str_p, is_int_p & ge_p(2), is_bool_p)
 

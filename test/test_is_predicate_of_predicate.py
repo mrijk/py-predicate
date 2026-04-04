@@ -14,7 +14,6 @@ from predicate.standard_predicates import is_str_p
         (bool, True, "foo"),
     ],
 )
-@pytest.mark.skip
 def test_is_predicate_of_type(klass, valid, invalid):
     predicate = is_predicate_of_p(klass)
 
@@ -22,7 +21,6 @@ def test_is_predicate_of_type(klass, valid, invalid):
     assert predicate(lt_p(valid))
 
 
-@pytest.mark.skip
 def test_is_predicate_repr():
     predicate = is_predicate_of_p(int)
 
@@ -38,7 +36,6 @@ def test_is_predicate_repr():
         (Predicate[str], is_str_p, is_bool_p),
     ],
 )
-@pytest.mark.skip
 def test_is_predicate_of_predicate_type(predicate, klass, valid, invalid):
     predicate_of = is_predicate_of_p(klass)
 
@@ -47,14 +44,12 @@ def test_is_predicate_of_predicate_type(predicate, klass, valid, invalid):
 
 
 @pytest.mark.parametrize(("predicate", "klass"), [(~le_p(2), int), (ge_p("bar") & le_p("foo"), str)])
-@pytest.mark.skip
 def test_is_predicate_of_type_composed(predicate, klass):
     predicate_of = is_predicate_of_p(klass)
 
     assert predicate_of(predicate)
 
 
-@pytest.mark.skip
 def test_is_predicate_of_type_explain():
     predicate = is_predicate_of_p(int)
 
@@ -62,7 +57,6 @@ def test_is_predicate_of_type_explain():
     assert explain(predicate, lt_p("foo")) == expected
 
 
-@pytest.mark.skip
 def test_is_predicate_of_type_explain_not_predicate():
     predicate = is_predicate_of_p(int)
 

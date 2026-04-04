@@ -1,14 +1,11 @@
 from functools import partial
 from itertools import batched
 
-import pytest
-
 from predicate import all_p, comp_p, ge_p, is_tuple_of_p
 from predicate.explain import explain
 from predicate.standard_predicates import is_int_p, is_str_p
 
 
-@pytest.mark.skip
 def test_comp_p():
     ge_2 = ge_p(2)
 
@@ -18,7 +15,6 @@ def test_comp_p():
     assert predicate(1)
 
 
-@pytest.mark.skip
 def test_comp_p_iterable():
     to_pairs = partial(batched, n=2)
     int_str_p = is_tuple_of_p(is_int_p, is_str_p)
@@ -29,7 +25,6 @@ def test_comp_p_iterable():
     assert predicate([1, "foo", 2, "bar"])
 
 
-@pytest.mark.skip
 def test_comp_explain():
     ge_2 = ge_p(2)
 
