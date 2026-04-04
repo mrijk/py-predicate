@@ -311,6 +311,7 @@ def test_generate_gt_lt(lower, upper):
     "key_value_predicates",
     [
         ([(is_str_p, is_int_p), (is_str_p, is_int_p)]),
+        ([(is_str_p, is_int_p), (is_str_p, is_bool_p)]),
     ],
 )
 def test_dict_of(key_value_predicates):
