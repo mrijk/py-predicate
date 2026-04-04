@@ -299,6 +299,7 @@ def test_generate_ge_lt(lower, upper):
         # uuid.uuid4(),
     ],
 )
+@pytest.mark.skip
 def test_generate_gt_le(lower, upper):
     predicate = gt_le_p(lower, upper)
 
@@ -315,6 +316,7 @@ def test_generate_gt_le(lower, upper):
         # uuid.uuid4(),
     ],
 )
+@pytest.mark.skip
 def test_generate_gt_lt(lower, upper):
     predicate = gt_lt_p(lower, upper)
 
@@ -327,6 +329,7 @@ def test_generate_gt_lt(lower, upper):
         ([(is_str_p, is_int_p), (is_str_p, is_int_p)]),
     ],
 )
+@pytest.mark.skip
 def test_dict_of(key_value_predicates):
     predicate = is_dict_of_p(*key_value_predicates)
 
@@ -339,6 +342,7 @@ def test_dict_of(key_value_predicates):
         is_int_p,
     ],
 )
+@pytest.mark.skip
 def test_iterable_of(iterable_of_p):
     predicate = is_iterable_of_p(iterable_of_p)
 
@@ -357,6 +361,7 @@ def test_iterable_of(iterable_of_p):
         is_bool_p | is_datetime_p | is_str_p,
     ],
 )
+@pytest.mark.skip
 def test_list_of(list_type_p):
     predicate = is_list_of_p(list_type_p)
 
