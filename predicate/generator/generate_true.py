@@ -168,16 +168,25 @@ def generate_and(predicate: AndPredicate) -> Iterator:
         yield from []
     else:
         attempts = 100
-        try_left = (item for item in take(attempts, generate_true(predicate.left)) if predicate.right(item))
-        try_right = (item for item in take(attempts, generate_true(predicate.right)) if predicate.left(item))
+        _sentinel = object()
 
-        range_1 = (item for item in generate_true(predicate.left) if predicate.right(item)) if try_left else ()
-        range_2 = (item for item in generate_true(predicate.right) if predicate.left(item)) if try_right else ()
+        first_left = next(
+            (item for item in take(attempts, generate_true(predicate.left)) if predicate.right(item)), _sentinel
+        )
+        first_right = next(
+            (item for item in take(attempts, generate_true(predicate.right)) if predicate.left(item)), _sentinel
+        )
 
-        if range_1 or range_2:
-            yield from random_first_from_iterables(range_1, range_2)
+        iterables = []
+        if first_left is not _sentinel:
+            iterables.append(item for item in generate_true(predicate.left) if predicate.right(item))
+        if first_right is not _sentinel:
+            iterables.append(item for item in generate_true(predicate.right) if predicate.left(item))
 
-        raise ValueError(f"Couldn't generate values that statisfy {predicate}")
+        if not iterables:
+            raise ValueError(f"Couldn't generate values that satisfy {predicate}")
+
+        yield from random_first_from_iterables(*iterables)
 
 
 @generate_true.register
