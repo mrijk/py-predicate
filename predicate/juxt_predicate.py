@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Iterable
+from typing import Any, Iterable, override
 
 from predicate.helpers import predicates_repr
 from predicate.predicate import Predicate
@@ -18,6 +18,14 @@ class JuxtPredicate[T](Predicate[T]):
 
     def __repr__(self) -> str:
         return f"juxt_p({predicates_repr(self.predicates)})"
+
+    @override
+    def explain_failure(self, x: Any) -> dict:
+        results = [predicate(x) for predicate in self.predicates]
+        return {
+            "results": results,
+            "evaluate": self.evaluate.explain(results),
+        }
 
 
 def juxt_p(*predicates: Predicate, evaluate: Predicate[Iterable[bool]]) -> Predicate:

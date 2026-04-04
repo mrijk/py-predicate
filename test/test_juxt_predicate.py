@@ -1,4 +1,4 @@
-from predicate import all_p, count_p, eq_p, exactly_one_p, is_int_p, is_str_p, juxt_p
+from predicate import all_p, count_p, eq_p, exactly_one_p, explain, is_int_p, is_str_p, juxt_p
 
 
 def test_juxt():
@@ -19,6 +19,24 @@ def test_juxt():
 def test_juxt_repr():
     predicate = juxt_p(is_int_p, is_str_p, evaluate=exactly_one_p(predicate=eq_p(True)))
     assert repr(predicate).startswith("juxt_p(")
+
+
+def test_juxt_explain():
+    p1 = is_int_p
+    p2 = is_str_p
+    p3 = eq_p(2)
+    p4 = eq_p("foo")
+    two_true = count_p(predicate=eq_p(True), length_p=eq_p(2))
+
+    predicate = juxt_p(p1, p2, p3, p4, evaluate=two_true)
+
+    result = explain(predicate, 3)
+
+    assert result == {
+        "result": False,
+        "results": [True, False, False, False],
+        "evaluate": {"result": False, "reason": "Expected count eq_p(2), actual: 1"},
+    }
 
 
 def test_juxt_iterables():
