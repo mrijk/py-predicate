@@ -5,7 +5,6 @@ from predicate import count_p, eq_p, is_int_p, is_str_p, juxt_p
 
 
 @pytest.mark.skip("TODO")
-@pytest.mark.skip
 def test_generate_juxt():
     p1 = is_int_p
     p2 = is_str_p

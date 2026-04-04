@@ -5,14 +5,12 @@ from generator.generate_true.helpers import assert_generated_true
 from predicate import generate_true, in_p
 
 
-@pytest.mark.skip
 def test_generate_in():
     predicate = in_p([2, 3, 4])
 
     assert_generated_true(predicate)
 
 
-@pytest.mark.skip
 def test_generate_in_fail():
     class Contains13:
         def __contains__(self, item):

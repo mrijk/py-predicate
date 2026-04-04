@@ -6,13 +6,11 @@ from predicate import generate_false, is_subclass_p
 
 
 @pytest.mark.parametrize("parameter", [int, (int, str), int | str])
-@pytest.mark.skip
 def test_generate_is_subclass(parameter):
     predicate = is_subclass_p(parameter)
     assert_generated_false(predicate)
 
 
-@pytest.mark.skip
 def test_generate_is_subclass_none():
     predicate = is_subclass_p(object)
 

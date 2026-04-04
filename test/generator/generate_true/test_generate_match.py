@@ -20,7 +20,6 @@ from predicate import exactly_n, is_bool_p, is_float_p, is_int_p, is_str_p, matc
         (optional(is_int_p), is_str_p),
     ],
 )
-@pytest.mark.skip
 def test_generate_match(predicates):
     predicate = match_p(*predicates)
 

@@ -13,7 +13,6 @@ from predicate import all_p, eq_p, ge_le_p, generate_false, has_length_p, is_int
     ],
 )
 @pytest.mark.skip
-@pytest.mark.skip
 def test_generate_false_has_length_p(length_p):
     predicate = has_length_p(length_p=length_p)
 
@@ -27,7 +26,6 @@ def test_generate_false_has_length_p(length_p):
         (ge_le_p(lower=1, upper=3), is_str_p),
     ],
 )
-@pytest.mark.skip
 def test_generate_has_length_p_with_klass(length_p, value_p):
     predicate = has_length_p(length_p=length_p)
     values_p = all_p(value_p)

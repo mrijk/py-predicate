@@ -12,7 +12,6 @@ from predicate import exactly_n, is_int_p, is_str_p, match_p
         (exactly_n(3, is_int_p),),
     ],
 )
-@pytest.mark.skip
 def test_generate_match(predicates):
     predicate = match_p(*predicates)
 

@@ -8,7 +8,6 @@ from predicate import eq_p, ge_p, has_path_p, is_int_p, is_list_p
     "path",
     [[eq_p("x")], [eq_p("x"), is_int_p], [eq_p("x"), eq_p("y"), eq_p(13)], [eq_p("x"), is_list_p, eq_p("y"), ge_p(2)]],
 )
-@pytest.mark.skip
 def test_generate_has_path(path):
     predicate = has_path_p(*path)
 

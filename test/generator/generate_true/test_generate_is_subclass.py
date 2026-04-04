@@ -13,7 +13,6 @@ from predicate import is_subclass_p
         object,
     ],
 )
-@pytest.mark.skip
 def test_generate_is_subclass(parameter):
     predicate = is_subclass_p(parameter)
     assert_generated_true(predicate)
