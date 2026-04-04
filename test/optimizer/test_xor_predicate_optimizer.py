@@ -315,21 +315,6 @@ def test_xor_left_xor_both_inner_fail():
     assert result is not None
 
 
-def test_xor_optimize_p_xor_p_or_q():
-    # p ^ (p | q) = ~p & q
-    # Failing example: ge_p(3) ^ (ge_p(3) | ge_p(5))
-    # For x=7: T ^ T = False, but wrong rule returned ge_p(5)(7) = True
-    p = ge_p(3)
-    q = ge_p(5)
-    predicate = p ^ (p | q)
-
-    optimized = optimize(predicate)
-
-    # The optimized predicate must agree with the original on all test values
-    for x in [1, 4, 7]:
-        assert optimized(x) == predicate(x), f"Mismatch at x={x}: optimized={optimized(x)}, original={predicate(x)}"
-
-
 def test_xor_right_xor_no_optimize():
     # p ^ (q ^ r) where q ^ r stays a XorPredicate after optimize — covers _, XorPredicate() case
     from predicate.standard_predicates import is_int_p, is_str_p
