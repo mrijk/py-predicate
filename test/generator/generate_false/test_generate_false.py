@@ -359,7 +359,6 @@ def test_list_of(list_type_p):
         (is_int_p, is_str_p, is_float_p),
     ],
 )
-@pytest.mark.skip
 def test_tuple_of(tuple_types_p):
     predicate = is_tuple_of_p(*tuple_types_p)
 
