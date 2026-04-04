@@ -125,13 +125,11 @@ from predicate import (
         # is_subset_p({1, 2, 3}),
     ],
 )
-@pytest.mark.skip
 def test_generate_false(predicate):
     assert_generated_false(predicate)
 
 
 @pytest.mark.parametrize("predicate_pair", combinations_of_2())
-@pytest.mark.skip
 def test_generate_false_and(predicate_pair):
     predicate_1, predicate_2 = predicate_pair
     predicate = predicate_1 & predicate_2
@@ -139,14 +137,12 @@ def test_generate_false_and(predicate_pair):
 
 
 @pytest.mark.parametrize("predicate_pair", combinations_of_2())
-@pytest.mark.skip
 def test_generate_false_or(predicate_pair):
     predicate_1, predicate_2 = predicate_pair
     predicate = predicate_1 | predicate_2
     assert_generated_false(predicate)
 
 
-@pytest.mark.skip
 def test_generate_tee():
     predicate = tee_p(fn=lambda x: x) & eq_p(2)
 
@@ -154,14 +150,12 @@ def test_generate_tee():
 
 
 @pytest.mark.parametrize("predicate_pair", combinations_of_2())
-@pytest.mark.skip
 def test_generate_false_xor(predicate_pair):
     predicate_1, predicate_2 = predicate_pair
     predicate = predicate_1 ^ predicate_2
     assert_generated_false(predicate)
 
 
-@pytest.mark.skip
 def test_generate_false_or_with_3():
     predicate = is_int_p | is_str_p | is_float_p
 
@@ -169,7 +163,6 @@ def test_generate_false_or_with_3():
 
 
 @pytest.mark.parametrize("value", [2, "foo", "3.14", "complex(1, 2)"])
-@pytest.mark.skip
 def test_generate_eq(value):
     predicate = eq_p(value)
 
@@ -177,7 +170,6 @@ def test_generate_eq(value):
 
 
 @pytest.mark.parametrize("value", [True])
-@pytest.mark.skip
 def test_generate_is(value):
     predicate = is_p(value)
 
@@ -194,7 +186,6 @@ def test_generate_is(value):
         uuid.uuid4(),
     ],
 )
-@pytest.mark.skip
 def test_generate_ge(value):
     predicate = ge_p(value)
 
@@ -211,7 +202,6 @@ def test_generate_ge(value):
         uuid.uuid4(),
     ],
 )
-@pytest.mark.skip
 def test_generate_gt(value):
     predicate = gt_p(value)
 
@@ -228,7 +218,6 @@ def test_generate_gt(value):
         uuid.uuid4(),
     ],
 )
-@pytest.mark.skip
 def test_generate_le(value):
     predicate = le_p(value)
 
@@ -245,7 +234,6 @@ def test_generate_le(value):
         uuid.uuid4(),
     ],
 )
-@pytest.mark.skip
 def test_generate_lt(value):
     predicate = lt_p(value)
 
@@ -265,7 +253,6 @@ now = datetime.now()
         # uuid.uuid4(),
     ],
 )
-@pytest.mark.skip
 def test_generate_ge_le(lower, upper):
     predicate = ge_le_p(lower, upper)
 
@@ -282,7 +269,6 @@ def test_generate_ge_le(lower, upper):
         # uuid.uuid4(),
     ],
 )
-@pytest.mark.skip
 def test_generate_ge_lt(lower, upper):
     predicate = ge_lt_p(lower, upper)
 
@@ -299,7 +285,6 @@ def test_generate_ge_lt(lower, upper):
         # uuid.uuid4(),
     ],
 )
-@pytest.mark.skip
 def test_generate_gt_le(lower, upper):
     predicate = gt_le_p(lower, upper)
 
@@ -316,7 +301,6 @@ def test_generate_gt_le(lower, upper):
         # uuid.uuid4(),
     ],
 )
-@pytest.mark.skip
 def test_generate_gt_lt(lower, upper):
     predicate = gt_lt_p(lower, upper)
 
@@ -329,7 +313,6 @@ def test_generate_gt_lt(lower, upper):
         ([(is_str_p, is_int_p), (is_str_p, is_int_p)]),
     ],
 )
-@pytest.mark.skip
 def test_dict_of(key_value_predicates):
     predicate = is_dict_of_p(*key_value_predicates)
 
@@ -342,7 +325,6 @@ def test_dict_of(key_value_predicates):
         is_int_p,
     ],
 )
-@pytest.mark.skip
 def test_iterable_of(iterable_of_p):
     predicate = is_iterable_of_p(iterable_of_p)
 
@@ -361,7 +343,6 @@ def test_iterable_of(iterable_of_p):
         is_bool_p | is_datetime_p | is_str_p,
     ],
 )
-@pytest.mark.skip
 def test_list_of(list_type_p):
     predicate = is_list_of_p(list_type_p)
 
@@ -430,7 +411,6 @@ def test_generate_fn_p():
     assert_generated_false(predicate)
 
 
-@pytest.mark.skip
 def test_generate_false_unknown(unknown_p):
     with pytest.raises(ValueError):
         take(5, generate_false(unknown_p))
@@ -445,7 +425,6 @@ def test_generate_false_unknown(unknown_p):
         lt_p,
     ],
 )
-@pytest.mark.skip
 def test_generate_false_unknown_compare(compare_predicate):
     predicate = compare_predicate(v=None)
     with pytest.raises(ValueError):
@@ -461,14 +440,12 @@ def test_generate_false_unknown_compare(compare_predicate):
         gt_lt_p,
     ],
 )
-@pytest.mark.skip
 def test_generate_false_unknown_range(range_predicate):
     predicate = range_predicate(lower="bar", upper="foo")
     with pytest.raises(ValueError):
         take(5, generate_false(predicate))
 
 
-@pytest.mark.skip
 def test_generate_false_xor_always_true():
     # XOR that optimizes to always_true_p — generate_false yields nothing
     predicate = is_int_p ^ ~is_int_p
@@ -477,7 +454,6 @@ def test_generate_false_xor_always_true():
     assert values == []
 
 
-@pytest.mark.skip
 def test_generate_false_xor_overlapping():
     # XOR where AND doesn't optimize to always_false_p — covers the left_and_right path
     predicate = ge_p(2) ^ gt_p(5)
