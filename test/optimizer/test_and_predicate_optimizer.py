@@ -30,7 +30,6 @@ from predicate.standard_predicates import (
 )
 
 
-@pytest.mark.skip
 def test_and_optimize_right_false(p):
     # p & False == False
     predicate = p & always_false_p
@@ -42,7 +41,6 @@ def test_and_optimize_right_false(p):
     assert optimized == always_false_p
 
 
-@pytest.mark.skip
 def test_and_optimize_right_true(p):
     # p & True == p
     predicate = p & always_true_p
@@ -54,7 +52,6 @@ def test_and_optimize_right_true(p):
     assert optimized == p
 
 
-@pytest.mark.skip
 def test_and_optimize_left_false(p):
     # False & p == False
     predicate = always_false_p & p
@@ -66,7 +63,6 @@ def test_and_optimize_left_false(p):
     assert optimized == always_false_p
 
 
-@pytest.mark.skip
 def test_and_optimize_left_true(p):
     # True & p == p
     predicate = always_true_p & p
@@ -87,7 +83,6 @@ def test_and_optimize_left_true(p):
         (always_true_p, always_true_p, always_true_p, "True & True == True"),
     ],
 )
-@pytest.mark.skip
 def test_and_truth_combinations(left, right, expected, description):
     predicate = left & right
 
@@ -98,7 +93,6 @@ def test_and_truth_combinations(left, right, expected, description):
     assert optimized == expected, description
 
 
-@pytest.mark.skip
 def test_and_optimize_eq_single_p(p):
     # p == p
 
@@ -111,7 +105,6 @@ def test_and_optimize_eq_single_p(p):
     assert optimized == p
 
 
-@pytest.mark.skip
 def test_and_optimize_eq_multiple_p(p):
     # p & p & p == p
 
@@ -124,7 +117,6 @@ def test_and_optimize_eq_multiple_p(p):
     assert optimized == p
 
 
-@pytest.mark.skip
 def test_and_optimize_eq_nested_one(p, q):
     # p & q & p == p & q
 
@@ -137,7 +129,6 @@ def test_and_optimize_eq_nested_one(p, q):
     assert optimized == p & q
 
 
-@pytest.mark.skip
 def test_and_optimize_eq_nested_two(p, q, r):
     # p & q & r & p == p & q & r
 
@@ -150,7 +141,6 @@ def test_and_optimize_eq_nested_two(p, q, r):
     assert optimized == p & q & r
 
 
-@pytest.mark.skip
 def test_and_optimize_eq_complex(p, q, r):
     # p & q & r & p == p & q & r
 
@@ -163,7 +153,6 @@ def test_and_optimize_eq_complex(p, q, r):
     assert optimized == always_false_p
 
 
-@pytest.mark.skip
 def test_and_not_optimize_eq(p, q):
     # p & q == p & q
 
@@ -176,7 +165,6 @@ def test_and_not_optimize_eq(p, q):
     assert not_optimized == p & q
 
 
-@pytest.mark.skip
 def test_and_optimize_not_right(p):
     # p & ~p == False
 
@@ -189,7 +177,6 @@ def test_and_optimize_not_right(p):
     assert optimized == always_false_p
 
 
-@pytest.mark.skip
 def test_and_optimize_not_right_different(p, q):
     not_same = p & ~q
 
@@ -200,7 +187,6 @@ def test_and_optimize_not_right_different(p, q):
     assert not_optimized == p & ~q
 
 
-@pytest.mark.skip
 def test_and_optimize_not_left(p):
     # ~p & p == False
 
@@ -213,7 +199,6 @@ def test_and_optimize_not_left(p):
     assert optimized == always_false_p
 
 
-@pytest.mark.skip
 def test_and_optimize_not_left_different(p, q):
     not_same = ~p & q
 
@@ -224,7 +209,6 @@ def test_and_optimize_not_left_different(p, q):
     assert not_optimized == ~p & q
 
 
-@pytest.mark.skip
 def test_optimize_eq_v1_eq_v2():
     # x == v1 & x == v2 & v1 != v2 => False
     p1 = eq_p(2)
@@ -239,7 +223,6 @@ def test_optimize_eq_v1_eq_v2():
     assert optimized == always_false_p
 
 
-@pytest.mark.skip
 def test_optimize_eq_v1_eq_v1():
     # x == v1 & x == v1 => x == v1
     p1 = eq_p(2)
@@ -254,7 +237,6 @@ def test_optimize_eq_v1_eq_v1():
     assert optimized == p1
 
 
-@pytest.mark.skip
 def test_optimize_eq_v1_ge_v1():
     # x = v & x >= v => x = v
     p1 = eq_p(2)
@@ -270,7 +252,6 @@ def test_optimize_eq_v1_ge_v1():
     assert optimized == p1
 
 
-@pytest.mark.skip
 def test_optimize_eq_v1_ge_v2():
     # x = v & x >= w & w > v => False
     p1 = eq_p(2)
@@ -285,7 +266,6 @@ def test_optimize_eq_v1_ge_v2():
     assert optimized == p1
 
 
-@pytest.mark.skip
 def test_optimize_le_v1_le_v2():
     # le(v1) & le(v2) == le(min(v1, v2))
     predicate = le_p(5) & le_p(2)
@@ -297,7 +277,6 @@ def test_optimize_le_v1_le_v2():
     assert optimized == le_p(2)
 
 
-@pytest.mark.skip
 def test_optimize_lt_v1_lt_v2():
     # lt(v1) & lt(v2) == lt(min(v1, v2))
     predicate = lt_p(5) & lt_p(2)
@@ -309,7 +288,6 @@ def test_optimize_lt_v1_lt_v2():
     assert optimized == lt_p(2)
 
 
-@pytest.mark.skip
 def test_optimize_ge_v1_le_v2():
     ge_2 = ge_p(2)
     le_3 = le_p(3)
@@ -323,7 +301,6 @@ def test_optimize_ge_v1_le_v2():
     assert optimized == ge_le_p(lower=2, upper=3)
 
 
-@pytest.mark.skip
 def test_optimize_ge_v1_le_v2_v1_is_v2():
     ge_2 = ge_p(2)
     le_2 = le_p(2)
@@ -337,7 +314,6 @@ def test_optimize_ge_v1_le_v2_v1_is_v2():
     assert optimized == eq_p(2)
 
 
-@pytest.mark.skip
 def test_optimize_ge_v1_le_v2_v1_ge_v2():
     ge_3 = ge_p(3)
     le_2 = le_p(2)
@@ -351,7 +327,6 @@ def test_optimize_ge_v1_le_v2_v1_ge_v2():
     assert optimized == always_false_p
 
 
-@pytest.mark.skip
 def test_optimize_ge_v1_lt_v2():
     ge_2 = ge_p(2)
     lt_3 = lt_p(3)
@@ -365,7 +340,6 @@ def test_optimize_ge_v1_lt_v2():
     assert optimized == ge_lt_p(lower=2, upper=3)
 
 
-@pytest.mark.skip
 def test_optimize_ge_v1_lt_v2_v1_is_v2():
     ge_2 = ge_p(2)
     lt_2 = lt_p(2)
@@ -379,7 +353,6 @@ def test_optimize_ge_v1_lt_v2_v1_is_v2():
     assert optimized == always_false_p
 
 
-@pytest.mark.skip
 def test_optimize_ge_v1_lt_v2_v1_ge_v2():
     ge_3 = ge_p(3)
     lt_2 = lt_p(2)
@@ -393,7 +366,6 @@ def test_optimize_ge_v1_lt_v2_v1_ge_v2():
     assert optimized == always_false_p
 
 
-@pytest.mark.skip
 def test_optimize_gt_v1_le_v2():
     gt_2 = gt_p(2)
     le_3 = le_p(3)
@@ -407,7 +379,6 @@ def test_optimize_gt_v1_le_v2():
     assert optimized == gt_le_p(lower=2, upper=3)
 
 
-@pytest.mark.skip
 def test_optimize_gt_v1_le_v2_v1_is_v2():
     gt_2 = gt_p(2)
     le_2 = le_p(2)
@@ -421,7 +392,6 @@ def test_optimize_gt_v1_le_v2_v1_is_v2():
     assert optimized == always_false_p
 
 
-@pytest.mark.skip
 def test_optimize_gt_v1_le_v2_v1_ge_v2():
     gt_3 = gt_p(3)
     le_2 = le_p(2)
@@ -435,7 +405,6 @@ def test_optimize_gt_v1_le_v2_v1_ge_v2():
     assert optimized == always_false_p
 
 
-@pytest.mark.skip
 def test_optimize_gt_v1_lt_v2():
     gt_2 = gt_p(2)
     lt_3 = lt_p(3)
@@ -449,7 +418,6 @@ def test_optimize_gt_v1_lt_v2():
     assert optimized == gt_lt_p(lower=2, upper=3)
 
 
-@pytest.mark.skip
 def test_optimize_gt_v1_lt_v2_v1_is_v2():
     gt_2 = gt_p(2)
     lt_2 = lt_p(2)
@@ -463,7 +431,6 @@ def test_optimize_gt_v1_lt_v2_v1_is_v2():
     assert optimized == always_false_p
 
 
-@pytest.mark.skip
 def test_optimize_gt_v1_lt_v2_v1_ge_v2():
     gt_3 = gt_p(3)
     lt_2 = lt_p(2)
@@ -477,7 +444,6 @@ def test_optimize_gt_v1_lt_v2_v1_ge_v2():
     assert optimized == always_false_p
 
 
-@pytest.mark.skip
 def test_optimize_and_all():
     all_ge_2 = all_p(ge_p(2))
     all_ge_3 = all_p(ge_p(3))
@@ -491,7 +457,6 @@ def test_optimize_and_all():
     assert optimized == all_ge_3
 
 
-@pytest.mark.skip
 def test_optimize_and_all_not():
     ge_2 = ge_p(2)
     all_ge_2 = all_p(ge_2)
@@ -508,7 +473,6 @@ def test_optimize_and_all_not():
     assert optimized([])
 
 
-@pytest.mark.skip
 def test_optimize_none_and_not_none():
     # None & ~None => False
     predicate = is_none_p & is_not_none_p
@@ -520,7 +484,6 @@ def test_optimize_none_and_not_none():
     assert optimized == always_false_p
 
 
-@pytest.mark.skip
 def test_optimize_not_none_and_none():
     # None & ~None => False
     predicate = is_not_none_p & is_none_p
@@ -532,7 +495,6 @@ def test_optimize_not_none_and_none():
     assert optimized == always_false_p
 
 
-@pytest.mark.skip
 def test_optimize_in_and_in():
     p1 = in_p([2, 3])
     p2 = in_p([2, 3, 4])
@@ -546,7 +508,6 @@ def test_optimize_in_and_in():
     assert optimized == in_p({2, 3})
 
 
-@pytest.mark.skip
 def test_optimize_in_and_in_single():
     p1 = in_p([2, 3])
     p2 = in_p([3, 4])
@@ -560,7 +521,6 @@ def test_optimize_in_and_in_single():
     assert optimized == eq_p(3)
 
 
-@pytest.mark.skip
 def test_optimize_in_and_in_empty():
     p1 = in_p([2, 3])
     p2 = in_p([4, 5])
@@ -574,7 +534,6 @@ def test_optimize_in_and_in_empty():
     assert optimized == always_false_p
 
 
-@pytest.mark.skip
 def test_optimize_in_and_not_in():
     p1 = in_p([2, 3, 4])
     p2 = not_in_p([3, 5])
@@ -588,7 +547,6 @@ def test_optimize_in_and_not_in():
     assert optimized == in_p({2, 4})
 
 
-@pytest.mark.skip
 def test_optimize_in_and_not_in_single():
     p1 = in_p({2, 3, 4})
     p2 = not_in_p({2, 3})
@@ -602,7 +560,6 @@ def test_optimize_in_and_not_in_single():
     assert optimized == eq_p(4)
 
 
-@pytest.mark.skip
 def test_optimize_in_and_not_in_empty():
     p1 = in_p({2, 3})
     p2 = not_in_p({2, 3, 4})
@@ -616,7 +573,6 @@ def test_optimize_in_and_not_in_empty():
     assert optimized == always_false_p
 
 
-@pytest.mark.skip
 def test_optimize_not_in_and_not_in():
     p = not_in_p({2, 3, 4})
     q = not_in_p({3, 5})
@@ -630,7 +586,6 @@ def test_optimize_not_in_and_not_in():
     assert optimized == not_in_p({2, 3, 4, 5})
 
 
-@pytest.mark.skip
 def test_optimize_not_in_and_not_in_single():
     p1 = not_in_p({2})
     p2 = not_in_p({2})
@@ -644,7 +599,6 @@ def test_optimize_not_in_and_not_in_single():
     assert optimized == ne_p(2)
 
 
-@pytest.mark.skip
 def test_optimize_not_in_and_not_in_empty():
     p = not_in_p({})
     q = not_in_p({})
@@ -658,7 +612,6 @@ def test_optimize_not_in_and_not_in_empty():
     assert optimized == always_true_p
 
 
-@pytest.mark.skip
 def test_optimize_in_and_eq():
     p = in_p({2, 3, 4})
     q = eq_p(2)
@@ -672,7 +625,6 @@ def test_optimize_in_and_eq():
     assert optimized == q
 
 
-@pytest.mark.skip
 def test_optimize_nested_and():
     p1 = in_p({2, 3, 4})
     p2 = not_in_p({3})
@@ -686,7 +638,6 @@ def test_optimize_nested_and():
     assert optimized == always_false_p
 
 
-@pytest.mark.skip
 def test_optimize_nested_and_2(p, q):
     predicate = p & (q & ~p)
 
@@ -697,7 +648,6 @@ def test_optimize_nested_and_2(p, q):
     assert optimized == always_false_p
 
 
-@pytest.mark.skip
 def test_optimize_nested_and_3(p, q, r, s):
     predicate = p & q & r & s & ~p
 
@@ -708,7 +658,6 @@ def test_optimize_nested_and_3(p, q, r, s):
     assert optimized == always_false_p
 
 
-@pytest.mark.skip
 def test_optimize_nested_and_4(p, q, r):
     predicate = p & (q & r) & ~p
 
@@ -719,7 +668,6 @@ def test_optimize_nested_and_4(p, q, r):
     assert optimized == always_false_p
 
 
-@pytest.mark.skip
 def test_optimize_ge_and_lt_false():
     ge_4 = ge_p(4)
     lt_4 = lt_p(4)
@@ -733,7 +681,6 @@ def test_optimize_ge_and_lt_false():
     assert optimized == always_false_p
 
 
-@pytest.mark.skip
 def test_optimize_fn_and_eq_false():
     p = fn_p(lambda x: x * x > 5)
     q = eq_p(2)
@@ -747,7 +694,6 @@ def test_optimize_fn_and_eq_false():
     assert optimized == always_false_p
 
 
-@pytest.mark.skip
 def test_optimize_fn_and_eq_true():
     p = fn_p(lambda x: x * x > 5)
     q = eq_p(3)
@@ -761,7 +707,6 @@ def test_optimize_fn_and_eq_true():
     assert optimized == always_true_p
 
 
-@pytest.mark.skip
 def test_optimize_is_instance_different():
     predicate = is_int_p & is_str_p
 
@@ -772,7 +717,6 @@ def test_optimize_is_instance_different():
     assert optimized == always_false_p
 
 
-@pytest.mark.skip
 def test_optimize_is_subset():
     p = is_subset_p({1, 2, 3})
     q = is_real_subset_p({1, 2, 3})
@@ -786,7 +730,6 @@ def test_optimize_is_subset():
     assert optimized == q
 
 
-@pytest.mark.skip
 def test_optimize_is_superset():
     p = is_superset_p({1, 2, 3})
     q = is_real_superset_p({1, 2, 3})
@@ -800,7 +743,6 @@ def test_optimize_is_superset():
     assert optimized == q
 
 
-@pytest.mark.skip
 def test_optimize_is_subset_subset():
     p = is_subset_p({1, 2, 3})
     q = is_subset_p({2, 3, 4})
@@ -814,7 +756,6 @@ def test_optimize_is_subset_subset():
     assert optimized == is_subset_p({2, 3})
 
 
-@pytest.mark.skip
 def test_optimize_is_subset_subset_empty():
     p = is_subset_p({1, 2, 3})
     q = is_subset_p({4, 5, 6})
@@ -828,7 +769,6 @@ def test_optimize_is_subset_subset_empty():
     assert optimized == always_false_p
 
 
-@pytest.mark.skip
 def test_optimize_ne_and_gt():
     # ne(5) & gt(5) = gt(5)  [gt implies ne]
 
@@ -841,7 +781,6 @@ def test_optimize_ne_and_gt():
     assert optimized == gt_p(5)
 
 
-@pytest.mark.skip
 def test_optimize_gt_and_ne():
     # gt(5) & ne(5) = gt(5)  [gt implies ne, symmetric]
 
@@ -854,7 +793,6 @@ def test_optimize_gt_and_ne():
     assert optimized == gt_p(5)
 
 
-@pytest.mark.skip
 def test_optimize_ne_and_lt():
     # ne(5) & lt(5) = lt(5)  [lt implies ne]
 
@@ -867,7 +805,6 @@ def test_optimize_ne_and_lt():
     assert optimized == lt_p(5)
 
 
-@pytest.mark.skip
 def test_optimize_lt_and_ne():
     # lt(5) & ne(5) = lt(5)  [lt implies ne, symmetric]
 
@@ -880,7 +817,6 @@ def test_optimize_lt_and_ne():
     assert optimized == lt_p(5)
 
 
-@pytest.mark.skip
 def test_optimize_absorption_and_or(p, q):
     # p & (p | q) = p  [absorption]
 
@@ -893,7 +829,6 @@ def test_optimize_absorption_and_or(p, q):
     assert optimized == p
 
 
-@pytest.mark.skip
 def test_optimize_absorption_or_and(p, q):
     # (p | q) & p = p  [absorption, symmetric]
 
@@ -906,7 +841,6 @@ def test_optimize_absorption_or_and(p, q):
     assert optimized == p
 
 
-@pytest.mark.skip
 def test_optimize_xor_and_left(p, q):
     # (p ^ q) & p = p & ~q
 
@@ -919,7 +853,6 @@ def test_optimize_xor_and_left(p, q):
     assert optimized == p & ~q
 
 
-@pytest.mark.skip
 def test_optimize_xor_and_right(p, q):
     # (p ^ q) & q = ~p & q
 
@@ -932,7 +865,6 @@ def test_optimize_xor_and_right(p, q):
     assert optimized == ~p & q
 
 
-@pytest.mark.skip
 def test_optimize_and_xor_left(p, q):
     # p & (p ^ q) = p & ~q  [symmetric]
 
@@ -945,7 +877,6 @@ def test_optimize_and_xor_left(p, q):
     assert optimized == p & ~q
 
 
-@pytest.mark.skip
 def test_optimize_and_xor_right(p, q):
     # q & (p ^ q) = ~p & q  [symmetric]
 
@@ -958,28 +889,24 @@ def test_optimize_and_xor_right(p, q):
     assert optimized == ~p & q
 
 
-@pytest.mark.skip
 def test_optimize_le_ge_reversed():
     # le(v2) & ge(v1) => ge_le(v1, v2)  — reversed operand order
 
     assert optimize(le_p(3) & ge_p(1)) == ge_le_p(lower=1, upper=3)
 
 
-@pytest.mark.skip
 def test_optimize_le_gt_reversed():
     # le(v2) & gt(v1) => gt_le(v1, v2)  — reversed operand order
 
     assert optimize(le_p(3) & gt_p(1)) == gt_le_p(lower=1, upper=3)
 
 
-@pytest.mark.skip
 def test_optimize_lt_ge_reversed():
     # lt(v2) & ge(v1) => ge_lt(v1, v2)  — reversed operand order
 
     assert optimize(lt_p(3) & ge_p(1)) == ge_lt_p(lower=1, upper=3)
 
 
-@pytest.mark.skip
 def test_optimize_lt_gt_reversed():
     # lt(v2) & gt(v1) => gt_lt(v1, v2)  — reversed operand order
 

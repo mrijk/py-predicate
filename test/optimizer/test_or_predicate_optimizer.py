@@ -1,5 +1,3 @@
-import pytest
-
 from predicate import (
     all_p,
     always_false_p,
@@ -19,7 +17,6 @@ from predicate import (
 )
 
 
-@pytest.mark.skip
 def test_or_optimize_true_left(p):
     # True | p == True
     predicate = always_true_p | p
@@ -31,7 +28,6 @@ def test_or_optimize_true_left(p):
     assert optimized == always_true_p
 
 
-@pytest.mark.skip
 def test_or_optimize_right_false(p):
     # p | False == p
     predicate = p | always_false_p
@@ -43,7 +39,6 @@ def test_or_optimize_right_false(p):
     assert optimized == p
 
 
-@pytest.mark.skip
 def test_or_optimize_left_false(p):
     # False | p == p
     predicate = always_false_p | p
@@ -55,7 +50,6 @@ def test_or_optimize_left_false(p):
     assert optimized == p
 
 
-@pytest.mark.skip
 def test_or_optimize_true_right(p):
     # p | True == True
     predicate = p | always_true_p
@@ -67,7 +61,6 @@ def test_or_optimize_true_right(p):
     assert optimized == always_true_p
 
 
-@pytest.mark.skip
 def test_or_optimize_eq(p):
     # p | p == p
     same = p | p
@@ -79,7 +72,6 @@ def test_or_optimize_eq(p):
     assert optimized == p
 
 
-@pytest.mark.skip
 def test_or_optimize_eq_not_same(p, q):
     not_same = p | q
 
@@ -90,7 +82,6 @@ def test_or_optimize_eq_not_same(p, q):
     assert not_optimized == not_same
 
 
-@pytest.mark.skip
 def test_or_optimize_right_not_same(p):
     # p | ~p == True
 
@@ -103,7 +94,6 @@ def test_or_optimize_right_not_same(p):
     assert optimized == always_true_p
 
 
-@pytest.mark.skip
 def test_or_optimize_right_not_same_after_optimization(p):
     # p | ~p == True
 
@@ -119,7 +109,6 @@ def test_or_optimize_right_not_same_after_optimization(p):
     assert optimized == always_true_p
 
 
-@pytest.mark.skip
 def test_or_optimize_negate(p):
     # p | ~p == True
     predicate = p | ~p
@@ -131,7 +120,6 @@ def test_or_optimize_negate(p):
     assert optimized == always_true_p
 
 
-@pytest.mark.skip
 def test_or_optimize_left_not_same(p):
     # ~p | p == True
     predicate = ~p | p
@@ -143,7 +131,6 @@ def test_or_optimize_left_not_same(p):
     assert optimized == always_true_p
 
 
-@pytest.mark.skip
 def test_or_optimize_not_not_same(p, q):
     # p | ~q with p != q
     predicate = p | q
@@ -151,7 +138,6 @@ def test_or_optimize_not_not_same(p, q):
     assert not can_optimize(predicate)
 
 
-@pytest.mark.skip
 def test_optimize_or_any():
     ge_2 = ge_p(2)
     ge_3 = ge_p(3)
@@ -167,7 +153,6 @@ def test_optimize_or_any():
     assert optimized == any_p(ge_2)
 
 
-@pytest.mark.skip
 def test_optimize_to_xor_left(p, q):
     # (~p & q) | (p & ~q) == p ^ q
 
@@ -180,7 +165,6 @@ def test_optimize_to_xor_left(p, q):
     assert optimized == p ^ q
 
 
-@pytest.mark.skip
 def test_optimize_to_xor_right(p, q):
     # (p & ~q) | (~p & q) == p ^ q
 
@@ -193,7 +177,6 @@ def test_optimize_to_xor_right(p, q):
     assert optimized == p ^ q
 
 
-@pytest.mark.skip
 def test_or_optimize_not_optimize(p, q, r, s):
     # (p & q) | (r & s)
 
@@ -202,7 +185,6 @@ def test_or_optimize_not_optimize(p, q, r, s):
     assert not can_optimize(predicate)
 
 
-@pytest.mark.skip
 def test_optimize_multiple_eq():
     # x == 2 or x == 3 => x in (2, 3)
     eq_2 = eq_p(2)
@@ -217,7 +199,6 @@ def test_optimize_multiple_eq():
     assert optimized == in_p({2, 3})
 
 
-@pytest.mark.skip
 def test_optimize_in_and_in():
     p = in_p({2, 3})
     q = in_p({4, 5})
@@ -227,7 +208,6 @@ def test_optimize_in_and_in():
     assert can_optimize(predicate)
 
 
-@pytest.mark.skip
 def test_optimize_in_and_not_in():
     p = in_p({2, 3})
     q = not_in_p({2, 3, 4, 5})
@@ -241,7 +221,6 @@ def test_optimize_in_and_not_in():
     assert optimized == not_in_p({4, 5})
 
 
-@pytest.mark.skip
 def test_optimize_in_and_not_in_single():
     p = in_p([2])
     q = not_in_p({2, 3})
@@ -255,7 +234,6 @@ def test_optimize_in_and_not_in_single():
     assert optimized == ne_p(3)
 
 
-@pytest.mark.skip
 def test_optimize_in_and_not_in_empty():
     p1 = in_p({3, 4, 5})
     p2 = not_in_p({4, 5})
@@ -269,7 +247,6 @@ def test_optimize_in_and_not_in_empty():
     assert optimized == always_true_p
 
 
-@pytest.mark.skip
 def test_or_optimize_eq_or_in():
     p1 = eq_p(5)
     p2 = in_p({2, 3, 4})
@@ -283,7 +260,6 @@ def test_or_optimize_eq_or_in():
     assert optimized == in_p({2, 3, 4, 5})
 
 
-@pytest.mark.skip
 def test_or_optimize_in_or_eq():
     p = in_p({2, 3, 4})
     q = eq_p(5)
@@ -297,7 +273,6 @@ def test_or_optimize_in_or_eq():
     assert optimized == in_p({2, 3, 4, 5})
 
 
-@pytest.mark.skip
 def test_optimize_nested_or(p, q):
     predicate = p | q | ~p
 
@@ -308,7 +283,6 @@ def test_optimize_nested_or(p, q):
     assert optimized == always_true_p
 
 
-@pytest.mark.skip
 def test_optimize_nested_or_1(p, q, r, s):
     predicate = p | q | r | s | ~q
 
@@ -319,7 +293,6 @@ def test_optimize_nested_or_1(p, q, r, s):
     assert optimized == always_true_p
 
 
-@pytest.mark.skip
 def test_or_optimize_all_or_any(p):
     predicate = all_p(p) | any_p(p)
 
@@ -330,7 +303,6 @@ def test_or_optimize_all_or_any(p):
     assert optimized == is_empty_p | any_p(p)
 
 
-@pytest.mark.skip
 def test_or_optimize_any_or_all(p):
     predicate = any_p(p) | all_p(p)
 
@@ -341,7 +313,6 @@ def test_or_optimize_any_or_all(p):
     assert optimized == is_empty_p | any_p(p)
 
 
-@pytest.mark.skip
 def test_or_optimize_right_is_or():
     # p | (q | r): right is OrPredicate → triggers case _, OrPredicate() swap
     predicate = ge_p(2) | (ge_p(3) | le_p(1))
@@ -351,7 +322,6 @@ def test_or_optimize_right_is_or():
     assert result is not None
 
 
-@pytest.mark.skip
 def test_optimize_ge_or_le_always_true():
     # ge(2) | le(5) = True when lower <= upper
 
@@ -364,7 +334,6 @@ def test_optimize_ge_or_le_always_true():
     assert optimized == always_true_p
 
 
-@pytest.mark.skip
 def test_optimize_ge_or_le_equal_bounds():
     # ge(3) | le(3) = True (every x is either >= 3 or <= 3)
 
@@ -377,7 +346,6 @@ def test_optimize_ge_or_le_equal_bounds():
     assert optimized == always_true_p
 
 
-@pytest.mark.skip
 def test_optimize_le_or_ge_always_true():
     # le(5) | ge(2) = True when lower <= upper (symmetric)
 
@@ -390,7 +358,6 @@ def test_optimize_le_or_ge_always_true():
     assert optimized == always_true_p
 
 
-@pytest.mark.skip
 def test_optimize_ge_or_le_not_always_true():
     # ge(5) | le(2) is NOT always true (e.g. x=3 fails both)
 
@@ -399,7 +366,6 @@ def test_optimize_ge_or_le_not_always_true():
     assert not can_optimize(predicate)
 
 
-@pytest.mark.skip
 def test_optimize_eq_or_gt():
     # eq(5) | gt(5) = ge(5)
 
@@ -412,7 +378,6 @@ def test_optimize_eq_or_gt():
     assert optimized == ge_p(5)
 
 
-@pytest.mark.skip
 def test_optimize_gt_or_eq():
     # gt(5) | eq(5) = ge(5)
 
@@ -425,7 +390,6 @@ def test_optimize_gt_or_eq():
     assert optimized == ge_p(5)
 
 
-@pytest.mark.skip
 def test_optimize_eq_or_lt():
     # eq(5) | lt(5) = le(5)
 
@@ -438,7 +402,6 @@ def test_optimize_eq_or_lt():
     assert optimized == le_p(5)
 
 
-@pytest.mark.skip
 def test_optimize_lt_or_eq():
     # lt(5) | eq(5) = le(5)
 
@@ -451,7 +414,6 @@ def test_optimize_lt_or_eq():
     assert optimized == le_p(5)
 
 
-@pytest.mark.skip
 def test_optimize_not_in_or_not_in():
     # not_in({1, 2}) | not_in({2, 3}) = not_in({2})
 
@@ -464,7 +426,6 @@ def test_optimize_not_in_or_not_in():
     assert optimized == ne_p(2)
 
 
-@pytest.mark.skip
 def test_optimize_not_in_or_not_in_disjoint():
     # not_in({1, 2}) | not_in({3, 4}) = always_true  [disjoint sets → empty intersection]
 
@@ -477,7 +438,6 @@ def test_optimize_not_in_or_not_in_disjoint():
     assert optimized == always_true_p
 
 
-@pytest.mark.skip
 def test_optimize_not_in_or_not_in_same():
     # not_in({1, 2}) | not_in({1, 2}) = not_in({1, 2})  [identical sets]
 

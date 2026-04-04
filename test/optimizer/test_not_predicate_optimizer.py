@@ -1,4 +1,3 @@
-import pytest
 from helpers import is_not_p
 
 from predicate import (
@@ -21,7 +20,6 @@ from predicate import (
 from predicate.optimizer.predicate_optimizer import can_optimize, optimize
 
 
-@pytest.mark.skip
 def test_optimize_not_not():
     # ~~p == p
     ge_2 = ge_p(2)
@@ -35,7 +33,6 @@ def test_optimize_not_not():
     assert optimized == ge_2
 
 
-@pytest.mark.skip
 def test_not_optimize_always_true():
     # ~False == True
     always_true = ~always_false_p
@@ -48,7 +45,6 @@ def test_not_optimize_always_true():
     assert optimized == always_true_p
 
 
-@pytest.mark.skip
 def test_not_optimize_always_false():
     # ~True == False
     always_false = ~always_true_p
@@ -61,7 +57,6 @@ def test_not_optimize_always_false():
     assert optimized == always_false_p
 
 
-@pytest.mark.skip
 def test_not_optimize_ge():
     # ~ge(v) => lt(v)
     ge_2 = ge_p(2)
@@ -74,7 +69,6 @@ def test_not_optimize_ge():
     assert optimized == lt_p(2)
 
 
-@pytest.mark.skip
 def test_not_optimize_gt():
     # ~gt(v) => le(v)
     gt_2 = gt_p(2)
@@ -87,7 +81,6 @@ def test_not_optimize_gt():
     assert optimized == le_p(2)
 
 
-@pytest.mark.skip
 def test_not_optimize_le():
     # ~lt(v) => ge(v)
     le_2 = le_p(2)
@@ -100,7 +93,6 @@ def test_not_optimize_le():
     assert optimized == gt_p(2)
 
 
-@pytest.mark.skip
 def test_not_optimize_lt():
     # ~lt(v) => ge(v)
     lt_2 = lt_p(2)
@@ -113,7 +105,6 @@ def test_not_optimize_lt():
     assert optimized == ge_p(2)
 
 
-@pytest.mark.skip
 def test_not_optimize_eq():
     # ~(x == v) => x != v
     eq_2 = eq_p(2)
@@ -126,7 +117,6 @@ def test_not_optimize_eq():
     assert optimized == ne_p(2)
 
 
-@pytest.mark.skip
 def test_not_optimize_ne():
     # ~(x != v) => x == v
     ne_2 = ne_p(2)
@@ -139,7 +129,6 @@ def test_not_optimize_ne():
     assert optimized == eq_p(2)
 
 
-@pytest.mark.skip
 def test_not_optimize_none():
     predicate = ~is_none_p
 
@@ -150,7 +139,6 @@ def test_not_optimize_none():
     assert optimized == is_not_none_p
 
 
-@pytest.mark.skip
 def test_not_optimize_not_none():
     predicate = ~is_not_none_p
 
@@ -161,7 +149,6 @@ def test_not_optimize_not_none():
     assert optimized == is_none_p
 
 
-@pytest.mark.skip
 def test_not_optimize_all():
     predicate = ~all_p(ge_p(2))
 
@@ -172,7 +159,6 @@ def test_not_optimize_all():
     assert optimized == any_p(lt_p(2))
 
 
-@pytest.mark.skip
 def test_not_optimize_all_skip(p):
     predicate = ~all_p(~p)
 
@@ -183,7 +169,6 @@ def test_not_optimize_all_skip(p):
     assert optimized == any_p(p)
 
 
-@pytest.mark.skip
 def test_not_optimize_any():
     predicate = ~any_p(ge_p(2))
 
@@ -194,7 +179,6 @@ def test_not_optimize_any():
     assert optimized == all_p(lt_p(2))
 
 
-@pytest.mark.skip
 def test_not_optimize_not_in():
     not_in_234 = not_in_p({2, 3, 4})
     predicate = ~not_in_234
@@ -206,7 +190,6 @@ def test_not_optimize_not_in():
     assert optimized == in_p({2, 3, 4})
 
 
-@pytest.mark.skip
 def test_not_optimize_in():
     in_234 = in_p({2, 3, 4})
     predicate = ~in_234
@@ -218,14 +201,12 @@ def test_not_optimize_in():
     assert optimized == not_in_p({2, 3, 4})
 
 
-@pytest.mark.skip
 def test_not_optimize_empty():
     predicate = ~is_empty_p
 
     assert can_optimize(predicate)
 
 
-@pytest.mark.skip
 def test_not_optimize_or_left_not(p, q):
     # ~(~p | q) => p & ~q
 
@@ -238,7 +219,6 @@ def test_not_optimize_or_left_not(p, q):
     assert optimized == p & ~q
 
 
-@pytest.mark.skip
 def test_not_optimize_or_right_not(p, q):
     # ~(p | ~q) => ~p & q
 
@@ -251,7 +231,6 @@ def test_not_optimize_or_right_not(p, q):
     assert optimized == ~p & q
 
 
-@pytest.mark.skip
 def test_not_optimize_or_cant_optimize(p, q):
     # ~(p | q) => ~(p | q)
 
@@ -260,7 +239,6 @@ def test_not_optimize_or_cant_optimize(p, q):
     assert not can_optimize(predicate)
 
 
-@pytest.mark.skip
 def test_not_optimize_and_left_not(p, q):
     # ~(~p & q) => p | ~q
 
@@ -273,7 +251,6 @@ def test_not_optimize_and_left_not(p, q):
     assert optimized == p | ~q
 
 
-@pytest.mark.skip
 def test_not_optimize_and_right_not(p, q):
     # ~(p & ~q) => ~p | q
 
@@ -286,7 +263,6 @@ def test_not_optimize_and_right_not(p, q):
     assert optimized == ~p | q
 
 
-@pytest.mark.skip
 def test_not_optimize_and_cant_optimize(p, q):
     # ~(p & q) => ~(p & q)
 

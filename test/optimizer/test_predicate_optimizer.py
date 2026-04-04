@@ -1,4 +1,3 @@
-import pytest
 from helpers import (
     is_and_p,
 )
@@ -11,7 +10,6 @@ from predicate import (
 )
 
 
-@pytest.mark.skip
 def test_optimize_not_or(p):
     # ~(p | ~p) == False
 
@@ -24,7 +22,6 @@ def test_optimize_not_or(p):
     assert optimized == always_false_p
 
 
-@pytest.mark.skip
 def test_optimize_not_and(p):
     # ~(p & ~p) == True
 
@@ -37,7 +34,6 @@ def test_optimize_not_and(p):
     assert optimized == always_true_p
 
 
-@pytest.mark.skip
 def test_optimize_not_xor_p_q(p, q):
     # ~(p ^ q) == ~p ^ q
 
@@ -50,7 +46,6 @@ def test_optimize_not_xor_p_q(p, q):
     assert optimized == ~p ^ q
 
 
-@pytest.mark.skip
 def test_optimize_not_xor_not_p_q(p, q):
     # ~(~p ^ q) == p ^ q
 
@@ -63,7 +58,6 @@ def test_optimize_not_xor_not_p_q(p, q):
     assert optimized == p ^ q
 
 
-@pytest.mark.skip
 def test_optimize_not_xor_p_not_q(p, q):
     # ~(p ^ ~q) == p ^ q
 
@@ -76,7 +70,6 @@ def test_optimize_not_xor_p_not_q(p, q):
     assert optimized == p ^ q
 
 
-@pytest.mark.skip
 def test_optimize_or_1(p, q):
     # p | (~p & q) == p | q
 
@@ -89,7 +82,6 @@ def test_optimize_or_1(p, q):
     assert optimized == p | q
 
 
-@pytest.mark.skip
 def test_optimize_and_1(p, q):
     # p & (~p | q) == p & q
 
@@ -102,7 +94,6 @@ def test_optimize_and_1(p, q):
     assert optimized == p & q
 
 
-@pytest.mark.skip
 def test_optimize_and_2(p, q):
     # p & (q | ~p) == p & q
 
@@ -116,7 +107,6 @@ def test_optimize_and_2(p, q):
     assert optimized == p & q
 
 
-@pytest.mark.skip
 def test_optimize_and_3(p, q):
     # (~p | q) & p == q & p
 
@@ -130,7 +120,6 @@ def test_optimize_and_3(p, q):
     assert optimized == q & p
 
 
-@pytest.mark.skip
 def test_optimize_and_4(p, q):
     # (q | ~p) & p == q & p
 
@@ -144,7 +133,6 @@ def test_optimize_and_4(p, q):
     assert optimized == q & p
 
 
-@pytest.mark.skip
 def test_optimize_xor_1(p, q):
     # p ^ (^p & q) = ~(p | q)
 
@@ -157,7 +145,6 @@ def test_optimize_xor_1(p, q):
     assert optimized == ~(p | q)
 
 
-@pytest.mark.skip
 def test_optimize_xor_2(p, q):
     # p ^ (q & ~p) = ~(p | q)
 
@@ -170,7 +157,6 @@ def test_optimize_xor_2(p, q):
     assert optimized == ~(p | q)
 
 
-@pytest.mark.skip
 def test_optimize_xor_3(p, q):
     # (q & ~p) ^ p = ~(p | q)
 
@@ -183,7 +169,6 @@ def test_optimize_xor_3(p, q):
     assert optimized == ~(p | q)
 
 
-@pytest.mark.skip
 def test_optimize_xor_4(p, q):
     # (~p & q) ^ p = ~(p | q)
 
@@ -196,7 +181,6 @@ def test_optimize_xor_4(p, q):
     assert optimized == ~(p | q)
 
 
-@pytest.mark.skip
 def test_optimize_xor_5(p, q):
     # p ^ (p & q) = p & ~q
 
@@ -209,7 +193,6 @@ def test_optimize_xor_5(p, q):
     assert optimized == p & ~q
 
 
-@pytest.mark.skip
 def test_optimize_xor_or_left_left(p, q):
     # p ^ (p | q) = q
 
@@ -222,7 +205,6 @@ def test_optimize_xor_or_left_left(p, q):
     assert optimized == q
 
 
-@pytest.mark.skip
 def test_optimize_xor_or_left_right(p, q):
     # p ^ (q | p) = q
 
@@ -235,7 +217,6 @@ def test_optimize_xor_or_left_right(p, q):
     assert optimized == q
 
 
-@pytest.mark.skip
 def test_optimize_xor_or_right_left(p, q):
     # (p | q) ^ p = q
 
@@ -248,7 +229,6 @@ def test_optimize_xor_or_right_left(p, q):
     assert optimized == q
 
 
-@pytest.mark.skip
 def test_optimize_xor_or_right_right(p, q):
     # (q | p) ^ p = q
 

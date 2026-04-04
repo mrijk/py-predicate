@@ -1,5 +1,3 @@
-import pytest
-
 from predicate import (
     always_false_p,
     always_true_p,
@@ -15,7 +13,6 @@ from predicate import (
 )
 
 
-@pytest.mark.skip
 def test_xor_optimize_false_true():
     # False ^ True = True
     predicate = always_false_p ^ always_true_p
@@ -27,7 +24,6 @@ def test_xor_optimize_false_true():
     assert optimized == always_true_p
 
 
-@pytest.mark.skip
 def test_xor_optimize_true_false():
     # True ^ False = True
     predicate = always_true_p ^ always_false_p
@@ -39,7 +35,6 @@ def test_xor_optimize_true_false():
     assert optimized == always_true_p
 
 
-@pytest.mark.skip
 def test_xor_optimize_false_false():
     # False ^ False = False
     xor_false = always_false_p ^ always_false_p
@@ -51,7 +46,6 @@ def test_xor_optimize_false_false():
     assert optimized == always_false_p
 
 
-@pytest.mark.skip
 def test_xor_optimize_true_true():
     # True ^ True = False
     predicate = always_true_p ^ always_true_p
@@ -63,7 +57,6 @@ def test_xor_optimize_true_true():
     assert optimized == always_false_p
 
 
-@pytest.mark.skip
 def test_xor_optimize_eq(p):
     # p ^ p = False
 
@@ -76,7 +69,6 @@ def test_xor_optimize_eq(p):
     assert optimized == always_false_p
 
 
-@pytest.mark.skip
 def test_xor_optimize_neq(p, q):
     # p ^ q = p ^q
 
@@ -85,7 +77,6 @@ def test_xor_optimize_neq(p, q):
     assert not can_optimize(predicate)
 
 
-@pytest.mark.skip
 def test_xor_optimize_not_right(p):
     # p ^ ~p = True
 
@@ -97,7 +88,6 @@ def test_xor_optimize_not_right(p):
     assert optimized == always_true_p
 
 
-@pytest.mark.skip
 def test_xor_optimize_not_left(p):
     # ~p ^ p = True
 
@@ -109,7 +99,6 @@ def test_xor_optimize_not_left(p):
     assert optimized == always_true_p
 
 
-@pytest.mark.skip
 def test_xor_optimize_not_2(p, q):
     not_same = p & q
 
@@ -120,7 +109,6 @@ def test_xor_optimize_not_2(p, q):
     assert not_optimized == p & q
 
 
-@pytest.mark.skip
 def test_xor_optimize_false_right(p):
     # p ^ False == p
 
@@ -133,7 +121,6 @@ def test_xor_optimize_false_right(p):
     assert optimized == p
 
 
-@pytest.mark.skip
 def test_xor_optimize_false_left(p):
     # False ^ p = p
 
@@ -146,7 +133,6 @@ def test_xor_optimize_false_left(p):
     assert optimized == p
 
 
-@pytest.mark.skip
 def test_xor_optimize_true_right(p):
     # p ^ True = ~p
 
@@ -159,7 +145,6 @@ def test_xor_optimize_true_right(p):
     assert optimized == ~p
 
 
-@pytest.mark.skip
 def test_xor_optimize_true_left(p):
     # True ^ p = ~p
 
@@ -172,7 +157,6 @@ def test_xor_optimize_true_left(p):
     assert optimized == ~p
 
 
-@pytest.mark.skip
 def test_xor_optimize_not_not(p, q):
     # ~p ^ ~q = p ^ q
 
@@ -185,7 +169,6 @@ def test_xor_optimize_not_not(p, q):
     assert optimized == p ^ q
 
 
-@pytest.mark.skip
 def test_xor_optimize_xor_left(p, q):
     # p ^ q ^ p = q
 
@@ -198,7 +181,6 @@ def test_xor_optimize_xor_left(p, q):
     assert optimized == q
 
 
-@pytest.mark.skip
 def test_xor_optimize_xor_right(p, q):
     # p ^ q ^ q = p
 
@@ -211,7 +193,6 @@ def test_xor_optimize_xor_right(p, q):
     assert optimized == p
 
 
-@pytest.mark.skip
 def test_optimize_in_xor_in():
     p1 = in_p({2, 3})
     p2 = in_p({4, 5})
@@ -225,7 +206,6 @@ def test_optimize_in_xor_in():
     assert optimized == in_p({2, 3, 4, 5})
 
 
-@pytest.mark.skip
 def test_optimize_in_xor_in_empty():
     p1 = in_p({2, 3, 4})
     p2 = in_p({2, 3, 4})
@@ -239,7 +219,6 @@ def test_optimize_in_xor_in_empty():
     assert optimized == always_false_p
 
 
-@pytest.mark.skip
 def test_optimize_in_xor_in_single():
     p1 = in_p({2, 3})
     p2 = in_p({2})
@@ -253,7 +232,6 @@ def test_optimize_in_xor_in_single():
     assert optimized == eq_p(3)
 
 
-@pytest.mark.skip
 def test_xor_optimize_left_implies_right():
     # ge(3) ^ ge(2): ge(3) implies ge(2), so result is ~ge(3) & ge(2) = ge_lt(2, 3)
 
@@ -266,7 +244,6 @@ def test_xor_optimize_left_implies_right():
     assert optimized == ge_lt_p(lower=2, upper=3)
 
 
-@pytest.mark.skip
 def test_xor_optimize_right_implies_left():
     # ge(2) ^ ge(3): ge(3) implies ge(2), so result is ge(2) & ~ge(3) = ge_lt(2, 3)
 
@@ -279,7 +256,6 @@ def test_xor_optimize_right_implies_left():
     assert optimized == ge_lt_p(lower=2, upper=3)
 
 
-@pytest.mark.skip
 def test_xor_optimize_le_left_implies_right():
     # le(2) ^ le(5): le(2) implies le(5), so result is ~le(2) & le(5) = gt_le(2, 5)
 
@@ -292,7 +268,6 @@ def test_xor_optimize_le_left_implies_right():
     assert optimized == gt_le_p(lower=2, upper=5)
 
 
-@pytest.mark.skip
 def test_xor_optimize_lt_left_implies_right():
     # lt(2) ^ lt(5): lt(2) implies lt(5), so result is ~lt(2) & lt(5) = ge_lt(2, 5)
 
@@ -305,7 +280,6 @@ def test_xor_optimize_lt_left_implies_right():
     assert optimized == ge_lt_p(lower=2, upper=5)
 
 
-@pytest.mark.skip
 def test_xor_optimize_ge_le_implies():
     # ge(3) ^ le(5): neither implies the other, should not use this rule
 
@@ -314,7 +288,6 @@ def test_xor_optimize_ge_le_implies():
     assert not can_optimize(predicate)
 
 
-@pytest.mark.skip
 def test_xor_optimize_right_xor():
     # p ^ (q ^ r): right is XorPredicate → swaps and re-optimizes
     predicate = ge_p(2) ^ (ge_p(3) ^ ge_p(4))
@@ -324,7 +297,6 @@ def test_xor_optimize_right_xor():
     assert optimized is not None
 
 
-@pytest.mark.skip
 def test_xor_optimize_nested_not_optimizable():
     # (p ^ q) ^ r where neither sub-xor can be further simplified
     predicate = (ge_p(2) ^ ge_p(3)) ^ ge_p(4)
@@ -334,7 +306,6 @@ def test_xor_optimize_nested_not_optimizable():
     assert result is not None
 
 
-@pytest.mark.skip
 def test_xor_left_xor_both_inner_fail():
     # (p ^ q) ^ r where neither inner cross-xor optimizes — covers the nested NotOptimized() path
     from predicate.standard_predicates import is_float_p, is_int_p, is_str_p
@@ -344,7 +315,6 @@ def test_xor_left_xor_both_inner_fail():
     assert result is not None
 
 
-@pytest.mark.skip
 def test_xor_right_xor_no_optimize():
     # p ^ (q ^ r) where q ^ r stays a XorPredicate after optimize — covers _, XorPredicate() case
     from predicate.standard_predicates import is_int_p, is_str_p
