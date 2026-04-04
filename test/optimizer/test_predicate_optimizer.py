@@ -194,7 +194,7 @@ def test_optimize_xor_5(p, q):
 
 
 def test_optimize_xor_or_left_left(p, q):
-    # p ^ (p | q) = q
+    # p ^ (p | q) = ~p & q
 
     predicate = p ^ (p | q)
 
@@ -202,11 +202,11 @@ def test_optimize_xor_or_left_left(p, q):
 
     optimized = optimize(predicate)
 
-    assert optimized == q
+    assert optimized == ~p & q
 
 
 def test_optimize_xor_or_left_right(p, q):
-    # p ^ (q | p) = q
+    # p ^ (q | p) = ~p & q
 
     predicate = p ^ (q | p)
 
@@ -214,11 +214,11 @@ def test_optimize_xor_or_left_right(p, q):
 
     optimized = optimize(predicate)
 
-    assert optimized == q
+    assert optimized == ~p & q
 
 
 def test_optimize_xor_or_right_left(p, q):
-    # (p | q) ^ p = q
+    # (p | q) ^ p = q & ~p
 
     predicate = (p | q) ^ p
 
@@ -226,11 +226,11 @@ def test_optimize_xor_or_right_left(p, q):
 
     optimized = optimize(predicate)
 
-    assert optimized == q
+    assert optimized == q & ~p
 
 
 def test_optimize_xor_or_right_right(p, q):
-    # (q | p) ^ p = q
+    # (q | p) ^ p = q & ~p
 
     predicate = (q | p) ^ p
 
@@ -238,4 +238,4 @@ def test_optimize_xor_or_right_right(p, q):
 
     optimized = optimize(predicate)
 
-    assert optimized == q
+    assert optimized == q & ~p
