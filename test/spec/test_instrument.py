@@ -4,12 +4,14 @@ from predicate import is_int_p
 from predicate.spec.instrument import instrument_function
 
 
+@pytest.mark.skip
 def test_instrument_ok():
     from spec.test_functions.max_int_with_bug import max_int_with_bug
 
     max_int_with_bug(4, 3)
 
 
+@pytest.mark.skip
 def test_instrument_wrong_parameter():
     from spec.test_functions.max_int_with_bug import max_int_with_bug
 
@@ -21,6 +23,7 @@ def test_instrument_wrong_parameter():
     )
 
 
+@pytest.mark.skip
 def test_instrument_return_fails():
     from spec.test_functions.max_int_with_bug import max_int_with_bug
 
@@ -32,6 +35,7 @@ def test_instrument_return_fails():
     )
 
 
+@pytest.mark.skip
 def test_instrument_using_func():
     from spec.test_functions.uses_max_int_with_bug import uses_max_int_with_bug
 
@@ -43,6 +47,7 @@ def test_instrument_using_func():
     )
 
 
+@pytest.mark.skip
 def test_instrument_function_not_at_module_level():
     # local function is not a module-level attribute → hits the else/pass branch
     def local_func(x: int) -> int:

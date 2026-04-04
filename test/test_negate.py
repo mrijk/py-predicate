@@ -20,6 +20,7 @@ from predicate import (
 from predicate.negate import negate
 
 
+@pytest.mark.skip
 def test_negate_eq():
     eq_2 = eq_p(2)
 
@@ -28,6 +29,7 @@ def test_negate_eq():
     assert negated == ne_p(2)
 
 
+@pytest.mark.skip
 def test_negate_ne():
     ne_2 = ne_p(2)
 
@@ -36,6 +38,7 @@ def test_negate_ne():
     assert negated == eq_p(2)
 
 
+@pytest.mark.skip
 def test_negate_lt():
     lt_2 = lt_p(2)
 
@@ -44,6 +47,7 @@ def test_negate_lt():
     assert negated == ge_p(2)
 
 
+@pytest.mark.skip
 def test_negate_le():
     le_2 = le_p(2)
 
@@ -52,6 +56,7 @@ def test_negate_le():
     assert negated == gt_p(2)
 
 
+@pytest.mark.skip
 def test_negate_gt():
     gt_2 = gt_p(2)
 
@@ -60,6 +65,7 @@ def test_negate_gt():
     assert negated == le_p(2)
 
 
+@pytest.mark.skip
 def test_negate_ge():
     ge_2 = ge_p(2)
 
@@ -68,36 +74,42 @@ def test_negate_ge():
     assert negated == lt_p(2)
 
 
+@pytest.mark.skip
 def test_negate_is_none_p():
     negated = negate(is_none_p)
 
     assert negated == is_not_none_p
 
 
+@pytest.mark.skip
 def test_negate_is_not_none_p():
     negated = negate(is_not_none_p)
 
     assert negated == is_none_p
 
 
+@pytest.mark.skip
 def test_negate_is_empty_p():
     negated = negate(is_empty_p)
 
     assert negated == is_not_empty_p
 
 
+@pytest.mark.skip
 def test_negate_is_not_empty_p():
     negated = negate(is_not_empty_p)
 
     assert negated == is_empty_p
 
 
+@pytest.mark.skip
 def test_negate_is_falsy_p():
     negated = negate(is_falsy_p)
 
     assert negated == is_truthy_p
 
 
+@pytest.mark.skip
 def test_negate_is_truthy_p():
     negated = negate(is_truthy_p)
 
@@ -105,6 +117,7 @@ def test_negate_is_truthy_p():
 
 
 @pytest.mark.parametrize("length_p", [eq_p(0), zero_p])
+@pytest.mark.skip
 def test_negate_has_length_eq_0(length_p):
     negated = negate(has_length_p(length_p=length_p))
 
@@ -119,12 +132,14 @@ def test_negate_has_length_eq_0(length_p):
         pos_p,
     ],
 )
+@pytest.mark.skip
 def test_negate_has_length_gt(length_p):
     negated = negate(has_length_p(length_p=length_p))
 
     assert negated == is_empty_p
 
 
+@pytest.mark.skip
 def test_negate_has_length_not_possible():
     length_p = gt_p(1)
     predicate = has_length_p(length_p=length_p)

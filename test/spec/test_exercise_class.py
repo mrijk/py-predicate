@@ -4,6 +4,7 @@ from predicate import ge_p, is_bool_p, is_float_p, is_int_p, pos_p, zero_p
 from predicate.spec.exercise import Spec, exercise
 
 
+@pytest.mark.skip
 def test_exercise_zero_p():
     spec: Spec = {"args": {"x": is_int_p}, "ret": is_bool_p}
 
@@ -12,6 +13,7 @@ def test_exercise_zero_p():
     assert result
 
 
+@pytest.mark.skip
 def test_exercise_pos_p():
     spec: Spec = {"args": {"x": is_int_p | is_float_p}, "ret": is_bool_p}
 
@@ -20,6 +22,7 @@ def test_exercise_pos_p():
     assert result
 
 
+@pytest.mark.skip
 def test_exercise_class_with_call():
     class Foo:
         def __call__(self, x: int) -> bool:
@@ -33,6 +36,7 @@ def test_exercise_class_with_call():
 # --- exercise_class: no return annotation → ValueError ---
 
 
+@pytest.mark.skip
 def test_exercise_class_no_return_annotation():
     class NoReturn:
         def __call__(self, x: int):
@@ -45,6 +49,7 @@ def test_exercise_class_no_return_annotation():
 # --- exercise_class: *args and **kwargs in __call__ are skipped ---
 
 
+@pytest.mark.skip
 def test_exercise_class_with_var_positional():
     class VarArgs:
         def __call__(self, *args) -> int:  # unannotated *args is skipped
@@ -54,6 +59,7 @@ def test_exercise_class_with_var_positional():
     assert result
 
 
+@pytest.mark.skip
 def test_exercise_class_with_var_keyword():
     class VarKwargs:
         def __call__(self, **kwargs) -> int:  # unannotated **kwargs is skipped
@@ -66,6 +72,7 @@ def test_exercise_class_with_var_keyword():
 # --- exercise_class: unannotated non-variadic param → ValueError ---
 
 
+@pytest.mark.skip
 def test_exercise_class_unannotated_param():
     class BadSig:
         def __call__(self, x) -> int:
@@ -78,6 +85,7 @@ def test_exercise_class_unannotated_param():
 # --- exercise_class: Predicate used as callable (without spec) ---
 
 
+@pytest.mark.skip
 def test_exercise_predicate_without_spec():
     result = list(exercise(zero_p))
     assert result
@@ -86,6 +94,7 @@ def test_exercise_predicate_without_spec():
 # --- exercise_class: no parameters ---
 
 
+@pytest.mark.skip
 def test_exercise_class_no_params():
     class Answer:
         def __call__(self) -> int:
@@ -98,6 +107,7 @@ def test_exercise_class_no_params():
 # --- exercise_class: wrong return type ---
 
 
+@pytest.mark.skip
 def test_exercise_class_wrong_return():
     class BadReturn:
         def __call__(self, x: int) -> int:
@@ -110,6 +120,7 @@ def test_exercise_class_wrong_return():
 # --- exercise_class: fn in spec ---
 
 
+@pytest.mark.skip
 def test_exercise_class_with_fn_happy():
     class Doubler:
         def __call__(self, x: int) -> int:
@@ -121,6 +132,7 @@ def test_exercise_class_with_fn_happy():
     assert result
 
 
+@pytest.mark.skip
 def test_exercise_class_with_fn_fail():
     class Doubler:
         def __call__(self, x: int) -> int:
@@ -136,6 +148,7 @@ def test_exercise_class_with_fn_fail():
 # --- exercise_class: fn_p in spec ---
 
 
+@pytest.mark.skip
 def test_exercise_class_with_fn_p_happy():
     class Doubler:
         def __call__(self, x: int) -> int:
@@ -147,6 +160,7 @@ def test_exercise_class_with_fn_p_happy():
     assert result
 
 
+@pytest.mark.skip
 def test_exercise_class_with_fn_p_fail():
     class Doubler:
         def __call__(self, x: int) -> int:

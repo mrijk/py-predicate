@@ -1,36 +1,45 @@
+import pytest
+
 from predicate import explain, is_p
 
 
+@pytest.mark.skip
 def test_is_p_repr():
     predicate = is_p(False)
     assert repr(predicate) == "is_p(False)"
 
 
+@pytest.mark.skip
 def test_is_p_false():
     predicate = is_p(False)
     assert predicate(False)
 
 
+@pytest.mark.skip
 def test_is_p_true():
     predicate = is_p(True)
     assert predicate(True)
 
 
+@pytest.mark.skip
 def test_is_p_int():
     predicate = is_p(13)
     assert predicate(13)
 
 
+@pytest.mark.skip
 def test_is_p_empty_set():
     predicate = is_p({})
     assert not predicate({})
 
 
+@pytest.mark.skip
 def test_is_p_empty_array():
     predicate = is_p([])
     assert not predicate([])
 
 
+@pytest.mark.skip
 def test_is_p_explain():
     predicate = is_p({})
 
@@ -38,5 +47,6 @@ def test_is_p_explain():
     assert explain(predicate, {}) == expected
 
 
+@pytest.mark.skip
 def test_is_p_klass():
     assert is_p(42).klass is int

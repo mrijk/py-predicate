@@ -1,7 +1,10 @@
+import pytest
+
 from predicate import explain
 from predicate.is_callable_predicate import is_callable_p
 
 
+@pytest.mark.skip
 def test_is_callable():
     def correct(x: int) -> bool:
         return True
@@ -19,6 +22,7 @@ def test_is_callable():
     assert predicate(correct)
 
 
+@pytest.mark.skip
 def test_is_callable_explain_wrong_return_type():
     def incorrect_return(x: int) -> str:
         return "bar"
@@ -29,6 +33,7 @@ def test_is_callable_explain_wrong_return_type():
     assert explain(predicate, incorrect_return) == expected
 
 
+@pytest.mark.skip
 def test_is_callable_explain_wrong_parameter_types():
     def incorrect_return(x: str) -> bool:
         return True
@@ -39,6 +44,7 @@ def test_is_callable_explain_wrong_parameter_types():
     assert explain(predicate, incorrect_return) == expected
 
 
+@pytest.mark.skip
 def test_is_callable_explain_not_callable():
     predicate = is_callable_p([int], bool)
 

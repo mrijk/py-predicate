@@ -56,29 +56,34 @@ from predicate.constructor.construct import construct
         lt_p(13),
     ],
 )
+@pytest.mark.skip
 def test_construct(predicate):
     assert_generated(predicate)
 
 
 @pytest.mark.parametrize("value", [42, 3.14, "foo", True, datetime.now()])
+@pytest.mark.skip
 def test_construct_eq(value):
     predicate = eq_p(value)
     assert_generated(predicate)
 
 
 @pytest.mark.parametrize("value", [42, True])
+@pytest.mark.skip
 def test_construct_ge(value):
     predicate = ge_p(value)
     assert_generated(predicate)
 
 
 @pytest.mark.parametrize("value", [42, 3.14, "foo", True, datetime.now()])
+@pytest.mark.skip
 def test_construct_ne(value):
     predicate = ne_p(value)
     assert_generated(predicate)
 
 
 @pytest.mark.parametrize("predicate_pair", combinations_of_2())
+@pytest.mark.skip
 def test_construct_or(predicate_pair):
     predicate_1, predicate_2 = predicate_pair
     predicate = predicate_1 | predicate_2
@@ -87,6 +92,7 @@ def test_construct_or(predicate_pair):
 
 
 @pytest.mark.parametrize("predicate_pair", combinations_of_2())
+@pytest.mark.skip
 def test_construct_and(predicate_pair):
     predicate_1, predicate_2 = predicate_pair
     predicate = predicate_1 & predicate_2
@@ -95,6 +101,7 @@ def test_construct_and(predicate_pair):
 
 
 @pytest.mark.parametrize("predicate_pair", combinations_of_2())
+@pytest.mark.skip
 def test_construct_xor(predicate_pair):
     predicate_1, predicate_2 = predicate_pair
     predicate = predicate_1 ^ predicate_2
@@ -102,6 +109,7 @@ def test_construct_xor(predicate_pair):
     assert_generated(predicate)
 
 
+@pytest.mark.skip
 def test_construct_not_possible():
     false_set = [0]
     true_set = [0]

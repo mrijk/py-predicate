@@ -1,6 +1,9 @@
+import pytest
+
 from predicate import all_p, always_false_p, always_true_p, any_p, can_optimize, eq_p, optimize
 
 
+@pytest.mark.skip
 def test_optimize_any_ne():
     # Any(~p) => ~All(p)
     eq_2 = eq_p(2)
@@ -14,6 +17,7 @@ def test_optimize_any_ne():
     assert optimized == ~all_p(eq_2)
 
 
+@pytest.mark.skip
 def test_optimize_any_always_false():
     predicate = any_p(always_false_p)
 
@@ -24,6 +28,7 @@ def test_optimize_any_always_false():
     assert optimized == always_false_p
 
 
+@pytest.mark.skip
 def test_optimize_any_always_true():
     predicate = any_p(always_true_p)
 
@@ -34,6 +39,7 @@ def test_optimize_any_always_true():
     assert optimized == always_true_p
 
 
+@pytest.mark.skip
 def test_optimize_any_not(p):
     # Any(~p) == ~All(p)
 

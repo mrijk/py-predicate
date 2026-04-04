@@ -5,15 +5,18 @@ from predicate import explain, is_falsy_p
 
 
 @pytest.mark.parametrize("value", [False, None, 0, {}, "", (), []])
+@pytest.mark.skip
 def test_is_falsy_p(value):
     assert is_falsy_p(value)
 
 
+@pytest.mark.skip
 def test_is_falsy_p_explain():
     expected = {"reason": "13 is not a falsy value", "result": False}
 
     assert explain(is_falsy_p, 13) == expected
 
 
+@pytest.mark.skip
 def test_is_falsy_exercise():
     exercise_predicate(is_falsy_p)

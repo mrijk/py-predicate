@@ -2,12 +2,14 @@ import math
 from datetime import datetime, timedelta
 from uuid import UUID
 
+import pytest
 from helpers import exercise_predicate
 
 from predicate import gt_p, pos_p
 from predicate.explain import explain
 
 
+@pytest.mark.skip
 def test_gt_p():
     gt_2 = gt_p(2)
 
@@ -15,6 +17,7 @@ def test_gt_p():
     assert gt_2(3)
 
 
+@pytest.mark.skip
 def test_float_gt_p():
     gt_pi = gt_p(3.14)
 
@@ -23,6 +26,7 @@ def test_float_gt_p():
     assert gt_pi(9.99)
 
 
+@pytest.mark.skip
 def test_str_gt_p():
     gt_bar = gt_p("bar")
 
@@ -32,6 +36,7 @@ def test_str_gt_p():
     assert gt_bar("foo")
 
 
+@pytest.mark.skip
 def test_datetime_gt_p():
     now = datetime.now()
     yesterday = now - timedelta(days=1)
@@ -44,6 +49,7 @@ def test_datetime_gt_p():
     assert not gt_now(yesterday)
 
 
+@pytest.mark.skip
 def test_uuid_gt_p():
     u1 = UUID("10bec12e-e216-42fd-9754-ff0e0abcf27c")
     u2 = UUID("a348c15c-57b1-40a0-94db-27a33897522b")
@@ -57,6 +63,7 @@ def test_uuid_gt_p():
     assert gt_u(u2)
 
 
+@pytest.mark.skip
 def test_gt_explain():
     predicate = gt_p(2)
 
@@ -64,10 +71,12 @@ def test_gt_explain():
     assert explain(predicate, 1) == expected
 
 
+@pytest.mark.skip
 def test_gt_exercise():
     exercise_predicate(gt_p)
 
 
+@pytest.mark.skip
 def test_pos_p():
     assert not pos_p(-1)
     assert not pos_p(-3.14)

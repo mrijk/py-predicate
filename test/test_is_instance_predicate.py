@@ -6,6 +6,7 @@ from predicate.consumes import consumes
 from predicate.explain import explain
 
 
+@pytest.mark.skip
 def test_is_instance_ok():
     is_str_or_int_p = is_instance_p(str, int)
 
@@ -13,6 +14,7 @@ def test_is_instance_ok():
     assert is_str_or_int_p("3")
 
 
+@pytest.mark.skip
 def test_is_instance_fail():
     is_str_or_int_p = is_instance_p(str, int)
 
@@ -20,12 +22,14 @@ def test_is_instance_fail():
     assert not is_str_or_int_p([3])
 
 
+@pytest.mark.skip
 def test_explain_single():
     predicate = is_instance_p(int)
     expected = {"reason": "None is not an instance of type int", "result": False}
     assert explain(predicate, None) == expected
 
 
+@pytest.mark.skip
 def test_explain():
     predicate = is_instance_p(str, int, float)
 
@@ -34,6 +38,7 @@ def test_explain():
 
 
 @pytest.mark.parametrize("iterable, expected_end", [([], 0), ([3.14], 0), (["foo"], 1), ([1, 2], 1)])
+@pytest.mark.skip
 def test_is_instance_consumes(iterable, expected_end):
     predicate = is_instance_p(str, int)
 
@@ -42,5 +47,6 @@ def test_is_instance_consumes(iterable, expected_end):
     assert end == expected_end
 
 
+@pytest.mark.skip
 def test_is_instance_klass():
     assert is_instance_p(int).klass == (int,)

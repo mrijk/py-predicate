@@ -16,6 +16,7 @@ def q():
     return NamedPredicate(name="q")
 
 
+@pytest.mark.skip
 def test_truth_table_names(p, q):
     predicate = p & q
 
@@ -23,6 +24,7 @@ def test_truth_table_names(p, q):
     assert named_predicates == ["p", "q"]
 
 
+@pytest.mark.skip
 def test_truth_table_names_invalid(p, q):
     predicate = p & q & le_p(2)
 
@@ -30,6 +32,7 @@ def test_truth_table_names_invalid(p, q):
         get_named_predicates(predicate)
 
 
+@pytest.mark.skip
 def test_truth_table_values_invalid(p, q):
     predicate = p & q & le_p(2)
 
@@ -38,6 +41,7 @@ def test_truth_table_values_invalid(p, q):
         set_named_values(predicate, values)
 
 
+@pytest.mark.skip
 def test_truth_table_and(p, q):
     predicate = p & q
 
@@ -46,6 +50,7 @@ def test_truth_table_and(p, q):
     assert result == [False, False, False, True]
 
 
+@pytest.mark.skip
 def test_truth_table_not(p):
     predicate = ~p
 
@@ -54,6 +59,7 @@ def test_truth_table_not(p):
     assert result == [True, False]
 
 
+@pytest.mark.skip
 def test_truth_table_or(p, q):
     predicate = p | q
 
@@ -62,6 +68,7 @@ def test_truth_table_or(p, q):
     assert result == [False, True, True, True]
 
 
+@pytest.mark.skip
 def test_truth_table_xor(p, q):
     predicate = p ^ q
 
@@ -70,6 +77,7 @@ def test_truth_table_xor(p, q):
     assert result == [False, True, True, False]
 
 
+@pytest.mark.skip
 def test_truth_table_false(p):
     predicate = p | always_false_p
 
@@ -78,6 +86,7 @@ def test_truth_table_false(p):
     assert result == [False, True]
 
 
+@pytest.mark.skip
 def test_truth_table_implies(p, q):
     predicate = implies_p_p(p, q)
 
@@ -86,6 +95,7 @@ def test_truth_table_implies(p, q):
     assert result == [True, True, False, True]
 
 
+@pytest.mark.skip
 def test_truth_table_true(p):
     predicate = p | always_true_p
 

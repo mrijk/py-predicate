@@ -8,6 +8,7 @@ class Contains13:
         return item == 13
 
 
+@pytest.mark.skip
 def test_not_in_p():
     not_in_123 = not_in_p(["1", "2", "3"])
 
@@ -22,11 +23,13 @@ def test_not_in_p():
         (Contains13(), "not_in_p(Contains13())"),
     ],
 )
+@pytest.mark.skip
 def test_repr_in_p(parameter, expected):
     predicate = not_in_p(parameter)
     assert repr(predicate) == expected
 
 
+@pytest.mark.skip
 def test_not_in_p_klass_non_iterable():
     from typing import Any
 

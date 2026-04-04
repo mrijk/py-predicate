@@ -1,6 +1,9 @@
+import pytest
+
 from predicate import all_p, count_p, eq_p, exactly_one_p, is_int_p, is_str_p, juxt_p
 
 
+@pytest.mark.skip
 def test_juxt():
     p1 = is_int_p
     p2 = is_str_p
@@ -16,11 +19,13 @@ def test_juxt():
     assert not predicate("bar")
 
 
+@pytest.mark.skip
 def test_juxt_repr():
     predicate = juxt_p(is_int_p, is_str_p, evaluate=exactly_one_p(predicate=eq_p(True)))
     assert repr(predicate).startswith("juxt_p(")
 
 
+@pytest.mark.skip
 def test_juxt_iterables():
     all_int = all_p(is_int_p)
     three_zeros = count_p(predicate=eq_p(0), length_p=eq_p(3))

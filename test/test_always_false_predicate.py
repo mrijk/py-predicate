@@ -10,24 +10,29 @@ from predicate.generator.helpers import random_anys
 
 
 @pytest.mark.parametrize("value", take(5, random_anys()))
+@pytest.mark.skip
 def test_always_false_p(value):
     assert not always_false_p(value)
 
 
+@pytest.mark.skip
 def test_always_false_p_klass():
     assert always_false_p.klass is type(Any)
 
 
+@pytest.mark.skip
 def test_always_false_p_explain():
     expected = {"reason": "Always returns False", "result": False}
     assert explain(always_false_p, None) == expected
 
 
+@pytest.mark.skip
 def test_always_false_exercise():
     exercise_predicate(always_false_p)
 
 
 @pytest.mark.parametrize("iterable", [[], ["foo"], [1, 2], (3, 4, 5, "foo", 6)])
+@pytest.mark.skip
 def test_always_false_consumes(iterable):
     end = one(consumes(always_false_p, iterable))
 

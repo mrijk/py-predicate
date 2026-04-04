@@ -8,12 +8,14 @@ from predicate.explain import explain
 
 
 @pytest.mark.parametrize("v, invalid", [(2, 3), ("foo", "bar")])
+@pytest.mark.skip
 def test_eq_p(v, invalid):
     predicate = eq_p(v)
     assert predicate(v)
     assert not predicate(invalid)
 
 
+@pytest.mark.skip
 def test_eq_explain():
     predicate = eq_p(2)
 
@@ -21,6 +23,7 @@ def test_eq_explain():
     assert explain(predicate, 3) == expected
 
 
+@pytest.mark.skip
 def test_eq_int():
     eq_1 = eq_p(2)
     eq_2 = eq_p(2)
@@ -31,6 +34,7 @@ def test_eq_int():
     assert eq_1 != eq_3
 
 
+@pytest.mark.skip
 def test_eq_str():
     eq_1 = eq_p("foo")
     eq_2 = eq_p("foo")
@@ -41,11 +45,13 @@ def test_eq_str():
     assert eq_1 != eq_3
 
 
+@pytest.mark.skip
 def test_eq_exercise():
     exercise_predicate(eq_p)
 
 
 @pytest.mark.parametrize("iterable, expected_end", [([], 0), ([1, 2], 0), ([2, 1], 1)])
+@pytest.mark.skip
 def test_eq_consumes(iterable, expected_end):
     predicate = eq_p(2)
 

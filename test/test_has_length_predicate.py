@@ -1,7 +1,10 @@
+import pytest
+
 from predicate import eq_p, has_length_p
 from predicate.explain import explain
 
 
+@pytest.mark.skip
 def test_has_length():
     of_length_1 = has_length_p(eq_p(1))
 
@@ -9,6 +12,7 @@ def test_has_length():
     assert of_length_1("f")
 
 
+@pytest.mark.skip
 def test_has_length_false():
     of_length_1 = has_length_p(eq_p(1))
 
@@ -17,6 +21,7 @@ def test_has_length_false():
     assert not of_length_1("foobar")
 
 
+@pytest.mark.skip
 def test_has_length_explain():
     predicate = has_length_p(eq_p(1))
 

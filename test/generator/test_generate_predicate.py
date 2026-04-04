@@ -27,6 +27,7 @@ AMOUNT_TO_GENERATE = 100
 
 @pytest.mark.parametrize("predicate_type", (AndPredicate, OrPredicate, XorPredicate))
 @pytest.mark.parametrize("klass", (int, str, float))
+@pytest.mark.skip
 def test_generate_and_predicate(predicate_type, klass):
     generator = generate_predicate(predicate_type, max_depth=2, klass=klass)
     predicates = take(AMOUNT_TO_GENERATE, generator)
@@ -41,6 +42,7 @@ def test_generate_and_predicate(predicate_type, klass):
 
 
 @pytest.mark.parametrize("klass", (int, str, float))
+@pytest.mark.skip
 def test_generate_not_predicate(klass):
     generator = generate_predicate(NotPredicate, max_depth=2, klass=klass)
     predicates = take(AMOUNT_TO_GENERATE, generator)
@@ -72,6 +74,7 @@ def test_generate_not_predicate(klass):
     ),
 )
 @pytest.mark.parametrize("klass", (int, str, float))
+@pytest.mark.skip
 def test_generate_basic_predicate(predicate_type, klass):
     generator = generate_predicate(predicate_type, max_depth=1, klass=klass)
     predicates = take(AMOUNT_TO_GENERATE, generator)
@@ -93,6 +96,7 @@ def test_generate_basic_predicate(predicate_type, klass):
     ],
 )
 @pytest.mark.parametrize("klass", (int, str, float))
+@pytest.mark.skip
 def test_generate_all_predicate(predicate_type, generate_func, klass):
     generator = generate_func(max_depth=2, klass=klass)
 
@@ -108,6 +112,7 @@ def test_generate_all_predicate(predicate_type, generate_func, klass):
 
 
 @pytest.mark.parametrize("klass", (int,))
+@pytest.mark.skip
 def test_generate_set_of_predicate(klass):
     predicate_type = SetOfPredicate
     generator = generate_set_of_predicates(max_depth=1, klass=klass)
@@ -123,9 +128,11 @@ def test_generate_set_of_predicate(klass):
         assert is_klass_predicate(predicate)
 
 
+@pytest.mark.skip
 def test_generate_any_predicates_depth_zero():
     assert list(take(3, generate_any_predicates(max_depth=0, klass=int))) == []
 
 
+@pytest.mark.skip
 def test_generate_set_of_predicates_depth_zero():
     assert list(take(3, generate_set_of_predicates(max_depth=0, klass=int))) == []

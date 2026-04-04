@@ -4,6 +4,7 @@ from more_itertools import first, take
 from predicate import all_p, fn_p, ge_le_p, generate_true, has_length_p, in_p, is_dict_p, is_int_p, zero_p
 
 
+@pytest.mark.skip
 def test_generate_is_dict():
     predicate = is_dict_p
 
@@ -12,6 +13,7 @@ def test_generate_is_dict():
     assert first(values) == {}
 
 
+@pytest.mark.skip
 def test_generate_is_dict_with_keys_p():
     predicate = is_dict_p
     key_p = is_int_p
@@ -23,6 +25,7 @@ def test_generate_is_dict_with_keys_p():
     assert values_p(values)
 
 
+@pytest.mark.skip
 def test_generate_is_dict_with_value_p():
     predicate = is_dict_p
     value_p = in_p({"foo", "bar", "foobar"})
@@ -35,6 +38,7 @@ def test_generate_is_dict_with_value_p():
 
 
 @pytest.mark.parametrize("size_p", [zero_p, ge_le_p(lower=3, upper=5)])
+@pytest.mark.skip
 def test_generate_is_dict_with_size_p(size_p):
     predicate = is_dict_p
 

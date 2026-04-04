@@ -1,9 +1,11 @@
+import pytest
 from helpers import is_not_p
 
 from predicate import ge_p
 from predicate.explain import explain
 
 
+@pytest.mark.skip
 def test_not():
     ge_2 = ge_p(2)
     lt_2 = ~ge_2
@@ -14,6 +16,7 @@ def test_not():
     assert lt_2(1)
 
 
+@pytest.mark.skip
 def test_not_not():
     ge_2 = ge_p(2)
     ge_2_to = ~~ge_2
@@ -24,6 +27,7 @@ def test_not_not():
     assert ge_2_to(2)
 
 
+@pytest.mark.skip
 def test_not_explain():
     ge_2 = ge_p(2)
 

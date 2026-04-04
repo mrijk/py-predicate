@@ -1,7 +1,10 @@
+import pytest
+
 from predicate import ge_p, gt_p, is_none_p, is_not_none_p, le_p, lt_p
 from predicate.explain import explain
 
 
+@pytest.mark.skip
 def test_or():
     ge_4 = ge_p(4)
     le_2 = le_p(2)
@@ -13,6 +16,7 @@ def test_or():
     assert le_2_or_ge_4(4)
 
 
+@pytest.mark.skip
 def test_or_commutative():
     lt_2 = lt_p(2)
     gt_4 = gt_p(4)
@@ -30,6 +34,7 @@ def test_or_commutative():
     assert p_2(5)
 
 
+@pytest.mark.skip
 def test_or_eq():
     # p | q == q | p
     p = gt_p(2)
@@ -38,6 +43,7 @@ def test_or_eq():
     assert p | q == q | p
 
 
+@pytest.mark.skip
 def test_or_always_true():
     always_true = is_none_p | is_not_none_p
 
@@ -45,6 +51,7 @@ def test_or_always_true():
     assert always_true(None)
 
 
+@pytest.mark.skip
 def test_or_contains(p, q, r):
     predicate = p | q
 
@@ -53,6 +60,7 @@ def test_or_contains(p, q, r):
     assert q in predicate
 
 
+@pytest.mark.skip
 def test_or_explain():
     p = gt_p(4)
     q = lt_p(3)

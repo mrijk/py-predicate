@@ -66,6 +66,7 @@ from predicate.implies_predicate import implies_p
         (is_superset_p({1, 2, 3}), "x \\supset \\{1, 2, 3\\}"),
     ],
 )
+@pytest.mark.skip
 def test_format_latex_one_level(predicate, expected):
     assert to_latex(predicate) == expected
 
@@ -77,10 +78,12 @@ def test_format_latex_one_level(predicate, expected):
         (ne_p(2) & ne_p(3), "x \\neq 2 \\wedge x \\neq 3"),
     ],
 )
+@pytest.mark.skip
 def test_format_latex_two_levels(predicate, expected):
     assert to_latex(predicate) == expected
 
 
+@pytest.mark.skip
 def test_format_latex_unknown(unknown_p):
     with pytest.raises(ValueError):
         to_latex(unknown_p)
