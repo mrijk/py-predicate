@@ -5,7 +5,6 @@ from predicate.constructor.mutate import mutations
 from predicate.eq_predicate import EqPredicate
 
 
-@pytest.mark.skip
 def test_mutate_eq_p():
     eq_2 = eq_p(2)
 
@@ -27,6 +26,5 @@ def test_mutate_eq_p():
         lt_p("foo"),
     ],
 )
-@pytest.mark.skip
 def test_mutate_non_int(predicate):
     assert list(mutations(predicate, false_set=["bar"], true_set=["foo"])) == []
