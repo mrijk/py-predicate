@@ -130,7 +130,7 @@ def test_exercise_class_with_fn_fail():
 
     with pytest.raises(AssertionError) as exc:
         list(exercise(Doubler(), spec=spec))
-    assert exc.value.args[0] == "Not conform spec, details tbd"
+    assert exc.value.args[0].startswith("Not conform spec: fn constraint failed for inputs")
 
 
 # --- exercise_class: fn_p in spec ---
@@ -236,7 +236,7 @@ async def test_exercise_async_class_with_fn_fail():
     with pytest.raises(AssertionError) as exc:
         async for _ in exercise(AsyncDoubler(), spec=spec):
             pass
-    assert exc.value.args[0] == "Not conform spec, details tbd"
+    assert exc.value.args[0].startswith("Not conform spec: fn constraint failed for inputs")
 
 
 @pytest.mark.asyncio

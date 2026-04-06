@@ -61,7 +61,7 @@ def test_exercise_with_fn_fail():
     with pytest.raises(AssertionError) as exc:
         list(exercise(max_int, spec=spec))
 
-    assert exc.value.args[0] == "Not conform spec, details tbd"
+    assert exc.value.args[0].startswith("Not conform spec: fn constraint failed for inputs")
 
 
 def test_exercise_with_fn_p_happy():
@@ -313,7 +313,7 @@ async def test_exercise_async_function_with_fn_fail():
     with pytest.raises(AssertionError) as exc:
         async for _ in exercise(max_int, spec=spec):
             pass
-    assert exc.value.args[0] == "Not conform spec, details tbd"
+    assert exc.value.args[0].startswith("Not conform spec: fn constraint failed for inputs")
 
 
 @pytest.mark.asyncio
