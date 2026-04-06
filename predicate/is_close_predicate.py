@@ -6,7 +6,7 @@ from predicate.predicate import Predicate
 
 
 @dataclass
-class IsClosePredicate(Predicate[float]):
+class IsClosePredicate[T](Predicate[T]):
     """A predicate class that models approximate float equality."""
 
     target: float
