@@ -10,11 +10,10 @@ from random import choices
 from typing import Any, Final, Iterator
 from uuid import UUID, uuid4
 
-from more_itertools import first, interleave, random_permutation, repeatfunc, take
+from more_itertools import interleave, random_permutation, repeatfunc, take
 
 from predicate.eq_predicate import eq_p
 from predicate.generator.generate_predicate import generate_predicate
-from predicate.is_instance_predicate import is_hashable_p
 from predicate.predicate import Predicate
 from predicate.range_predicate import ge_le_p
 from predicate.regex_predicate import regex_p
@@ -34,9 +33,11 @@ def random_first_from_iterables(*iterables: Iterable) -> Iterator:
 
 def set_from_list(value: list, order: bool = False) -> Iterator:
     length = len(value)
-    if length and is_hashable_p(first(value)):
-        if len(result := set(value)) == length:
+    try:
+        if length and len(result := set(value)) == length:
             yield result if order else set(random_permutation(result))
+    except TypeError:
+        pass
 
 
 def random_complex_numbers(radius: float = 1e6) -> Iterator:
