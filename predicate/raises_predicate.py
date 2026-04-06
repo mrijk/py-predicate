@@ -1,7 +1,16 @@
+import asyncio
+from asyncio import iscoroutinefunction
 from dataclasses import dataclass, field
 from typing import Any, Final, override
 
 from predicate.predicate import Predicate
+
+
+def _call(x: Any) -> None:
+    if iscoroutinefunction(x):
+        asyncio.run(x())
+    else:
+        x()
 
 
 @dataclass
@@ -12,7 +21,7 @@ class RaisesPredicate[T](Predicate[T]):
 
     def __call__(self, x: Any) -> bool:
         try:
-            x()
+            _call(x)
             return False
         except self.exception_type:
             return True
@@ -27,7 +36,7 @@ class RaisesPredicate[T](Predicate[T]):
     @override
     def explain_failure(self, x: Any) -> dict:
         try:
-            x()
+            _call(x)
             return {"reason": "callable did not raise an exception"}
         except self.exception_type:
             return {}  # shouldn't reach here

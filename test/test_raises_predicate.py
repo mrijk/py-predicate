@@ -58,3 +58,27 @@ def test_raises_p_false_parametrized(thunk):
 )
 def test_raises_p_true_parametrized(thunk):
     assert raises_p(thunk)
+
+
+async def _async_raises():
+    raise ValueError("async error")
+
+
+async def _async_no_raise():
+    return 42
+
+
+def test_raises_p_async_true():
+    assert raises_p(_async_raises)
+
+
+def test_raises_p_async_false():
+    assert not raises_p(_async_no_raise)
+
+
+def test_raises_exception_p_async_correct_type():
+    assert raises_exception_p(ValueError)(_async_raises)
+
+
+def test_raises_exception_p_async_wrong_type():
+    assert not raises_exception_p(TypeError)(_async_raises)
