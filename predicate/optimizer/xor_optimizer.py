@@ -52,10 +52,10 @@ def optimize_xor_predicate[T](predicate: XorPredicate[T]) -> MaybeOptimized[T]:
         case _, AndPredicate(and_left, and_right):
             match and_left, and_right:
                 case NotPredicate(not_predicate), _ if left == not_predicate:
-                    return Optimized(NotPredicate(OrPredicate(left=left, right=and_right)))  # p ^ (^p & q) == ~(p | q)
+                    return Optimized(NotPredicate(OrPredicate(left=left, right=and_right)))  # p ^ (~p & q) == ~(p | q)
                 case _, NotPredicate(not_predicate) if left == not_predicate:
-                    return Optimized(NotPredicate(OrPredicate(left=left, right=and_left)))  # p ^ (q & ^p) == ~(p | q)
-                case _:
+                    return Optimized(NotPredicate(OrPredicate(left=left, right=and_left)))  # p ^ (q & ~p) == ~(p | q)
+                case _ if and_left == left:
                     return Optimized(AndPredicate(left=left, right=NotPredicate(and_right)))  # p ^ (p & q) = p & ~q
         case AndPredicate(), _:
             return optimize_xor_predicate(XorPredicate(left=right, right=left))
