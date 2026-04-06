@@ -1,6 +1,8 @@
 from dataclasses import dataclass
 from typing import Any, override
 
+from more_itertools import first
+
 from predicate.eq_predicate import EqPredicate
 from predicate.predicate import Predicate
 
@@ -49,13 +51,25 @@ class DictOfPredicate[T](Predicate[T]):
             return {"reason": f"{x} is not an instance of a dict"}
         if not x:
             return {"reason": "empty dict"}
-        for key_p, value_p in self.key_value_predicates:
-            for key, value in x.items():
-                if key_p(key) and not value_p(value):
-                    return {"key": key, "value": value} | value_p.explain_failure(value)
-        for key, value in x.items():
-            if not any(key_p(key) for key_p, _ in self.key_value_predicates):
-                return {"key": key, "value": value, "reason": "no matching predicate for key"}
+        if failing := first(
+            (
+                ({"key": key, "value": value} | value_p.explain_failure(value))
+                for key_p, value_p in self.key_value_predicates
+                for key, value in x.items()
+                if key_p(key) and not value_p(value)
+            ),
+            None,
+        ):
+            return failing
+        if unmatched := first(
+            (
+                {"key": key, "value": value, "reason": "no matching predicate for key"}
+                for key, value in x.items()
+                if not any(key_p(key) for key_p, _ in self.key_value_predicates)
+            ),
+            None,
+        ):
+            return unmatched
         return {}
 
 
