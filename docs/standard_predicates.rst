@@ -883,6 +883,7 @@ raises_p
 
 This predicate tests if a callable (thunk) raises an exception when called.
 Returns True if calling the thunk raises any exception, False otherwise.
+Both synchronous and async callables are supported.
 
 .. code-block:: python
 
@@ -892,11 +893,25 @@ Returns True if calling the thunk raises any exception, False otherwise.
     assert raises_p(lambda: int("x"))
     assert not raises_p(lambda: 1)
 
+Async functions are also supported:
+
+.. code-block:: python
+
+    async def fetch():
+        raise ConnectionError("unreachable")
+
+    async def ok():
+        return 42
+
+    assert raises_p(fetch)
+    assert not raises_p(ok)
+
 raises_exception_p
 ------------------
 
 This predicate tests if a callable raises a specific exception type when called.
 Returns True only if the exact exception type (or a subclass of it) is raised.
+Both synchronous and async callables are supported.
 
 .. code-block:: python
 
@@ -906,6 +921,11 @@ Returns True only if the exact exception type (or a subclass of it) is raised.
     assert raises_exception_p(Exception)(lambda: 1 / 0)    # ZeroDivisionError is a subclass of Exception
     assert not raises_exception_p(ValueError)(lambda: 1 / 0)  # wrong exception type
     assert not raises_exception_p(ValueError)(lambda: 1)       # no exception raised
+
+    async def async_value_error():
+        raise ValueError("bad input")
+
+    assert raises_exception_p(ValueError)(async_value_error)
 
 tee_p
 -----
