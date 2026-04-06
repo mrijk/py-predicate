@@ -57,7 +57,7 @@ class Predicate[T]:
             "result": False,
         } | self.explain_failure(x, *args, **kwargs)
 
-    def explain_failure(self, x: Any) -> dict:
+    def explain_failure(self, x: Any, *args, **kwargs) -> dict:
         raise NotImplementedError
 
     def consumes_single(self, iterable: Iterable[Any]) -> Iterator[int]:
