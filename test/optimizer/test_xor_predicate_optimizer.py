@@ -322,3 +322,16 @@ def test_xor_right_xor_no_optimize():
     predicate = ge_p(2) ^ (is_int_p ^ is_str_p)
     result = optimize(predicate)
     assert result is not None
+
+
+def test_xor_and_right_different_left_not_optimized():
+    # Regression: p ^ (a & b) where a != p must NOT be "optimized" to p & ~b.
+    # Previously the unguarded case _ fallthrough would incorrectly fire, e.g.
+    # is_int_p ^ (is_str_p & ge_p(3)) would wrongly become is_int_p & lt_p(3).
+    from predicate.standard_predicates import is_int_p, is_str_p
+
+    predicate = is_int_p ^ (is_str_p & ge_p(3))
+
+    # must not produce the wrong form is_int_p & ~ge_p(3)
+    optimized = optimize(predicate)
+    assert optimized != is_int_p & lt_p(3)
