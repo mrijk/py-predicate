@@ -12,26 +12,39 @@ from predicate.always_false_predicate import AlwaysFalsePredicate
 from predicate.always_true_predicate import AlwaysTruePredicate
 from predicate.any_predicate import AnyPredicate
 from predicate.comp_predicate import CompPredicate
+from predicate.count_predicate import CountPredicate
 from predicate.dict_of_predicate import DictOfPredicate
 from predicate.eq_predicate import EqPredicate
+from predicate.exactly_predicate import ExactlyPredicate
 from predicate.fn_predicate import FnPredicate
 from predicate.formatter.helpers import set_to_str
 from predicate.ge_predicate import GePredicate
 from predicate.gt_predicate import GtPredicate
+from predicate.has_key_predicate import HasKeyPredicate
+from predicate.has_length_predicate import HasLengthPredicate
+from predicate.has_path_predicate import HasPathPredicate
 from predicate.implies import Implies
 from predicate.in_predicate import InPredicate
+from predicate.is_close_predicate import IsClosePredicate
 from predicate.is_falsy_predicate import IsFalsyPredicate
 from predicate.is_instance_predicate import IsInstancePredicate
 from predicate.is_none_predicate import IsNonePredicate
+from predicate.is_not_none_predicate import IsNotNonePredicate
+from predicate.is_same_predicate import IsSamePredicate
+from predicate.is_subclass_predicate import IsSubclassPredicate
 from predicate.is_truthy_predicate import IsTruthyPredicate
 from predicate.juxt_predicate import JuxtPredicate
 from predicate.lazy_predicate import LazyPredicate, find_predicate_by_ref
 from predicate.le_predicate import LePredicate
+from predicate.list_of_predicate import ListOfPredicate
 from predicate.lt_predicate import LtPredicate
+from predicate.match_predicate import MatchPredicate
 from predicate.named_predicate import NamedPredicate
 from predicate.ne_predicate import NePredicate
 from predicate.not_in_predicate import NotInPredicate
 from predicate.optimizer.predicate_optimizer import optimize
+from predicate.optional_predicate import OptionalPredicate
+from predicate.plus_predicate import PlusPredicate
 from predicate.predicate import (
     AndPredicate,
     NotPredicate,
@@ -40,13 +53,17 @@ from predicate.predicate import (
     XorPredicate,
 )
 from predicate.range_predicate import GeLePredicate, GeLtPredicate, GtLePredicate, GtLtPredicate
+from predicate.regex_predicate import RegexPredicate
+from predicate.repeat_predicate import RepeatPredicate
 from predicate.root_predicate import RootPredicate, find_root_predicate
+from predicate.set_of_predicate import SetOfPredicate
 from predicate.set_predicates import (
     IsRealSubsetPredicate,
     IsRealSupersetPredicate,
     IsSubsetPredicate,
     IsSupersetPredicate,
 )
+from predicate.star_predicate import StarPredicate
 from predicate.tee_predicate import TeePredicate
 from predicate.this_predicate import ThisPredicate, find_this_predicate
 from predicate.tuple_of_predicate import TupleOfPredicate
@@ -115,8 +132,15 @@ def render(dot: Digraph, predicate: Predicate, node_nr: count):
                 return add_node_with_child("any", label="∃", child=any_predicate)
             case CompPredicate(_fn, comp_predicate):
                 return add_node_with_child("comp", label="f", child=comp_predicate)
+            case CountPredicate(predicate, length_p):
+                node = add_node("count", label="count")
+                dot.edge(node, to_value(predicate), label="predicate")
+                dot.edge(node, to_value(length_p), label="length")
+                return node
             case EqPredicate(v):
                 return add_node("eq", label=f"x = {v}")
+            case ExactlyPredicate(n, predicate):
+                return add_node_with_child("exactly", label=f"exactly {n}", child=predicate)
             case IsFalsyPredicate():
                 return add_node("falsy", label="falsy")
             case IsTruthyPredicate():
@@ -124,6 +148,15 @@ def render(dot: Digraph, predicate: Predicate, node_nr: count):
             case FnPredicate(predicate_fn):
                 name = predicate_fn.__code__.co_name
                 return add_node("fn", label=f"fn: {name}")
+            case HasKeyPredicate(key):
+                return add_node("has_key", label=f"has_key: {key!r}")
+            case HasLengthPredicate(length_p):
+                return add_node_with_child("has_length", label="has_length", child=length_p)
+            case HasPathPredicate(path):
+                node = add_node("has_path", label="has_path")
+                for step in path:
+                    dot.edge(node, to_value(step))
+                return node
             case GePredicate(v):
                 return add_node("ge", label=f"x ≥ {v}")
             case GeLePredicate(upper, lower):
@@ -138,6 +171,8 @@ def render(dot: Digraph, predicate: Predicate, node_nr: count):
                 return add_node("gtlt", label=f"{lower} ≤ x < {upper}")
             case InPredicate(v) if isinstance(v, Iterable):
                 return add_node("in", label=f"x ∈ {set_to_str(v)}")
+            case IsClosePredicate(target, rel_tol, abs_tol):
+                return add_node("is_close", label=f"x ≈ {target!r}\nrel={rel_tol}, abs={abs_tol}")
             case DictOfPredicate(key_value_predicates):
                 node = add_node("dict_of", label="is_dict_of")
                 for key, value in key_value_predicates:
@@ -153,6 +188,17 @@ def render(dot: Digraph, predicate: Predicate, node_nr: count):
                 return add_node("instance", label=f"is_{name}_p")
             case IsNonePredicate():
                 return add_node("none", label="x = None")
+            case IsNotNonePredicate():
+                return add_node("not_none", label="x ≠ None")
+            case IsSamePredicate(predicate):
+                return add_node_with_child("is_same", label="is_same", child=predicate)
+            case IsSubclassPredicate(class_or_tuple):
+                match class_or_tuple:
+                    case tuple() as klasses:
+                        names = ", ".join(k.__name__ for k in klasses)
+                    case _ as klass:
+                        names = klass.__name__
+                return add_node("is_subclass", label=f"subclass of {names}")
             case IsRealSubsetPredicate(v):
                 return add_node("real_subset", label=f"x ⊂ {set_to_str(v)}")
             case IsSubsetPredicate(v):
@@ -176,20 +222,39 @@ def render(dot: Digraph, predicate: Predicate, node_nr: count):
                 return add_node("lazy", label=ref)
             case LePredicate(v):
                 return add_node("le", label=f"x ≤ {v}")
+            case ListOfPredicate(predicate):
+                return add_node_with_child("list_of", label="is_list_of", child=predicate)
             case LtPredicate(v):
                 return add_node("lt", label=f"x < {v}")
+            case MatchPredicate(predicates):
+                node = add_node("match", label="match")
+                for match_predicate in predicates:
+                    dot.edge(node, to_value(match_predicate))
+                return node
             case NamedPredicate(name):
                 return add_node("named", label=name)
             case NotInPredicate(v) if isinstance(v, Iterable):
                 return add_node("in", label=f"x ∉ {set_to_str(v)}")
             case NePredicate(v):
                 return add_node("ne", label=f"x ≠ {v}")
+            case OptionalPredicate(predicate):
+                return add_node_with_child("optional", label="?", child=predicate)
+            case PlusPredicate(predicate):
+                return add_node_with_child("plus", label="+", child=predicate)
             case NotPredicate(not_predicate):
                 return add_node_with_child("not", label="¬", child=not_predicate)
             case OrPredicate(left, right):
                 return add_node_left_right("or", label="∨", left=left, right=right)
+            case RegexPredicate() as r:
+                return add_node("regex", label=f"~/{r.pattern}/")
+            case RepeatPredicate(m, n, predicate):
+                return add_node_with_child("repeat", label=f"{{{m},{n}}}", child=predicate)
             case RootPredicate():
                 return add_node("root", label="root")
+            case SetOfPredicate(predicate):
+                return add_node_with_child("set_of", label="is_set_of", child=predicate)
+            case StarPredicate(predicate):
+                return add_node_with_child("star", label="*", child=predicate)
             case TeePredicate():
                 return add_node("tee", label="tee")
             case ThisPredicate():
