@@ -148,7 +148,7 @@ def generate_has_path(predicate: HasPathPredicate) -> Iterator:
 
     if rest_path:
         valid_keys = generate_true(root_p)
-        false_rest_values = generate_false(HasPathPredicate(path=rest_path))
+        false_rest_values: Iterator = generate_false(HasPathPredicate(path=rest_path))
         while True:
             yield {next(valid_keys): next(false_rest_values)}
     else:
