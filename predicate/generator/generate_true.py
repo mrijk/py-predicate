@@ -62,6 +62,7 @@ from predicate.has_key_predicate import HasKeyPredicate
 from predicate.has_length_predicate import HasLengthPredicate
 from predicate.has_path_predicate import HasPathPredicate
 from predicate.in_predicate import InPredicate
+from predicate.is_close_predicate import IsClosePredicate
 from predicate.is_falsy_predicate import IsFalsyPredicate
 from predicate.is_instance_predicate import IsInstancePredicate
 from predicate.is_lambda_predicate import IsLambdaPredicate
@@ -286,6 +287,11 @@ def generate_gt(predicate: GtPredicate) -> Iterator:
             yield from generate_uuids(predicate)
         case _:
             raise ValueError(f"Can't generate for type {type(v)}")
+
+
+@generate_true.register
+def generate_is_close_p(predicate: IsClosePredicate) -> Iterator:
+    yield from repeat(predicate.target)
 
 
 @generate_true.register
