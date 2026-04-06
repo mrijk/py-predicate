@@ -45,9 +45,9 @@ this_p: PredicateFactory = PredicateFactory(factory=ThisPredicate)
 
 def dict_depth(value: dict) -> int:
     match value:
-        case list() as l:
+        case list(l):
             return 1 + max(dict_depth(item) for item in l) if l else 0
-        case dict() as d if d:
+        case dict(d) if d:
             return 1 + max(dict_depth(item) for item in d.values())
         case _:
             return 1
