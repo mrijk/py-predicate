@@ -19,6 +19,7 @@ from predicate.has_length_predicate import HasLengthPredicate
 from predicate.has_path_predicate import HasPathPredicate
 from predicate.implies_predicate import ImpliesPredicate
 from predicate.in_predicate import InPredicate
+from predicate.is_close_predicate import IsClosePredicate
 from predicate.is_falsy_predicate import IsFalsyPredicate
 from predicate.is_instance_predicate import IsInstancePredicate
 from predicate.is_none_predicate import IsNonePredicate
@@ -93,6 +94,8 @@ def to_json(predicate: Predicate) -> dict[str, Any]:
                 return "implies", {"predicate": to_json(predicate)}
             case InPredicate(v):
                 return "in", {"v": list(cast(Iterable, v))}
+            case IsClosePredicate(target, rel_tol, abs_tol):
+                return "is_close", {"target": target, "rel_tol": rel_tol, "abs_tol": abs_tol}
             case IsFalsyPredicate():
                 return "is_falsy", None
             case IsInstancePredicate(instance_klass):

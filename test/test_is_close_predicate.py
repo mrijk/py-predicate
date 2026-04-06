@@ -1,6 +1,6 @@
 from helpers import exercise_predicate
 
-from predicate import is_close_p
+from predicate import is_close_p, to_json, to_yaml
 from predicate.explain import explain
 
 
@@ -41,6 +41,18 @@ def test_is_close_explain():
     predicate = is_close_p(1.0)
     result = explain(predicate, 2.0)
     assert result == {"reason": "2.0 is not close to 1.0", "result": False}
+
+
+def test_is_close_to_json():
+    predicate = is_close_p(1.0, rel_tol=1e-6, abs_tol=0.0)
+    assert to_json(predicate) == {"is_close": {"target": 1.0, "rel_tol": 1e-6, "abs_tol": 0.0}}
+
+
+def test_is_close_to_yaml():
+    predicate = is_close_p(1.0)
+    result = to_yaml(predicate)
+    assert "is_close" in result
+    assert "target" in result
 
 
 def test_is_close_exercise():
