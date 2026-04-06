@@ -1,7 +1,7 @@
 import pytest
 
 from predicate import ge_p, is_int_p
-from predicate.spec.instrument import instrument_function
+from predicate.spec.instrument import instrument, instrument_function
 
 
 def test_instrument_ok():
@@ -134,3 +134,16 @@ def test_instrument_fn_p_constraint_fails():
 
     with pytest.raises(ValueError, match="fn_p constraint for function bad_add failed"):
         wrapped(2, 3)
+
+
+def test_instrument_decorator():
+    spec = {"args": {"x": is_int_p, "y": is_int_p}, "ret": is_int_p}
+
+    @instrument(spec)
+    def add(x: int, y: int) -> int:
+        return x + y
+
+    assert add(2, 3) == 5
+
+    with pytest.raises(ValueError, match="Parameter predicate for function add failed"):
+        add("not-an-int", 3)

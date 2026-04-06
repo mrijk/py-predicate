@@ -42,7 +42,6 @@ def instrument_function(func: Callable, spec: Spec) -> Callable:
 
         return result
 
-    # Attach metadata
     wrapped.__spec__ = spec  # type: ignore
 
     module_name = func.__module__
@@ -50,8 +49,12 @@ def instrument_function(func: Callable, spec: Spec) -> Callable:
 
     if module and hasattr(module, func_name):
         setattr(module, func_name, wrapped)
-    else:
-        pass
-        # print(f"[instrument_function] WARNING: Could not find {module_name}.{func_name} to patch.")
 
     return wrapped
+
+
+def instrument(spec: Spec) -> Callable:
+    def decorator(func: Callable) -> Callable:
+        return instrument_function(func, spec)
+
+    return decorator
