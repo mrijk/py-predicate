@@ -24,7 +24,7 @@ def test_is_single_or_list_of_p():
 def test_is_list_of_explain():
     predicate = is_list_of_p(is_str_p)
 
-    expected = {"reason": "Item '3' didn't match predicate is_str_p", "result": False}
+    expected = {"result": False, "index": 2, "value": 3, "reason": "3 is not an instance of type str"}
     assert explain(predicate, ["one", "two", 3]) == expected
 
 
