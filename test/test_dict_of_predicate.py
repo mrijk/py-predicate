@@ -74,8 +74,15 @@ def test_is_dict_extra_predicate():
 def test_is_dict_of_explain():
     predicate = is_dict_of_p(("x", is_int_p), (eq_p("y"), is_str_p))
 
-    expected = {"key_value_predicates": [], "result": False}
+    expected = {"result": False, "key": "y", "value": 42, "reason": "42 is not an instance of type str"}
     assert explain(predicate, {"x": 42, "y": 42}) == expected
+
+
+def test_is_dict_of_explain_empty():
+    predicate = is_dict_of_p(("x", is_int_p))
+
+    expected = {"result": False, "reason": "empty dict"}
+    assert explain(predicate, {}) == expected
 
 
 def test_is_dict_of_explain_not_a_dict():
