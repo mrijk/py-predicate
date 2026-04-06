@@ -194,13 +194,12 @@ def render(dot: Digraph, predicate: Predicate, node_nr: count):
             case IsSamePredicate(predicate):
                 return add_node_with_child("is_same", label="is_same", child=predicate)
             case IsSubclassPredicate(class_or_tuple):
-                match class_or_tuple:
-                    case tuple() as klasses:
-                        names = ", ".join(k.__name__ for k in klasses)
-                    case UnionType() as union_type:
-                        names = ", ".join(k.__name__ for k in get_args(union_type))
-                    case klass:
-                        names = klass.__name__
+                if isinstance(class_or_tuple, tuple):
+                    names = ", ".join(k.__name__ for k in class_or_tuple)
+                elif isinstance(class_or_tuple, UnionType):
+                    names = ", ".join(k.__name__ for k in get_args(class_or_tuple))
+                else:
+                    names = class_or_tuple.__name__
                 return add_node("is_subclass", label=f"subclass of {names}")
             case IsRealSubsetPredicate(v):
                 return add_node("real_subset", label=f"x ⊂ {set_to_str(v)}")
