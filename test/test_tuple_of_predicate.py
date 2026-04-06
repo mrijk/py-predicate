@@ -29,5 +29,7 @@ def test_is_tuple_of_explain_incorrect_length():
 def test_is_tuple_of_explain_incorrect_value():
     predicate = is_tuple_of_p(is_str_p, is_int_p & ge_p(2), is_bool_p)
 
-    expected = {"reason": "Predicate is_int_p & ge_p(2) failed for value 1", "result": False}
-    assert explain(predicate, ("foo", 1, False)) == expected
+    result = explain(predicate, ("foo", 1, False))
+    assert result["result"] is False
+    assert result["index"] == 1
+    assert result["value"] == 1
