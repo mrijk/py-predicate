@@ -7,7 +7,7 @@ from more_itertools import take
 
 from predicate import generate_true
 from predicate import optimize as optimize_predicate
-from predicate.formatter import from_json, to_dot, to_json, to_latex
+from predicate.formatter import from_json, to_dot, to_json, to_latex, to_yaml
 from predicate.parser import parse_expression
 from predicate.predicate import Predicate
 from predicate.truth_table import get_named_predicates, truth_table
@@ -33,6 +33,14 @@ def dot(expression: str, optimize: Optimize = False, as_json: Json = False) -> N
 def json(expression: Expression, optimize: Optimize = False, as_json: Json = False) -> None:
     if predicate := expression_to_predicate(expression, optimize, as_json=as_json):
         sys.stdout.write(json_lib.dumps(to_json(predicate)))
+    else:
+        failed_to_pass(expression)
+
+
+@app.command("yaml", help="Output predicate as yaml")
+def yaml(expression: Expression, optimize: Optimize = False, as_json: Json = False) -> None:
+    if predicate := expression_to_predicate(expression, optimize, as_json=as_json):
+        sys.stdout.write(to_yaml(predicate))
     else:
         failed_to_pass(expression)
 
