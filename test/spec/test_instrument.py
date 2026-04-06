@@ -136,7 +136,6 @@ def test_instrument_fn_p_constraint_fails():
         wrapped(2, 3)
 
 
-
 def test_instrument_decorator():
     spec = {"args": {"x": is_int_p, "y": is_int_p}, "ret": is_int_p}
 
