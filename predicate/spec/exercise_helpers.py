@@ -77,7 +77,7 @@ def _verify_result(spec: Spec, return_p: Predicate, value: dict, result) -> None
 
     if fn := spec.get("fn"):
         if not fn(**value, ret=result):
-            raise AssertionError("Not conform spec, details tbd")
+            raise AssertionError(f"Not conform spec: fn constraint failed for inputs {value} -> {result}")
 
     if fn_p := spec.get("fn_p"):
         fn_p_result = fn_p(**value)

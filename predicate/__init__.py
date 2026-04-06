@@ -82,7 +82,7 @@ from predicate.set_predicates import (
     is_superset_p,
 )
 from predicate.spec.exercise import exercise
-from predicate.spec.instrument import instrument_function
+from predicate.spec.instrument import instrument, instrument_function
 from predicate.spec.spec import Spec
 from predicate.standard_predicates import (
     is_dict_p,
@@ -135,6 +135,7 @@ __all__ = [
     "has_path_p",
     "implies_p",
     "in_p",
+    "instrument",
     "instrument_function",
     "is_alnum_p",
     "is_alpha_p",

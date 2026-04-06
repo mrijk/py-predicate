@@ -97,3 +97,4 @@ do_not_mutate = ["predicate/is_lambda_predicate.py", "predicate/is_callable_pred
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
+testpaths = ["test"]
