@@ -35,7 +35,7 @@ def test_all_combined_2():
 def test_all_explain():
     predicate = all_p(is_int_p)
 
-    expected = {"reason": "Item 'three' didn't match predicate is_int_p", "result": False}
+    expected = {"result": False, "index": 2, "value": "three", "reason": "three is not an instance of type int"}
     assert explain(predicate, [1, 2, "three"]) == expected
 
 
@@ -47,3 +47,15 @@ def test_all_consumes(iterable, expected_end):
     expected_consumed = list(range(0, expected_end + 1))
 
     assert consumed == expected_consumed
+
+
+def test_all_explain_nested():
+    from predicate import ge_p
+
+    predicate = all_p(is_int_p & ge_p(0))
+
+    result = explain(predicate, [1, 2, -3, 4])
+
+    assert result["result"] is False
+    assert result["index"] == 2
+    assert result["value"] == -3

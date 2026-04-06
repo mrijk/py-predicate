@@ -24,6 +24,8 @@ def test_any_contains(p, q, r):
 def test_any_explain():
     predicate = any_p(is_int_p)
 
-    expected = {"reason": "No item matches predicate is_int_p", "result": False}
+    result = explain(predicate, ["one", "two", "three"])
 
-    assert explain(predicate, {"one", "two", "three"}) == expected
+    assert result["result"] is False
+    assert len(result["failures"]) == 3
+    assert result["failures"][0] == {"index": 0, "value": "one", "reason": "one is not an instance of type int"}

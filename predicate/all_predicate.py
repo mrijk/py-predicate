@@ -4,7 +4,6 @@ from typing import Any, Iterable, Iterator, override
 
 from more_itertools import ilen
 
-from predicate.helpers import first_false
 from predicate.predicate import Predicate, resolve_predicate
 
 
@@ -34,9 +33,10 @@ class AllPredicate[T](Predicate[T]):
 
     @override
     def explain_failure(self, iterable: Iterable[T]) -> dict:
-        fail = first_false(iterable, self.predicate)
-
-        return {"reason": f"Item '{fail}' didn't match predicate {self.predicate!r}"}
+        for index, item in enumerate(iterable):
+            if not self.predicate(item):
+                return {"index": index, "value": item} | self.predicate.explain_failure(item)
+        return {}
 
     @override
     def consumes(self, iterable: Iterable[Any]) -> Iterator[int]:
