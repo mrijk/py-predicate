@@ -71,6 +71,7 @@ from predicate.is_predicate import IsPredicate
 from predicate.is_predicate_of_p import IsPredicateOfPredicate
 from predicate.is_subclass_predicate import IsSubclassPredicate
 from predicate.is_truthy_predicate import IsTruthyPredicate
+from predicate.juxt_predicate import JuxtPredicate
 from predicate.le_predicate import LePredicate
 from predicate.list_of_predicate import ListOfPredicate, is_list_of_p
 from predicate.lt_predicate import LtPredicate
@@ -681,3 +682,8 @@ def generate_is_subclass(is_subclass_predicate: IsSubclassPredicate) -> Iterator
 @generate_true.register
 def generate_is(is_predicate: IsPredicate) -> Iterator:
     yield from repeat(is_predicate.v)
+
+
+@generate_true.register
+def generate_juxt_p(predicate: JuxtPredicate) -> Iterator:
+    yield from (item for item in random_anys() if predicate(item))
