@@ -1,7 +1,8 @@
 from dataclasses import dataclass
 from typing import Any, TypeGuard, override
 
-from predicate.helpers import first_false
+from more_itertools import first
+
 from predicate.predicate import Predicate, resolve_predicate
 
 
@@ -16,7 +17,7 @@ class ListOfPredicate[T](Predicate[T]):
 
     def __call__(self, x: Any) -> TypeGuard[list[T]]:
         match x:
-            case list() as l:
+            case list(l):
                 return all(self.predicate(item) for item in l)
             case _:
                 return False
@@ -32,11 +33,11 @@ class ListOfPredicate[T](Predicate[T]):
         return Predicate[self.predicate.klass]  # type: ignore[name-defined]
 
     @override
-    def explain_failure(self, x: Any) -> dict:
+    def explain_failure(self, x: Any, *args, **kwargs) -> dict:
         match x:
-            case list() as l:
-                fail = first_false(l, self.predicate)
-                return {"reason": f"Item '{fail}' didn't match predicate {self.predicate}"}
+            case list(l):
+                index, item = first((i, v) for i, v in enumerate(l) if not self.predicate(v))
+                return {"index": index, "value": item} | self.predicate.explain_failure(item)
             case _:
                 return {"reason": f"{x} is not an instance of a list"}
 

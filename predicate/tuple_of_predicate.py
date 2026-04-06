@@ -24,9 +24,10 @@ class TupleOfPredicate[T](Predicate[T]):
         if (actual_length := ilen(x)) != (expected_length := len(self.predicates)):
             return {"reason": f"Incorrect tuple size, expected: {expected_length}, actual: {actual_length}"}
 
-        fail_p, fail_v = first((p, v) for p, v in zip(self.predicates, x, strict=False) if not p(v))
-
-        return {"reason": f"Predicate {fail_p} failed for value {fail_v}"}
+        index, fail_p, fail_v = first(
+            (i, p, v) for i, (p, v) in enumerate(zip(self.predicates, x, strict=False)) if not p(v)
+        )
+        return {"index": index, "value": fail_v} | fail_p.explain_failure(fail_v)
 
 
 def is_tuple_of_p(*predicates: Predicate) -> Predicate:

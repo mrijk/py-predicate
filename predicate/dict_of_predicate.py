@@ -1,6 +1,8 @@
 from dataclasses import dataclass
 from typing import Any, override
 
+from more_itertools import first
+
 from predicate.eq_predicate import EqPredicate
 from predicate.predicate import Predicate
 
@@ -44,12 +46,31 @@ class DictOfPredicate[T](Predicate[T]):
         return f"is_dict_of_p({key_value_predicates})"
 
     @override
-    def explain_failure(self, x: Any) -> dict:
-        match x:
-            case dict():
-                return {"key_value_predicates": []}
-            case _:
-                return {"reason": f"{x} is not an instance of a dict"}
+    def explain_failure(self, x: Any, *args, **kwargs) -> dict:
+        if not isinstance(x, dict):
+            return {"reason": f"{x} is not an instance of a dict"}
+        if not x:
+            return {"reason": "empty dict"}
+        if failing := first(
+            (
+                ({"key": key, "value": value} | value_p.explain_failure(value))
+                for key_p, value_p in self.key_value_predicates
+                for key, value in x.items()
+                if key_p(key) and not value_p(value)
+            ),
+            None,
+        ):
+            return failing
+        if unmatched := first(
+            (
+                {"key": key, "value": value, "reason": "no matching predicate for key"}
+                for key, value in x.items()
+                if not any(key_p(key) for key_p, _ in self.key_value_predicates)
+            ),
+            None,
+        ):
+            return unmatched
+        return {}
 
 
 def to_key_p(key_p: Predicate | str) -> Predicate:

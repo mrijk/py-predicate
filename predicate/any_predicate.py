@@ -33,7 +33,11 @@ class AnyPredicate[T](Predicate[T]):
 
     @override
     def explain_failure(self, iterable: Iterable[T]) -> dict:
-        return {"reason": f"No item matches predicate {self.predicate!r}"}
+        failures = [
+            {"index": index, "value": item} | self.predicate.explain_failure(item)
+            for index, item in enumerate(iterable)
+        ]
+        return {"failures": failures}
 
     @override
     def consumes(self, iterable: Iterable[Any]) -> Iterator[int]:

@@ -2,9 +2,8 @@ from dataclasses import dataclass
 from itertools import takewhile
 from typing import Any, Iterable, Iterator, override
 
-from more_itertools import ilen
+from more_itertools import first, ilen
 
-from predicate.helpers import first_false
 from predicate.predicate import Predicate, resolve_predicate
 
 
@@ -34,9 +33,8 @@ class AllPredicate[T](Predicate[T]):
 
     @override
     def explain_failure(self, iterable: Iterable[T]) -> dict:
-        fail = first_false(iterable, self.predicate)
-
-        return {"reason": f"Item '{fail}' didn't match predicate {self.predicate!r}"}
+        index, item = first((i, x) for i, x in enumerate(iterable) if not self.predicate(x))
+        return {"index": index, "value": item} | self.predicate.explain_failure(item)
 
     @override
     def consumes(self, iterable: Iterable[Any]) -> Iterator[int]:

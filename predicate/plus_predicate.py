@@ -23,7 +23,7 @@ class PlusPredicate[T](Predicate[T]):
         return f"plus({self.predicate!r})"
 
     @override
-    def explain_failure(self, iterable: Iterable[T], *, predicates: list[Predicate], full_match: bool) -> dict:  # type: ignore
+    def explain_failure(self, iterable: Iterable[T], *, predicates: list[Predicate], full_match: bool) -> dict:
         if not iterable:
             return {"reason": f"Iterable should have at least one element to match against {self.predicate!r}"}
 
