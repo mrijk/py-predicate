@@ -878,6 +878,35 @@ This predicate tests for non equality
     assert ne_2(3)
 
 
+raises_p
+--------
+
+This predicate tests if a callable (thunk) raises an exception when called.
+Returns True if calling the thunk raises any exception, False otherwise.
+
+.. code-block:: python
+
+    from predicate import raises_p
+
+    assert raises_p(lambda: 1 / 0)
+    assert raises_p(lambda: int("x"))
+    assert not raises_p(lambda: 1)
+
+raises_exception_p
+------------------
+
+This predicate tests if a callable raises a specific exception type when called.
+Returns True only if the exact exception type (or a subclass of it) is raised.
+
+.. code-block:: python
+
+    from predicate import raises_exception_p
+
+    assert raises_exception_p(ValueError)(lambda: int("x"))
+    assert raises_exception_p(Exception)(lambda: 1 / 0)    # ZeroDivisionError is a subclass of Exception
+    assert not raises_exception_p(ValueError)(lambda: 1 / 0)  # wrong exception type
+    assert not raises_exception_p(ValueError)(lambda: 1)       # no exception raised
+
 tee_p
 -----
 
