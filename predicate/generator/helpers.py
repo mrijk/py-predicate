@@ -166,16 +166,7 @@ def random_dicts(
 
     while True:
         if (valid_size := next(valid_sizes)) >= 0:
-            if valid_size == 0:
-                yield {}
-                continue
-            d: dict = {}
-            for key in valid_keys:
-                if key not in d:
-                    d[key] = next(valid_values)
-                    if len(d) == valid_size:
-                        break
-            yield d
+            yield {k: next(valid_values) for k in take(valid_size, valid_keys)}
 
 
 def random_datetimes(lower: datetime | None = None, upper: datetime | None = None) -> Iterator:
