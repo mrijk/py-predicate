@@ -4,6 +4,10 @@ __pycache__/
 .venv/
 .idea/
 
+mutants/
+uv.lock
+.claude/
+
 dist/
 *.egg-info/
 
