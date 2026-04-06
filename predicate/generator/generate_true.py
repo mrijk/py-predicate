@@ -95,6 +95,7 @@ from predicate.predicate import (
 from predicate.property_predicate import PropertyPredicate
 from predicate.raises_predicate import RaisesPredicate
 from predicate.range_predicate import GeLePredicate, GeLtPredicate, GtLePredicate, GtLtPredicate, ge_le_p
+from predicate.reduce_predicate import ReducePredicate
 from predicate.regex_predicate import RegexPredicate
 from predicate.repeat_predicate import RepeatPredicate
 from predicate.set_of_predicate import SetOfPredicate
@@ -436,6 +437,11 @@ def generate_not_none(predicate: IsNotNonePredicate) -> Iterator:
 @generate_true.register
 def generate_or(predicate: OrPredicate) -> Iterator:
     yield from random_first_from_iterables(generate_true(predicate.left), generate_true(predicate.right))
+
+
+@generate_true.register
+def generate_reduce_p(predicate: ReducePredicate) -> Iterator:
+    yield []
 
 
 @generate_true.register

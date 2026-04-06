@@ -28,3 +28,25 @@ def test_is_subset():
     assert predicate([{1}])
     assert predicate([{1}, {1, 3}, {1, 3, 7}])
     assert not predicate([{1}, {2, 3}])
+
+
+def test_reduce_repr():
+    predicate = reduce_p(fn=lambda acc, x: (x, ge_p(acc)), initial=-sys.maxsize - 1)
+    assert repr(predicate).startswith("reduce_p(<lambda>")
+
+
+def test_reduce_explain_success():
+    from predicate import explain
+
+    predicate = reduce_p(fn=lambda acc, x: (x, ge_p(acc)), initial=-sys.maxsize - 1)
+    assert explain(predicate, [1, 2, 3]) == {"result": True}
+
+
+def test_reduce_explain_failure():
+    from predicate import explain
+
+    predicate = reduce_p(fn=lambda acc, x: (x, ge_p(acc)), initial=-sys.maxsize - 1)
+    result = explain(predicate, [1, 3, 2])
+    assert result["result"] is False
+    assert result["index"] == 2
+    assert result["value"] == 2

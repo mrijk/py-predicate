@@ -69,6 +69,7 @@ from predicate.plus_predicate import PlusPredicate
 from predicate.predicate import AndPredicate, NotPredicate, OrPredicate, Predicate, XorPredicate
 from predicate.raises_predicate import RaisesPredicate
 from predicate.range_predicate import GeLePredicate, GeLtPredicate, GtLePredicate, GtLtPredicate, ge_le_p
+from predicate.reduce_predicate import ReducePredicate
 from predicate.regex_predicate import RegexPredicate
 from predicate.repeat_predicate import RepeatPredicate
 from predicate.set_of_predicate import SetOfPredicate
@@ -620,6 +621,12 @@ def generate_is_subset(predicate: IsSubsetPredicate) -> Iterator:
 def generate_is_real_subset(predicate: IsRealSubsetPredicate) -> Iterator:
     yield predicate.v  # v is not a real subset of itself
     yield from (s for s in random_sets() if not predicate(s))
+
+
+@generate_false.register
+def generate_reduce_p(predicate: ReducePredicate) -> Iterator:
+    return
+    yield
 
 
 @generate_false.register

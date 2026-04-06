@@ -44,6 +44,7 @@ from predicate.predicate import (
     XorPredicate,
 )
 from predicate.range_predicate import GeLePredicate, GeLtPredicate, GtLePredicate, GtLtPredicate
+from predicate.reduce_predicate import ReducePredicate
 from predicate.regex_predicate import RegexPredicate
 from predicate.set_of_predicate import SetOfPredicate
 from predicate.set_predicates import (
@@ -79,6 +80,9 @@ def to_json(predicate: Predicate) -> dict[str, Any]:
                 return "eq", {"v": v}
             case ExactlyPredicate(n, predicate):
                 return "exactly", {"n": n, "predicate": to_json(predicate)}
+            case ReducePredicate(fn, initial):
+                name = getattr(fn, "__name__", str(fn))
+                return "reduce", {"fn": name, "initial": initial}
             case FnPredicate(predicate_fn):
                 name = getattr(predicate_fn, "__name__", str(predicate_fn))
                 fn_info: dict[str, Any] = {"name": name}
