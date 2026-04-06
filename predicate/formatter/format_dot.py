@@ -1,7 +1,8 @@
 import inspect
 from functools import partial
 from itertools import count
-from typing import Iterable
+from types import UnionType
+from typing import Iterable, get_args
 
 import graphviz  # type: ignore
 from graphviz import Digraph
@@ -196,7 +197,9 @@ def render(dot: Digraph, predicate: Predicate, node_nr: count):
                 match class_or_tuple:
                     case tuple() as klasses:
                         names = ", ".join(k.__name__ for k in klasses)
-                    case _ as klass:
+                    case UnionType() as union_type:
+                        names = ", ".join(k.__name__ for k in get_args(union_type))
+                    case klass:
                         names = klass.__name__
                 return add_node("is_subclass", label=f"subclass of {names}")
             case IsRealSubsetPredicate(v):
