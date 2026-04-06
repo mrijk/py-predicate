@@ -60,6 +60,26 @@ def test_raises_p_true_parametrized(thunk):
     assert raises_p(thunk)
 
 
+def test_explain_failure_no_exception():
+    result = raises_p.explain_failure(lambda: 1)
+    assert result == {"reason": "callable did not raise an exception"}
+
+
+def test_explain_failure_wrong_exception_type():
+    result = raises_exception_p(ValueError).explain_failure(lambda: 1 / 0)
+    assert "ZeroDivisionError" in result["reason"]
+    assert "ValueError" in result["reason"]
+
+
+async def _async_no_raise_for_explain():
+    return 42
+
+
+def test_explain_failure_async_no_exception():
+    result = raises_p.explain_failure(_async_no_raise_for_explain)
+    assert result == {"reason": "callable did not raise an exception"}
+
+
 async def _async_raises():
     raise ValueError("async error")
 

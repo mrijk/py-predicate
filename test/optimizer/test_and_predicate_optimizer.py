@@ -911,3 +911,9 @@ def test_optimize_lt_gt_reversed():
     # lt(v2) & gt(v1) => gt_lt(v1, v2)  — reversed operand order
 
     assert optimize(lt_p(3) & gt_p(1)) == gt_lt_p(lower=1, upper=3)
+
+
+def test_optimize_le_and_ge_equal():
+    # le(v) & ge(v) => eq(v) — reversed operand order, equal bounds
+
+    assert optimize(le_p(2) & ge_p(2)) == eq_p(2)
