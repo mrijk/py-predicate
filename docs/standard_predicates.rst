@@ -955,6 +955,34 @@ Both synchronous and async callables are supported.
 
     assert raises_exception_p(ValueError)(async_value_error)
 
+reduce_p
+--------
+
+The reduce_p predicate threads an accumulator through an iterable. For each element x, it calls
+fn(acc, x) which returns a (new_acc, predicate) tuple. The element x must satisfy the returned
+predicate, and the accumulator advances for the next element. Returns True if all elements pass, or if
+the iterable is empty.
+
+.. code-block:: python
+
+    import sys
+    from predicate import reduce_p, ge_p
+
+    is_sorted_p = reduce_p(fn=lambda acc, x: (x, ge_p(acc)), initial=-sys.maxsize - 1)
+
+    assert is_sorted_p([])
+    assert is_sorted_p([1, 2, 3])
+    assert not is_sorted_p([1, 3, 2])
+
+.. code-block:: python
+
+    from predicate import reduce_p, eq_p, always_true_p
+
+    is_interval_3_p = reduce_p(fn=lambda acc, x: (x, eq_p(acc + 3) if acc else always_true_p), initial=None)
+
+    assert is_interval_3_p([1, 4, 7])
+    assert not is_interval_3_p([1, 3])
+
 tee_p
 -----
 
