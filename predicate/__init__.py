@@ -69,6 +69,7 @@ from predicate.optimizer.predicate_optimizer import can_optimize, optimize
 from predicate.optional_predicate import optional
 from predicate.plus_predicate import plus
 from predicate.predicate import and_p, or_p, xor_p
+from predicate.raises_predicate import RaisesPredicate, raises_exception_p, raises_p
 from predicate.range_predicate import ge_le_p, ge_lt_p, gt_le_p, gt_lt_p
 from predicate.recur_predicate import recur_p
 from predicate.reduce_predicate import reduce_p
@@ -225,6 +226,9 @@ __all__ = [
     "pos_p",
     "recur_p",
     "reduce_p",
+    "RaisesPredicate",
+    "raises_exception_p",
+    "raises_p",
     "regex_p",
     "repeat",
     "root_p",

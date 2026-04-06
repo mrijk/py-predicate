@@ -92,6 +92,7 @@ from predicate.predicate import (
     XorPredicate,
 )
 from predicate.property_predicate import PropertyPredicate
+from predicate.raises_predicate import RaisesPredicate
 from predicate.range_predicate import GeLePredicate, GeLtPredicate, GtLePredicate, GtLtPredicate, ge_le_p
 from predicate.regex_predicate import RegexPredicate
 from predicate.repeat_predicate import RepeatPredicate
@@ -687,3 +688,10 @@ def generate_is(is_predicate: IsPredicate) -> Iterator:
 @generate_true.register
 def generate_juxt_p(predicate: JuxtPredicate) -> Iterator:
     yield from (item for item in random_anys() if predicate(item))
+
+
+@generate_true.register
+def generate_raises(predicate: RaisesPredicate) -> Iterator:
+    exc_type = predicate.exception_type
+    while True:
+        yield lambda: (_ for _ in ()).throw(exc_type())
