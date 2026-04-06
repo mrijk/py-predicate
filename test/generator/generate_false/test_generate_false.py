@@ -53,10 +53,12 @@ from predicate import (
     is_odd_p,
     is_p,
     is_predicate_p,
+    is_real_subset_p,
     is_sequence_p,
     is_set_of_p,
     is_set_p,
     is_str_p,
+    is_subset_p,
     is_timedelta_p,
     is_truthy_p,
     is_tuple_of_p,
@@ -71,6 +73,7 @@ from predicate import (
     tee_p,
     zero_p,
 )
+from predicate.is_callable_predicate import is_callable_p as is_callable_signature_p
 
 
 @pytest.mark.parametrize(
@@ -121,8 +124,8 @@ from predicate import (
         neg_p,
         pos_p,
         zero_p,
-        # is_real_subset_p({1, 2, 3}),
-        # is_subset_p({1, 2, 3}),
+        is_real_subset_p({1, 2, 3}),
+        is_subset_p({1, 2, 3}),
     ],
 )
 def test_generate_false(predicate):
@@ -456,5 +459,11 @@ def test_generate_false_xor_always_true():
 def test_generate_false_xor_overlapping():
     # XOR where AND doesn't optimize to always_false_p — covers the left_and_right path
     predicate = ge_p(2) ^ gt_p(5)
+
+    assert_generated_false(predicate)
+
+
+def test_generate_false_is_callable_signature():
+    predicate = is_callable_signature_p(params=[int], return_type=str)
 
     assert_generated_false(predicate)

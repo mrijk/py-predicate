@@ -35,6 +35,8 @@ from predicate.generator.helpers import (
     random_iterables,
     random_lambdas,
     random_non_hashables,
+    random_sets,
+    random_strings,
     random_values_of_type,
 )
 from predicate.gt_predicate import GtPredicate
@@ -42,6 +44,7 @@ from predicate.has_key_predicate import HasKeyPredicate, has_key_p
 from predicate.has_length_predicate import HasLengthPredicate
 from predicate.has_path_predicate import HasPathPredicate
 from predicate.in_predicate import InPredicate
+from predicate.is_callable_predicate import IsCallablePredicate
 from predicate.is_falsy_predicate import IsFalsyPredicate
 from predicate.is_instance_predicate import IsInstancePredicate
 from predicate.is_lambda_predicate import IsLambdaPredicate
@@ -64,8 +67,10 @@ from predicate.optional_predicate import OptionalPredicate
 from predicate.plus_predicate import PlusPredicate
 from predicate.predicate import AndPredicate, NotPredicate, OrPredicate, Predicate, XorPredicate
 from predicate.range_predicate import GeLePredicate, GeLtPredicate, GtLePredicate, GtLtPredicate, ge_le_p
+from predicate.regex_predicate import RegexPredicate
 from predicate.repeat_predicate import RepeatPredicate
 from predicate.set_of_predicate import SetOfPredicate
+from predicate.set_predicates import IsRealSubsetPredicate, IsSubsetPredicate
 from predicate.standard_predicates import is_int_p
 from predicate.star_predicate import StarPredicate
 from predicate.tee_predicate import TeePredicate
@@ -597,3 +602,24 @@ def generate_is(is_predicate: IsPredicate) -> Iterator:
     selection = [v for v in singletons if v is not is_predicate.v]
 
     yield from cycle(selection)
+
+
+@generate_false.register
+def generate_is_subset(predicate: IsSubsetPredicate) -> Iterator:
+    yield from (s for s in random_sets() if not predicate(s))
+
+
+@generate_false.register
+def generate_is_real_subset(predicate: IsRealSubsetPredicate) -> Iterator:
+    yield predicate.v  # v is not a real subset of itself
+    yield from (s for s in random_sets() if not predicate(s))
+
+
+@generate_false.register
+def generate_regex(predicate: RegexPredicate) -> Iterator:
+    yield from (s for s in random_strings() if not predicate(s))
+
+
+@generate_false.register
+def generate_is_callable(predicate: IsCallablePredicate) -> Iterator:
+    yield from (item for item in random_anys() if not predicate(item))
