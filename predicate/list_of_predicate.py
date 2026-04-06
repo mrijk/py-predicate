@@ -17,7 +17,7 @@ class ListOfPredicate[T](Predicate[T]):
 
     def __call__(self, x: Any) -> TypeGuard[list[T]]:
         match x:
-            case list() as l:
+            case list(l):
                 return all(self.predicate(item) for item in l)
             case _:
                 return False
@@ -35,7 +35,7 @@ class ListOfPredicate[T](Predicate[T]):
     @override
     def explain_failure(self, x: Any, *args, **kwargs) -> dict:
         match x:
-            case list() as l:
+            case list(l):
                 index, item = first((i, v) for i, v in enumerate(l) if not self.predicate(v))
                 return {"index": index, "value": item} | self.predicate.explain_failure(item)
             case _:
