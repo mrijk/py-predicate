@@ -45,6 +45,7 @@ from predicate.has_length_predicate import HasLengthPredicate
 from predicate.has_path_predicate import HasPathPredicate
 from predicate.in_predicate import InPredicate
 from predicate.is_callable_predicate import IsCallablePredicate
+from predicate.is_close_predicate import IsClosePredicate
 from predicate.is_falsy_predicate import IsFalsyPredicate
 from predicate.is_instance_predicate import IsInstancePredicate
 from predicate.is_lambda_predicate import IsLambdaPredicate
@@ -128,6 +129,11 @@ def generate_eq(predicate: EqPredicate) -> Iterator:
 @generate_false.register
 def generate_always_false(_predicate: AlwaysFalsePredicate) -> Iterator:
     yield from random_anys()
+
+
+@generate_false.register
+def generate_is_close_p(predicate: IsClosePredicate) -> Iterator:
+    yield from (v for v in random_floats() if not predicate(v))
 
 
 @generate_false.register

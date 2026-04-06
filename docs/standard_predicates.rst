@@ -260,6 +260,34 @@ This predicate tests if the value is of type ``Callable``.
 
 
 
+is_close_p
+----------
+
+This predicate tests if a float value is approximately equal to a target, accounting for
+floating-point rounding errors. It wraps :func:`math.isclose` with configurable ``rel_tol``
+and ``abs_tol`` parameters.
+
+.. code-block:: python
+
+    from predicate import is_close_p
+
+    predicate = is_close_p(1.0)
+
+    assert predicate(1.0)
+    assert predicate(1.0 + 1e-10)   # within default relative tolerance
+    assert not predicate(1.1)
+
+Use ``abs_tol`` when comparing values near zero:
+
+.. code-block:: python
+
+    from predicate import is_close_p
+
+    near_zero = is_close_p(0.0, abs_tol=1e-6)
+
+    assert near_zero(1e-7)
+    assert not near_zero(1e-5)
+
 is_complex_p
 ------------
 
