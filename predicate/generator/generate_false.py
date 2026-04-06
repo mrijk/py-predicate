@@ -66,6 +66,7 @@ from predicate.optimizer.predicate_optimizer import optimize
 from predicate.optional_predicate import OptionalPredicate
 from predicate.plus_predicate import PlusPredicate
 from predicate.predicate import AndPredicate, NotPredicate, OrPredicate, Predicate, XorPredicate
+from predicate.raises_predicate import RaisesPredicate
 from predicate.range_predicate import GeLePredicate, GeLtPredicate, GtLePredicate, GtLtPredicate, ge_le_p
 from predicate.regex_predicate import RegexPredicate
 from predicate.repeat_predicate import RepeatPredicate
@@ -623,3 +624,8 @@ def generate_regex(predicate: RegexPredicate) -> Iterator:
 @generate_false.register
 def generate_is_callable(predicate: IsCallablePredicate) -> Iterator:
     yield from (item for item in random_anys() if not predicate(item))
+
+
+@generate_false.register
+def generate_raises(predicate: RaisesPredicate) -> Iterator:
+    yield from repeat(lambda: None)
