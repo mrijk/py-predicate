@@ -50,7 +50,7 @@ def _(_predicate: AlwaysTruePredicate, other: Predicate) -> bool:
 
 @implies.register
 def _(predicate: AndPredicate, other: Predicate) -> bool:
-    return other == predicate.left or other == predicate.right
+    return implies(predicate.left, other) or implies(predicate.right, other)
 
 
 @implies.register
@@ -59,6 +59,8 @@ def _(predicate: GePredicate, other: Predicate) -> bool:
         case GePredicate(v):
             return predicate.v >= v
         case GtPredicate(v):
+            return predicate.v > v
+        case NePredicate(v):
             return predicate.v > v
         case _:
             return False
@@ -85,6 +87,8 @@ def _(predicate: LePredicate, other: Predicate) -> bool:
         case LePredicate(v):
             return predicate.v <= v
         case LtPredicate(v):
+            return predicate.v < v
+        case NePredicate(v):
             return predicate.v < v
         case _:
             return False
@@ -132,7 +136,7 @@ def _(predicate: EqPredicate, other: Predicate) -> bool:
 def _(predicate: IsRealSubsetPredicate, other: Predicate) -> bool:
     match other:
         case IsSubsetPredicate(v):
-            return predicate.v == v
+            return predicate.v <= v
         case _:
             return False
 
@@ -141,7 +145,7 @@ def _(predicate: IsRealSubsetPredicate, other: Predicate) -> bool:
 def _(predicate: IsRealSupersetPredicate, other: Predicate) -> bool:
     match other:
         case IsSupersetPredicate(v):
-            return predicate.v == v
+            return v <= predicate.v
         case _:
             return False
 

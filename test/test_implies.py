@@ -37,10 +37,13 @@ def test_implies_ge_gt():
     assert implies(p, q)
 
 
-def test_implies_ge_other():
-    p = ge_p(3)
-
-    assert not implies(p, ne_p(2))
+def test_implies_ge_ne():
+    # x >= 3 implies x != 2 (since 2 < 3)
+    assert implies(ge_p(3), ne_p(2))
+    # x >= 3 does not imply x != 3 (since x could equal 3)
+    assert not implies(ge_p(3), ne_p(3))
+    # x >= 3 does not imply x != 4 (since x could equal 4)
+    assert not implies(ge_p(3), ne_p(4))
 
 
 def test_implies_ge_eq():
@@ -121,8 +124,11 @@ def test_implies_is_real_subset_false():
 def test_implies_is_real_super_superset():
     p = is_real_superset_p({1, 2, 3})
 
-    assert not implies(p, is_superset_p({1, 2}))
+    # proper superset of {1,2,3} is also a superset of {1,2}
+    assert implies(p, is_superset_p({1, 2}))
     assert implies(p, is_superset_p({1, 2, 3}))
+    # proper superset of {1,2,3} does not imply superset of {1,2,3,4}
+    assert not implies(p, is_superset_p({1, 2, 3, 4}))
 
 
 def test_implies_is_real_super_false():
@@ -136,3 +142,28 @@ def test_implies_in_in():
 
     assert not implies(p, in_p({1, 2}))
     assert implies(p, in_p({1, 2, 3, 4}))
+
+
+def test_implies_le_ne():
+    # x <= 5 implies x != 6 (since 6 > 5)
+    assert implies(le_p(5), ne_p(6))
+    # x <= 5 does not imply x != 5 (since x could equal 5)
+    assert not implies(le_p(5), ne_p(5))
+    # x <= 5 does not imply x != 4 (since x could equal 4)
+    assert not implies(le_p(5), ne_p(4))
+
+
+def test_implies_and_recursive():
+    # ge_p(5) & le_p(7) implies ge_p(3) because ge_p(5) implies ge_p(3)
+    assert implies(ge_p(5) & le_p(7), ge_p(3))
+    # ge_p(5) & le_p(7) implies le_p(9) because le_p(7) implies le_p(9)
+    assert implies(ge_p(5) & le_p(7), le_p(9))
+    # ge_p(5) & le_p(7) does not imply eq_p(6)
+    assert not implies(ge_p(5) & le_p(7), eq_p(6))
+
+
+def test_implies_is_real_subset_superset():
+    # proper subset of {1,2} is also a subset of {1,2,3}
+    assert implies(is_real_subset_p({1, 2}), is_subset_p({1, 2, 3}))
+    # proper subset of {1,2,3} does not imply subset of {1,2}
+    assert not implies(is_real_subset_p({1, 2, 3}), is_subset_p({1, 2}))
