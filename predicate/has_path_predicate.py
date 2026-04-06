@@ -13,7 +13,7 @@ class HasPathPredicate[T](Predicate[T]):
 
     def __call__(self, x: Any) -> bool:
         match x:
-            case dict() as d:
+            case dict(d):
                 return match_dict(d, path=self.path)
             case _:
                 return False
@@ -38,27 +38,24 @@ class HasPathPredicate[T](Predicate[T]):
                 return {"reason": f"Value {x} is not a dict"}
 
 
-def match_dict(
-    x: dict,
-    *,
-    path: list[Predicate],
-) -> bool:
+def match_dict(x: dict, *, path: list[Predicate]) -> bool:
     first_p, *rest = path
     found = [v for k, v in x.items() if first_p(k)]
     return any(match_rest(value, rest) for value in found)
 
 
 def match_rest(value: Any, rest_path: list[Predicate]) -> bool:
-    match value:
-        case dict() as d if rest_path:
+    match (value, rest_path):
+        case (dict(d), [_, *_]):
             return match_dict(d, path=rest_path)
-        case list() as l if rest_path:
-            first_p, *rest = rest_path
-            return first_p(l) and any(match_rest(value, rest) for value in l)
-        case _ if len(rest_path) == 1:
-            return rest_path[0](value)
+        case (list(l), [first_p, *rest]):
+            return first_p(l) and any(match_rest(v, rest) for v in l)
+        case (_, [p]):
+            return p(value)
+        case (_, []):
+            return True
         case _:
-            return len(rest_path) == 0
+            return False
 
 
 def has_path_p(*predicates: Predicate) -> Predicate:
