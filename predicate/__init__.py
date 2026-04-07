@@ -5,6 +5,7 @@ __version__ = "1.6.0"
 from predicate.all_predicate import all_p
 from predicate.always_false_predicate import always_false_p, never_p
 from predicate.always_true_predicate import always_p, always_true_p
+from predicate.analysis import are_equivalent, is_satisfiable, is_tautology
 from predicate.any_predicate import any_p
 from predicate.comp_predicate import comp_p
 from predicate.count_predicate import count_p, exactly_one_p, exactly_zero_p
@@ -104,6 +105,9 @@ from predicate.tuple_of_predicate import is_tuple_of_p
 __all__ = [
     "PredicateError",
     "Spec",
+    "are_equivalent",
+    "is_satisfiable",
+    "is_tautology",
     "all_p",
     "always_false_p",
     "always_p",

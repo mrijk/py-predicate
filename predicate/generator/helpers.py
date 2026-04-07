@@ -167,7 +167,14 @@ def random_dicts(
 
     while True:
         if (valid_size := next(valid_sizes)) >= 0:
-            yield {k: next(valid_values) for k in take(valid_size, valid_keys)}
+            seen: set = set()
+            keys: list = []
+            while len(keys) < valid_size:
+                k = next(valid_keys)
+                if k not in seen:
+                    seen.add(k)
+                    keys.append(k)
+            yield {k: next(valid_values) for k in keys}
 
 
 def random_datetimes(lower: datetime | None = None, upper: datetime | None = None) -> Iterator:
