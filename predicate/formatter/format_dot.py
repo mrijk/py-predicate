@@ -54,6 +54,7 @@ from predicate.predicate import (
     XorPredicate,
 )
 from predicate.range_predicate import GeLePredicate, GeLtPredicate, GtLePredicate, GtLtPredicate
+from predicate.reduce_predicate import ReducePredicate
 from predicate.regex_predicate import RegexPredicate
 from predicate.repeat_predicate import RepeatPredicate
 from predicate.root_predicate import RootPredicate, find_root_predicate
@@ -247,6 +248,9 @@ def render(dot: Digraph, predicate: Predicate, node_nr: count):
                 return add_node_with_child("not", label="¬", child=not_predicate)
             case OrPredicate(left, right):
                 return add_node_left_right("or", label="∨", left=left, right=right)
+            case ReducePredicate(fn, initial):
+                name = getattr(fn, "__name__", str(fn))
+                return add_node("reduce", label=f"reduce({name}, {initial!r})")
             case RegexPredicate() as r:
                 return add_node("regex", label=f"~/{r.pattern}/")
             case RepeatPredicate(m, n, predicate):

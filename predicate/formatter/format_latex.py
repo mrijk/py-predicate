@@ -22,6 +22,7 @@ from predicate.predicate import (
     XorPredicate,
 )
 from predicate.range_predicate import GeLePredicate, GeLtPredicate, GtLePredicate, GtLtPredicate
+from predicate.reduce_predicate import ReducePredicate
 from predicate.set_predicates import (
     IsRealSubsetPredicate,
     IsRealSupersetPredicate,
@@ -90,5 +91,8 @@ def to_latex(predicate: Predicate, parameter: str = "x") -> str:
             return f"{to_latex(left)} \\vee {to_latex(right)}"
         case XorPredicate(left, right):
             return f"{to_latex(left)} \\oplus {to_latex(right)}"
+        case ReducePredicate(fn, initial):
+            name = getattr(fn, "__name__", str(fn))
+            return rf"\text{{reduce}}({name}, {initial!r})"
         case _:
             raise ValueError(f"Unknown predicate type {predicate}")

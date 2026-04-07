@@ -134,6 +134,8 @@ def from_json(data: dict[str, Any]) -> Predicate:
             return optional(from_json(value["predicate"]))
         case "or":
             return from_json(value["left"]) | from_json(value["right"])
+        case "reduce":
+            raise ValueError("reduce_p cannot be deserialized from JSON: function reference required")
         case "regex":
             return regex_p(value["pattern"])
         case "set_of":
