@@ -6,17 +6,26 @@ from predicate.range_predicate import ge_le_p
 
 
 @pytest.mark.parametrize(
-    "predicate, expected, description",
+    "predicate, description",
     [
-        (always_true_p, True, "always_true_p is a tautology"),
-        (always_false_p, False, "always_false_p is not a tautology"),
-        (is_int_p | ~is_int_p, True, "p | ~p is a tautology"),
-        (is_int_p, False, "is_int_p is not a tautology"),
-        (~(is_int_p & ~is_int_p), True, "~(p & ~p) is a tautology"),
+        (always_true_p, "always_true_p is a tautology"),
+        (is_int_p | ~is_int_p, "p | ~p is a tautology"),
+        (~(is_int_p & ~is_int_p), "~(p & ~p) is a tautology"),
     ],
 )
-def test_is_tautology(predicate, expected, description):
-    assert is_tautology(predicate) is expected, description
+def test_is_tautology(predicate, description):
+    assert is_tautology(predicate), description
+
+
+@pytest.mark.parametrize(
+    "predicate, description",
+    [
+        (always_false_p, "always_false_p is not a tautology"),
+        (is_int_p, "is_int_p is not a tautology"),
+    ],
+)
+def test_is_not_tautology(predicate, description):
+    assert not is_tautology(predicate), description
 
 
 @pytest.mark.parametrize(
