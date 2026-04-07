@@ -84,3 +84,15 @@ def test_format_latex_two_levels(predicate, expected):
 def test_format_latex_unknown(unknown_p):
     with pytest.raises(ValueError):
         to_latex(unknown_p)
+
+
+def test_format_latex_reduce():
+    from predicate import ge_p, reduce_p
+
+    def my_fn(acc, x):
+        return acc + x, ge_p(0)
+
+    predicate = reduce_p(my_fn, 0)
+    result = to_latex(predicate)
+    assert "reduce" in result
+    assert "my_fn" in result

@@ -279,5 +279,19 @@ def test_format_yaml_is_same():
     assert parsed(is_same_p(always_true_p)) == to_json(is_same_p(always_true_p))
 
 
+def test_format_yaml_is_close():
+    from predicate import is_close_p
+
+    predicate = is_close_p(1.0, rel_tol=1e-9, abs_tol=0.0)
+    assert parsed(predicate) == to_json(predicate)
+
+
+def test_format_yaml_reduce():
+    from predicate import ge_p, reduce_p
+
+    predicate = reduce_p(lambda acc, x: (acc + x, ge_p(0)), 0)
+    assert parsed(predicate) == to_json(predicate)
+
+
 def test_format_yaml_unknown(unknown_p):
     assert parsed(unknown_p) == to_json(unknown_p)
