@@ -59,7 +59,7 @@ def test_exercise_with_fn_fail():
     }
 
     with pytest.raises(AssertionError) as exc:
-        list(exercise(max_int, spec=spec))
+        list(exercise(max_int, spec=spec, n=100))
 
     assert exc.value.args[0].startswith("Not conform spec: fn constraint failed for inputs")
 
@@ -81,7 +81,7 @@ def test_exercise_with_fn_p_fail():
     spec: Spec = {"args": {"x": is_int_p, "y": is_int_p}, "ret": is_int_p, "fn_p": lambda x, y: ge_p(x) & ge_p(y)}
 
     with pytest.raises(AssertionError) as exc:
-        list(exercise(max_int, spec=spec))
+        list(exercise(max_int, spec=spec, n=100))
 
     assert exc.value.args[0].startswith("Not conform spec:")
 
@@ -311,7 +311,7 @@ async def test_exercise_async_function_with_fn_fail():
     }
 
     with pytest.raises(AssertionError) as exc:
-        async for _ in exercise(max_int, spec=spec):
+        async for _ in exercise(max_int, spec=spec, n=100):
             pass
     assert exc.value.args[0].startswith("Not conform spec: fn constraint failed for inputs")
 
@@ -335,6 +335,6 @@ async def test_exercise_async_function_with_fn_p_fail():
     spec: Spec = {"args": {"x": is_int_p, "y": is_int_p}, "ret": is_int_p, "fn_p": lambda x, y: ge_p(x) & ge_p(y)}
 
     with pytest.raises(AssertionError) as exc:
-        async for _ in exercise(max_int, spec=spec):
+        async for _ in exercise(max_int, spec=spec, n=100):
             pass
     assert exc.value.args[0].startswith("Not conform spec:")
