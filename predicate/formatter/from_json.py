@@ -105,7 +105,7 @@ def from_json(data: dict[str, Any]) -> Predicate:
             return is_same_p(from_json(value["predicate"]))
         case "is_subclass":
             klasses = [_resolve_class(name) for name in value["klass"]]
-            return is_subclass_p(*klasses)
+            return is_subclass_p(tuple(klasses) if len(klasses) > 1 else klasses[0])
         case "is_subset":
             return is_subset_p(set(value["v"]))
         case "is_superset":
