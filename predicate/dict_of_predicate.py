@@ -4,6 +4,7 @@ from typing import Any, override
 from more_itertools import first
 
 from predicate.eq_predicate import EqPredicate
+from predicate.helpers import key_value_pairs_repr
 from predicate.predicate import Predicate
 
 
@@ -36,14 +37,8 @@ class DictOfPredicate[T](Predicate[T]):
         return True
 
     def __repr__(self) -> str:
-        def to_key_value_str(key_p: Predicate, value_p: Predicate) -> str:
-            return f"({repr(from_key_p(key_p))}, {repr(value_p)})"
-
-        key_value_predicates = ", ".join(
-            to_key_value_str(key_p, value_p) for key_p, value_p in self.key_value_predicates
-        )
-
-        return f"is_dict_of_p({key_value_predicates})"
+        pairs = [(from_key_p(key_p), value_p) for key_p, value_p in self.key_value_predicates]
+        return f"is_dict_of_p({key_value_pairs_repr(pairs)})"
 
     @override
     def explain_failure(self, x: Any, *args, **kwargs) -> dict:

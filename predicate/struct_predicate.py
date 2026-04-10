@@ -3,6 +3,7 @@ from typing import Any, override
 
 from more_itertools import first
 
+from predicate.helpers import dict_predicates_repr
 from predicate.predicate import Predicate
 
 
@@ -35,7 +36,9 @@ class StructPredicate[T](Predicate[T]):
                 return False
 
     def __repr__(self) -> str:
-        return "struct_p"  # TODO
+        return (
+            f"struct_p(required={dict_predicates_repr(self.required)}, optional={dict_predicates_repr(self.optional)})"
+        )
 
     @override
     def explain_failure(self, x: Any, *args, **kwargs) -> dict:

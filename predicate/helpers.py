@@ -18,6 +18,15 @@ def predicates_repr(predicates: list[Predicate]) -> str:
     return ", ".join(repr(predicate) for predicate in predicates)
 
 
+def dict_predicates_repr(predicates: dict[str, Predicate]) -> str:
+    items = ", ".join(f'"{k}": {v!r}' for k, v in predicates.items())
+    return "{" + items + "}"
+
+
+def key_value_pairs_repr(pairs: list[tuple[Predicate, Predicate]], from_key=repr) -> str:
+    return ", ".join(f"({from_key(k)}, {v!r})" for k, v in pairs)
+
+
 def join_with_or(s: list[str]) -> str:
     first = s[:-1]
     last = s[-1]

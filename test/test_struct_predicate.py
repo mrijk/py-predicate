@@ -86,6 +86,10 @@ def test_is_struct_p_explain_wrong_required_value(is_person_p):
     assert explain(is_person_p, value) == expected
 
 
+def test_is_struct_p_repr(is_person_p):
+    assert repr(is_person_p) == 'struct_p(required={"name": is_str_p, "age": is_int_p & ge_p(0)}, optional={})'
+
+
 def test_is_struct_p_explain_additional_data(is_person_p):
     value = {"name": "Alice", "age": 30, "email": "alice@test.nl"}
 
