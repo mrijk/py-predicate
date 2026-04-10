@@ -53,8 +53,17 @@ from predicate.set_predicates import (
     IsSubsetPredicate,
     IsSupersetPredicate,
 )
+from predicate.struct_predicate import StructPredicate
 from predicate.tee_predicate import TeePredicate
 from predicate.tuple_of_predicate import TupleOfPredicate
+
+
+def dict_to_json(predicates: dict[str, Predicate]) -> dict[str, Any]:
+    return {key: to_json(value) for key, value in predicates.items()}
+
+
+def list_to_json(predicates: list[Predicate]) -> list[dict[str, Any]]:
+    return [to_json(predicate) for predicate in predicates]
 
 
 def to_json(predicate: Predicate) -> dict[str, Any]:
@@ -116,7 +125,7 @@ def to_json(predicate: Predicate) -> dict[str, Any]:
                 return "is_same", {"predicate": to_json(predicate)}
             case IsSubclassPredicate(class_or_tuple):
                 match class_or_tuple:
-                    case tuple() as klasses:
+                    case tuple(klasses):
                         names = [k.__name__ for k in klasses]
                     case UnionType() as union_type:
                         names = [k.__name__ for k in get_args(union_type)]
@@ -130,7 +139,7 @@ def to_json(predicate: Predicate) -> dict[str, Any]:
             case IsTruthyPredicate():
                 return "is_truthy", None
             case JuxtPredicate(predicates=predicates, evaluate=evaluate):
-                return "juxt", {"predicates": [to_json(p) for p in predicates], "evaluate": to_json(evaluate)}
+                return "juxt", {"predicates": list_to_json(predicates), "evaluate": to_json(evaluate)}
             case GeLePredicate(lower, upper):
                 return "ge_le", {"lower": lower, "upper": upper}
             case GeLtPredicate(lower, upper):
@@ -150,7 +159,7 @@ def to_json(predicate: Predicate) -> dict[str, Any]:
             case LtPredicate(v):
                 return "lt", {"v": v}
             case MatchPredicate(predicates, full_match):
-                return "match", {"predicates": [to_json(p) for p in predicates], "full_match": full_match}
+                return "match", {"predicates": list_to_json(predicates), "full_match": full_match}
             case NamedPredicate(name):
                 return "variable", name
             case NePredicate(v):
@@ -167,10 +176,12 @@ def to_json(predicate: Predicate) -> dict[str, Any]:
                 return "regex", {"pattern": r.pattern}
             case SetOfPredicate(predicate):
                 return "set_of", {"predicate": to_json(predicate)}
+            case StructPredicate(required, optional):
+                return "struct_p", {"required": dict_to_json(required), "optional": dict_to_json(optional)}
             case TeePredicate():
                 return "tee", None
             case TupleOfPredicate(predicates):
-                return "tuple_of", {"predicates": [to_json(p) for p in predicates]}
+                return "tuple_of", {"predicates": list_to_json(predicates)}
             case XorPredicate(left, right):
                 return "xor", {"left": to_json(left), "right": to_json(right)}
             case _:

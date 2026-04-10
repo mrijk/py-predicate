@@ -76,6 +76,7 @@ from predicate.set_of_predicate import SetOfPredicate
 from predicate.set_predicates import IsRealSubsetPredicate, IsSubsetPredicate
 from predicate.standard_predicates import is_int_p
 from predicate.star_predicate import StarPredicate
+from predicate.struct_predicate import StructPredicate
 from predicate.tee_predicate import TeePredicate
 from predicate.tuple_of_predicate import TupleOfPredicate
 
@@ -587,7 +588,7 @@ def generate_is_subclass(is_subclass_predicate: IsSubclassPredicate) -> Iterator
     all_sub_classes = _subclasses(object)
 
     match is_subclass_predicate.class_or_tuple:
-        case tuple() as klasses:
+        case tuple(klasses):
             subclasses = set(flatten(_subclasses(klass) for klass in klasses))
             if non_subclasses := all_sub_classes - subclasses:
                 while True:
@@ -642,3 +643,12 @@ def generate_is_callable(predicate: IsCallablePredicate) -> Iterator:
 @generate_false.register
 def generate_raises(predicate: RaisesPredicate) -> Iterator:
     yield from repeat(lambda: None)
+
+
+@generate_false.register
+def generate_struct(predicate: StructPredicate) -> Iterator:
+    required = predicate.required
+    key_value_predicates = [(key, value) for key, value in required.items()]
+    dict_of_predicate = DictOfPredicate(key_value_predicates=key_value_predicates)
+
+    yield from generate_dict_of_p(dict_of_predicate)

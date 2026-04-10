@@ -99,6 +99,7 @@ from predicate.standard_predicates import (
     this_p,
 )
 from predicate.star_predicate import star
+from predicate.struct_predicate import is_struct_p
 from predicate.tee_predicate import tee_p
 from predicate.tuple_of_predicate import is_tuple_of_p
 
@@ -201,6 +202,7 @@ __all__ = [
     "is_space_p",
     "is_str_enum_p",
     "is_str_p",
+    "is_struct_p",
     "is_subclass_p",
     "is_subset_p",
     "is_superset_p",

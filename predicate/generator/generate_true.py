@@ -105,6 +105,7 @@ from predicate.standard_predicates import (
     is_list_p,
 )
 from predicate.star_predicate import StarPredicate
+from predicate.struct_predicate import StructPredicate
 from predicate.tee_predicate import TeePredicate
 from predicate.tuple_of_predicate import TupleOfPredicate
 
@@ -678,7 +679,7 @@ def generate_count(count_predicate: CountPredicate) -> Iterator:
 @generate_true.register
 def generate_is_subclass(is_subclass_predicate: IsSubclassPredicate) -> Iterator:
     match is_subclass_predicate.class_or_tuple:
-        case tuple() as klasses:
+        case tuple(klasses):
             while True:
                 for klass in klasses:
                     yield from klass.__subclasses__()
@@ -707,3 +708,12 @@ def generate_raises(predicate: RaisesPredicate) -> Iterator:
     exc_type = predicate.exception_type
     while True:
         yield lambda: (_ for _ in ()).throw(exc_type())
+
+
+@generate_true.register
+def generate_struct(predicate: StructPredicate) -> Iterator:
+    required = predicate.required
+    key_value_predicates = [(key, value) for key, value in required.items()]
+    dict_of_predicate = DictOfPredicate(key_value_predicates=key_value_predicates)
+
+    yield from generate_dict_of_p(dict_of_predicate)

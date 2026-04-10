@@ -32,6 +32,7 @@ from predicate import (
     is_container_p,
     is_datetime_p,
     is_dict_of_p,
+    is_dict_p,
     is_empty_p,
     is_even_p,
     is_falsy_p,
@@ -43,6 +44,7 @@ from predicate import (
     is_iterable_of_p,
     is_iterable_p,
     is_list_of_p,
+    is_list_p,
     is_nan_p,
     is_none_p,
     is_not_empty_p,
@@ -70,10 +72,6 @@ from predicate import (
     zero_p,
 )
 from predicate.set_predicates import is_real_subset_p, is_subset_p
-from predicate.standard_predicates import (
-    is_dict_p,
-    is_list_p,
-)
 
 
 def foo(self) -> bool:
