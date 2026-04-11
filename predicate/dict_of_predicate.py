@@ -1,3 +1,4 @@
+from collections.abc import Sequence
 from dataclasses import dataclass
 from typing import Any, override
 
@@ -14,7 +15,7 @@ class DictOfPredicate(Predicate):
 
     key_value_predicates: list[tuple[Predicate, Predicate]]
 
-    def __init__(self, key_value_predicates: list[tuple[Predicate | str, Predicate]]):
+    def __init__(self, key_value_predicates: Sequence[tuple[Predicate | str, Predicate]]):
         self.key_value_predicates = [(to_key_p(key_p), value_p) for key_p, value_p in key_value_predicates]
 
     def __call__(self, x: Any) -> bool:
