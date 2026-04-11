@@ -23,7 +23,7 @@ def dict_predicates_repr(predicates: dict[str, Predicate]) -> str:
     return "{" + items + "}"
 
 
-def key_value_pairs_repr(pairs: list[tuple[Predicate, Predicate]], from_key=repr) -> str:
+def key_value_pairs_repr(pairs: list[tuple[Predicate | str, Predicate]], from_key=repr) -> str:
     return ", ".join(f"({from_key(k)}, {v!r})" for k, v in pairs)
 
 
