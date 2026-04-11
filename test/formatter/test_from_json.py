@@ -49,6 +49,7 @@ from predicate import (
 from predicate.formatter.from_json import from_json
 from predicate.is_same_predicate import is_same_p
 from predicate.named_predicate import NamedPredicate
+from predicate.struct_predicate import is_struct_p
 
 
 @pytest.mark.parametrize(
@@ -102,6 +103,7 @@ from predicate.named_predicate import NamedPredicate
         optional(is_int_p),
         regex_p(r"\d+"),
         is_set_of_p(is_int_p),
+        is_struct_p(required={"name": is_str_p, "age": is_int_p}, optional={"email": regex_p(r".+@.+")}),
         is_tuple_of_p(is_int_p, is_str_p),
         NamedPredicate(name="x"),
     ],
