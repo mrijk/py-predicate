@@ -349,6 +349,11 @@ def random_constrained_pairs_of_type(klass: type) -> Iterator[tuple]:
     yield from (ordered_tuple(x, y) for x, y in values)
 
 
+def sample_optional_fields(optional: dict, generators: dict) -> dict:
+    optional_keys = random.sample(list(optional), k=random.randint(0, len(optional)))
+    return {key: next(generators[key]) for key in optional_keys}
+
+
 def generate_strings(predicate: Predicate[str]) -> Iterator[str]:
     yield from (item for item in random_strings() if predicate(item))
 
