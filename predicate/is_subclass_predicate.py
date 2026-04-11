@@ -18,7 +18,7 @@ class IsSubclassPredicate[T](Predicate[T]):
 
     def __repr__(self) -> str:
         match self.class_or_tuple:
-            case tuple() as klasses:
+            case tuple(klasses):
                 class_names = ", ".join(klass.__name__ for klass in klasses)
                 return f"is_subclass_p(({class_names}))"
             case UnionType() as union_type:
@@ -35,7 +35,7 @@ class IsSubclassPredicate[T](Predicate[T]):
     def explain_failure(self, x: T) -> dict:
         def class_names() -> Iterator[str]:
             match self.class_or_tuple:
-                case tuple() as klasses:
+                case tuple(klasses):
                     for klass in klasses:
                         yield klass.__name__
                 case _:

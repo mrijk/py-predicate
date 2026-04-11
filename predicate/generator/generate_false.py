@@ -76,6 +76,7 @@ from predicate.set_of_predicate import SetOfPredicate
 from predicate.set_predicates import IsRealSubsetPredicate, IsSubsetPredicate
 from predicate.standard_predicates import is_int_p
 from predicate.star_predicate import StarPredicate
+from predicate.struct_predicate import StructPredicate
 from predicate.tee_predicate import TeePredicate
 from predicate.tuple_of_predicate import TupleOfPredicate
 
@@ -587,7 +588,7 @@ def generate_is_subclass(is_subclass_predicate: IsSubclassPredicate) -> Iterator
     all_sub_classes = _subclasses(object)
 
     match is_subclass_predicate.class_or_tuple:
-        case tuple() as klasses:
+        case tuple(klasses):
             subclasses = set(flatten(_subclasses(klass) for klass in klasses))
             if non_subclasses := all_sub_classes - subclasses:
                 while True:
@@ -642,3 +643,19 @@ def generate_is_callable(predicate: IsCallablePredicate) -> Iterator:
 @generate_false.register
 def generate_raises(predicate: RaisesPredicate) -> Iterator:
     yield from repeat(lambda: None)
+
+
+@generate_false.register
+def generate_struct(predicate: StructPredicate) -> Iterator:
+    required = predicate.required
+    optional = predicate.optional
+
+    required_kvp = [(key, value) for key, value in required.items()]
+    dict_of_predicate = DictOfPredicate(key_value_predicates=required_kvp)
+
+    optional_generators = {key: generate_false(value_p) for key, value_p in optional.items()}
+
+    for false_dict in generate_dict_of_p(dict_of_predicate):
+        optional_keys = random.sample(list(optional), k=random.randint(0, len(optional)))
+        optional_fields = {key: next(optional_generators[key]) for key in optional_keys}
+        yield false_dict | optional_fields

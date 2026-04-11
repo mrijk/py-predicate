@@ -105,6 +105,7 @@ from predicate.standard_predicates import (
     is_list_p,
 )
 from predicate.star_predicate import StarPredicate
+from predicate.struct_predicate import StructPredicate
 from predicate.tee_predicate import TeePredicate
 from predicate.tuple_of_predicate import TupleOfPredicate
 
@@ -678,7 +679,7 @@ def generate_count(count_predicate: CountPredicate) -> Iterator:
 @generate_true.register
 def generate_is_subclass(is_subclass_predicate: IsSubclassPredicate) -> Iterator:
     match is_subclass_predicate.class_or_tuple:
-        case tuple() as klasses:
+        case tuple(klasses):
             while True:
                 for klass in klasses:
                     yield from klass.__subclasses__()
@@ -699,7 +700,11 @@ def generate_is(is_predicate: IsPredicate) -> Iterator:
 
 @generate_true.register
 def generate_juxt_p(predicate: JuxtPredicate) -> Iterator:
-    yield from (item for item in random_anys() if predicate(item))
+    generators = [generate_true(p) for p in predicate.predicates]
+    for gen in cycle(generators):
+        candidate = next(gen)
+        if predicate(candidate):
+            yield candidate
 
 
 @generate_true.register
@@ -707,3 +712,19 @@ def generate_raises(predicate: RaisesPredicate) -> Iterator:
     exc_type = predicate.exception_type
     while True:
         yield lambda: (_ for _ in ()).throw(exc_type())
+
+
+@generate_true.register
+def generate_struct(predicate: StructPredicate) -> Iterator:
+    required = predicate.required
+    optional = predicate.optional
+
+    required_kvp = [(key, value) for key, value in required.items()]
+    dict_of_predicate = DictOfPredicate(key_value_predicates=required_kvp)
+
+    optional_generators = {key: generate_true(value_p) for key, value_p in optional.items()}
+
+    for required_dict in generate_dict_of_p(dict_of_predicate):
+        optional_keys = random.sample(list(optional), k=random.randint(0, len(optional)))
+        optional_fields = {key: next(optional_generators[key]) for key in optional_keys}
+        yield required_dict | optional_fields
