@@ -713,7 +713,14 @@ def generate_raises(predicate: RaisesPredicate) -> Iterator:
 @generate_true.register
 def generate_struct(predicate: StructPredicate) -> Iterator:
     required = predicate.required
-    key_value_predicates = [(key, value) for key, value in required.items()]
-    dict_of_predicate = DictOfPredicate(key_value_predicates=key_value_predicates)
+    optional = predicate.optional
 
-    yield from generate_dict_of_p(dict_of_predicate)
+    required_kvp = [(key, value) for key, value in required.items()]
+    dict_of_predicate = DictOfPredicate(key_value_predicates=required_kvp)
+
+    optional_generators = {key: generate_true(value_p) for key, value_p in optional.items()}
+
+    for required_dict in generate_dict_of_p(dict_of_predicate):
+        optional_keys = random.sample(list(optional), k=random.randint(0, len(optional)))
+        optional_fields = {key: next(optional_generators[key]) for key in optional_keys}
+        yield required_dict | optional_fields
