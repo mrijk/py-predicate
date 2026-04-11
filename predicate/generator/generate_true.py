@@ -720,9 +720,7 @@ def generate_struct(predicate: StructPredicate) -> Iterator:
     required = predicate.required
     optional = predicate.optional
 
-    required_kvp = [(key, value) for key, value in required.items()]
-    dict_of_predicate = DictOfPredicate(key_value_predicates=required_kvp)
-
+    dict_of_predicate = DictOfPredicate(key_value_predicates=list(required.items()))
     optional_generators = {key: generate_true(value_p) for key, value_p in optional.items()}
 
     for required_dict in generate_dict_of_p(dict_of_predicate):
