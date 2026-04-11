@@ -9,7 +9,7 @@ from predicate.predicate import Predicate
 
 
 @dataclass
-class DictOfPredicate[T](Predicate[T]):
+class DictOfPredicate(Predicate):
     """A predicate class that models the dict_of predicate."""
 
     key_value_predicates: list[tuple[Predicate, Predicate]]
