@@ -666,7 +666,8 @@ def generate_struct(predicate: StructPredicate) -> Iterator:
     optional = predicate.optional
 
     known_keys = set(required) | set(optional)
-    dict_of_predicate = DictOfPredicate(key_value_predicates=list(required.items()))
+    required_kvp: list[tuple[Predicate | str, Predicate]] = [(key, value) for key, value in required.items()]
+    dict_of_predicate = DictOfPredicate(key_value_predicates=required_kvp)
 
     def false_required_fields() -> Iterator:
         optional_generators = {key: generate_false(value_p) for key, value_p in optional.items()}
