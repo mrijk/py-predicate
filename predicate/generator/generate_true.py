@@ -700,7 +700,11 @@ def generate_is(is_predicate: IsPredicate) -> Iterator:
 
 @generate_true.register
 def generate_juxt_p(predicate: JuxtPredicate) -> Iterator:
-    yield from (item for item in random_anys() if predicate(item))
+    generators = [generate_true(p) for p in predicate.predicates]
+    for gen in cycle(generators):
+        candidate = next(gen)
+        if predicate(candidate):
+            yield candidate
 
 
 @generate_true.register
