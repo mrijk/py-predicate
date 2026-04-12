@@ -55,6 +55,7 @@ from predicate.generator.helpers import (
     random_tuples,
     random_uuids,
     random_values_of_type,
+    sample_optional_fields,
     set_from_list,
 )
 from predicate.gt_predicate import GtPredicate
@@ -719,12 +720,8 @@ def generate_struct(predicate: StructPredicate) -> Iterator:
     required = predicate.required
     optional = predicate.optional
 
-    required_kvp: list[tuple[Predicate | str, Predicate]] = [(key, value) for key, value in required.items()]
-    dict_of_predicate: DictOfPredicate = DictOfPredicate(key_value_predicates=required_kvp)
-
+    dict_of_predicate = DictOfPredicate(key_value_predicates=list(required.items()))
     optional_generators = {key: generate_true(value_p) for key, value_p in optional.items()}
 
     for required_dict in generate_dict_of_p(dict_of_predicate):
-        optional_keys = random.sample(list(optional), k=random.randint(0, len(optional)))
-        optional_fields = {key: next(optional_generators[key]) for key in optional_keys}
-        yield required_dict | optional_fields
+        yield required_dict | sample_optional_fields(optional, optional_generators)

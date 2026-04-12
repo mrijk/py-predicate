@@ -10,7 +10,7 @@ from random import choices
 from typing import Any, Final, Iterator
 from uuid import UUID, uuid4
 
-from more_itertools import interleave, random_permutation, repeatfunc, take
+from more_itertools import interleave, random_permutation, repeatfunc, take, unique_everseen
 
 from predicate.eq_predicate import eq_p
 from predicate.generator.generate_predicate import generate_predicate
@@ -20,7 +20,7 @@ from predicate.regex_predicate import regex_p
 from predicate.standard_predicates import is_int_p, is_str_p
 
 
-def random_first_from_iterables(*iterables: Iterable) -> Iterator:
+def random_first_from_iterables(*iterables: Iterable) -> Iterator[Any]:
     non_empty_iterables = [it for it in iterables if it]
 
     while True:
@@ -31,7 +31,7 @@ def random_first_from_iterables(*iterables: Iterable) -> Iterator:
             pass
 
 
-def set_from_list(value: list, order: bool = False) -> Iterator:
+def set_from_list(value: list[Any], order: bool = False) -> Iterator[set[Any]]:
     length = len(value)
     try:
         if length and len(result := set(value)) == length:
@@ -40,7 +40,7 @@ def set_from_list(value: list, order: bool = False) -> Iterator:
         pass
 
 
-def random_complex_numbers(radius: float = 1e6) -> Iterator:
+def random_complex_numbers(radius: float = 1e6) -> Iterator[complex]:
     valid_amplitudes = random_floats(lower=0.0, upper=radius)
     valid_angles = random_floats(lower=0.0, upper=2 * math.pi)
 
@@ -50,11 +50,11 @@ def random_complex_numbers(radius: float = 1e6) -> Iterator:
     yield from (to_complex(amplitude, angle) for amplitude, angle in zip(valid_amplitudes, valid_angles, strict=False))
 
 
-def random_callables() -> Iterator:
+def random_callables() -> Iterator[types.FunctionType]:
     yield from random_lambdas()
 
 
-def generate_lambda(arg_names: list[str]):
+def generate_lambda(arg_names: list[str]) -> types.FunctionType:
     arg_count = len(arg_names)
     arg_str = tuple(arg_names)
 
@@ -144,7 +144,7 @@ def generate_lambda(arg_names: list[str]):
 default_nr_of_parameters_p: Final = eq_p(1)
 
 
-def random_lambdas(nr_of_parameters_p: Predicate = default_nr_of_parameters_p) -> Iterator:
+def random_lambdas(nr_of_parameters_p: Predicate = default_nr_of_parameters_p) -> Iterator[types.FunctionType]:
     value_p = regex_p("[a-z]{2,3}")
     valid_parameter_lists = random_lists(length_p=nr_of_parameters_p, value_p=value_p)
     yield from (generate_lambda(list(arg_names)) for arg_names in valid_parameter_lists)
@@ -155,7 +155,7 @@ default_size_p: Final = ge_le_p(lower=0, upper=5)
 
 def random_dicts(
     key_p: Predicate = is_str_p, value_p: Predicate = is_int_p, size_p: Predicate = default_size_p
-) -> Iterator:
+) -> Iterator[dict[Any, Any]]:
     from predicate import generate_true
 
     if size_p(0):
@@ -163,21 +163,13 @@ def random_dicts(
 
     valid_keys = generate_true(key_p)
     valid_values = generate_true(value_p)
-    valid_sizes = generate_true(size_p)
+    valid_sizes = (s for s in generate_true(size_p) if s >= 0)
 
-    while True:
-        if (valid_size := next(valid_sizes)) >= 0:
-            seen: set = set()
-            keys: list = []
-            while len(keys) < valid_size:
-                k = next(valid_keys)
-                if k not in seen:
-                    seen.add(k)
-                    keys.append(k)
-            yield {k: next(valid_values) for k in keys}
+    for valid_size in valid_sizes:
+        yield dict(zip(take(valid_size, unique_everseen(valid_keys)), valid_values, strict=False))
 
 
-def random_datetimes(lower: datetime | None = None, upper: datetime | None = None) -> Iterator:
+def random_datetimes(lower: datetime | None = None, upper: datetime | None = None) -> Iterator[datetime]:
     start = lower if lower else datetime(year=1980, month=1, day=1)
     end = upper if upper else datetime(year=2050, month=1, day=1)
 
@@ -193,7 +185,7 @@ def random_datetimes(lower: datetime | None = None, upper: datetime | None = Non
         yield start + timedelta(seconds=random_second)
 
 
-def random_predicates(*, max_depth: int = 10, klass: type = int) -> Iterator:
+def random_predicates(*, max_depth: int = 10, klass: type = int) -> Iterator[Predicate]:
     subclasses = Predicate.__subclasses__()
 
     iterables = [generate_predicate(subclass, max_depth=max_depth, klass=klass) for subclass in subclasses]  # type: ignore
@@ -204,47 +196,46 @@ def random_predicates(*, max_depth: int = 10, klass: type = int) -> Iterator:
 default_length_p: Final = ge_le_p(lower=0, upper=10)
 
 
-def random_sets(length_p: Predicate = default_length_p, value_p: Predicate = is_int_p) -> Iterator:
+def random_sets(length_p: Predicate = default_length_p, value_p: Predicate = is_int_p) -> Iterator[set[Any]]:
     from predicate import generate_true
 
     if length_p(0):
         yield set()
-    valid_lengths = generate_true(length_p)
+    valid_lengths = (n for n in generate_true(length_p) if n > 0)
 
-    while True:
-        if (length := next(valid_lengths)) > 0:
-            values = take(length, generate_true(value_p))
-            if len(result := set(values)) == length:
-                yield result
+    for length in valid_lengths:
+        values = take(length, generate_true(value_p))
+        if len(result := set(values)) == length:
+            yield result
 
 
-def random_bools() -> Iterator:
+def random_bools() -> Iterator[bool]:
     yield from (False, True)
     yield from repeatfunc(random.choice, None, (False, True))
 
 
-def random_containers() -> Iterator:
+def random_containers() -> Iterator[list[Any] | dict[Any, Any]]:
     yield from cycle(([], {}))
 
 
-def random_hashables() -> Iterator:
+def random_hashables() -> Iterator[Any]:
     yield from interleave(
         random_bools(), random_ints(), random_strings(), random_floats(), random_datetimes(), random_uuids()
     )
 
 
-def random_non_hashables() -> Iterator:
+def random_non_hashables() -> Iterator[Any]:
     yield from interleave(random_lists(), random_dicts())
 
 
-def random_strings(min_size: int = 0, max_size: int = 10) -> Iterator:
+def random_strings(min_size: int = 0, max_size: int = 10) -> Iterator[str]:
     population = string.ascii_letters + string.digits
     while True:
         length = random.randint(min_size, max_size)
         yield "".join(choices(population, k=length))
 
 
-def random_floats(lower: float = -1e-6, upper: float = 1e6) -> Iterator:
+def random_floats(lower: float = -1e-6, upper: float = 1e6) -> Iterator[float]:
     def between(limit: float) -> Iterator[float]:
         low = max(-limit, lower)
         high = min(limit, upper)
@@ -273,7 +264,7 @@ def random_ints(lower: int = -sys.maxsize, upper: int = sys.maxsize, **_kwargs) 
         yield from between(100)
 
 
-def random_iterables(length_p: Predicate = default_length_p, value_p=is_int_p) -> Iterator[Iterable]:
+def random_iterables(length_p: Predicate = default_length_p, value_p: Predicate = is_int_p) -> Iterator[Iterable]:
     if length_p(0):
         yield from ([], {}, (), "")
     else:
@@ -283,31 +274,31 @@ def random_iterables(length_p: Predicate = default_length_p, value_p=is_int_p) -
         yield from random_first_from_iterables(iterable_1, iterable_2, iterable_3)
 
 
-def random_lists(length_p: Predicate = default_length_p, value_p: Predicate = is_int_p) -> Iterator[Iterable]:
+def random_lists(length_p: Predicate = default_length_p, value_p: Predicate = is_int_p) -> Iterator[list[Any]]:
     from predicate import generate_true
 
     if length_p(0):
         yield []
 
-    valid_lengths = generate_true(length_p)
-    while True:
-        if (length := next(valid_lengths)) >= 0:
-            yield take(length, generate_true(value_p))
+    valid_lengths = (n for n in generate_true(length_p) if n >= 0)
+
+    for length in valid_lengths:
+        yield take(length, generate_true(value_p))
 
 
-def random_tuples(length_p: Predicate = default_length_p, value_p: Predicate = is_int_p) -> Iterator[Iterable]:
+def random_tuples(length_p: Predicate = default_length_p, value_p: Predicate = is_int_p) -> Iterator[tuple[Any, ...]]:
     yield from (tuple(random_list) for random_list in random_lists(length_p=length_p, value_p=value_p))
 
 
-def random_uuids() -> Iterator:
+def random_uuids() -> Iterator[UUID]:
     yield from repeatfunc(uuid4)
 
 
-def random_anys() -> Iterator:
+def random_anys() -> Iterator[Any]:
     yield from interleave(random_bools(), random_ints(), random_strings(), random_floats(), random_datetimes())
 
 
-def random_values_of_type(klass: type) -> Iterator:
+def random_values_of_type(klass: type) -> Iterator[Any]:
     type_registry: dict[type, Callable[[], Iterator]] = {
         bool: random_bools,
         datetime: random_datetimes,
@@ -324,7 +315,7 @@ def random_values_of_type(klass: type) -> Iterator:
         raise ValueError(f"No generator found for {klass}")
 
 
-def random_constrained_values_of_type(klass: type) -> Iterator:
+def random_constrained_values_of_type(klass: type) -> Iterator[Any]:
     type_registry: dict[type, Callable[[], Iterator]] = {
         int: random_ints,
         float: random_floats,
@@ -338,8 +329,8 @@ def random_constrained_values_of_type(klass: type) -> Iterator:
         # raise ValueError(f"No generator found for {klass}")
 
 
-def random_constrained_pairs_of_type(klass: type) -> Iterator[tuple]:
-    def ordered_tuple(x: Any, y: Any) -> tuple:
+def random_constrained_pairs_of_type(klass: type) -> Iterator[tuple[Any, Any]]:
+    def ordered_tuple(x: Any, y: Any) -> tuple[Any, Any]:
         return (x, y) if x <= y else (y, x)
 
     values_1 = random_constrained_values_of_type(klass)
@@ -347,6 +338,11 @@ def random_constrained_pairs_of_type(klass: type) -> Iterator[tuple]:
     values = zip(values_1, values_2, strict=False)
 
     yield from (ordered_tuple(x, y) for x, y in values)
+
+
+def sample_optional_fields(optional: dict[str, Any], generators: dict[str, Iterator[Any]]) -> dict[str, Any]:
+    optional_keys = random.sample(list(optional), k=random.randint(0, len(optional)))
+    return {key: next(generators[key]) for key in optional_keys}
 
 
 def generate_strings(predicate: Predicate[str]) -> Iterator[str]:
@@ -361,7 +357,7 @@ def generate_uuids(predicate: Predicate[UUID]) -> Iterator[UUID]:
     yield from (item for item in random_uuids() if predicate(item))
 
 
-def generate_anys(predicate: Predicate) -> Iterator:
+def generate_anys(predicate: Predicate) -> Iterator[Any]:
     yield from (item for item in random_anys() if predicate(item))
 
 
