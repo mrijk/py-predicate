@@ -176,17 +176,20 @@ def generate_has_path(predicate: HasPathPredicate) -> Iterator:
 def generate_ge_le(predicate: GeLePredicate) -> Iterator:
     match lower := predicate.lower, upper := predicate.upper:
         case datetime(), _:
-            smaller = random_datetimes(upper=lower - timedelta(seconds=1))
-            larger = random_datetimes(lower=upper + timedelta(seconds=1))
-            yield from interleave(smaller, larger)
+            yield from interleave(
+                random_datetimes(upper=lower - timedelta(seconds=1)),
+                random_datetimes(lower=upper + timedelta(seconds=1)),
+            )
         case int(), _:
-            smaller = random_ints(lower=lower - 100, upper=lower - 1)
-            larger = random_ints(lower=upper + 1, upper=upper + 100)
-            yield from interleave(smaller, larger)
+            yield from interleave(
+                random_ints(lower=lower - 100, upper=lower - 1),
+                random_ints(lower=upper + 1, upper=upper + 100),
+            )
         case float(), _:
-            smaller = random_floats(lower=lower - 100.0, upper=lower - 0.01)
-            larger = random_floats(lower=upper + 0.01, upper=upper + 100.0)
-            yield from interleave(smaller, larger)
+            yield from interleave(
+                random_floats(lower=lower - 100.0, upper=lower - 0.01),
+                random_floats(lower=upper + 0.01, upper=upper + 100.0),
+            )
         case _:
             raise ValueError(f"Can't generate for type {type(lower)}")
 
@@ -195,17 +198,20 @@ def generate_ge_le(predicate: GeLePredicate) -> Iterator:
 def generate_ge_lt(predicate: GeLtPredicate) -> Iterator:
     match lower := predicate.lower, upper := predicate.upper:
         case datetime(), _:
-            smaller = random_datetimes(upper=lower - timedelta(seconds=1))
-            larger = random_datetimes(lower=upper)
-            yield from interleave(smaller, larger)
+            yield from interleave(
+                random_datetimes(upper=lower - timedelta(seconds=1)),
+                random_datetimes(lower=upper),
+            )
         case int(), _:
-            smaller = random_ints(lower=lower - 100, upper=lower - 1)
-            larger = random_ints(lower=upper, upper=upper + 100)
-            yield from interleave(smaller, larger)
+            yield from interleave(
+                random_ints(lower=lower - 100, upper=lower - 1),
+                random_ints(lower=upper, upper=upper + 100),
+            )
         case float(), _:
-            smaller = random_floats(lower=lower - 100.0, upper=lower - 0.01)
-            larger = random_floats(lower=upper, upper=upper + 100.0)
-            yield from interleave(smaller, larger)
+            yield from interleave(
+                random_floats(lower=lower - 100.0, upper=lower - 0.01),
+                random_floats(lower=upper, upper=upper + 100.0),
+            )
         case _:
             raise ValueError(f"Can't generate for type {type(lower)}")
 
@@ -214,17 +220,20 @@ def generate_ge_lt(predicate: GeLtPredicate) -> Iterator:
 def generate_gt_le(predicate: GtLePredicate) -> Iterator:
     match lower := predicate.lower, upper := predicate.upper:
         case datetime(), _:
-            smaller = random_datetimes(upper=lower)
-            larger = random_datetimes(lower=upper + timedelta(seconds=1))
-            yield from interleave(smaller, larger)
+            yield from interleave(
+                random_datetimes(upper=lower),
+                random_datetimes(lower=upper + timedelta(seconds=1)),
+            )
         case int(), _:
-            smaller = random_ints(lower=lower - 100, upper=lower)
-            larger = random_ints(lower=upper + 1, upper=upper + 100)
-            yield from interleave(smaller, larger)
+            yield from interleave(
+                random_ints(lower=lower - 100, upper=lower),
+                random_ints(lower=upper + 1, upper=upper + 100),
+            )
         case float(), _:
-            smaller = random_floats(lower=lower - 100.0, upper=lower)
-            larger = random_floats(lower=upper + 0.01, upper=upper + 100.0)
-            yield from interleave(smaller, larger)
+            yield from interleave(
+                random_floats(lower=lower - 100.0, upper=lower),
+                random_floats(lower=upper + 0.01, upper=upper + 100.0),
+            )
         case _:
             raise ValueError(f"Can't generate for type {type(lower)}")
 
@@ -233,17 +242,20 @@ def generate_gt_le(predicate: GtLePredicate) -> Iterator:
 def generate_gt_lt(predicate: GtLtPredicate) -> Iterator:
     match lower := predicate.lower, upper := predicate.upper:
         case datetime(), _:
-            smaller = random_datetimes(upper=lower)
-            larger = random_datetimes(lower=upper)
-            yield from interleave(smaller, larger)
+            yield from interleave(
+                random_datetimes(upper=lower),
+                random_datetimes(lower=upper),
+            )
         case int(), _:
-            smaller = random_ints(lower=lower - 100, upper=lower)
-            larger = random_ints(lower=upper, upper=upper + 100)
-            yield from interleave(smaller, larger)
+            yield from interleave(
+                random_ints(lower=lower - 100, upper=lower),
+                random_ints(lower=upper, upper=upper + 100),
+            )
         case float(), _:
-            smaller = random_floats(lower=lower - 100.0, upper=lower)
-            larger = random_floats(lower=upper, upper=upper + 100.0)
-            yield from interleave(smaller, larger)
+            yield from interleave(
+                random_floats(lower=lower - 100.0, upper=lower),
+                random_floats(lower=upper, upper=upper + 100.0),
+            )
         case _:
             raise ValueError(f"Can't generate for type {type(lower)}")
 
