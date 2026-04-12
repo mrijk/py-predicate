@@ -10,7 +10,7 @@ from random import choices
 from typing import Any, Final, Iterator
 from uuid import UUID, uuid4
 
-from more_itertools import interleave, random_permutation, repeatfunc, take
+from more_itertools import interleave, random_permutation, repeatfunc, take, unique_everseen
 
 from predicate.eq_predicate import eq_p
 from predicate.generator.generate_predicate import generate_predicate
@@ -163,18 +163,10 @@ def random_dicts(
 
     valid_keys = generate_true(key_p)
     valid_values = generate_true(value_p)
-    valid_sizes = generate_true(size_p)
+    valid_sizes = (s for s in generate_true(size_p) if s >= 0)
 
-    while True:
-        if (valid_size := next(valid_sizes)) >= 0:
-            seen: set = set()
-            keys: list = []
-            while len(keys) < valid_size:
-                k = next(valid_keys)
-                if k not in seen:
-                    seen.add(k)
-                    keys.append(k)
-            yield {k: next(valid_values) for k in keys}
+    for valid_size in valid_sizes:
+        yield dict(zip(take(valid_size, unique_everseen(valid_keys)), valid_values, strict=False))
 
 
 def random_datetimes(lower: datetime | None = None, upper: datetime | None = None) -> Iterator:
@@ -209,13 +201,12 @@ def random_sets(length_p: Predicate = default_length_p, value_p: Predicate = is_
 
     if length_p(0):
         yield set()
-    valid_lengths = generate_true(length_p)
+    valid_lengths = (n for n in generate_true(length_p) if n > 0)
 
-    while True:
-        if (length := next(valid_lengths)) > 0:
-            values = take(length, generate_true(value_p))
-            if len(result := set(values)) == length:
-                yield result
+    for length in valid_lengths:
+        values = take(length, generate_true(value_p))
+        if len(result := set(values)) == length:
+            yield result
 
 
 def random_bools() -> Iterator:
@@ -289,10 +280,10 @@ def random_lists(length_p: Predicate = default_length_p, value_p: Predicate = is
     if length_p(0):
         yield []
 
-    valid_lengths = generate_true(length_p)
-    while True:
-        if (length := next(valid_lengths)) >= 0:
-            yield take(length, generate_true(value_p))
+    valid_lengths = (n for n in generate_true(length_p) if n >= 0)
+
+    for length in valid_lengths:
+        yield take(length, generate_true(value_p))
 
 
 def random_tuples(length_p: Predicate = default_length_p, value_p: Predicate = is_int_p) -> Iterator[Iterable]:
