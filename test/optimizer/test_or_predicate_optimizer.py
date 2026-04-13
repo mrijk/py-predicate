@@ -438,6 +438,17 @@ def test_optimize_not_in_or_not_in_disjoint():
     assert optimized == always_true_p
 
 
+def test_optimize_or_not_p_and_q(p, q):
+    # p | (~p & q) == p | q
+    predicate = p | (~p & q)
+
+    assert can_optimize(predicate)
+
+    optimized = optimize(predicate)
+
+    assert optimized == p | q
+
+
 def test_optimize_not_in_or_not_in_same():
     # not_in({1, 2}) | not_in({1, 2}) = not_in({1, 2})  [identical sets]
 

@@ -31,6 +31,12 @@ def test_optimize_not_in_p_empty():
     assert optimized == always_true_p
 
 
+def test_optimize_in_p_multiple():
+    in_multiple = in_p({1, 2})
+
+    assert not can_optimize(in_multiple)
+
+
 def test_optimize_not_in_p_single():
     not_in_empty = not_in_p({1})
 
@@ -39,3 +45,9 @@ def test_optimize_not_in_p_single():
     optimized = optimize(not_in_empty)
 
     assert optimized == ne_p(1)
+
+
+def test_optimize_not_in_p_multiple():
+    not_in_multiple = not_in_p({1, 2})
+
+    assert not can_optimize(not_in_multiple)
