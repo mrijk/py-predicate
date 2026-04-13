@@ -13,7 +13,7 @@ from predicate.predicate import Predicate
 from predicate.spec.spec import Spec
 
 _type_narrowing_origins: set = {TypeGuard}
-if sys.version_info >= (3, 13):
+if sys.version_info >= (3, 13):  # pragma: no cover
     from typing import TypeIs
 
     _type_narrowing_origins.add(TypeIs)

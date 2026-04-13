@@ -1,6 +1,9 @@
+from typing import TypeGuard, TypeVar
+
 import pytest
 
 from predicate import ge_p, is_bool_p, is_float_p, is_int_p, pos_p, zero_p
+from predicate.predicate import Predicate
 from predicate.spec.exercise import Spec, exercise
 
 
@@ -157,6 +160,37 @@ def test_exercise_class_with_fn_p_fail():
     with pytest.raises(AssertionError) as exc:
         list(exercise(Doubler(), spec=spec))
     assert exc.value.args[0].startswith("Not conform spec:")
+
+
+def test_exercise_predicate_klass_not_implemented():
+    class MyPred(Predicate):
+        def __call__(self, x: int) -> bool:
+            return True
+
+        # no get_klass() override → .klass raises NotImplementedError
+
+    result = list(exercise(MyPred()))
+    assert result
+
+
+def test_exercise_class_typeguard_return():
+    class MyCallable:
+        def __call__(self, x: int) -> TypeGuard[int]:
+            return x > 0
+
+    result = list(exercise(MyCallable()))
+    assert result
+
+
+def test_exercise_class_typevar_param():
+    T = TypeVar("T")
+
+    class MyCallable:
+        def __call__(self, x: T) -> bool:
+            return True
+
+    result = list(exercise(MyCallable()))
+    assert result
 
 
 @pytest.mark.asyncio
