@@ -1,3 +1,5 @@
+from typing import TypeVar
+
 import pytest
 
 from predicate import ge_p, is_int_p, is_str_p, pos_p
@@ -325,6 +327,17 @@ async def test_exercise_async_function_with_fn_p():
 
     result = [r async for r in exercise(max_int, spec=spec)]
     assert result
+
+
+def test_exercise_function_typevar_param_not_in_spec():
+    T = TypeVar("T")
+
+    def identity(x: T) -> int:
+        return 0
+
+    spec: Spec = {"args": {}, "ret": is_int_p}
+    with pytest.raises(AssertionError, match="not in spec"):
+        list(exercise(identity, spec=spec))
 
 
 @pytest.mark.asyncio
