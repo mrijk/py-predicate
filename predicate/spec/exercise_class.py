@@ -54,8 +54,7 @@ def _resolve_class_spec(f: Callable, spec: Spec | None) -> Spec:
         if not (spec_from_annotation := get_spec_from_class_annotation(f)):
             raise ValueError("Not implemented yet")
         return spec_from_annotation
-    check_signature_against_spec(f, spec)
-    return spec
+    return check_signature_against_spec(f, spec)
 
 
 def exercise_class(f: Callable, spec: Spec | None, n: int) -> Iterator[tuple]:

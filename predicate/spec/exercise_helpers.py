@@ -1,5 +1,5 @@
 import sys
-from inspect import Signature
+from inspect import Signature, signature
 from itertools import repeat
 from typing import Callable, TypeGuard, TypeVar, get_origin
 
@@ -28,20 +28,35 @@ def get_return_predicate(sig: Signature) -> Predicate:
     return is_instance_p(annotation)
 
 
-def check_signature_against_spec(f: Callable, spec: Spec):
-    from inspect import signature
-
+def validate_args(f: Callable, spec: Spec) -> dict[str, Predicate]:
+    parameters = spec["args"]
     sig = signature(f)
 
-    parameters = spec["args"]
     for key, _ in parameters.items():
         if key not in sig.parameters:
             raise AssertionError(f"Parameter '{key}' not in function signature")
 
+    return parameters
+
+
+def get_return_spec(f: Callable, spec: Spec) -> Spec:
     if not spec.get("ret"):
+        sig = signature(f)
+
         if sig.return_annotation == sig.empty:
             raise AssertionError("Return annotation not in spec")
-        spec["ret"] = is_instance_p(sig.return_annotation)
+        return spec | {"ret": is_instance_p(sig.return_annotation)}
+    return spec
+
+
+def check_signature_against_spec(f: Callable, spec: Spec) -> Spec:
+    from inspect import signature
+
+    sig = signature(f)
+
+    parameters = validate_args(f, spec)
+
+    spec = get_return_spec(f, spec)
 
     for key in sig.parameters:
         parameter = sig.parameters[key]
@@ -59,6 +74,8 @@ def check_signature_against_spec(f: Callable, spec: Spec):
             else:
                 if not implies(parameters[key], annotation_p):
                     raise AssertionError("Spec predicate is not a constrained annotation")
+
+    return spec
 
 
 def _generate_values(spec: Spec, n: int) -> tuple:
