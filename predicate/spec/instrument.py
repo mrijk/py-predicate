@@ -108,7 +108,14 @@ def instrument_function(func: Callable, spec: Spec) -> Callable:
     return wrapped
 
 
-def instrument(spec: Spec) -> Callable:
+def instrument(spec_or_func: Spec | Callable = None) -> Callable:  # type: ignore[assignment]
+    empty_spec: Spec = {"args": {}}
+
+    if callable(spec_or_func):
+        return instrument_function(spec_or_func, empty_spec)
+
+    spec = spec_or_func or empty_spec
+
     def decorator(func: Callable) -> Callable:
         return instrument_function(func, spec)
 

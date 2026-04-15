@@ -60,9 +60,7 @@ def test_instrument_validates_args_before_executing():
     # side_effect is set only if the function body runs
     side_effect = []
 
-    spec: Spec = {"args": {"x": is_int_p}, "ret": is_int_p}
-
-    @instrument(spec)
+    @instrument
     def func_with_side_effect(x: int) -> int:
         side_effect.append(x)
         return x
@@ -74,10 +72,7 @@ def test_instrument_validates_args_before_executing():
 
 
 def test_instrument_optional_ret():
-    # spec without "ret" must not raise KeyError
-    spec: Spec = {"args": {"x": is_int_p}}
-
-    @instrument(spec)
+    @instrument
     def add_one(x: int) -> int:
         return x + 1
 
@@ -85,13 +80,7 @@ def test_instrument_optional_ret():
 
 
 def test_instrument_fn_constraint_ok():
-    spec: Spec = {
-        "args": {"x": is_int_p, "y": is_int_p},
-        "ret": is_int_p,
-        "fn": lambda x, y, ret: ret >= x and ret >= y,
-    }
-
-    @instrument(spec)
+    @instrument({"args": {}, "fn": lambda x, y, ret: ret >= x and ret >= y})
     def max_int(x: int, y: int) -> int:
         return x if x >= y else y
 
@@ -99,13 +88,7 @@ def test_instrument_fn_constraint_ok():
 
 
 def test_instrument_fn_constraint_fails():
-    spec: Spec = {
-        "args": {"x": is_int_p, "y": is_int_p},
-        "ret": is_int_p,
-        "fn": lambda x, y, ret: ret >= x and ret >= y,
-    }
-
-    @instrument(spec)
+    @instrument({"args": {}, "fn": lambda x, y, ret: ret >= x and ret >= y})
     def broken_max(x: int, y: int) -> int:
         return x  # always returns x, violates fn when y > x
 
@@ -114,13 +97,7 @@ def test_instrument_fn_constraint_fails():
 
 
 def test_instrument_fn_p_constraint_ok():
-    spec: Spec = {
-        "args": {"x": is_int_p, "y": is_int_p},
-        "ret": is_int_p,
-        "fn_p": lambda x, y: ge_p(x + y),
-    }
-
-    @instrument(spec)
+    @instrument({"args": {}, "fn_p": lambda x, y: ge_p(x + y)})
     def add(x: int, y: int) -> int:
         return x + y
 
@@ -128,13 +105,7 @@ def test_instrument_fn_p_constraint_ok():
 
 
 def test_instrument_fn_p_constraint_fails():
-    spec: Spec = {
-        "args": {"x": is_int_p, "y": is_int_p},
-        "ret": is_int_p,
-        "fn_p": lambda x, y: ge_p(x + y),
-    }
-
-    @instrument(spec)
+    @instrument({"args": {}, "fn_p": lambda x, y: ge_p(x + y)})
     def bad_add(x: int, y: int) -> int:
         return x  # returns x instead of x+y
 
@@ -143,9 +114,7 @@ def test_instrument_fn_p_constraint_fails():
 
 
 def test_instrument_decorator():
-    spec: Spec = {"args": {"x": is_int_p, "y": is_int_p}, "ret": is_int_p}
-
-    @instrument(spec)
+    @instrument
     def add(x: int, y: int) -> int:
         return x + y
 
@@ -156,9 +125,7 @@ def test_instrument_decorator():
 
 
 def test_instrument_async_ok():
-    spec: Spec = {"args": {"x": is_int_p, "y": is_int_p}, "ret": is_int_p}
-
-    @instrument(spec)
+    @instrument
     async def async_add(x: int, y: int) -> int:
         return x + y
 
@@ -166,9 +133,7 @@ def test_instrument_async_ok():
 
 
 def test_instrument_async_wrong_parameter():
-    spec: Spec = {"args": {"x": is_int_p, "y": is_int_p}, "ret": is_int_p}
-
-    @instrument(spec)
+    @instrument
     async def async_add(x: int, y: int) -> int:
         return x + y
 
@@ -177,9 +142,7 @@ def test_instrument_async_wrong_parameter():
 
 
 def test_instrument_async_return_fails():
-    spec: Spec = {"args": {"x": is_int_p, "y": is_int_p}, "ret": is_int_p}
-
-    @instrument(spec)
+    @instrument
     async def async_bad(x: int, y: int) -> int:
         return "oops"  # type: ignore
 
@@ -248,9 +211,7 @@ def test_enrich_spec_no_annotation_leaves_spec_unchanged():
 
 
 def test_instrument_enriches_ret_from_annotation():
-    spec: Spec = {"args": {"x": is_int_p, "y": is_int_p}}
-
-    @instrument(spec)
+    @instrument
     def bad_add(x: int, y: int) -> int:
         return "oops"  # type: ignore
 
@@ -259,9 +220,7 @@ def test_instrument_enriches_ret_from_annotation():
 
 
 def test_instrument_union_return_type_ok():
-    spec: Spec = {"args": {"x": is_int_p}}
-
-    @instrument(spec)
+    @instrument
     def f(x: int) -> int | str:
         return "hello"
 
@@ -269,9 +228,7 @@ def test_instrument_union_return_type_ok():
 
 
 def test_instrument_union_return_type_fails():
-    spec: Spec = {"args": {"x": is_int_p}}
-
-    @instrument(spec)
+    @instrument
     def f(x: int) -> int | str:
         return 3.14  # type: ignore
 
@@ -280,9 +237,7 @@ def test_instrument_union_return_type_fails():
 
 
 def test_instrument_none_return_type_ok():
-    spec: Spec = {"args": {"x": is_int_p}}
-
-    @instrument(spec)
+    @instrument
     def f(x: int) -> None:
         pass
 
@@ -290,9 +245,7 @@ def test_instrument_none_return_type_ok():
 
 
 def test_instrument_none_return_type_fails():
-    spec: Spec = {"args": {"x": is_int_p}}
-
-    @instrument(spec)
+    @instrument
     def f(x: int) -> None:
         return 42  # type: ignore
 
@@ -301,9 +254,7 @@ def test_instrument_none_return_type_fails():
 
 
 def test_instrument_any_return_type():
-    spec: Spec = {"args": {"x": is_int_p}}
-
-    @instrument(spec)
+    @instrument
     def f(x: int) -> Any:
         return "anything"
 
@@ -313,9 +264,7 @@ def test_instrument_any_return_type():
 def test_instrument_literal_return_type_ok():
     from typing import Literal
 
-    spec: Spec = {"args": {"x": is_int_p}}
-
-    @instrument(spec)
+    @instrument
     def f(x: int) -> Literal[1, 2, 3]:
         return 2  # type: ignore
 
@@ -325,9 +274,7 @@ def test_instrument_literal_return_type_ok():
 def test_instrument_literal_return_type_fails():
     from typing import Literal
 
-    spec: Spec = {"args": {"x": is_int_p}}
-
-    @instrument(spec)
+    @instrument
     def f(x: int) -> Literal[1, 2, 3]:
         return 4  # type: ignore
 
@@ -336,9 +283,7 @@ def test_instrument_literal_return_type_fails():
 
 
 def test_instrument_list_return_type_ok():
-    spec: Spec = {"args": {}}
-
-    @instrument(spec)
+    @instrument
     def f() -> list[int]:
         return [1, 2, 3]
 
@@ -346,9 +291,7 @@ def test_instrument_list_return_type_ok():
 
 
 def test_instrument_list_return_type_fails():
-    spec: Spec = {"args": {}}
-
-    @instrument(spec)
+    @instrument
     def f() -> list[int]:
         return [1, "oops", 3]  # type: ignore
 
@@ -357,9 +300,7 @@ def test_instrument_list_return_type_fails():
 
 
 def test_instrument_dict_return_type_ok():
-    spec: Spec = {"args": {}}
-
-    @instrument(spec)
+    @instrument
     def f() -> dict[str, int]:
         return {"a": 1}
 
@@ -367,9 +308,7 @@ def test_instrument_dict_return_type_ok():
 
 
 def test_instrument_dict_return_type_fails():
-    spec: Spec = {"args": {}}
-
-    @instrument(spec)
+    @instrument
     def f() -> dict[str, int]:
         return {"a": "oops"}  # type: ignore
 
@@ -378,9 +317,7 @@ def test_instrument_dict_return_type_fails():
 
 
 def test_instrument_tuple_return_type_ok():
-    spec: Spec = {"args": {}}
-
-    @instrument(spec)
+    @instrument
     def f() -> tuple[int, str]:
         return (1, "hello")
 
@@ -388,9 +325,7 @@ def test_instrument_tuple_return_type_ok():
 
 
 def test_instrument_tuple_return_type_fails():
-    spec: Spec = {"args": {}}
-
-    @instrument(spec)
+    @instrument
     def f() -> tuple[int, str]:
         return (1, 2)  # type: ignore
 
