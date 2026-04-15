@@ -303,6 +303,29 @@ An optional ``pattern`` argument (fnmatch-style) limits which methods are instru
 
 ``classmethod`` and ``staticmethod`` members are not affected.
 
+Combining class-level and method-level instrumentation
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+``@instrument`` on a class and ``@instrument(spec)`` on a specific method can be used
+together. Methods that already carry a spec are skipped by the class-level instrumentation,
+so the more specific per-method spec always wins:
+
+.. code-block:: python
+
+    from predicate import instrument, Spec, is_int_p
+
+    @instrument
+    class Calculator:
+        @instrument({"args": {}, "fn": lambda self, x, y, ret: ret == x + y})
+        def add(self, x: int, y: int) -> int:
+            return x + y          # validated by the explicit fn constraint
+
+        def negate(self, x: int) -> int:
+            return -x             # validated by annotation-derived spec only
+
+In this example ``add`` is instrumented only once with its custom spec, while ``negate``
+receives the generic annotation-based spec from the class decorator.
+
 Instrumenting whole modules
 ---------------------------
 
