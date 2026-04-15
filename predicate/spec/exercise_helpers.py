@@ -12,8 +12,11 @@ from predicate.explain import explain
 from predicate.implies import implies
 from predicate.in_predicate import in_p
 from predicate.is_none_predicate import is_none_p
+from predicate.list_of_predicate import is_list_of_p
 from predicate.predicate import Predicate, or_p
+from predicate.set_of_predicate import is_set_of_p
 from predicate.spec.spec import Spec
+from predicate.tuple_of_predicate import is_tuple_of_p
 
 _type_narrowing_origins: set = {TypeGuard}
 if sys.version_info >= (3, 13):  # pragma: no cover
@@ -31,12 +34,26 @@ def annotation_to_predicate(annotation: Any) -> Predicate:
         return always_true_p
     if type(annotation) is TypeVar:
         return always_true_p
-    if get_origin(annotation) in _type_narrowing_origins:
+    origin = get_origin(annotation)
+    if origin in _type_narrowing_origins:
         return always_true_p  # TypeGuard/TypeIs is bool at runtime
-    if get_origin(annotation) in _union_origins:
-        return or_p(*[is_instance_p(t) for t in get_args(annotation)])
-    if get_origin(annotation) is Literal:
+    if origin in _union_origins:
+        return or_p(*[annotation_to_predicate(t) for t in get_args(annotation)])
+    if origin is Literal:
         return in_p(get_args(annotation))
+    if origin is list:
+        (item_type,) = get_args(annotation)
+        return is_list_of_p(annotation_to_predicate(item_type))
+    if origin is set:
+        (item_type,) = get_args(annotation)
+        return is_set_of_p(annotation_to_predicate(item_type))
+    if origin is dict:
+        key_type, value_type = get_args(annotation)
+        return is_dict_of_p((annotation_to_predicate(key_type), annotation_to_predicate(value_type)))
+    if origin is tuple:
+        args = get_args(annotation)
+        if args and args[-1] is not Ellipsis:
+            return is_tuple_of_p(*[annotation_to_predicate(t) for t in args])
     return is_instance_p(annotation)
 
 

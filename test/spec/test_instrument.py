@@ -333,3 +333,66 @@ def test_instrument_literal_return_type_fails():
 
     with pytest.raises(ValueError, match="Return predicate for function f failed"):
         f(1)
+
+
+def test_instrument_list_return_type_ok():
+    spec: Spec = {"args": {}}
+
+    @instrument(spec)
+    def f() -> list[int]:
+        return [1, 2, 3]
+
+    assert f() == [1, 2, 3]
+
+
+def test_instrument_list_return_type_fails():
+    spec: Spec = {"args": {}}
+
+    @instrument(spec)
+    def f() -> list[int]:
+        return [1, "oops", 3]  # type: ignore
+
+    with pytest.raises(ValueError, match="Return predicate for function f failed"):
+        f()
+
+
+def test_instrument_dict_return_type_ok():
+    spec: Spec = {"args": {}}
+
+    @instrument(spec)
+    def f() -> dict[str, int]:
+        return {"a": 1}
+
+    assert f() == {"a": 1}
+
+
+def test_instrument_dict_return_type_fails():
+    spec: Spec = {"args": {}}
+
+    @instrument(spec)
+    def f() -> dict[str, int]:
+        return {"a": "oops"}  # type: ignore
+
+    with pytest.raises(ValueError, match="Return predicate for function f failed"):
+        f()
+
+
+def test_instrument_tuple_return_type_ok():
+    spec: Spec = {"args": {}}
+
+    @instrument(spec)
+    def f() -> tuple[int, str]:
+        return (1, "hello")
+
+    assert f() == (1, "hello")
+
+
+def test_instrument_tuple_return_type_fails():
+    spec: Spec = {"args": {}}
+
+    @instrument(spec)
+    def f() -> tuple[int, str]:
+        return (1, 2)  # type: ignore
+
+    with pytest.raises(ValueError, match="Return predicate for function f failed"):
+        f()
