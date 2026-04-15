@@ -222,6 +222,76 @@ key in the spec to declare expected exception types:
 
     asyncio.run(fetch("missing"))  # raises KeyError as expected
 
+Instrumenting instance methods
+------------------------------
+
+``@instrument`` can be applied directly to an instance method inside a class body.
+``self`` is automatically ignored — it has no annotation so it is never added to the spec.
+
+.. code-block:: python
+
+    from predicate import instrument
+
+    class Adder:
+        @instrument
+        def add(self, x: int, y: int) -> int:
+            return x + y
+
+    Adder().add(1, 2)    # returns 3
+    Adder().add(1, "x")  # raises ValueError: Parameter predicate …
+
+``instrument_function`` works the same way when passed the unbound method:
+
+.. code-block:: python
+
+    from predicate import instrument_function, Spec, is_int_p
+
+    class Adder:
+        def add(self, x: int, y: int) -> int:
+            return x + y
+
+    spec: Spec = {"args": {"x": is_int_p, "y": is_int_p}, "ret": is_int_p}
+    instrument_function(Adder.add, spec)
+
+**Note on** ``fn`` **/** ``fn_p`` **constraints and** ``self``
+
+When using ``fn``, ``self`` is included in the keyword arguments passed to the callable,
+so the lambda must accept it:
+
+.. code-block:: python
+
+    spec: Spec = {
+        "args": {},
+        "fn": lambda self, x, y, ret: ret == x + y,
+    }
+
+Instrumenting whole classes
+----------------------------
+
+``instrument_class`` applies an empty spec (derived entirely from annotations) to every
+instance method of a class:
+
+.. code-block:: python
+
+    from predicate import instrument_class
+
+    class Calculator:
+        def add(self, x: int, y: int) -> int:
+            return x + y
+
+        def negate(self, x: int) -> int:
+            return -x
+
+    instrument_class(Calculator)
+
+An optional ``pattern`` argument (fnmatch-style) limits which methods are instrumented:
+
+.. code-block:: python
+
+    instrument_class(Calculator, pattern="get_*")
+
+``classmethod`` and ``staticmethod`` members are not affected.
+
 Instrumenting whole modules
 ---------------------------
 
@@ -259,5 +329,5 @@ By default, spec violations raise ``ValueError``. Pass ``on_error`` to override:
     add("oops", 1)       # on_error called, but function still runs
     print(errors)        # ['Parameter predicate for function add failed. Reason: ...']
 
-The same ``on_error`` parameter is accepted by ``instrument_function`` and
-``instrument_module``.
+The same ``on_error`` parameter is accepted by ``instrument_function``,
+``instrument_class``, and ``instrument_module``.

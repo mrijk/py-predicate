@@ -169,3 +169,11 @@ def instrument_module(module: ModuleType, pattern: str | None = None, on_error: 
     empty_spec: Spec = {"args": {}}
     funcs = [func for _, func in getmembers(module, isfunction) if _include_in_module(func, module, pattern)]
     consume(side_effect(lambda func: instrument_function(func, empty_spec, on_error), funcs))
+
+
+def instrument_class(cls: type, pattern: str | None = None, on_error: OnError = _default_on_error) -> None:
+    empty_spec: Spec = {"args": {}}
+    for name, func in getmembers(cls, isfunction):
+        if pattern is None or fnmatch(name, pattern):
+            wrapped = instrument_function(func, empty_spec, on_error)
+            setattr(cls, name, wrapped)
