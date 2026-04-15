@@ -25,6 +25,7 @@ from predicate.has_length_predicate import has_length_p, is_empty_p, is_not_empt
 from predicate.has_path_predicate import has_path_p
 from predicate.implies_predicate import implies_p
 from predicate.in_predicate import in_p
+from predicate.is_async_predicate import is_async_p
 from predicate.is_close_predicate import is_close_p
 from predicate.is_falsy_predicate import is_falsy_p
 from predicate.is_instance_predicate import (
@@ -85,7 +86,7 @@ from predicate.set_predicates import (
     is_superset_p,
 )
 from predicate.spec.exercise import exercise
-from predicate.spec.instrument import instrument, instrument_function
+from predicate.spec.instrument import instrument, instrument_function, instrument_module
 from predicate.spec.spec import Spec
 from predicate.standard_predicates import (
     is_dict_p,
@@ -144,9 +145,11 @@ __all__ = [
     "in_p",
     "instrument",
     "instrument_function",
+    "instrument_module",
     "is_alnum_p",
     "is_alpha_p",
     "is_ascii_p",
+    "is_async_p",
     "is_bool_p",
     "is_bytes_p",
     "is_callable_p",
