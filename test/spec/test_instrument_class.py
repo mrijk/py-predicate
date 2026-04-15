@@ -118,7 +118,7 @@ def test_instrument_class_skips_already_instrumented_method():
 
     @instrument
     class Calculator:
-        @instrument({"args": {}, "fn": lambda self, x, y, ret: (calls.append("fn") or True)})
+        @instrument({"args": {}, "fn": lambda self, x, y, ret: calls.append("fn") or True})
         def add(self, x: int, y: int) -> int:
             return x + y
 
