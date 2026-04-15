@@ -1,8 +1,9 @@
 import asyncio
+from typing import Any
 
 import pytest
 
-from predicate import ge_p, is_int_p
+from predicate import Spec, ge_p, is_int_p
 from predicate.spec.instrument import enrich_spec, instrument, instrument_function
 
 
@@ -59,87 +60,90 @@ def test_instrument_validates_args_before_executing():
     # side_effect is set only if the function body runs
     side_effect = []
 
+    spec: Spec = {"args": {"x": is_int_p}, "ret": is_int_p}
+
+    @instrument(spec)
     def func_with_side_effect(x: int) -> int:
         side_effect.append(x)
         return x
 
-    spec = {"args": {"x": is_int_p}, "ret": is_int_p}
-    wrapped = instrument_function(func_with_side_effect, spec)
-
     with pytest.raises(ValueError):
-        wrapped("not-an-int")
+        func_with_side_effect("not-an-int")
 
     assert side_effect == [], "function body must not execute when args are invalid"
 
 
 def test_instrument_optional_ret():
     # spec without "ret" must not raise KeyError
+    spec: Spec = {"args": {"x": is_int_p}}
+
+    @instrument(spec)
     def add_one(x: int) -> int:
         return x + 1
 
-    spec = {"args": {"x": is_int_p}}
-    wrapped = instrument_function(add_one, spec)
-    assert wrapped(4) == 5
+    assert add_one(4) == 5
 
 
 def test_instrument_fn_constraint_ok():
+    spec: Spec = {
+        "args": {"x": is_int_p, "y": is_int_p},
+        "ret": is_int_p,
+        "fn": lambda x, y, ret: ret >= x and ret >= y,
+    }
+
+    @instrument(spec)
     def max_int(x: int, y: int) -> int:
         return x if x >= y else y
 
-    spec = {
-        "args": {"x": is_int_p, "y": is_int_p},
-        "ret": is_int_p,
-        "fn": lambda x, y, ret: ret >= x and ret >= y,
-    }
-    wrapped = instrument_function(max_int, spec)
-    assert wrapped(3, 7) == 7
+    assert max_int(3, 7) == 7
 
 
 def test_instrument_fn_constraint_fails():
-    def broken_max(x: int, y: int) -> int:
-        return x  # always returns x, violates fn when y > x
-
-    spec = {
+    spec: Spec = {
         "args": {"x": is_int_p, "y": is_int_p},
         "ret": is_int_p,
         "fn": lambda x, y, ret: ret >= x and ret >= y,
     }
-    wrapped = instrument_function(broken_max, spec)
+
+    @instrument(spec)
+    def broken_max(x: int, y: int) -> int:
+        return x  # always returns x, violates fn when y > x
 
     with pytest.raises(ValueError, match="fn constraint for function broken_max failed"):
-        wrapped(3, 7)
+        broken_max(3, 7)
 
 
 def test_instrument_fn_p_constraint_ok():
+    spec: Spec = {
+        "args": {"x": is_int_p, "y": is_int_p},
+        "ret": is_int_p,
+        "fn_p": lambda x, y: ge_p(x + y),
+    }
+
+    @instrument(spec)
     def add(x: int, y: int) -> int:
         return x + y
 
-    spec = {
-        "args": {"x": is_int_p, "y": is_int_p},
-        "ret": is_int_p,
-        "fn_p": lambda x, y: ge_p(x + y),
-    }
-    wrapped = instrument_function(add, spec)
-    assert wrapped(2, 3) == 5
+    assert add(2, 3) == 5
 
 
 def test_instrument_fn_p_constraint_fails():
-    def bad_add(x: int, y: int) -> int:
-        return x  # returns x instead of x+y
-
-    spec = {
+    spec: Spec = {
         "args": {"x": is_int_p, "y": is_int_p},
         "ret": is_int_p,
         "fn_p": lambda x, y: ge_p(x + y),
     }
-    wrapped = instrument_function(bad_add, spec)
+
+    @instrument(spec)
+    def bad_add(x: int, y: int) -> int:
+        return x  # returns x instead of x+y
 
     with pytest.raises(ValueError, match="fn_p constraint for function bad_add failed"):
-        wrapped(2, 3)
+        bad_add(2, 3)
 
 
 def test_instrument_decorator():
-    spec = {"args": {"x": is_int_p, "y": is_int_p}, "ret": is_int_p}
+    spec: Spec = {"args": {"x": is_int_p, "y": is_int_p}, "ret": is_int_p}
 
     @instrument(spec)
     def add(x: int, y: int) -> int:
@@ -152,37 +156,35 @@ def test_instrument_decorator():
 
 
 def test_instrument_async_ok():
-    spec = {"args": {"x": is_int_p, "y": is_int_p}, "ret": is_int_p}
+    spec: Spec = {"args": {"x": is_int_p, "y": is_int_p}, "ret": is_int_p}
 
+    @instrument(spec)
     async def async_add(x: int, y: int) -> int:
         return x + y
 
-    wrapped = instrument_function(async_add, spec)
-    assert asyncio.run(wrapped(2, 3)) == 5
+    assert asyncio.run(async_add(2, 3)) == 5
 
 
 def test_instrument_async_wrong_parameter():
-    spec = {"args": {"x": is_int_p, "y": is_int_p}, "ret": is_int_p}
+    spec: Spec = {"args": {"x": is_int_p, "y": is_int_p}, "ret": is_int_p}
 
+    @instrument(spec)
     async def async_add(x: int, y: int) -> int:
         return x + y
 
-    wrapped = instrument_function(async_add, spec)
-
     with pytest.raises(ValueError, match="Parameter predicate for function async_add failed"):
-        asyncio.run(wrapped("not-an-int", 3))
+        asyncio.run(async_add("not-an-int", 3))
 
 
 def test_instrument_async_return_fails():
-    spec = {"args": {"x": is_int_p, "y": is_int_p}, "ret": is_int_p}
+    spec: Spec = {"args": {"x": is_int_p, "y": is_int_p}, "ret": is_int_p}
 
+    @instrument(spec)
     async def async_bad(x: int, y: int) -> int:
         return "oops"  # type: ignore
 
-    wrapped = instrument_function(async_bad, spec)
-
     with pytest.raises(ValueError, match="Return predicate for function async_bad failed"):
-        asyncio.run(wrapped(2, 3))
+        asyncio.run(async_bad(2, 3))
 
 
 def test_enrich_spec_fills_ret_from_annotation():
@@ -213,34 +215,88 @@ def test_enrich_spec_no_annotation_leaves_spec_unchanged():
 
 
 def test_instrument_enriches_ret_from_annotation():
-    spec: dict = {"args": {"x": is_int_p, "y": is_int_p}}
+    spec: Spec = {"args": {"x": is_int_p, "y": is_int_p}}
 
+    @instrument(spec)
     def bad_add(x: int, y: int) -> int:
         return "oops"  # type: ignore
 
-    wrapped = instrument_function(bad_add, spec)
-
     with pytest.raises(ValueError, match="Return predicate for function bad_add failed"):
-        wrapped(2, 3)
+        bad_add(2, 3)
 
 
 def test_instrument_union_return_type_ok():
-    spec: dict = {"args": {"x": is_int_p}}
+    spec: Spec = {"args": {"x": is_int_p}}
 
+    @instrument(spec)
     def f(x: int) -> int | str:
         return "hello"
 
-    wrapped = instrument_function(f, spec)
-    assert wrapped(1) == "hello"
+    assert f(1) == "hello"
 
 
 def test_instrument_union_return_type_fails():
-    spec: dict = {"args": {"x": is_int_p}}
+    spec: Spec = {"args": {"x": is_int_p}}
 
+    @instrument(spec)
     def f(x: int) -> int | str:
         return 3.14  # type: ignore
 
-    wrapped = instrument_function(f, spec)
+    with pytest.raises(ValueError, match="Return predicate for function f failed"):
+        f(1)
+
+
+def test_instrument_none_return_type_ok():
+    spec: Spec = {"args": {"x": is_int_p}}
+
+    @instrument(spec)
+    def f(x: int) -> None:
+        pass
+
+    assert f(1) is None
+
+
+def test_instrument_none_return_type_fails():
+    spec: Spec = {"args": {"x": is_int_p}}
+
+    @instrument(spec)
+    def f(x: int) -> None:
+        return 42  # type: ignore
 
     with pytest.raises(ValueError, match="Return predicate for function f failed"):
-        wrapped(1)
+        f(1)
+
+
+def test_instrument_any_return_type():
+    spec: Spec = {"args": {"x": is_int_p}}
+
+    @instrument(spec)
+    def f(x: int) -> Any:
+        return "anything"
+
+    assert f(1) == "anything"
+
+
+def test_instrument_literal_return_type_ok():
+    from typing import Literal
+
+    spec: Spec = {"args": {"x": is_int_p}}
+
+    @instrument(spec)
+    def f(x: int) -> Literal[1, 2, 3]:
+        return 2  # type: ignore
+
+    assert f(1) == 2
+
+
+def test_instrument_literal_return_type_fails():
+    from typing import Literal
+
+    spec: Spec = {"args": {"x": is_int_p}}
+
+    @instrument(spec)
+    def f(x: int) -> Literal[1, 2, 3]:
+        return 4  # type: ignore
+
+    with pytest.raises(ValueError, match="Return predicate for function f failed"):
+        f(1)

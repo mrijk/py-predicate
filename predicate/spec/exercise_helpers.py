@@ -2,7 +2,7 @@ import sys
 import types
 from inspect import Signature, signature
 from itertools import repeat
-from typing import Callable, TypeGuard, TypeVar, Union, get_args, get_origin
+from typing import Any, Callable, Literal, TypeGuard, TypeVar, Union, get_args, get_origin
 
 from more_itertools import take
 
@@ -10,6 +10,8 @@ from predicate import always_true_p, generate_true, is_instance_p
 from predicate.dict_of_predicate import is_dict_of_p
 from predicate.explain import explain
 from predicate.implies import implies
+from predicate.in_predicate import in_p
+from predicate.is_none_predicate import is_none_p
 from predicate.predicate import Predicate, or_p
 from predicate.spec.spec import Spec
 
@@ -24,12 +26,18 @@ _union_origins: set = {Union, types.UnionType}
 
 def get_return_predicate(sig: Signature) -> Predicate:
     annotation = sig.return_annotation
+    if annotation is None:
+        return is_none_p
+    if annotation is Any:
+        return always_true_p
     if type(annotation) is TypeVar:
         return always_true_p
     if get_origin(annotation) in _type_narrowing_origins:
         return always_true_p  # TypeGuard/TypeIs is bool at runtime
     if get_origin(annotation) in _union_origins:
         return or_p(*[is_instance_p(t) for t in get_args(annotation)])
+    if get_origin(annotation) is Literal:
+        return in_p(get_args(annotation))
     return is_instance_p(annotation)
 
 

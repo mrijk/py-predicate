@@ -40,6 +40,10 @@ class InPredicate[T](Predicate[T]):
                 return False
 
     @override
+    def explain_failure(self, x: Any) -> dict:
+        return {"reason": f"{x} is not in {self!r}"}
+
+    @override
     def get_klass(self) -> type:
         if isinstance(self.v, Iterable):
             return class_from_set(self.v)
