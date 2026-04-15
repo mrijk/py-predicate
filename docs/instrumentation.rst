@@ -173,6 +173,8 @@ To allow several exception types, pass a tuple:
 
 .. code-block:: python
 
+    from predicate import instrument, Spec, is_str_p
+
     spec: Spec = {
         "args": {"key": is_str_p},
         "raises": (KeyError, ValueError),
@@ -188,7 +190,7 @@ return / constraint checking happens after:
 .. code-block:: python
 
     import asyncio
-    from predicate import instrument, Spec, is_int_p, ge_p
+    from predicate import instrument, Spec, is_int_p
 
     spec: Spec = {
         "args": {"x": is_int_p, "y": is_int_p},
@@ -206,6 +208,8 @@ Async functions that raise are handled identically to sync functions — use the
 key in the spec to declare expected exception types:
 
 .. code-block:: python
+
+    from predicate import instrument, Spec, is_str_p
 
     spec: Spec = {
         "args": {"key": is_str_p},
@@ -244,7 +248,7 @@ By default, spec violations raise ``ValueError``. Pass ``on_error`` to override:
 
 .. code-block:: python
 
-    import logging
+    from predicate import instrument
 
     errors = []
 
