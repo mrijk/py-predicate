@@ -1,7 +1,7 @@
 import sys
 from fnmatch import fnmatch
 from functools import wraps
-from inspect import getmembers, isfunction, signature, unwrap
+from inspect import getmembers, isclass, isfunction, signature, unwrap
 from types import ModuleType
 from typing import Any, Callable
 
@@ -32,9 +32,15 @@ def enrich_spec(func: Callable, spec: Spec) -> Spec:
 
 OnError = Callable[[str], None]
 
+_EMPTY_SPEC: Spec = {"args": {}}
+
 
 def _default_on_error(message: str) -> None:
     raise ValueError(message)
+
+
+def is_instrumented(func: Callable) -> bool:
+    return hasattr(func, "__spec__")
 
 
 def _get_reason(predicate: Predicate, value: Any) -> str | None:
@@ -59,10 +65,17 @@ def _check_return_value(spec: Spec, func_name: str, result: Any) -> str | None:
     return None
 
 
+def _format_expected_exceptions(expected: type | tuple) -> str:
+    if isinstance(expected, tuple):
+        return ", ".join(e.__name__ for e in expected)
+    return expected.__name__
+
+
 def _check_exception(spec: Spec, func_name: str, exc: Exception) -> str | None:
     if expected := spec.get("raises"):
         if not isinstance(exc, expected):
-            return f"Unexpected exception {type(exc).__name__} for function {func_name}"
+            expected_str = _format_expected_exceptions(expected)
+            return f"Unexpected exception {type(exc).__name__} for function {func_name}. Expected: {expected_str}"
         return None
     return None
 
@@ -70,7 +83,8 @@ def _check_exception(spec: Spec, func_name: str, exc: Exception) -> str | None:
 def _check_constraints(spec: Spec, func_name: str, arguments: dict, result: Any) -> str | None:
     if fn := spec.get("fn"):
         if not fn(**arguments, ret=result):
-            return f"fn constraint for function {func_name} failed."
+            args_str = ", ".join(f"{k}={v!r}" for k, v in arguments.items())
+            return f"fn constraint for function {func_name} failed. Arguments: {args_str}, ret={result!r}"
 
     if fn_p := spec.get("fn_p"):
         p = fn_p(**arguments)
@@ -81,6 +95,8 @@ def _check_constraints(spec: Spec, func_name: str, arguments: dict, result: Any)
 
 
 def instrument_function(func: Callable, spec: Spec, on_error: OnError = _default_on_error) -> Callable:
+    if is_instrumented(func):
+        return func
     func = unwrap(func)
     func_name = func.__name__
     spec = enrich_spec(func, spec)
@@ -148,14 +164,19 @@ def instrument_function(func: Callable, spec: Spec, on_error: OnError = _default
 
 
 def instrument(spec_or_func: Spec | Callable = None, *, on_error: OnError = _default_on_error) -> Callable:  # type: ignore[assignment]
-    empty_spec: Spec = {"args": {}}
+    if isclass(spec_or_func):
+        instrument_class(spec_or_func, on_error=on_error)
+        return spec_or_func
 
     if callable(spec_or_func):
-        return instrument_function(spec_or_func, empty_spec, on_error)
+        return instrument_function(spec_or_func, _EMPTY_SPEC, on_error)
 
-    spec = spec_or_func or empty_spec
+    spec = spec_or_func or _EMPTY_SPEC
 
     def decorator(func: Callable) -> Callable:
+        if isclass(func):
+            instrument_class(func, on_error=on_error)
+            return func
         return instrument_function(func, spec, on_error)
 
     return decorator
@@ -166,6 +187,12 @@ def _include_in_module(func: Callable, module: ModuleType, pattern: str | None) 
 
 
 def instrument_module(module: ModuleType, pattern: str | None = None, on_error: OnError = _default_on_error) -> None:
-    empty_spec: Spec = {"args": {}}
     funcs = [func for _, func in getmembers(module, isfunction) if _include_in_module(func, module, pattern)]
-    consume(side_effect(lambda func: instrument_function(func, empty_spec, on_error), funcs))
+    consume(side_effect(lambda func: instrument_function(func, _EMPTY_SPEC, on_error), funcs))
+
+
+def instrument_class(cls: type, pattern: str | None = None, on_error: OnError = _default_on_error) -> None:
+    for name, func in getmembers(cls, isfunction):
+        if not is_instrumented(func) and (pattern is None or fnmatch(name, pattern)):
+            wrapped = instrument_function(func, _EMPTY_SPEC, on_error)
+            setattr(cls, name, wrapped)

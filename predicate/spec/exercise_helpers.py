@@ -111,7 +111,7 @@ def check_signature_against_spec(f: Callable, spec: Spec) -> Spec:
     return spec
 
 
-def _generate_values(spec: Spec, n: int) -> tuple:
+def generate_values(spec: Spec, n: int) -> tuple:
     parameters = spec["args"]
     return_p = spec["ret"]
     if predicates := tuple(parameters.items()):
@@ -121,7 +121,7 @@ def _generate_values(spec: Spec, n: int) -> tuple:
     return return_p, values
 
 
-def _verify_result(spec: Spec, return_p: Predicate, value: dict, result) -> None:
+def verify_result(spec: Spec, return_p: Predicate, value: dict, result) -> None:
     if not return_p(result):
         raise AssertionError(f"Not conform spec: {explain(return_p, result)}")
 
