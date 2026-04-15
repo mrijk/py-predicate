@@ -59,6 +59,14 @@ def _check_return_value(spec: Spec, func_name: str, result: Any) -> str | None:
     return None
 
 
+def _check_exception(spec: Spec, func_name: str, exc: Exception) -> str | None:
+    if expected := spec.get("raises"):
+        if not isinstance(exc, expected):
+            return f"Unexpected exception {type(exc).__name__} for function {func_name}"
+        return None
+    return None
+
+
 def _check_constraints(spec: Spec, func_name: str, arguments: dict, result: Any) -> str | None:
     if fn := spec.get("fn"):
         if not fn(**arguments, ret=result):
@@ -88,7 +96,12 @@ def instrument_function(func: Callable, spec: Spec, on_error: OnError = _default
             if error := _check_args(spec, func_name, arguments):
                 on_error(error)
 
-            result = await func(*args, **kwargs)
+            try:
+                result = await func(*args, **kwargs)
+            except Exception as exc:
+                if error := _check_exception(spec, func_name, exc):
+                    on_error(error)
+                raise
 
             if error := _check_return_value(spec, func_name, result):
                 on_error(error)
@@ -108,7 +121,12 @@ def instrument_function(func: Callable, spec: Spec, on_error: OnError = _default
             if error := _check_args(spec, func_name, arguments):
                 on_error(error)
 
-            result = func(*args, **kwargs)
+            try:
+                result = func(*args, **kwargs)
+            except Exception as exc:
+                if error := _check_exception(spec, func_name, exc):
+                    on_error(error)
+                raise
 
             if error := _check_return_value(spec, func_name, result):
                 on_error(error)

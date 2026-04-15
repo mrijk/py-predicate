@@ -425,3 +425,44 @@ def test_instrument_module_with_on_error():
 
     assert len(errors) == 1
     assert "Parameter predicate for function greet failed" in errors[0]
+
+
+def test_instrument_raises_expected_exception() -> None:
+    spec: Spec = {"args": {}, "raises": ValueError}
+
+    @instrument(spec)
+    def f(x: int) -> int:
+        raise ValueError("bad input")
+
+    with pytest.raises(ValueError, match="bad input"):
+        f(1)
+
+
+def test_instrument_raises_unexpected_exception() -> None:
+    spec: Spec = {"args": {}, "raises": ValueError}
+
+    @instrument(spec)
+    def f(x: int) -> int:
+        raise TypeError("wrong type")
+
+    with pytest.raises(ValueError, match="Unexpected exception TypeError for function f"):
+        f(1)
+
+
+def test_instrument_raises_no_spec_propagates() -> None:
+    @instrument
+    def f(x: int) -> int:
+        raise RuntimeError("oops")
+
+    with pytest.raises(RuntimeError, match="oops"):
+        f(1)
+
+
+def test_instrument_raises_not_raised_validates_return() -> None:
+    spec: Spec = {"args": {}, "raises": ValueError}
+
+    @instrument(spec)
+    def f(x: int) -> int:
+        return x * 2
+
+    assert f(3) == 6
