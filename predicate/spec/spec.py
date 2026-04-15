@@ -9,5 +9,6 @@ Spec = TypedDict(
         "ret": NotRequired[Predicate],
         "fn": NotRequired[Callable[..., bool]],
         "fn_p": NotRequired[Callable[..., Predicate]],
+        "raises": NotRequired[type[Exception] | tuple[type[Exception], ...]],
     },
 )
