@@ -1,6 +1,8 @@
 import sys
+from fnmatch import fnmatch
 from functools import wraps
-from inspect import signature, unwrap
+from inspect import getmembers, isfunction, signature, unwrap
+from types import ModuleType
 from typing import Any, Callable
 
 from predicate import explain
@@ -137,3 +139,11 @@ def instrument(spec_or_func: Spec | Callable = None, *, on_error: OnError = _def
         return instrument_function(func, spec, on_error)
 
     return decorator
+
+
+def instrument_module(module: ModuleType, pattern: str | None = None, on_error: OnError = _default_on_error) -> None:
+    empty_spec: Spec = {"args": {}}
+    for name, func in getmembers(module, isfunction):
+        if func.__module__ == module.__name__:
+            if pattern is None or fnmatch(name, pattern):
+                instrument_function(func, empty_spec, on_error)

@@ -4,7 +4,7 @@ from typing import Any
 import pytest
 
 from predicate import Spec, ge_p, is_int_p
-from predicate.spec.instrument import enrich_spec, instrument, instrument_function
+from predicate.spec.instrument import enrich_spec, instrument, instrument_function, instrument_module
 
 
 def test_instrument_ok():
@@ -373,3 +373,62 @@ def test_instrument_tuple_return_type_fails():
 
     with pytest.raises(ValueError, match="Return predicate for function f failed"):
         f()
+
+
+def test_instrument_module_instruments_all_annotated_functions():
+    import importlib
+
+    import spec.test_functions.sample_module as sample_module
+
+    importlib.reload(sample_module)
+    instrument_module(sample_module)
+
+    assert sample_module.add(2, 3) == 5
+    assert sample_module.greet("world") == "Hello, world"
+
+    with pytest.raises(ValueError, match="Parameter predicate for function add failed"):
+        sample_module.add("oops", 3)
+
+    with pytest.raises(ValueError, match="Parameter predicate for function greet failed"):
+        sample_module.greet(42)
+
+
+def test_instrument_module_with_pattern():
+    import importlib
+
+    import spec.test_functions.sample_module as sample_module
+
+    importlib.reload(sample_module)
+    instrument_module(sample_module, pattern="gr*")
+
+    assert sample_module.add(2, 3) == 5  # not instrumented, no check
+
+    with pytest.raises(ValueError, match="Parameter predicate for function greet failed"):
+        sample_module.greet(42)
+
+
+def test_instrument_module_skips_unannotated_functions():
+    import importlib
+
+    import spec.test_functions.sample_module as sample_module
+
+    importlib.reload(sample_module)
+    instrument_module(sample_module)
+
+    # no_annotations has no type hints, so passes anything
+    assert sample_module.no_annotations("a", "b") == "ab"
+
+
+def test_instrument_module_with_on_error():
+    import importlib
+
+    import spec.test_functions.sample_module as sample_module
+
+    importlib.reload(sample_module)
+    errors = []
+    instrument_module(sample_module, on_error=errors.append)
+
+    sample_module.greet(42)
+
+    assert len(errors) == 1
+    assert "Parameter predicate for function greet failed" in errors[0]
