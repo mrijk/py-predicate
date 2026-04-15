@@ -40,28 +40,32 @@ def _get_reason(predicate: Predicate, value: Any) -> str | None:
     return result.get("reason") or str(result)
 
 
-def _check_args(spec: Spec, func_name: str, arguments: dict, on_error: OnError) -> None:
+def _check_args(spec: Spec, func_name: str, arguments: dict) -> str | None:
     for name, predicate in spec["args"].items():
         if name in arguments:
             if reason := _get_reason(predicate, value=arguments[name]):
-                on_error(f"Parameter predicate for function {func_name} failed. Reason: {reason}")
+                return f"Parameter predicate for function {func_name} failed. Reason: {reason}"
+    return None
 
 
-def _check_return_value(spec: Spec, func_name: str, result: Any, on_error: OnError) -> None:
+def _check_return_value(spec: Spec, func_name: str, result: Any) -> str | None:
     if return_p := spec.get("ret"):
         if reason := _get_reason(return_p, value=result):
-            on_error(f"Return predicate for function {func_name} failed. Reason: {reason}")
+            return f"Return predicate for function {func_name} failed. Reason: {reason}"
+    return None
 
 
-def _check_constraints(spec: Spec, func_name: str, arguments: dict, result: Any, on_error: OnError) -> None:
+def _check_constraints(spec: Spec, func_name: str, arguments: dict, result: Any) -> str | None:
     if fn := spec.get("fn"):
         if not fn(**arguments, ret=result):
-            on_error(f"fn constraint for function {func_name} failed.")
+            return f"fn constraint for function {func_name} failed."
 
     if fn_p := spec.get("fn_p"):
         p = fn_p(**arguments)
         if reason := _get_reason(p, value=result):
-            on_error(f"fn_p constraint for function {func_name} failed. Reason: {reason}")
+            return f"fn_p constraint for function {func_name} failed. Reason: {reason}"
+
+    return None
 
 
 def instrument_function(func: Callable, spec: Spec, on_error: OnError = _default_on_error) -> Callable:
@@ -77,13 +81,16 @@ def instrument_function(func: Callable, spec: Spec, on_error: OnError = _default
             bound.apply_defaults()
 
             arguments = bound.arguments
-            _check_args(spec, func_name, arguments, on_error)
+            if error := _check_args(spec, func_name, arguments):
+                on_error(error)
 
             result = await func(*args, **kwargs)
 
-            _check_return_value(spec, func_name, result, on_error)
+            if error := _check_return_value(spec, func_name, result):
+                on_error(error)
 
-            _check_constraints(spec, func_name, arguments, result, on_error)
+            if error := _check_constraints(spec, func_name, arguments, result):
+                on_error(error)
 
             return result
     else:
@@ -94,13 +101,16 @@ def instrument_function(func: Callable, spec: Spec, on_error: OnError = _default
             bound.apply_defaults()
 
             arguments = bound.arguments
-            _check_args(spec, func_name, arguments, on_error)
+            if error := _check_args(spec, func_name, arguments):
+                on_error(error)
 
             result = func(*args, **kwargs)
 
-            _check_return_value(spec, func_name, result, on_error)
+            if error := _check_return_value(spec, func_name, result):
+                on_error(error)
 
-            _check_constraints(spec, func_name, arguments, result, on_error)
+            if error := _check_constraints(spec, func_name, arguments, result):
+                on_error(error)
 
             return result
 
