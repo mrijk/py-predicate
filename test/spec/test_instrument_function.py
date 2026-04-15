@@ -3,7 +3,7 @@ from typing import Any
 
 import pytest
 
-from predicate import Spec, ge_p, is_int_p
+from predicate import Spec, ge_p, is_instrumented, is_int_p
 from predicate.spec.instrument import enrich_spec, instrument, instrument_function, instrument_module
 
 
@@ -445,7 +445,7 @@ def test_instrument_raises_unexpected_exception() -> None:
     def f(x: int) -> int:
         raise TypeError("wrong type")
 
-    with pytest.raises(ValueError, match="Unexpected exception TypeError for function f"):
+    with pytest.raises(ValueError, match="Unexpected exception TypeError for function f. Expected: ValueError"):
         f(1)
 
 
@@ -466,3 +466,59 @@ def test_instrument_raises_not_raised_validates_return() -> None:
         return x * 2
 
     assert f(3) == 6
+
+
+def test_instrument_raises_unexpected_includes_expected_type() -> None:
+    spec: Spec = {"args": {}, "raises": ValueError}
+
+    @instrument(spec)
+    def f(x: int) -> int:
+        raise TypeError("wrong")
+
+    with pytest.raises(ValueError, match="Expected: ValueError"):
+        f(1)
+
+
+def test_instrument_raises_unexpected_includes_multiple_expected_types() -> None:
+    spec: Spec = {"args": {}, "raises": (ValueError, KeyError)}
+
+    @instrument(spec)
+    def f(x: int) -> int:
+        raise TypeError("wrong")
+
+    with pytest.raises(ValueError, match="Expected: ValueError, KeyError"):
+        f(1)
+
+
+def test_instrument_fn_constraint_error_includes_arguments() -> None:
+    @instrument({"args": {}, "fn": lambda x, y, ret: ret >= x and ret >= y})
+    def broken_max(x: int, y: int) -> int:
+        return x
+
+    with pytest.raises(ValueError, match=r"Arguments: x=3, y=7, ret=3"):
+        broken_max(3, 7)
+
+
+def test_instrument_function_not_double_wrapped() -> None:
+    @instrument
+    def f(x: int) -> int:
+        return x
+
+    wrapped_once = f
+    instrument_function(f, {"args": {}})
+    assert f is wrapped_once
+
+
+def test_is_instrumented_true() -> None:
+    @instrument
+    def f(x: int) -> int:
+        return x
+
+    assert is_instrumented(f)
+
+
+def test_is_instrumented_false() -> None:
+    def f(x: int) -> int:
+        return x
+
+    assert not is_instrumented(f)
