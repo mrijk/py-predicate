@@ -1,13 +1,13 @@
 import asyncio
-from asyncio import iscoroutinefunction
 from dataclasses import dataclass, field
 from typing import Any, Final, override
 
+from predicate.is_async_predicate import is_async_p
 from predicate.predicate import Predicate
 
 
 def _call(x: Any) -> None:
-    if iscoroutinefunction(x):
+    if is_async_p(x):
         asyncio.run(x())
     else:
         x()
