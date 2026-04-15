@@ -45,6 +45,7 @@ from predicate.has_key_predicate import HasKeyPredicate, has_key_p
 from predicate.has_length_predicate import HasLengthPredicate
 from predicate.has_path_predicate import HasPathPredicate
 from predicate.in_predicate import InPredicate
+from predicate.is_async_predicate import IsAsyncPredicate
 from predicate.is_callable_predicate import IsCallablePredicate
 from predicate.is_close_predicate import IsClosePredicate
 from predicate.is_falsy_predicate import IsFalsyPredicate
@@ -393,6 +394,11 @@ def generate_is_instance_p(predicate: IsInstancePredicate) -> Iterator:
         return
     not_predicate = NotPredicate(predicate=predicate)
     yield from generate_anys(not_predicate)
+
+
+@generate_false.register
+def generate_is_async_p(predicate: IsAsyncPredicate) -> Iterator:
+    yield from random_lambdas()
 
 
 @generate_false.register

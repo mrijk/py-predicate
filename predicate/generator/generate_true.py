@@ -63,6 +63,7 @@ from predicate.has_key_predicate import HasKeyPredicate
 from predicate.has_length_predicate import HasLengthPredicate
 from predicate.has_path_predicate import HasPathPredicate
 from predicate.in_predicate import InPredicate
+from predicate.is_async_predicate import IsAsyncPredicate
 from predicate.is_close_predicate import IsClosePredicate
 from predicate.is_falsy_predicate import IsFalsyPredicate
 from predicate.is_instance_predicate import IsInstancePredicate
@@ -498,6 +499,15 @@ def generate_is_instance_p(predicate: IsInstancePredicate, **kwargs) -> Iterator
         yield from random_predicates(**kwargs)
     else:
         raise ValueError(f"No generator found for {klass}")
+
+
+@generate_true.register
+def generate_is_async_p(predicate: IsAsyncPredicate) -> Iterator:
+    async def _async_fn():
+        pass
+
+    while True:
+        yield _async_fn
 
 
 @generate_true.register
