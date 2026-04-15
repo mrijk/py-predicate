@@ -181,6 +181,6 @@ def instrument_module(module: ModuleType, pattern: str | None = None, on_error: 
 def instrument_class(cls: type, pattern: str | None = None, on_error: OnError = _default_on_error) -> None:
     empty_spec: Spec = {"args": {}}
     for name, func in getmembers(cls, isfunction):
-        if pattern is None or fnmatch(name, pattern):
+        if not hasattr(func, "__spec__") and (pattern is None or fnmatch(name, pattern)):
             wrapped = instrument_function(func, empty_spec, on_error)
             setattr(cls, name, wrapped)

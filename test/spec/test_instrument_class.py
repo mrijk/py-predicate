@@ -110,3 +110,24 @@ def test_instrument_decorator_on_class_with_on_error():
 
     Foo().bar("oops")  # type: ignore[arg-type]
     assert errors
+
+
+def test_instrument_class_skips_already_instrumented_method():
+    # A method-level spec should take precedence; instrument_class must not double-wrap it.
+    calls: list[str] = []
+
+    @instrument
+    class Calculator:
+        @instrument({"args": {}, "fn": lambda self, x, y, ret: (calls.append("fn") or True)})
+        def add(self, x: int, y: int) -> int:
+            return x + y
+
+        def negate(self, x: int) -> int:
+            return -x
+
+    calc = Calculator()
+    calc.add(1, 2)
+    assert calls == ["fn"], "fn constraint must be called exactly once"
+
+    with pytest.raises(ValueError, match="Parameter predicate"):
+        calc.negate("bad")  # type: ignore[arg-type]
