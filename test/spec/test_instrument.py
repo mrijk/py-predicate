@@ -192,7 +192,7 @@ def test_instrument_on_error_with_spec():
     assert result == 3
 
 
-def test_enrich_spec_fills_args_from_annotation():
+def test_enrich_spec_fills_args_from_annotation() -> None:
     def add(x: int, y: int) -> int:
         return x + y
 
@@ -202,7 +202,7 @@ def test_enrich_spec_fills_args_from_annotation():
     assert "y" in enriched["args"]
 
 
-def test_enrich_spec_keeps_existing_args():
+def test_enrich_spec_keeps_existing_args() -> None:
     def add(x: int, y: int) -> int:
         return x + y
 
@@ -212,7 +212,7 @@ def test_enrich_spec_keeps_existing_args():
     assert "y" in enriched["args"]
 
 
-def test_instrument_enriches_args_from_annotation():
+def test_instrument_enriches_args_from_annotation() -> None:
     spec: Spec = {"args": {}}
 
     @instrument(spec)
@@ -225,11 +225,11 @@ def test_instrument_enriches_args_from_annotation():
         add("not-an-int", 3)
 
 
-def test_enrich_spec_fills_ret_from_annotation():
+def test_enrich_spec_fills_ret_from_annotation() -> None:
     def add(x: int, y: int) -> int:
         return x + y
 
-    spec: dict = {"args": {"x": is_int_p, "y": is_int_p}}
+    spec: Spec = {"args": {"x": is_int_p, "y": is_int_p}}
     enriched = enrich_spec(add, spec)
     assert "ret" in enriched
 
@@ -243,11 +243,11 @@ def test_enrich_spec_keeps_existing_ret():
     assert enriched["ret"] is is_int_p
 
 
-def test_enrich_spec_no_annotation_leaves_spec_unchanged():
+def test_enrich_spec_no_annotation_leaves_spec_unchanged() -> None:
     def add(x, y):
         return x + y
 
-    spec: dict = {"args": {}}
+    spec: Spec = {"args": {}}
     enriched = enrich_spec(add, spec)
     assert "ret" not in enriched
 

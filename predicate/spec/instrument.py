@@ -7,7 +7,7 @@ from typing import Any, Callable
 
 from more_itertools import consume, side_effect
 
-from predicate import explain
+from predicate.explain import explain
 from predicate.is_async_predicate import is_async_p
 from predicate.predicate import Predicate
 from predicate.spec.exercise_helpers import annotation_to_predicate, get_return_predicate
