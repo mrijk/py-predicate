@@ -150,6 +150,48 @@ def test_instrument_async_return_fails():
         asyncio.run(async_bad(2, 3))
 
 
+def test_instrument_on_error_called_for_invalid_arg():
+    errors = []
+
+    @instrument(on_error=errors.append)
+    def f(x: int) -> int:
+        return 0
+
+    result = f("oops")
+
+    assert len(errors) == 1
+    assert "Parameter predicate" in errors[0]
+    assert result == 0
+
+
+def test_instrument_on_error_called_for_invalid_return():
+    errors = []
+
+    @instrument(on_error=errors.append)
+    def f(x: int) -> int:
+        return "oops"  # type: ignore
+
+    result = f(1)
+
+    assert len(errors) == 1
+    assert "Return predicate" in errors[0]
+    assert result == "oops"
+
+
+def test_instrument_on_error_with_spec():
+    errors = []
+
+    @instrument({"args": {}, "fn": lambda x, y, ret: ret >= x and ret >= y}, on_error=errors.append)
+    def broken_max(x: int, y: int) -> int:
+        return x
+
+    result = broken_max(3, 7)
+
+    assert len(errors) == 1
+    assert "fn constraint" in errors[0]
+    assert result == 3
+
+
 def test_enrich_spec_fills_args_from_annotation():
     def add(x: int, y: int) -> int:
         return x + y
