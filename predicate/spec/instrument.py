@@ -1,7 +1,7 @@
 import sys
 from fnmatch import fnmatch
 from functools import wraps
-from inspect import getmembers, isfunction, signature, unwrap
+from inspect import getmembers, isclass, isfunction, signature, unwrap
 from types import ModuleType
 from typing import Any, Callable
 
@@ -150,12 +150,19 @@ def instrument_function(func: Callable, spec: Spec, on_error: OnError = _default
 def instrument(spec_or_func: Spec | Callable = None, *, on_error: OnError = _default_on_error) -> Callable:  # type: ignore[assignment]
     empty_spec: Spec = {"args": {}}
 
+    if isclass(spec_or_func):
+        instrument_class(spec_or_func, on_error=on_error)
+        return spec_or_func
+
     if callable(spec_or_func):
         return instrument_function(spec_or_func, empty_spec, on_error)
 
     spec = spec_or_func or empty_spec
 
     def decorator(func: Callable) -> Callable:
+        if isclass(func):
+            instrument_class(func, on_error=on_error)
+            return func
         return instrument_function(func, spec, on_error)
 
     return decorator

@@ -548,3 +548,31 @@ def test_instrument_class_on_error():
 
     Foo().bar("oops")  # type: ignore[arg-type]
     assert errors
+
+
+# --- @instrument on a class ---
+
+
+def test_instrument_decorator_on_class():
+    @instrument
+    class Calculator:
+        def add(self, x: int, y: int) -> int:
+            return x + y
+
+    calc = Calculator()
+    assert calc.add(1, 2) == 3
+
+    with pytest.raises(ValueError, match="Parameter predicate"):
+        calc.add(1, "bad")  # type: ignore[arg-type]
+
+
+def test_instrument_decorator_on_class_with_on_error():
+    errors: list[str] = []
+
+    @instrument(on_error=errors.append)
+    class Foo:
+        def bar(self, x: int) -> int:
+            return x
+
+    Foo().bar("oops")  # type: ignore[arg-type]
+    assert errors

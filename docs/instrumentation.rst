@@ -268,19 +268,30 @@ so the lambda must accept it:
 Instrumenting whole classes
 ----------------------------
 
-``instrument_class`` applies an empty spec (derived entirely from annotations) to every
-instance method of a class:
+``@instrument`` can be applied to an entire class, instrumenting all its instance methods
+at once:
 
 .. code-block:: python
 
-    from predicate import instrument_class
+    from predicate import instrument
 
+    @instrument
     class Calculator:
         def add(self, x: int, y: int) -> int:
             return x + y
 
         def negate(self, x: int) -> int:
             return -x
+
+    calc = Calculator()
+    calc.add(1, 2)    # returns 3
+    calc.add(1, "x")  # raises ValueError: Parameter predicate …
+
+``instrument_class`` is available for the post-hoc form:
+
+.. code-block:: python
+
+    from predicate import instrument_class
 
     instrument_class(Calculator)
 
