@@ -222,3 +222,25 @@ def test_instrument_enriches_ret_from_annotation():
 
     with pytest.raises(ValueError, match="Return predicate for function bad_add failed"):
         wrapped(2, 3)
+
+
+def test_instrument_union_return_type_ok():
+    spec: dict = {"args": {"x": is_int_p}}
+
+    def f(x: int) -> int | str:
+        return "hello"
+
+    wrapped = instrument_function(f, spec)
+    assert wrapped(1) == "hello"
+
+
+def test_instrument_union_return_type_fails():
+    spec: dict = {"args": {"x": is_int_p}}
+
+    def f(x: int) -> int | str:
+        return 3.14  # type: ignore
+
+    wrapped = instrument_function(f, spec)
+
+    with pytest.raises(ValueError, match="Return predicate for function f failed"):
+        wrapped(1)

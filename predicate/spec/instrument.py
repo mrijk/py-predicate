@@ -20,7 +20,10 @@ def enrich_spec(func: Callable, spec: Spec) -> Spec:
 
 
 def _get_reason(predicate: Predicate, value: Any) -> str | None:
-    return None if predicate(value) else explain(predicate, value)["reason"]
+    if predicate(value):
+        return None
+    result = explain(predicate, value)
+    return result.get("reason") or str(result)
 
 
 def _check_args(spec: Spec, func_name: str, arguments: dict) -> None:

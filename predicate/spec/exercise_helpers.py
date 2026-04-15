@@ -1,7 +1,8 @@
 import sys
+import types
 from inspect import Signature, signature
 from itertools import repeat
-from typing import Callable, TypeGuard, TypeVar, get_origin
+from typing import Callable, TypeGuard, TypeVar, Union, get_args, get_origin
 
 from more_itertools import take
 
@@ -9,7 +10,7 @@ from predicate import always_true_p, generate_true, is_instance_p
 from predicate.dict_of_predicate import is_dict_of_p
 from predicate.explain import explain
 from predicate.implies import implies
-from predicate.predicate import Predicate
+from predicate.predicate import Predicate, or_p
 from predicate.spec.spec import Spec
 
 _type_narrowing_origins: set = {TypeGuard}
@@ -18,6 +19,8 @@ if sys.version_info >= (3, 13):  # pragma: no cover
 
     _type_narrowing_origins.add(TypeIs)
 
+_union_origins: set = {Union, types.UnionType}
+
 
 def get_return_predicate(sig: Signature) -> Predicate:
     annotation = sig.return_annotation
@@ -25,6 +28,8 @@ def get_return_predicate(sig: Signature) -> Predicate:
         return always_true_p
     if get_origin(annotation) in _type_narrowing_origins:
         return always_true_p  # TypeGuard/TypeIs is bool at runtime
+    if get_origin(annotation) in _union_origins:
+        return or_p(*[is_instance_p(t) for t in get_args(annotation)])
     return is_instance_p(annotation)
 
 
