@@ -3,7 +3,7 @@ import asyncio
 import pytest
 
 from predicate import ge_p, is_int_p
-from predicate.spec.instrument import instrument, instrument_function
+from predicate.spec.instrument import enrich_spec, instrument, instrument_function
 
 
 def test_instrument_ok():
@@ -183,3 +183,42 @@ def test_instrument_async_return_fails():
 
     with pytest.raises(ValueError, match="Return predicate for function async_bad failed"):
         asyncio.run(wrapped(2, 3))
+
+
+def test_enrich_spec_fills_ret_from_annotation():
+    def add(x: int, y: int) -> int:
+        return x + y
+
+    spec: dict = {"args": {"x": is_int_p, "y": is_int_p}}
+    enriched = enrich_spec(add, spec)
+    assert "ret" in enriched
+
+
+def test_enrich_spec_keeps_existing_ret():
+    def add(x: int, y: int) -> int:
+        return x + y
+
+    spec = {"args": {"x": is_int_p, "y": is_int_p}, "ret": is_int_p}
+    enriched = enrich_spec(add, spec)
+    assert enriched["ret"] is is_int_p
+
+
+def test_enrich_spec_no_annotation_leaves_spec_unchanged():
+    def add(x, y):
+        return x + y
+
+    spec: dict = {"args": {}}
+    enriched = enrich_spec(add, spec)
+    assert "ret" not in enriched
+
+
+def test_instrument_enriches_ret_from_annotation():
+    spec: dict = {"args": {"x": is_int_p, "y": is_int_p}}
+
+    def bad_add(x: int, y: int) -> int:
+        return "oops"  # type: ignore
+
+    wrapped = instrument_function(bad_add, spec)
+
+    with pytest.raises(ValueError, match="Return predicate for function bad_add failed"):
+        wrapped(2, 3)

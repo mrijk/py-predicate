@@ -6,7 +6,17 @@ from typing import Any, Callable
 from predicate import explain
 from predicate.is_async_predicate import is_async_p
 from predicate.predicate import Predicate
+from predicate.spec.exercise_helpers import get_return_predicate
 from predicate.spec.spec import Spec
+
+
+def enrich_spec(func: Callable, spec: Spec) -> Spec:
+    if spec.get("ret"):
+        return spec
+    sig = signature(func)
+    if sig.return_annotation == sig.empty:
+        return spec
+    return spec | {"ret": get_return_predicate(sig)}
 
 
 def _get_reason(predicate: Predicate, value: Any) -> str | None:
@@ -40,6 +50,7 @@ def _check_constraints(spec: Spec, func_name: str, arguments: dict, result: Any)
 def instrument_function(func: Callable, spec: Spec) -> Callable:
     func = unwrap(func)
     func_name = func.__name__
+    spec = enrich_spec(func, spec)
 
     if is_async_p(func):
 
