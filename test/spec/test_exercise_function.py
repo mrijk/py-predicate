@@ -229,7 +229,7 @@ def test_exercise_infer_ret_from_annotation():
     def adder(x, y) -> int:
         return x + y
 
-    spec: Spec = {"args": {"x": is_int_p, "y": is_int_p}}  # type: ignore[typeddict-item]
+    spec: Spec = {"args": {"x": is_int_p, "y": is_int_p}}
 
     result = list(exercise(adder, spec=spec))
     assert result
