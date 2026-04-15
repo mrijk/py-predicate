@@ -4,6 +4,7 @@ from inspect import signature, unwrap
 from typing import Any, Callable
 
 from predicate import explain
+from predicate.is_async_predicate import is_async_p
 from predicate.predicate import Predicate
 from predicate.spec.spec import Spec
 
@@ -40,21 +41,40 @@ def instrument_function(func: Callable, spec: Spec) -> Callable:
     func = unwrap(func)
     func_name = func.__name__
 
-    @wraps(func)
-    def wrapped(*args, **kwargs):
-        bound = signature(func).bind(*args, **kwargs)
-        bound.apply_defaults()
+    if is_async_p(func):
 
-        arguments = bound.arguments
-        _check_args(spec, func_name, arguments)
+        @wraps(func)
+        async def wrapped(*args, **kwargs):
+            bound = signature(func).bind(*args, **kwargs)
+            bound.apply_defaults()
 
-        result = func(*args, **kwargs)
+            arguments = bound.arguments
+            _check_args(spec, func_name, arguments)
 
-        _check_return_value(spec, func_name, result)
+            result = await func(*args, **kwargs)
 
-        _check_constraints(spec, func_name, arguments, result)
+            _check_return_value(spec, func_name, result)
 
-        return result
+            _check_constraints(spec, func_name, arguments, result)
+
+            return result
+    else:
+
+        @wraps(func)
+        def wrapped(*args, **kwargs):
+            bound = signature(func).bind(*args, **kwargs)
+            bound.apply_defaults()
+
+            arguments = bound.arguments
+            _check_args(spec, func_name, arguments)
+
+            result = func(*args, **kwargs)
+
+            _check_return_value(spec, func_name, result)
+
+            _check_constraints(spec, func_name, arguments, result)
+
+            return result
 
     wrapped.__spec__ = spec  # type: ignore
 

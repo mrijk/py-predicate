@@ -1,3 +1,5 @@
+import asyncio
+
 import pytest
 
 from predicate import ge_p, is_int_p
@@ -147,3 +149,37 @@ def test_instrument_decorator():
 
     with pytest.raises(ValueError, match="Parameter predicate for function add failed"):
         add("not-an-int", 3)
+
+
+def test_instrument_async_ok():
+    spec = {"args": {"x": is_int_p, "y": is_int_p}, "ret": is_int_p}
+
+    async def async_add(x: int, y: int) -> int:
+        return x + y
+
+    wrapped = instrument_function(async_add, spec)
+    assert asyncio.run(wrapped(2, 3)) == 5
+
+
+def test_instrument_async_wrong_parameter():
+    spec = {"args": {"x": is_int_p, "y": is_int_p}, "ret": is_int_p}
+
+    async def async_add(x: int, y: int) -> int:
+        return x + y
+
+    wrapped = instrument_function(async_add, spec)
+
+    with pytest.raises(ValueError, match="Parameter predicate for function async_add failed"):
+        asyncio.run(wrapped("not-an-int", 3))
+
+
+def test_instrument_async_return_fails():
+    spec = {"args": {"x": is_int_p, "y": is_int_p}, "ret": is_int_p}
+
+    async def async_bad(x: int, y: int) -> int:
+        return "oops"  # type: ignore
+
+    wrapped = instrument_function(async_bad, spec)
+
+    with pytest.raises(ValueError, match="Return predicate for function async_bad failed"):
+        asyncio.run(wrapped(2, 3))
