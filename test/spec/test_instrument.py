@@ -375,12 +375,17 @@ def test_instrument_tuple_return_type_fails():
         f()
 
 
-def test_instrument_module_instruments_all_annotated_functions():
+def _fresh_sample_module():
     import importlib
 
     import spec.test_functions.sample_module as sample_module
 
     importlib.reload(sample_module)
+    return sample_module
+
+
+def test_instrument_module_instruments_all_annotated_functions():
+    sample_module = _fresh_sample_module()
     instrument_module(sample_module)
 
     assert sample_module.add(2, 3) == 5
@@ -394,11 +399,7 @@ def test_instrument_module_instruments_all_annotated_functions():
 
 
 def test_instrument_module_with_pattern():
-    import importlib
-
-    import spec.test_functions.sample_module as sample_module
-
-    importlib.reload(sample_module)
+    sample_module = _fresh_sample_module()
     instrument_module(sample_module, pattern="gr*")
 
     assert sample_module.add(2, 3) == 5  # not instrumented, no check
@@ -408,11 +409,7 @@ def test_instrument_module_with_pattern():
 
 
 def test_instrument_module_skips_unannotated_functions():
-    import importlib
-
-    import spec.test_functions.sample_module as sample_module
-
-    importlib.reload(sample_module)
+    sample_module = _fresh_sample_module()
     instrument_module(sample_module)
 
     # no_annotations has no type hints, so passes anything
@@ -420,11 +417,7 @@ def test_instrument_module_skips_unannotated_functions():
 
 
 def test_instrument_module_with_on_error():
-    import importlib
-
-    import spec.test_functions.sample_module as sample_module
-
-    importlib.reload(sample_module)
+    sample_module = _fresh_sample_module()
     errors = []
     instrument_module(sample_module, on_error=errors.append)
 

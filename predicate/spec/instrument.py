@@ -5,6 +5,8 @@ from inspect import getmembers, isfunction, signature, unwrap
 from types import ModuleType
 from typing import Any, Callable
 
+from more_itertools import consume, side_effect
+
 from predicate import explain
 from predicate.is_async_predicate import is_async_p
 from predicate.predicate import Predicate
@@ -141,9 +143,11 @@ def instrument(spec_or_func: Spec | Callable = None, *, on_error: OnError = _def
     return decorator
 
 
+def _include_in_module(func: Callable, module: ModuleType, pattern: str | None) -> bool:
+    return func.__module__ == module.__name__ and (pattern is None or fnmatch(func.__name__, pattern))
+
+
 def instrument_module(module: ModuleType, pattern: str | None = None, on_error: OnError = _default_on_error) -> None:
     empty_spec: Spec = {"args": {}}
-    for name, func in getmembers(module, isfunction):
-        if func.__module__ == module.__name__:
-            if pattern is None or fnmatch(name, pattern):
-                instrument_function(func, empty_spec, on_error)
+    funcs = [func for _, func in getmembers(module, isfunction) if _include_in_module(func, module, pattern)]
+    consume(side_effect(lambda func: instrument_function(func, empty_spec, on_error), funcs))
