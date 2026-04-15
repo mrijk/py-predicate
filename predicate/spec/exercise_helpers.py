@@ -24,8 +24,7 @@ if sys.version_info >= (3, 13):  # pragma: no cover
 _union_origins: set = {Union, types.UnionType}
 
 
-def get_return_predicate(sig: Signature) -> Predicate:
-    annotation = sig.return_annotation
+def annotation_to_predicate(annotation: Any) -> Predicate:
     if annotation is None:
         return is_none_p
     if annotation is Any:
@@ -39,6 +38,10 @@ def get_return_predicate(sig: Signature) -> Predicate:
     if get_origin(annotation) is Literal:
         return in_p(get_args(annotation))
     return is_instance_p(annotation)
+
+
+def get_return_predicate(sig: Signature) -> Predicate:
+    return annotation_to_predicate(sig.return_annotation)
 
 
 def validate_args(f: Callable, spec: Spec) -> dict[str, Predicate]:

@@ -6,17 +6,24 @@ from typing import Any, Callable
 from predicate import explain
 from predicate.is_async_predicate import is_async_p
 from predicate.predicate import Predicate
-from predicate.spec.exercise_helpers import get_return_predicate
+from predicate.spec.exercise_helpers import annotation_to_predicate, get_return_predicate
 from predicate.spec.spec import Spec
 
 
 def enrich_spec(func: Callable, spec: Spec) -> Spec:
-    if spec.get("ret"):
-        return spec
     sig = signature(func)
-    if sig.return_annotation == sig.empty:
-        return spec
-    return spec | {"ret": get_return_predicate(sig)}
+
+    args = dict(spec["args"])
+    for name, param in sig.parameters.items():
+        if name not in args and param.annotation is not param.empty:
+            args[name] = annotation_to_predicate(param.annotation)
+
+    enriched = spec | {"args": args}
+
+    if not enriched.get("ret") and sig.return_annotation is not sig.empty:
+        enriched = enriched | {"ret": get_return_predicate(sig)}
+
+    return enriched
 
 
 def _get_reason(predicate: Predicate, value: Any) -> str | None:

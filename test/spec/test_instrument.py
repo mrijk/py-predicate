@@ -187,6 +187,39 @@ def test_instrument_async_return_fails():
         asyncio.run(async_bad(2, 3))
 
 
+def test_enrich_spec_fills_args_from_annotation():
+    def add(x: int, y: int) -> int:
+        return x + y
+
+    spec: Spec = {"args": {}}
+    enriched = enrich_spec(add, spec)
+    assert "x" in enriched["args"]
+    assert "y" in enriched["args"]
+
+
+def test_enrich_spec_keeps_existing_args():
+    def add(x: int, y: int) -> int:
+        return x + y
+
+    spec: Spec = {"args": {"x": is_int_p}}
+    enriched = enrich_spec(add, spec)
+    assert enriched["args"]["x"] is is_int_p
+    assert "y" in enriched["args"]
+
+
+def test_instrument_enriches_args_from_annotation():
+    spec: Spec = {"args": {}}
+
+    @instrument(spec)
+    def add(x: int, y: int) -> int:
+        return x + y
+
+    assert add(2, 3) == 5
+
+    with pytest.raises(ValueError, match="Parameter predicate for function add failed"):
+        add("not-an-int", 3)
+
+
 def test_enrich_spec_fills_ret_from_annotation():
     def add(x: int, y: int) -> int:
         return x + y
