@@ -101,7 +101,13 @@ from predicate.reduce_predicate import ReducePredicate
 from predicate.regex_predicate import RegexPredicate
 from predicate.repeat_predicate import RepeatPredicate
 from predicate.set_of_predicate import SetOfPredicate
-from predicate.set_predicates import IsRealSubsetPredicate, IsSubsetPredicate
+from predicate.set_predicates import (
+    IntersectsPredicate,
+    IsRealSubsetPredicate,
+    IsRealSupersetPredicate,
+    IsSubsetPredicate,
+    IsSupersetPredicate,
+)
 from predicate.standard_predicates import (
     is_int_p,
     is_list_p,
@@ -366,6 +372,30 @@ def generate_subset(predicate: IsSubsetPredicate) -> Iterator:
 @generate_true.register
 def generate_real_subset(predicate: IsRealSubsetPredicate) -> Iterator:
     yield from (v for v in powerset_of_sets(predicate.v) if v != predicate.v)
+
+
+@generate_true.register
+def generate_superset(predicate: IsSupersetPredicate) -> Iterator:
+    yield predicate.v  # v is a superset of itself
+    for extra in random_sets():
+        yield predicate.v | extra
+
+
+@generate_true.register
+def generate_real_superset(predicate: IsRealSupersetPredicate) -> Iterator:
+    for extra in random_sets():
+        candidate = predicate.v | extra
+        if candidate > predicate.v:
+            yield candidate
+
+
+@generate_true.register
+def generate_intersects(predicate: IntersectsPredicate) -> Iterator:
+    if not predicate.v:
+        return
+    elements = list(predicate.v)
+    for extra in random_sets():
+        yield extra | {random.choice(elements)}
 
 
 @generate_true.register
