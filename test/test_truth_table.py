@@ -26,14 +26,14 @@ def test_truth_table_names(p, q):
 def test_truth_table_names_invalid(p, q):
     predicate = p & q & le_p(2)
 
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match=r"^Type not allowed"):
         get_named_predicates(predicate)
 
 
 def test_truth_table_values_invalid(p, q):
     predicate = p & q & le_p(2)
 
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match=r"^Type not allowed"):
         values = {"p": True, "q": True}
         set_named_values(predicate, values)
 

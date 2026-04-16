@@ -1,6 +1,11 @@
 import math
 
-from predicate import explain, fn_p, is_finite_p, is_inf_p, is_not_none_p
+import pytest
+
+from predicate import eq_p, explain, fn_p, is_finite_p, is_inf_p, is_int_p, is_not_none_p, is_str_p, or_p
+from predicate.fn_predicate import generate_inf, undefined
+from predicate.match_predicate import match_p
+from predicate.predicate import predicate_partial
 
 
 def test_fn_p_with_lambda():
@@ -43,3 +48,28 @@ def test_is_inf_p():
 
     assert is_inf_p(-math.inf)
     assert is_inf_p(math.inf)
+
+
+def test_undefined_raises_with_message():
+    with pytest.raises(ValueError, match=r"^Please register generator type$"):
+        undefined()
+
+
+def test_generate_inf_first_value_is_negative():
+    assert next(generate_inf()) == -math.inf
+
+
+def test_predicate_partial():
+    partial_or = predicate_partial(or_p, eq_p(1))
+    combined = partial_or(eq_p(2))
+    assert combined(1)
+    assert combined(2)
+    assert not combined(3)
+
+
+def test_predicate_partial_with_kwargs():
+    # full_match=True kwarg must be preserved; dropping **kwargs makes full_match=False (default)
+    partial_match = predicate_partial(match_p, is_int_p, full_match=True)
+    predicate = partial_match(is_str_p)
+    assert predicate([1, "foo"])
+    assert not predicate([1, "foo", "bar"])  # "bar" leftover, only caught with full_match=True

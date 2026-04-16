@@ -2,6 +2,7 @@ import math
 from datetime import datetime, timedelta
 from uuid import UUID
 
+import pytest
 from helpers import exercise_predicate
 
 from predicate import gt_p, pos_p
@@ -66,6 +67,13 @@ def test_gt_explain():
 
 def test_gt_exercise():
     exercise_predicate(gt_p)
+
+
+@pytest.mark.parametrize("v", range(-3, 4))
+def test_gt_p_boundary(v):
+    pred = gt_p(v)
+    assert not pred(v)
+    assert pred(v + 1)
 
 
 def test_pos_p():

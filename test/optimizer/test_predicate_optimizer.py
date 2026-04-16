@@ -10,6 +10,12 @@ from predicate import (
 )
 
 
+def test_can_optimize_returns_false_for_leaf():
+    from predicate import eq_p
+
+    assert can_optimize(eq_p(2)) is False
+
+
 def test_optimize_not_or(p):
     # ~(p | ~p) == False
 

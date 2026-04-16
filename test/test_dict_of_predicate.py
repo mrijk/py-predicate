@@ -90,3 +90,8 @@ def test_is_dict_of_explain_not_a_dict():
 
     expected = {"reason": "3 is not an instance of a dict", "result": False}
     assert explain(predicate, 3) == expected
+
+
+def test_is_dict_of_p_repr_with_predicate_key():
+    predicate = is_dict_of_p((is_str_p, is_int_p))
+    assert "is_str_p" in repr(predicate)

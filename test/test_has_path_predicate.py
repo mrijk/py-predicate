@@ -1,4 +1,4 @@
-from predicate import eq_p, explain, ge_p, has_path_p
+from predicate import eq_p, explain, ge_p, has_path_p, is_str_p
 from predicate.standard_predicates import is_int_p, is_list_p
 
 
@@ -40,6 +40,12 @@ def test_has_path_predicate_with_list():
     predicate = has_path_p(has_x, is_list_p, has_y, ge_2)
 
     assert predicate({"x": [{"y": 13}]})
+
+
+def test_has_path_predicate_list_first_pred_fails():
+    # first_p(list) is False, but individual elements match — result must be False (and, not or)
+    predicate = has_path_p(eq_p("x"), is_str_p, is_int_p)
+    assert not predicate({"x": [1, 2]})
 
 
 # def test_has_path_predicate_with_nested_x():

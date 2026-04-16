@@ -1,5 +1,6 @@
 import math
 
+import pytest
 from helpers import exercise_predicate
 
 from predicate import lt_p, neg_p
@@ -22,6 +23,13 @@ def test_lt_explain():
 
 def test_lt_exercise():
     exercise_predicate(lt_p)
+
+
+@pytest.mark.parametrize("v", range(-3, 4))
+def test_lt_p_boundary(v):
+    pred = lt_p(v)
+    assert not pred(v)
+    assert pred(v - 1)
 
 
 def test_neg_p():

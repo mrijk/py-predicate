@@ -27,6 +27,14 @@ def test_root_predicate_dont_call():
         root_p(13)
 
 
+def test_root_predicate_not_found():
+    from predicate.root_predicate import RootPredicate
+
+    rp = RootPredicate()
+    with pytest.raises(ValueError, match=r"^Could not find 'root' predicate$"):
+        rp(13)
+
+
 def test_root_explain():
     str_or_list_of_str = is_str_p | is_list_of_p(root_p)
 

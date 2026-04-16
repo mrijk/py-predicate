@@ -1,3 +1,4 @@
+import pytest
 from helpers import exercise_predicate
 
 from predicate import le_p
@@ -21,3 +22,10 @@ def test_le_explain():
 
 def test_le_exercise():
     exercise_predicate(le_p)
+
+
+@pytest.mark.parametrize("v", range(-3, 4))
+def test_le_p_boundary(v):
+    pred = le_p(v)
+    assert pred(v)
+    assert not pred(v + 1)
