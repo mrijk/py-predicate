@@ -19,13 +19,16 @@ from predicate import (
     gt_lt_p,
     gt_p,
     has_key_p,
+    has_length_p,
     in_p,
     is_bool_p,
     is_close_p,
+    is_empty_p,
     is_falsy_p,
     is_int_p,
     is_list_of_p,
     is_none_p,
+    is_not_empty_p,
     is_not_none_p,
     is_set_of_p,
     is_str_p,
@@ -305,6 +308,28 @@ def test_compile_has_key():
     assert cp({"a": 1, "b": 2})
     assert not cp({"b": 1})
     assert not cp({})
+
+
+def test_compile_has_length():
+    cp = compile_predicate(has_length_p(eq_p(3)))
+    assert cp([1, 2, 3])
+    assert cp("abc")
+    assert not cp([1, 2])
+    assert not cp([])
+
+
+def test_compile_is_empty():
+    cp = compile_predicate(is_empty_p)
+    assert cp([])
+    assert cp("")
+    assert not cp([1])
+
+
+def test_compile_is_not_empty():
+    cp = compile_predicate(is_not_empty_p)
+    assert cp([1])
+    assert cp("x")
+    assert not cp([])
 
 
 def test_compile_set_of():

@@ -16,6 +16,7 @@ from predicate.eq_predicate import EqPredicate
 from predicate.ge_predicate import GePredicate
 from predicate.gt_predicate import GtPredicate
 from predicate.has_key_predicate import HasKeyPredicate
+from predicate.has_length_predicate import HasLengthPredicate
 from predicate.in_predicate import InPredicate
 from predicate.is_close_predicate import IsClosePredicate
 from predicate.is_falsy_predicate import IsFalsyPredicate
@@ -195,6 +196,31 @@ def _(predicate: HasKeyPredicate, namespace: dict) -> ast.expr:
         ops=[ast.In()],
         comparators=[_x()],
     )
+
+
+@_to_ast.register
+def _(predicate: HasLengthPredicate, namespace: dict) -> ast.expr:
+    # _length_p(sum(1 for _ in x))
+    length_key = f"_p{len(namespace)}"
+    namespace[length_key] = try_compile_predicate(predicate.length_p)
+    count_expr = ast.Call(
+        func=_name("sum"),
+        args=[
+            ast.GeneratorExp(
+                elt=_const(1),
+                generators=[
+                    ast.comprehension(
+                        target=ast.Name(id="_", ctx=ast.Store()),
+                        iter=_x(),
+                        ifs=[],
+                        is_async=0,
+                    )
+                ],
+            )
+        ],
+        keywords=[],
+    )
+    return ast.Call(func=_name(length_key), args=[count_expr], keywords=[])
 
 
 @_to_ast.register
