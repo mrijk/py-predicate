@@ -291,24 +291,24 @@ def _(predicate: AnyPredicate, namespace: dict) -> ast.expr:
     return _any_all_ast(predicate.predicate, "any", namespace)
 
 
-def _isinstance_and_all_ast(predicate: Predicate, type_name: str, namespace: dict) -> ast.expr:
+def _isinstance_and_all_ast(inner: Predicate, type_name: str, namespace: dict) -> ast.expr:
     isinstance_check = ast.Call(
         func=_name("isinstance"),
         args=[_x(), _name(type_name)],
         keywords=[],
     )
-    all_check = _any_all_ast(predicate.predicate, "all", namespace)
+    all_check = _any_all_ast(inner, "all", namespace)
     return ast.BoolOp(op=ast.And(), values=[isinstance_check, all_check])
 
 
 @_to_ast.register
 def _(predicate: ListOfPredicate, namespace: dict) -> ast.expr:
-    return _isinstance_and_all_ast(predicate, "list", namespace)
+    return _isinstance_and_all_ast(predicate.predicate, "list", namespace)
 
 
 @_to_ast.register
 def _(predicate: SetOfPredicate, namespace: dict) -> ast.expr:
-    return _isinstance_and_all_ast(predicate, "set", namespace)
+    return _isinstance_and_all_ast(predicate.predicate, "set", namespace)
 
 
 @_to_ast.register
