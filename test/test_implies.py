@@ -1,4 +1,4 @@
-from predicate import always_false_p, always_true_p, eq_p, ge_p, gt_p, in_p, le_p, lt_p, ne_p, not_in_p
+from predicate import always_false_p, always_true_p, eq_p, ge_p, gt_p, in_p, intersects_p, le_p, lt_p, ne_p, not_in_p
 from predicate.implies import implies
 from predicate.set_predicates import is_real_subset_p, is_real_superset_p, is_subset_p, is_superset_p
 
@@ -167,3 +167,26 @@ def test_implies_is_real_subset_superset():
     assert implies(is_real_subset_p({1, 2}), is_subset_p({1, 2, 3}))
     # proper subset of {1,2,3} does not imply subset of {1,2}
     assert not implies(is_real_subset_p({1, 2, 3}), is_subset_p({1, 2}))
+
+
+def test_implies_intersects_intersects():
+    # intersects({1,2}) implies intersects({1,2,3}) because {1,2} ⊆ {1,2,3}
+    assert implies(intersects_p({1, 2}), intersects_p({1, 2, 3}))
+    # not the other way around
+    assert not implies(intersects_p({1, 2, 3}), intersects_p({1, 2}))
+    # disjoint sets: no implication
+    assert not implies(intersects_p({1, 2}), intersects_p({3, 4}))
+
+
+def test_implies_is_superset_intersects():
+    # is_superset_p(S) implies intersects_p(T) when S ∩ T ≠ ∅
+    assert implies(is_superset_p({1, 2}), intersects_p({1, 2}))
+    assert implies(is_superset_p({1, 2}), intersects_p({2, 3}))
+    # S ∩ T = ∅: no implication
+    assert not implies(is_superset_p({1, 2}), intersects_p({3, 4}))
+
+
+def test_implies_is_real_superset_intersects():
+    # is_real_superset_p(S) also implies intersects_p(T) when S ∩ T ≠ ∅
+    assert implies(is_real_superset_p({1, 2}), intersects_p({1, 2}))
+    assert not implies(is_real_superset_p({1, 2}), intersects_p({3, 4}))

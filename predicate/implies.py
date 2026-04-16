@@ -19,6 +19,7 @@ from predicate.predicate import (
     Predicate,
 )
 from predicate.set_predicates import (
+    IntersectsPredicate,
     IsRealSubsetPredicate,
     IsRealSupersetPredicate,
     IsSubsetPredicate,
@@ -146,6 +147,26 @@ def _(predicate: IsRealSupersetPredicate, other: Predicate) -> bool:
     match other:
         case IsSupersetPredicate(v):
             return v <= predicate.v
+        case IntersectsPredicate(v) if predicate.v & v:
+            return True
+        case _:
+            return False
+
+
+@implies.register
+def _(predicate: IsSupersetPredicate, other: Predicate) -> bool:
+    match other:
+        case IntersectsPredicate(v) if predicate.v & v:
+            return True
+        case _:
+            return False
+
+
+@implies.register
+def _(predicate: IntersectsPredicate, other: Predicate) -> bool:
+    match other:
+        case IntersectsPredicate(v):
+            return predicate.v.issubset(v)
         case _:
             return False
 
