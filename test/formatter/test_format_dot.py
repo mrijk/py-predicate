@@ -51,7 +51,7 @@ from predicate import (
 )
 from predicate.implies import Implies
 from predicate.named_predicate import NamedPredicate
-from predicate.set_predicates import is_real_subset_p, is_real_superset_p, is_subset_p, is_superset_p
+from predicate.set_predicates import intersects_p, is_real_subset_p, is_real_superset_p, is_subset_p, is_superset_p
 from predicate.standard_predicates import (
     is_int_p,
     root_p,
@@ -66,6 +66,7 @@ from predicate.standard_predicates import (
         always_true_p,
         is_falsy_p,
         is_truthy_p,
+        intersects_p({1, 2, 3}),
         is_subset_p({1, 2, 3}),
         is_real_subset_p({1, 2, 3}),
         is_superset_p({1, 2, 3}),
