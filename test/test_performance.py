@@ -1,17 +1,148 @@
-# from predicate import is_int_p, all_p
-#
-#
-# def test_predicate(benchmark):
-#     predicate = all_p(is_int_p)
-#
-#     result = benchmark(predicate, [1, 2, 3])
-#
-#     assert result
-#
-# def test_old(benchmark):
-#     def foo():
-#         return all(isinstance(x, int) for x in [1, 2 ,3])
-#
-#     result = benchmark(foo)
-#
-#     assert result
+"""Performance comparison: interpreted vs compiled predicates vs raw Python."""
+
+from predicate import (
+    all_p,
+    any_p,
+    compile_predicate,
+    eq_p,
+    ge_le_p,
+    ge_p,
+    gt_p,
+    in_p,
+    is_list_of_p,
+    le_p,
+    lt_p,
+    ne_p,
+    optimize,
+)
+
+_S = frozenset(range(1, 11))
+
+
+def test_eval_eq_interpreted(benchmark):
+    p = eq_p(42)
+    benchmark(p, 42)
+
+
+def test_eval_eq_compiled(benchmark):
+    cp = compile_predicate(eq_p(42))
+    benchmark(cp, 42)
+
+
+def test_eval_and_interpreted(benchmark):
+    p = gt_p(0) & lt_p(100) & ne_p(50)
+    benchmark(p, 25)
+
+
+def test_eval_and_compiled(benchmark):
+    cp = compile_predicate(gt_p(0) & lt_p(100) & ne_p(50))
+    benchmark(cp, 25)
+
+
+def test_eval_range_interpreted(benchmark):
+    p = ge_le_p(0, 100)
+    benchmark(p, 50)
+
+
+def test_eval_range_compiled(benchmark):
+    cp = compile_predicate(ge_le_p(0, 100))
+    benchmark(cp, 50)
+
+
+def test_eval_optimize_then_interpreted(benchmark):
+    p = optimize(ge_p(0) & le_p(100))
+    benchmark(p, 50)
+
+
+def test_eval_optimize_then_compiled(benchmark):
+    cp = compile_predicate(optimize(ge_p(0) & le_p(100)))
+    benchmark(cp, 50)
+
+
+def test_eval_in_interpreted(benchmark):
+    p = in_p({1, 2, 3, 4, 5, 6, 7, 8, 9, 10})
+    benchmark(p, 5)
+
+
+def test_eval_in_compiled(benchmark):
+    cp = compile_predicate(in_p({1, 2, 3, 4, 5, 6, 7, 8, 9, 10}))
+    benchmark(cp, 5)
+
+
+# --- Raw Python lambdas for baseline ---
+
+
+def test_eval_eq_raw(benchmark):
+    f = lambda x: x == 42  # noqa: E731
+    benchmark(f, 42)
+
+
+def test_eval_and_raw(benchmark):
+    f = lambda x: x > 0 and x < 100 and x != 50  # noqa: E731
+    benchmark(f, 25)
+
+
+def test_eval_range_raw(benchmark):
+    f = lambda x: 0 <= x <= 100  # noqa: E731
+    benchmark(f, 50)
+
+
+def test_eval_in_raw(benchmark):
+    f = lambda x: x in _S  # noqa: E731
+    benchmark(f, 5)
+
+
+# --- all_p ---
+
+_DATA = list(range(1, 101))
+
+
+def test_eval_all_interpreted(benchmark):
+    p = all_p(gt_p(0))
+    benchmark(p, _DATA)
+
+
+def test_eval_all_compiled(benchmark):
+    cp = compile_predicate(all_p(gt_p(0)))
+    benchmark(cp, _DATA)
+
+
+def test_eval_all_raw(benchmark):
+    f = lambda x: all(e > 0 for e in x)  # noqa: E731
+    benchmark(f, _DATA)
+
+
+# --- any_p ---
+
+
+def test_eval_any_interpreted(benchmark):
+    p = any_p(gt_p(0))
+    benchmark(p, _DATA)
+
+
+def test_eval_any_compiled(benchmark):
+    cp = compile_predicate(any_p(gt_p(0)))
+    benchmark(cp, _DATA)
+
+
+def test_eval_any_raw(benchmark):
+    f = lambda x: any(e > 0 for e in x)  # noqa: E731
+    benchmark(f, _DATA)
+
+
+# --- is_list_of_p ---
+
+
+def test_eval_list_of_interpreted(benchmark):
+    p = is_list_of_p(gt_p(0))
+    benchmark(p, _DATA)
+
+
+def test_eval_list_of_compiled(benchmark):
+    cp = compile_predicate(is_list_of_p(gt_p(0)))
+    benchmark(cp, _DATA)
+
+
+def test_eval_list_of_raw(benchmark):
+    f = lambda x: isinstance(x, list) and all(e > 0 for e in x)  # noqa: E731
+    benchmark(f, _DATA)

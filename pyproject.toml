@@ -87,6 +87,9 @@ target-version = "py312"
 ban-relative-imports = "all"
 
 [tool.ruff.lint.per-file-ignores]
+# compile_predicate must be imported after exception_predicate to avoid a circular import
+# (is_none_predicate imports exception_p from the predicate package at module level)
+"predicate/__init__.py" = ["I001"]
 "test/*" = ["D101", "D400", "D415",  "S101"]
 "benchmarks/*" = ["D400", "D415", "S101"]
 

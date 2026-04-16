@@ -1,4 +1,5 @@
-from predicate import Spec, exercise, is_int_p, is_odd_p
+from predicate import exercise, is_int_p, is_odd_p
+from predicate.spec.spec import Spec
 
 
 def test_is_odd():

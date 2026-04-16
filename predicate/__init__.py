@@ -12,7 +12,8 @@ from predicate.count_predicate import count_p, exactly_one_p, exactly_zero_p
 from predicate.dict_of_predicate import is_dict_of_p
 from predicate.eq_predicate import eq_false_p, eq_p, eq_true_p, zero_p
 from predicate.exactly_predicate import exactly_n
-from predicate.exception_predicate import PredicateError, exception_p
+from predicate.exception_predicate import exception_p
+from predicate.compile_predicate import compile_predicate, try_compile_predicate
 from predicate.explain import explain
 from predicate.fn_predicate import fn_p, is_even_p, is_finite_p, is_inf_p, is_nan_p, is_odd_p
 from predicate.formatter import to_dot, to_json, to_latex, to_yaml
@@ -72,7 +73,7 @@ from predicate.optimizer.predicate_optimizer import can_optimize, optimize
 from predicate.optional_predicate import optional
 from predicate.plus_predicate import plus
 from predicate.predicate import and_p, or_p, xor_p
-from predicate.raises_predicate import RaisesPredicate, raises_exception_p, raises_p
+from predicate.raises_predicate import raises_exception_p, raises_p
 from predicate.range_predicate import ge_le_p, ge_lt_p, gt_le_p, gt_lt_p
 from predicate.recur_predicate import recur_p
 from predicate.reduce_predicate import reduce_p
@@ -80,7 +81,6 @@ from predicate.regex_predicate import regex_p
 from predicate.repeat_predicate import repeat
 from predicate.set_of_predicate import is_set_of_p
 from predicate.set_predicates import (
-    IntersectsPredicate,
     intersects_p,
     is_real_subset_p,
     is_real_superset_p,
@@ -95,7 +95,6 @@ from predicate.spec.instrument import (
     instrument_module,
     is_instrumented,
 )
-from predicate.spec.spec import Spec
 from predicate.standard_predicates import (
     is_dict_p,
     is_float_p,
@@ -113,8 +112,6 @@ from predicate.tee_predicate import tee_p
 from predicate.tuple_of_predicate import is_tuple_of_p
 
 __all__ = [
-    "PredicateError",
-    "Spec",
     "are_equivalent",
     "is_satisfiable",
     "is_tautology",
@@ -125,6 +122,7 @@ __all__ = [
     "and_p",
     "any_p",
     "can_optimize",
+    "compile_predicate",
     "comp_p",
     "count_p",
     "eq_false_p",
@@ -151,7 +149,6 @@ __all__ = [
     "has_path_p",
     "implies_p",
     "in_p",
-    "IntersectsPredicate",
     "intersects_p",
     "instrument",
     "instrument_class",
@@ -249,7 +246,6 @@ __all__ = [
     "pos_p",
     "recur_p",
     "reduce_p",
-    "RaisesPredicate",
     "raises_exception_p",
     "raises_p",
     "regex_p",
@@ -259,6 +255,7 @@ __all__ = [
     "starts_with_p",
     "tee_p",
     "this_p",
+    "try_compile_predicate",
     "to_dot",
     "to_json",
     "to_latex",
