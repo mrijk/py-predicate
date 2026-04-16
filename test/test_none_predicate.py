@@ -1,7 +1,8 @@
 import pytest
 from helpers import exercise_predicate
 
-from predicate import PredicateError, is_int_p, is_none_p, none_is_exception_p, none_is_false_p, none_is_true_p
+from predicate import is_int_p, is_none_p, none_is_exception_p, none_is_false_p, none_is_true_p
+from predicate.exception_predicate import PredicateError
 from predicate.explain import explain
 
 

@@ -1,6 +1,7 @@
 import pytest
 
-from predicate import PredicateError, exception_p
+from predicate import exception_p
+from predicate.exception_predicate import PredicateError
 
 
 def test_exception_p():

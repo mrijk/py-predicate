@@ -3,8 +3,9 @@ from typing import Any
 
 import pytest
 
-from predicate import Spec, ge_p, is_instrumented, is_int_p
+from predicate import ge_p, is_instrumented, is_int_p
 from predicate.spec.instrument import enrich_spec, instrument, instrument_function, instrument_module
+from predicate.spec.spec import Spec
 
 
 def test_instrument_ok():

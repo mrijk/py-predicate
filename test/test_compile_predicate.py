@@ -3,8 +3,6 @@
 import pytest
 
 from predicate import (
-    CompiledPredicate,
-    NotCompilableError,
     all_p,
     always_false_p,
     always_true_p,
@@ -34,6 +32,7 @@ from predicate import (
     regex_p,
     try_compile_predicate,
 )
+from predicate.compile_predicate import CompiledPredicate, NotCompilableError
 
 # --- compile_predicate returns CompiledPredicate ---
 
