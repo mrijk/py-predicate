@@ -7,6 +7,7 @@ from functools import singledispatch
 from typing import override
 
 from predicate.all_predicate import AllPredicate
+from predicate.any_predicate import AnyPredicate
 from predicate.eq_predicate import EqPredicate
 from predicate.ge_predicate import GePredicate
 from predicate.gt_predicate import GtPredicate
@@ -219,8 +220,10 @@ def _(predicate: XorPredicate, namespace: dict) -> ast.expr:
 
 @_to_ast.register
 def _(predicate: AllPredicate, namespace: dict) -> ast.expr:
-    # Compile the inner predicate to its raw fn if possible, else fall back to the original.
-    # This avoids the CompiledPredicate.__call__ wrapper overhead per element.
+    return _any_all_ast(predicate, "all", namespace)
+
+
+def _any_all_ast(predicate: AllPredicate | AnyPredicate, fn_name: str, namespace: dict) -> ast.expr:
     try:
         inner_fn = compile_predicate(predicate.predicate).fn
     except NotCompilableError:
@@ -245,13 +248,18 @@ def _(predicate: AllPredicate, namespace: dict) -> ast.expr:
             )
         ],
     )
-    return ast.Call(func=ast.Name(id="all", ctx=ast.Load()), args=[gen], keywords=[])
+    return ast.Call(func=ast.Name(id=fn_name, ctx=ast.Load()), args=[gen], keywords=[])
+
+
+@_to_ast.register
+def _(predicate: AnyPredicate, namespace: dict) -> ast.expr:
+    return _any_all_ast(predicate, "any", namespace)
 
 
 def compile_predicate[T](predicate: Predicate[T]) -> CompiledPredicate[T]:
     """Compile a predicate to a native callable for faster evaluation.
 
-    Raises NotCompilableError for unsupported predicate types (any_p, fn_p, regex_p, etc.).
+    Raises NotCompilableError for unsupported predicate types (fn_p, regex_p, etc.).
     """
     namespace: dict = {}
     body = _to_ast(predicate, namespace)

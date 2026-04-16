@@ -262,9 +262,17 @@ def test_compile_all_nested():
     assert not cp([1, 10, 3])
 
 
-def test_compile_any_raises():
-    with pytest.raises(NotCompilableError):
-        compile_predicate(any_p(gt_p(0)))
+def test_compile_any():
+    cp = compile_predicate(any_p(gt_p(0)))
+    assert cp([0, 0, 1])
+    assert not cp([0, -1, 0])
+    assert not cp([])
+
+
+def test_compile_any_nested():
+    cp = compile_predicate(any_p(gt_p(0) & lt_p(10)))
+    assert cp([0, 5, 10])
+    assert not cp([0, -1, 10])
 
 
 def test_compile_fn_raises():
@@ -298,7 +306,7 @@ def test_try_compile_compilable():
 
 
 def test_try_compile_non_compilable_returns_original():
-    p = any_p(gt_p(0))
+    p = fn_p(lambda x: x > 0)
     result = try_compile_predicate(p)
     assert result is p
 
