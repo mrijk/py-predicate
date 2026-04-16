@@ -28,6 +28,7 @@ from predicate.not_in_predicate import NotInPredicate
 from predicate.predicate import AndPredicate, NotPredicate, OrPredicate, Predicate, XorPredicate
 from predicate.range_predicate import GeLePredicate, GeLtPredicate, GtLePredicate, GtLtPredicate
 from predicate.set_of_predicate import SetOfPredicate
+from predicate.tuple_of_predicate import TupleOfPredicate
 
 
 class NotCompilableError(Exception):
@@ -300,6 +301,35 @@ def _(predicate: ListOfPredicate, namespace: dict) -> ast.expr:
 @_to_ast.register
 def _(predicate: SetOfPredicate, namespace: dict) -> ast.expr:
     return _isinstance_and_all_ast(predicate, "set", namespace)
+
+
+@_to_ast.register
+def _(predicate: TupleOfPredicate, namespace: dict) -> ast.expr:
+    n = len(predicate.predicates)
+    len_check = ast.Compare(
+        left=ast.Call(func=ast.Name(id="len", ctx=ast.Load()), args=[_x()], keywords=[]),
+        ops=[ast.Eq()],
+        comparators=[_const(n)],
+    )
+    if n == 0:
+        return len_check
+
+    element_checks = []
+    for i, p in enumerate(predicate.predicates):
+        try:
+            inner_fn = compile_predicate(p).fn
+        except NotCompilableError:
+            inner_fn = p
+        key = f"_p{len(namespace)}"
+        namespace[key] = inner_fn
+        element_checks.append(
+            ast.Call(
+                func=ast.Name(id=key, ctx=ast.Load()),
+                args=[ast.Subscript(value=_x(), slice=_const(i), ctx=ast.Load())],
+                keywords=[],
+            )
+        )
+    return ast.BoolOp(op=ast.And(), values=[len_check, *element_checks])
 
 
 def compile_predicate[T](predicate: Predicate[T]) -> CompiledPredicate[T]:

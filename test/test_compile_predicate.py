@@ -27,6 +27,7 @@ from predicate import (
     is_set_of_p,
     is_str_p,
     is_truthy_p,
+    is_tuple_of_p,
     le_p,
     lt_p,
     ne_p,
@@ -316,6 +317,28 @@ def test_compile_set_of_nested():
     assert cp({1, 2, 9})
     assert not cp({1, 10})
     assert not cp("not-a-set")
+
+
+def test_compile_tuple_of():
+    cp = compile_predicate(is_tuple_of_p(is_int_p, is_str_p))
+    assert cp((1, "hello"))
+    assert not cp((1, 2))
+    assert not cp(("hello", "world"))
+    assert not cp((1,))
+    assert not cp((1, "hello", True))
+
+
+def test_compile_tuple_of_empty():
+    cp = compile_predicate(is_tuple_of_p())
+    assert cp(())
+    assert not cp((1,))
+
+
+def test_compile_tuple_of_nested():
+    cp = compile_predicate(is_tuple_of_p(gt_p(0) & lt_p(10), gt_p(100)))
+    assert cp((5, 200))
+    assert not cp((0, 200))
+    assert not cp((5, 50))
 
 
 def test_compile_fn_raises():
