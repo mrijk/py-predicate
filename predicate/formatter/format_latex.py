@@ -24,6 +24,7 @@ from predicate.predicate import (
 from predicate.range_predicate import GeLePredicate, GeLtPredicate, GtLePredicate, GtLtPredicate
 from predicate.reduce_predicate import ReducePredicate
 from predicate.set_predicates import (
+    IntersectsPredicate,
     IsRealSubsetPredicate,
     IsRealSupersetPredicate,
     IsSubsetPredicate,
@@ -71,6 +72,8 @@ def to_latex(predicate: Predicate, parameter: str = "x") -> str:
             return f"p \\implies {to_latex(p)}"
         case InPredicate(v) if isinstance(v, Iterable):
             return f"x \\in {set_to_latex_set(v)}"
+        case IntersectsPredicate(v):
+            return f"x \\cap {set_to_latex_set(v)} \\neq \\emptyset"
         case IsRealSubsetPredicate(v):
             return f"x \\subseteq {set_to_latex_set(v)}"
         case IsSubsetPredicate(v):
