@@ -10,11 +10,13 @@ from predicate.all_predicate import AllPredicate
 from predicate.always_false_predicate import AlwaysFalsePredicate
 from predicate.always_true_predicate import AlwaysTruePredicate
 from predicate.any_predicate import AnyPredicate
+from predicate.comp_predicate import CompPredicate
 from predicate.eq_predicate import EqPredicate
 from predicate.ge_predicate import GePredicate
 from predicate.gt_predicate import GtPredicate
 from predicate.has_key_predicate import HasKeyPredicate
 from predicate.in_predicate import InPredicate
+from predicate.is_close_predicate import IsClosePredicate
 from predicate.is_falsy_predicate import IsFalsyPredicate
 from predicate.is_instance_predicate import IsInstancePredicate
 from predicate.is_none_predicate import IsNonePredicate
@@ -23,6 +25,7 @@ from predicate.is_truthy_predicate import IsTruthyPredicate
 from predicate.le_predicate import LePredicate
 from predicate.list_of_predicate import ListOfPredicate
 from predicate.lt_predicate import LtPredicate
+from predicate.named_predicate import NamedPredicate
 from predicate.ne_predicate import NePredicate
 from predicate.not_in_predicate import NotInPredicate
 from predicate.predicate import AndPredicate, NotPredicate, OrPredicate, Predicate, XorPredicate
@@ -100,6 +103,11 @@ def _(predicate: AlwaysTruePredicate, namespace: dict) -> ast.expr:
 @_to_ast.register
 def _(predicate: AlwaysFalsePredicate, namespace: dict) -> ast.expr:
     return _const(False)
+
+
+@_to_ast.register
+def _(predicate: NamedPredicate, namespace: dict) -> ast.expr:
+    return _const(predicate.v)
 
 
 @_to_ast.register
@@ -301,6 +309,38 @@ def _(predicate: ListOfPredicate, namespace: dict) -> ast.expr:
 @_to_ast.register
 def _(predicate: SetOfPredicate, namespace: dict) -> ast.expr:
     return _isinstance_and_all_ast(predicate, "set", namespace)
+
+
+@_to_ast.register
+def _(predicate: IsClosePredicate, namespace: dict) -> ast.expr:
+    import math
+
+    namespace["_isclose"] = math.isclose
+    return ast.Call(
+        func=ast.Name(id="_isclose", ctx=ast.Load()),
+        args=[_x(), _const(predicate.target)],
+        keywords=[
+            ast.keyword(arg="rel_tol", value=_const(predicate.rel_tol)),
+            ast.keyword(arg="abs_tol", value=_const(predicate.abs_tol)),
+        ],
+    )
+
+
+@_to_ast.register
+def _(predicate: CompPredicate, namespace: dict) -> ast.expr:
+    try:
+        inner_fn = compile_predicate(predicate.predicate).fn
+    except NotCompilableError:
+        inner_fn = predicate.predicate
+    fn_key = f"_fn{len(namespace)}"
+    namespace[fn_key] = predicate.fn
+    p_key = f"_p{len(namespace)}"
+    namespace[p_key] = inner_fn
+    return ast.Call(
+        func=ast.Name(id=p_key, ctx=ast.Load()),
+        args=[ast.Call(func=ast.Name(id=fn_key, ctx=ast.Load()), args=[_x()], keywords=[])],
+        keywords=[],
+    )
 
 
 @_to_ast.register

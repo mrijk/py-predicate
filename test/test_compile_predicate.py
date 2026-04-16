@@ -7,6 +7,7 @@ from predicate import (
     always_false_p,
     always_true_p,
     any_p,
+    comp_p,
     compile_predicate,
     eq_p,
     fn_p,
@@ -19,6 +20,7 @@ from predicate import (
     has_key_p,
     in_p,
     is_bool_p,
+    is_close_p,
     is_falsy_p,
     is_int_p,
     is_list_of_p,
@@ -37,6 +39,7 @@ from predicate import (
     try_compile_predicate,
 )
 from predicate.compile_predicate import CompiledPredicate, NotCompilableError
+from predicate.named_predicate import NamedPredicate
 
 # --- compile_predicate returns CompiledPredicate ---
 
@@ -339,6 +342,45 @@ def test_compile_tuple_of_nested():
     assert cp((5, 200))
     assert not cp((0, 200))
     assert not cp((5, 50))
+
+
+def test_compile_named_true():
+    cp = compile_predicate(NamedPredicate(name="p", v=True))
+    assert cp(0)
+    assert cp(None)
+    assert cp("anything")
+
+
+def test_compile_named_false():
+    cp = compile_predicate(NamedPredicate(name="p", v=False))
+    assert not cp(0)
+    assert not cp(None)
+
+
+def test_compile_is_close():
+    cp = compile_predicate(is_close_p(1.0))
+    assert cp(1.0)
+    assert cp(1.0 + 1e-10)
+    assert not cp(1.1)
+
+
+def test_compile_is_close_abs_tol():
+    cp = compile_predicate(is_close_p(0.0, abs_tol=0.01))
+    assert cp(0.005)
+    assert not cp(0.02)
+
+
+def test_compile_comp():
+    cp = compile_predicate(comp_p(abs, gt_p(0)))
+    assert cp(-1)
+    assert cp(1)
+    assert not cp(0)
+
+
+def test_compile_comp_with_lambda():
+    cp = compile_predicate(comp_p(lambda x: x * 2, eq_p(10)))
+    assert cp(5)
+    assert not cp(4)
 
 
 def test_compile_fn_raises():
