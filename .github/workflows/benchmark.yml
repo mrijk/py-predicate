@@ -24,6 +24,16 @@ jobs:
           pip install flit
           flit install --deps develop --symlink
 
+      - name: Create benchmark-results branch if missing
+        run: |
+          git fetch origin benchmark-results:benchmark-results 2>/dev/null || (
+            git checkout --orphan benchmark-results &&
+            git rm -rf --quiet . &&
+            git commit --allow-empty -m "Initialize benchmark-results branch" &&
+            git push origin benchmark-results &&
+            git checkout -
+          )
+
       - name: Run benchmarks
         run: pytest benchmarks/ --benchmark-json=benchmark.json
 
