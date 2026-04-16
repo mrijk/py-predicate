@@ -7,6 +7,8 @@ from functools import singledispatch
 from typing import override
 
 from predicate.all_predicate import AllPredicate
+from predicate.always_false_predicate import AlwaysFalsePredicate
+from predicate.always_true_predicate import AlwaysTruePredicate
 from predicate.any_predicate import AnyPredicate
 from predicate.eq_predicate import EqPredicate
 from predicate.ge_predicate import GePredicate
@@ -85,6 +87,16 @@ def _delegate(predicate: Predicate, namespace: dict) -> ast.Call:
 @singledispatch
 def _to_ast(predicate: Predicate, namespace: dict) -> ast.expr:
     raise NotCompilableError(f"Cannot compile predicate of type {type(predicate).__name__}")
+
+
+@_to_ast.register
+def _(predicate: AlwaysTruePredicate, namespace: dict) -> ast.expr:
+    return _const(True)
+
+
+@_to_ast.register
+def _(predicate: AlwaysFalsePredicate, namespace: dict) -> ast.expr:
+    return _const(False)
 
 
 @_to_ast.register

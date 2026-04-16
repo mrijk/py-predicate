@@ -302,14 +302,18 @@ def test_compile_regex_raises():
         compile_predicate(regex_p(r"\d+"))
 
 
-def test_compile_always_true_raises():
-    with pytest.raises(NotCompilableError):
-        compile_predicate(always_true_p)
+def test_compile_always_true():
+    cp = compile_predicate(always_true_p)
+    assert cp(0)
+    assert cp(None)
+    assert cp("anything")
 
 
-def test_compile_always_false_raises():
-    with pytest.raises(NotCompilableError):
-        compile_predicate(always_false_p)
+def test_compile_always_false():
+    cp = compile_predicate(always_false_p)
+    assert not cp(0)
+    assert not cp(None)
+    assert not cp("anything")
 
 
 # --- try_compile_predicate ---
