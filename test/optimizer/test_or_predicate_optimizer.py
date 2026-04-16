@@ -207,6 +207,10 @@ def test_optimize_in_and_in():
 
     assert can_optimize(predicate)
 
+    optimized = optimize(predicate)
+
+    assert optimized == in_p({2, 3, 4, 5})
+
 
 def test_optimize_in_and_not_in():
     p = in_p({2, 3})
@@ -459,3 +463,105 @@ def test_optimize_not_in_or_not_in_same():
     optimized = optimize(predicate)
 
     assert optimized == not_in_p({1, 2})
+
+
+def test_optimize_le_or_ge_equal_bounds():
+    # le(3) | ge(3) = True (every x is either <= 3 or >= 3)
+
+    predicate = le_p(3) | ge_p(3)
+
+    assert can_optimize(predicate)
+
+    optimized = optimize(predicate)
+
+    assert optimized == always_true_p
+
+
+def test_optimize_in_or_eq_already_in():
+    # in({1, 2, 3}) | eq(2): 2 is already covered by in, should not add duplicate
+
+    predicate = in_p({1, 2, 3}) | eq_p(2)
+
+    assert can_optimize(predicate)
+
+    optimized = optimize(predicate)
+
+    assert optimized == in_p({1, 2, 3})
+
+
+def test_optimize_eq_or_in_already_in():
+    # eq(2) | in({1, 2, 3}): 2 is already covered by in, symmetric case
+
+    predicate = eq_p(2) | in_p({1, 2, 3})
+
+    assert can_optimize(predicate)
+
+    optimized = optimize(predicate)
+
+    assert optimized == in_p({1, 2, 3})
+
+
+def test_optimize_or_right_is_or_with_eq(p):
+    # eq(1) | (eq(2) | p): right is OrPredicate, swap triggers, then eq(1)|eq(2) -> in({1,2})
+
+    predicate = eq_p(1) | (eq_p(2) | p)
+
+    assert can_optimize(predicate)
+
+    optimized = optimize(predicate)
+
+    assert optimized == in_p({1, 2}) | p
+
+
+def test_optimize_and_or_and_inner_change(p, q, r, s):
+    # (p & (q | q)) | (r & s): inner q|q simplifies to q, changing left child
+    # falls into AndPredicate, AndPredicate case _ fallback
+
+    predicate = (p & (q | q)) | (r & s)
+
+    assert can_optimize(predicate)
+
+    optimized = optimize(predicate)
+
+    assert optimized == (p & q) | (r & s)
+
+
+def test_optimize_or_implies_left():
+    # ge(5) | ge(3): ge(5) implies ge(3), so result is ge(3)
+
+    predicate = ge_p(5) | ge_p(3)
+
+    assert can_optimize(predicate)
+
+    optimized = optimize(predicate)
+
+    assert optimized == ge_p(3)
+
+
+def test_optimize_or_final_return(p, q):
+    # (always_false | p) | q: left changes after optimization, no specific pattern matches
+    # falls to final return which should give p | q
+
+    predicate = (always_false_p | p) | q
+
+    assert can_optimize(predicate)
+
+    optimized = optimize(predicate)
+
+    assert optimized == p | q
+
+
+def test_or_no_xor_left(p, q, r):
+    # (~p & q) | (p & ~r): looks like xor pattern but r != q, should NOT simplify to p ^ q
+
+    predicate = (~p & q) | (p & ~r)
+
+    assert not can_optimize(predicate)
+
+
+def test_or_no_xor_right(p, q, r):
+    # (p & ~q) | (~r & q): looks like xor pattern but r != p, should NOT simplify to p ^ q
+
+    predicate = (p & ~q) | (~r & q)
+
+    assert not can_optimize(predicate)
