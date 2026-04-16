@@ -8,12 +8,12 @@ from predicate.always_true_predicate import always_p, always_true_p
 from predicate.analysis import are_equivalent, is_satisfiable, is_tautology
 from predicate.any_predicate import any_p
 from predicate.comp_predicate import comp_p
-from predicate.compile_predicate import CompiledPredicate, NotCompilableError, compile_predicate, try_compile_predicate
 from predicate.count_predicate import count_p, exactly_one_p, exactly_zero_p
 from predicate.dict_of_predicate import is_dict_of_p
 from predicate.eq_predicate import eq_false_p, eq_p, eq_true_p, zero_p
 from predicate.exactly_predicate import exactly_n
 from predicate.exception_predicate import PredicateError, exception_p
+from predicate.compile_predicate import CompiledPredicate, NotCompilableError, compile_predicate, try_compile_predicate
 from predicate.explain import explain
 from predicate.fn_predicate import fn_p, is_even_p, is_finite_p, is_inf_p, is_nan_p, is_odd_p
 from predicate.formatter import to_dot, to_json, to_latex, to_yaml
