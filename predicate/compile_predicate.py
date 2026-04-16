@@ -18,6 +18,7 @@ from predicate.is_none_predicate import IsNonePredicate
 from predicate.is_not_none_predicate import IsNotNonePredicate
 from predicate.is_truthy_predicate import IsTruthyPredicate
 from predicate.le_predicate import LePredicate
+from predicate.list_of_predicate import ListOfPredicate
 from predicate.lt_predicate import LtPredicate
 from predicate.ne_predicate import NePredicate
 from predicate.not_in_predicate import NotInPredicate
@@ -254,6 +255,18 @@ def _any_all_ast(predicate: AllPredicate | AnyPredicate, fn_name: str, namespace
 @_to_ast.register
 def _(predicate: AnyPredicate, namespace: dict) -> ast.expr:
     return _any_all_ast(predicate, "any", namespace)
+
+
+@_to_ast.register
+def _(predicate: ListOfPredicate, namespace: dict) -> ast.expr:
+    # isinstance(x, list) and all(_p0(_e) for _e in x)
+    isinstance_check = ast.Call(
+        func=ast.Name(id="isinstance", ctx=ast.Load()),
+        args=[_x(), ast.Name(id="list", ctx=ast.Load())],
+        keywords=[],
+    )
+    all_check = _any_all_ast(predicate, "all", namespace)
+    return ast.BoolOp(op=ast.And(), values=[isinstance_check, all_check])
 
 
 def compile_predicate[T](predicate: Predicate[T]) -> CompiledPredicate[T]:

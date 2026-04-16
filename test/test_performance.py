@@ -1,6 +1,20 @@
 """Performance comparison: interpreted vs compiled predicates vs raw Python."""
 
-from predicate import all_p, any_p, compile_predicate, eq_p, ge_le_p, ge_p, gt_p, in_p, le_p, lt_p, ne_p, optimize
+from predicate import (
+    all_p,
+    any_p,
+    compile_predicate,
+    eq_p,
+    ge_le_p,
+    ge_p,
+    gt_p,
+    in_p,
+    is_list_of_p,
+    le_p,
+    lt_p,
+    ne_p,
+    optimize,
+)
 
 _S = frozenset(range(1, 11))
 
@@ -113,4 +127,22 @@ def test_eval_any_compiled(benchmark):
 
 def test_eval_any_raw(benchmark):
     f = lambda x: any(e > 0 for e in x)  # noqa: E731
+    benchmark(f, _DATA)
+
+
+# --- is_list_of_p ---
+
+
+def test_eval_list_of_interpreted(benchmark):
+    p = is_list_of_p(gt_p(0))
+    benchmark(p, _DATA)
+
+
+def test_eval_list_of_compiled(benchmark):
+    cp = compile_predicate(is_list_of_p(gt_p(0)))
+    benchmark(cp, _DATA)
+
+
+def test_eval_list_of_raw(benchmark):
+    f = lambda x: isinstance(x, list) and all(e > 0 for e in x)  # noqa: E731
     benchmark(f, _DATA)

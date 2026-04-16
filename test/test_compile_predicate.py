@@ -20,6 +20,7 @@ from predicate import (
     is_bool_p,
     is_falsy_p,
     is_int_p,
+    is_list_of_p,
     is_none_p,
     is_not_none_p,
     is_str_p,
@@ -273,6 +274,22 @@ def test_compile_any_nested():
     cp = compile_predicate(any_p(gt_p(0) & lt_p(10)))
     assert cp([0, 5, 10])
     assert not cp([0, -1, 10])
+
+
+def test_compile_list_of():
+    cp = compile_predicate(is_list_of_p(gt_p(0)))
+    assert cp([1, 2, 3])
+    assert not cp([1, -1, 3])
+    assert cp([])
+    assert not cp("not-a-list")
+    assert not cp(42)
+
+
+def test_compile_list_of_nested():
+    cp = compile_predicate(is_list_of_p(gt_p(0) & lt_p(10)))
+    assert cp([1, 2, 9])
+    assert not cp([1, 10, 3])
+    assert not cp("not-a-list")
 
 
 def test_compile_fn_raises():
