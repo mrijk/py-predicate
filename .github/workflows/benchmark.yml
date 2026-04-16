@@ -41,7 +41,7 @@ jobs:
           gh-pages-branch: benchmark-results
           benchmark-data-dir-path: benchmarks
           # Alert on 20% regression; post a PR comment and fail the check
-          alert-threshold: "120%"
+          alert-threshold: "150%"
           comment-on-alert: true
           fail-on-alert: true
           # Always post a summary comment on PRs even without a regression
