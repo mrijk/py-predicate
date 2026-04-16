@@ -255,14 +255,14 @@ def _(predicate: XorPredicate, namespace: dict) -> ast.expr:
 
 @_to_ast.register
 def _(predicate: AllPredicate, namespace: dict) -> ast.expr:
-    return _any_all_ast(predicate, "all", namespace)
+    return _any_all_ast(predicate.predicate, "all", namespace)
 
 
-def _any_all_ast(predicate: AllPredicate | AnyPredicate, fn_name: str, namespace: dict) -> ast.expr:
+def _any_all_ast(inner: Predicate, fn_name: str, namespace: dict) -> ast.expr:
     try:
-        inner_fn = compile_predicate(predicate.predicate).fn
+        inner_fn = compile_predicate(inner).fn
     except NotCompilableError:
-        inner_fn = predicate.predicate
+        inner_fn = inner
 
     inner_key = f"_p{len(namespace)}"
     namespace[inner_key] = inner_fn
@@ -288,7 +288,7 @@ def _any_all_ast(predicate: AllPredicate | AnyPredicate, fn_name: str, namespace
 
 @_to_ast.register
 def _(predicate: AnyPredicate, namespace: dict) -> ast.expr:
-    return _any_all_ast(predicate, "any", namespace)
+    return _any_all_ast(predicate.predicate, "any", namespace)
 
 
 def _isinstance_and_all_ast(predicate: Predicate, type_name: str, namespace: dict) -> ast.expr:
@@ -297,7 +297,7 @@ def _isinstance_and_all_ast(predicate: Predicate, type_name: str, namespace: dic
         args=[_x(), _name(type_name)],
         keywords=[],
     )
-    all_check = _any_all_ast(predicate, "all", namespace)
+    all_check = _any_all_ast(predicate.predicate, "all", namespace)
     return ast.BoolOp(op=ast.And(), values=[isinstance_check, all_check])
 
 
