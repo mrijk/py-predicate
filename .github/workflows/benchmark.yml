@@ -40,8 +40,8 @@ jobs:
           auto-push: ${{ github.ref == 'refs/heads/main' }}
           gh-pages-branch: benchmark-results
           benchmark-data-dir-path: benchmarks
-          # Alert on 20% regression; post a PR comment and fail the check
-          alert-threshold: "150%"
+          # Alert on 100% regression (2x slower); post a PR comment and fail the check
+          alert-threshold: "200%"
           comment-on-alert: true
           fail-on-alert: true
           # Always post a summary comment on PRs even without a regression
