@@ -16,6 +16,7 @@ from predicate import (
     gt_le_p,
     gt_lt_p,
     gt_p,
+    has_key_p,
     in_p,
     is_bool_p,
     is_falsy_p,
@@ -23,6 +24,7 @@ from predicate import (
     is_list_of_p,
     is_none_p,
     is_not_none_p,
+    is_set_of_p,
     is_str_p,
     is_truthy_p,
     le_p,
@@ -290,6 +292,30 @@ def test_compile_list_of_nested():
     assert cp([1, 2, 9])
     assert not cp([1, 10, 3])
     assert not cp("not-a-list")
+
+
+def test_compile_has_key():
+    cp = compile_predicate(has_key_p("a"))
+    assert cp({"a": 1})
+    assert cp({"a": 1, "b": 2})
+    assert not cp({"b": 1})
+    assert not cp({})
+
+
+def test_compile_set_of():
+    cp = compile_predicate(is_set_of_p(gt_p(0)))
+    assert cp({1, 2, 3})
+    assert cp(set())
+    assert not cp({1, -1, 3})
+    assert not cp([1, 2, 3])
+    assert not cp(42)
+
+
+def test_compile_set_of_nested():
+    cp = compile_predicate(is_set_of_p(gt_p(0) & lt_p(10)))
+    assert cp({1, 2, 9})
+    assert not cp({1, 10})
+    assert not cp("not-a-set")
 
 
 def test_compile_fn_raises():

@@ -13,6 +13,7 @@ from predicate.any_predicate import AnyPredicate
 from predicate.eq_predicate import EqPredicate
 from predicate.ge_predicate import GePredicate
 from predicate.gt_predicate import GtPredicate
+from predicate.has_key_predicate import HasKeyPredicate
 from predicate.in_predicate import InPredicate
 from predicate.is_falsy_predicate import IsFalsyPredicate
 from predicate.is_instance_predicate import IsInstancePredicate
@@ -26,6 +27,7 @@ from predicate.ne_predicate import NePredicate
 from predicate.not_in_predicate import NotInPredicate
 from predicate.predicate import AndPredicate, NotPredicate, OrPredicate, Predicate, XorPredicate
 from predicate.range_predicate import GeLePredicate, GeLtPredicate, GtLePredicate, GtLtPredicate
+from predicate.set_of_predicate import SetOfPredicate
 
 
 class NotCompilableError(Exception):
@@ -171,6 +173,17 @@ def _(predicate: NotInPredicate, namespace: dict) -> ast.expr:
 
 
 @_to_ast.register
+def _(predicate: HasKeyPredicate, namespace: dict) -> ast.expr:
+    key = f"_k{len(namespace)}"
+    namespace[key] = predicate.key
+    return ast.Compare(
+        left=ast.Name(id=key, ctx=ast.Load()),
+        ops=[ast.In()],
+        comparators=[_x()],
+    )
+
+
+@_to_ast.register
 def _(predicate: GeLePredicate, namespace: dict) -> ast.expr:
     return ast.Compare(
         left=_const(predicate.lower), ops=[ast.LtE(), ast.LtE()], comparators=[_x(), _const(predicate.upper)]
@@ -269,16 +282,24 @@ def _(predicate: AnyPredicate, namespace: dict) -> ast.expr:
     return _any_all_ast(predicate, "any", namespace)
 
 
-@_to_ast.register
-def _(predicate: ListOfPredicate, namespace: dict) -> ast.expr:
-    # isinstance(x, list) and all(_p0(_e) for _e in x)
+def _isinstance_and_all_ast(predicate: Predicate, type_name: str, namespace: dict) -> ast.expr:
     isinstance_check = ast.Call(
         func=ast.Name(id="isinstance", ctx=ast.Load()),
-        args=[_x(), ast.Name(id="list", ctx=ast.Load())],
+        args=[_x(), ast.Name(id=type_name, ctx=ast.Load())],
         keywords=[],
     )
     all_check = _any_all_ast(predicate, "all", namespace)
     return ast.BoolOp(op=ast.And(), values=[isinstance_check, all_check])
+
+
+@_to_ast.register
+def _(predicate: ListOfPredicate, namespace: dict) -> ast.expr:
+    return _isinstance_and_all_ast(predicate, "list", namespace)
+
+
+@_to_ast.register
+def _(predicate: SetOfPredicate, namespace: dict) -> ast.expr:
+    return _isinstance_and_all_ast(predicate, "set", namespace)
 
 
 def compile_predicate[T](predicate: Predicate[T]) -> CompiledPredicate[T]:
