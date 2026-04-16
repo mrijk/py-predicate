@@ -40,7 +40,7 @@ class HasPathPredicate[T](Predicate[T]):
 
 def match_dict(x: dict, *, path: list[Predicate]) -> bool:
     first_p, *rest = path
-    found = [v for k, v in x.items() if first_p(k)]
+    found = (v for k, v in x.items() if first_p(k))
     return any(match_rest(value, rest) for value in found)
 
 

@@ -76,6 +76,16 @@ def test_has_path_predicate_no_match_explain():
     assert explain(predicate, {"y": 13}) == expected
 
 
+def test_has_path_predicate_non_dict_non_list_intermediate():
+    has_x = eq_p("x")
+    has_y = eq_p("y")
+    y_is_13 = eq_p(13)
+    predicate = has_path_p(has_x, has_y, y_is_13)
+
+    # value at "x" is a string (not a dict/list), but path still has 2 elements remaining
+    assert not predicate({"x": "not_a_dict"})
+
+
 def test_has_path_predicate_repr():
     has_x = eq_p("x")
     predicate = has_path_p(has_x)

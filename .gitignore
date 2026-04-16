@@ -7,6 +7,7 @@ __pycache__/
 mutants/
 uv.lock
 .claude/
+CLAUDE.md
 
 dist/
 *.egg-info/
