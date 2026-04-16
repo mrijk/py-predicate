@@ -48,6 +48,7 @@ from predicate.reduce_predicate import ReducePredicate
 from predicate.regex_predicate import RegexPredicate
 from predicate.set_of_predicate import SetOfPredicate
 from predicate.set_predicates import (
+    IntersectsPredicate,
     IsRealSubsetPredicate,
     IsRealSupersetPredicate,
     IsSubsetPredicate,
@@ -107,6 +108,8 @@ def to_json(predicate: Predicate) -> dict[str, Any]:
                 return "implies", {"predicate": to_json(predicate)}
             case InPredicate(v):
                 return "in", {"v": list(cast(Iterable, v))}
+            case IntersectsPredicate(v):
+                return "intersects", {"v": list(v)}
             case IsClosePredicate(target, rel_tol, abs_tol):
                 return "is_close", {"target": target, "rel_tol": rel_tol, "abs_tol": abs_tol}
             case IsFalsyPredicate():

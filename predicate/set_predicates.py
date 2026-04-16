@@ -55,6 +55,24 @@ class IsRealSupersetPredicate[T](Predicate[T]):
         return f"is_real_superset_p({self.v})"
 
 
+@dataclass
+class IntersectsPredicate[T](Predicate[T]):
+    """A predicate class that returns True if the value shares at least one element with a given set."""
+
+    v: set[T]
+
+    def __call__(self, v) -> bool:
+        return not self.v.isdisjoint(v)
+
+    def __repr__(self) -> str:
+        return f"intersects_p({self.v})"
+
+
+def intersects_p[T](v: set[T]) -> IntersectsPredicate[T]:
+    """Return True if the value shares at least one element with v, otherwise False."""
+    return IntersectsPredicate(v)
+
+
 def is_subset_p[T](v: set[T]) -> IsSubsetPredicate[T]:
     """Return True if the value is a subset, otherwise False."""
     return IsSubsetPredicate(v)
