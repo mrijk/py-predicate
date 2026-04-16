@@ -354,21 +354,16 @@ def _(predicate: TupleOfPredicate, namespace: dict) -> ast.expr:
     if n == 0:
         return len_check
 
-    element_checks = []
-    for i, p in enumerate(predicate.predicates):
-        try:
-            inner_fn = compile_predicate(p).fn
-        except NotCompilableError:
-            inner_fn = p
+    def element_check(i: int, p: Predicate) -> ast.expr:
         key = f"_p{len(namespace)}"
-        namespace[key] = inner_fn
-        element_checks.append(
-            ast.Call(
-                func=ast.Name(id=key, ctx=ast.Load()),
-                args=[ast.Subscript(value=_x(), slice=_const(i), ctx=ast.Load())],
-                keywords=[],
-            )
+        namespace[key] = try_compile_predicate(p)
+        return ast.Call(
+            func=ast.Name(id=key, ctx=ast.Load()),
+            args=[ast.Subscript(value=_x(), slice=_const(i), ctx=ast.Load())],
+            keywords=[],
         )
+
+    element_checks = [element_check(i, p) for i, p in enumerate(predicate.predicates)]
     return ast.BoolOp(op=ast.And(), values=[len_check, *element_checks])
 
 
