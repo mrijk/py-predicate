@@ -6,6 +6,7 @@ from predicate.all_predicate import AllPredicate
 from predicate.always_false_predicate import AlwaysFalsePredicate
 from predicate.always_true_predicate import AlwaysTruePredicate
 from predicate.any_predicate import AnyPredicate
+from predicate.compile_predicate import CompiledPredicate
 from predicate.count_predicate import CountPredicate
 from predicate.dict_of_predicate import DictOfPredicate
 from predicate.eq_predicate import EqPredicate
@@ -72,6 +73,8 @@ def to_json(predicate: Predicate) -> dict[str, Any]:
 
     def to_value(predicate) -> tuple[str, Any]:
         match predicate:
+            case CompiledPredicate(predicate=inner):
+                return to_value(inner)
             case AllPredicate(all_predicate):
                 return "all", {"predicate": to_json(all_predicate)}
             case AlwaysFalsePredicate():

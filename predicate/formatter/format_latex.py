@@ -4,6 +4,7 @@ from predicate.all_predicate import AllPredicate
 from predicate.always_false_predicate import AlwaysFalsePredicate
 from predicate.always_true_predicate import AlwaysTruePredicate
 from predicate.any_predicate import AnyPredicate
+from predicate.compile_predicate import CompiledPredicate
 from predicate.count_predicate import CountPredicate
 from predicate.eq_predicate import EqPredicate
 from predicate.ge_predicate import GePredicate
@@ -40,6 +41,8 @@ def set_to_latex_set(v: Iterable) -> str:
 def to_latex(predicate: Predicate, parameter: str = "x") -> str:
     """Format predicate as LaTeX."""
     match predicate:
+        case CompiledPredicate(predicate=inner):
+            return to_latex(inner, parameter=parameter)
         case AllPredicate(all_predicate):
             return f"\\forall {parameter} \\in S, {to_latex(all_predicate)}"
         case AlwaysFalsePredicate():
