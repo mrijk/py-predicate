@@ -26,19 +26,6 @@ jobs:
           pip install flit
           flit install --deps develop --symlink
 
-      - name: Create benchmark-results branch if missing
-        run: |
-          git fetch origin benchmark-results:benchmark-results 2>/dev/null || (
-            ORIG=$(git rev-parse HEAD) &&
-            git config user.email "github-actions[bot]@users.noreply.github.com" &&
-            git config user.name "github-actions[bot]" &&
-            git checkout --orphan benchmark-results &&
-            git rm -rf --quiet . &&
-            git commit --allow-empty -m "Initialize benchmark-results branch" &&
-            git push origin benchmark-results &&
-            git checkout "$ORIG"
-          )
-
       - name: Run benchmarks
         run: pytest benchmarks/ --benchmark-json=benchmark.json
 
@@ -50,9 +37,8 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           # Only push results to the storage branch on main, not on PRs
           auto-push: ${{ github.ref == 'refs/heads/main' }}
-          # Use a dedicated branch to avoid conflicts with the sphinx gh-pages deployment
-          gh-pages-branch: benchmark-results
-          benchmark-data-dir-path: benchmarks
+          gh-pages-branch: gh-pages
+          benchmark-data-dir-path: dev/bench
           # Alert on 20% regression; post a PR comment and fail the check
           alert-threshold: "120%"
           comment-on-alert: true
