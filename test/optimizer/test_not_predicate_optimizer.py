@@ -269,3 +269,27 @@ def test_not_optimize_and_cant_optimize(p, q):
     predicate = ~(p & q)
 
     assert not can_optimize(predicate)
+
+
+def test_not_optimize_and_inner_change(p, q):
+    # ~((p | p) & q): inner p|p simplifies, falls to And case _: negate(optimized)
+
+    predicate = ~((p | p) & q)
+
+    assert can_optimize(predicate)
+
+    optimized = optimize(predicate)
+
+    assert optimized == ~(p & q)
+
+
+def test_not_optimize_or_inner_change(p, q):
+    # ~((p | p) | q): inner p|p simplifies, falls to Or case _: negate(optimized)
+
+    predicate = ~((p | p) | q)
+
+    assert can_optimize(predicate)
+
+    optimized = optimize(predicate)
+
+    assert optimized == ~(p | q)
