@@ -6,6 +6,7 @@ from dataclasses import dataclass, field
 from functools import singledispatch
 from typing import override
 
+from predicate.all_predicate import AllPredicate
 from predicate.eq_predicate import EqPredicate
 from predicate.ge_predicate import GePredicate
 from predicate.gt_predicate import GtPredicate
@@ -216,10 +217,41 @@ def _(predicate: XorPredicate, namespace: dict) -> ast.expr:
     return ast.BinOp(left=bool_left, op=ast.BitXor(), right=bool_right)
 
 
+@_to_ast.register
+def _(predicate: AllPredicate, namespace: dict) -> ast.expr:
+    # Compile the inner predicate to its raw fn if possible, else fall back to the original.
+    # This avoids the CompiledPredicate.__call__ wrapper overhead per element.
+    try:
+        inner_fn = compile_predicate(predicate.predicate).fn
+    except NotCompilableError:
+        inner_fn = predicate.predicate
+
+    inner_key = f"_p{len(namespace)}"
+    namespace[inner_key] = inner_fn
+
+    loop_var = "_e"
+    gen = ast.GeneratorExp(
+        elt=ast.Call(
+            func=ast.Name(id=inner_key, ctx=ast.Load()),
+            args=[ast.Name(id=loop_var, ctx=ast.Load())],
+            keywords=[],
+        ),
+        generators=[
+            ast.comprehension(
+                target=ast.Name(id=loop_var, ctx=ast.Store()),
+                iter=_x(),
+                ifs=[],
+                is_async=0,
+            )
+        ],
+    )
+    return ast.Call(func=ast.Name(id="all", ctx=ast.Load()), args=[gen], keywords=[])
+
+
 def compile_predicate[T](predicate: Predicate[T]) -> CompiledPredicate[T]:
     """Compile a predicate to a native callable for faster evaluation.
 
-    Raises NotCompilableError for unsupported predicate types (all_p, any_p, fn_p, regex_p, etc.).
+    Raises NotCompilableError for unsupported predicate types (any_p, fn_p, regex_p, etc.).
     """
     namespace: dict = {}
     body = _to_ast(predicate, namespace)

@@ -249,9 +249,17 @@ def test_compile_optimize_then_compile():
 # --- NotCompilableError ---
 
 
-def test_compile_all_raises():
-    with pytest.raises(NotCompilableError):
-        compile_predicate(all_p(gt_p(0)))
+def test_compile_all():
+    cp = compile_predicate(all_p(gt_p(0)))
+    assert cp([1, 2, 3])
+    assert not cp([1, -1, 3])
+    assert cp([])
+
+
+def test_compile_all_nested():
+    cp = compile_predicate(all_p(gt_p(0) & lt_p(10)))
+    assert cp([1, 2, 9])
+    assert not cp([1, 10, 3])
 
 
 def test_compile_any_raises():
@@ -290,7 +298,7 @@ def test_try_compile_compilable():
 
 
 def test_try_compile_non_compilable_returns_original():
-    p = all_p(gt_p(0))
+    p = any_p(gt_p(0))
     result = try_compile_predicate(p)
     assert result is p
 
