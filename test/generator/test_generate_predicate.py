@@ -9,6 +9,10 @@ from predicate.ge_predicate import GePredicate
 from predicate.generator.generate_predicate import (
     generate_all_predicates,
     generate_any_predicates,
+    generate_ge_le_predicates,
+    generate_ge_lt_predicates,
+    generate_gt_le_predicates,
+    generate_gt_lt_predicates,
     generate_predicate,
     generate_set_of_predicates,
 )
@@ -121,6 +125,19 @@ def test_generate_set_of_predicate(klass):
     for predicate in predicates:
         assert isinstance(predicate, predicate_type)
         assert is_klass_predicate(predicate)
+
+
+@pytest.mark.parametrize(
+    "generate_func",
+    [generate_ge_le_predicates, generate_ge_lt_predicates, generate_gt_le_predicates, generate_gt_lt_predicates],
+)
+def test_generate_range_predicates_are_callable(generate_func):
+    predicates = take(10, generate_func(max_depth=1, klass=int))
+    assert predicates
+    for predicate in predicates:
+        # Calling the predicate must not raise — upper=None would cause TypeError
+        assert isinstance(predicate(predicate.lower), bool)
+        assert isinstance(predicate(predicate.upper), bool)
 
 
 def test_generate_any_predicates_depth_zero():

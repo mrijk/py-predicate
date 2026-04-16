@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta
 from uuid import UUID
 
+import pytest
 from helpers import exercise_predicate
 
 from predicate import ge_p
@@ -66,3 +67,10 @@ def test_ge_explain():
 
 def test_ge_exercise():
     exercise_predicate(ge_p)
+
+
+@pytest.mark.parametrize("v", range(-3, 4))
+def test_ge_p_boundary(v):
+    pred = ge_p(v)
+    assert pred(v)
+    assert not pred(v - 1)

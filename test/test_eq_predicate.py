@@ -2,7 +2,7 @@ import pytest
 from helpers import exercise_predicate
 from more_itertools import one
 
-from predicate import eq_p
+from predicate import eq_p, exercise, is_int_p
 from predicate.consumes import consumes
 from predicate.explain import explain
 
@@ -43,6 +43,11 @@ def test_eq_str():
 
 def test_eq_exercise():
     exercise_predicate(eq_p)
+
+
+def test_eq_p_relational():
+    spec = {"args": {"v": is_int_p}, "fn": lambda v, ret: ret(v) and not ret(v + 1)}
+    assert list(exercise(eq_p, spec=spec, n=20))
 
 
 @pytest.mark.parametrize("iterable, expected_end", [([], 0), ([1, 2], 0), ([2, 1], 1)])
