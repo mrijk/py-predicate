@@ -17,6 +17,20 @@ Return True if the values are included in the container, otherwise False.
     assert in_123(1)
 
 
+intersects_p
+~~~~~~~~~~~~
+Return True if the value shares at least one element with the given set, otherwise False.
+
+.. code-block:: python
+
+    from predicate import intersects_p
+
+    intersects_123 = intersects_p({1, 2, 3})
+
+    assert not intersects_123([4, 5, 6])
+    assert intersects_123([2, 4, 6])
+
+
 is_subset_p
 ~~~~~~~~~~~
 Return True if the value is a subset, otherwise False.

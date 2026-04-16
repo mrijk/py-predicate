@@ -20,6 +20,7 @@ from predicate import (
     has_path_p,
     implies_p,
     in_p,
+    intersects_p,
     is_dict_of_p,
     is_even_p,
     is_falsy_p,
@@ -481,6 +482,14 @@ def test_format_json_is_real_superset():
     json = to_json(predicate)
 
     assert json == {"is_real_superset": {"v": sorted([1, 2, 3])}}
+
+
+def test_format_json_intersects():
+    predicate = intersects_p({1, 2, 3})
+
+    json = to_json(predicate)
+
+    assert json == {"intersects": {"v": sorted([1, 2, 3])}}
 
 
 def test_format_json_in():

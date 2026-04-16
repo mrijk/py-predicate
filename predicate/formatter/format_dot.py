@@ -60,6 +60,7 @@ from predicate.repeat_predicate import RepeatPredicate
 from predicate.root_predicate import RootPredicate, find_root_predicate
 from predicate.set_of_predicate import SetOfPredicate
 from predicate.set_predicates import (
+    IntersectsPredicate,
     IsRealSubsetPredicate,
     IsRealSupersetPredicate,
     IsSubsetPredicate,
@@ -173,6 +174,8 @@ def render(dot: Digraph, predicate: Predicate, node_nr: count):
                 return add_node("gtlt", label=f"{lower} ≤ x < {upper}")
             case InPredicate(v) if isinstance(v, Iterable):
                 return add_node("in", label=f"x ∈ {set_to_str(v)}")
+            case IntersectsPredicate(v):
+                return add_node("intersects", label=f"x ∩ {set_to_str(v)} ≠ ∅")
             case IsClosePredicate(target, rel_tol, abs_tol):
                 return add_node("is_close", label=f"x ≈ {target!r}\nrel={rel_tol}, abs={abs_tol}")
             case DictOfPredicate(key_value_predicates):

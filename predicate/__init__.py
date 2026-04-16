@@ -80,6 +80,8 @@ from predicate.regex_predicate import regex_p
 from predicate.repeat_predicate import repeat
 from predicate.set_of_predicate import is_set_of_p
 from predicate.set_predicates import (
+    IntersectsPredicate,
+    intersects_p,
     is_real_subset_p,
     is_real_superset_p,
     is_subset_p,
@@ -149,6 +151,8 @@ __all__ = [
     "has_path_p",
     "implies_p",
     "in_p",
+    "IntersectsPredicate",
+    "intersects_p",
     "instrument",
     "instrument_class",
     "instrument_function",

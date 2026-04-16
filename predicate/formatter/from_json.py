@@ -36,7 +36,7 @@ from predicate.predicate import Predicate
 from predicate.range_predicate import ge_le_p, ge_lt_p, gt_le_p, gt_lt_p
 from predicate.regex_predicate import regex_p
 from predicate.set_of_predicate import is_set_of_p
-from predicate.set_predicates import is_real_subset_p, is_real_superset_p, is_subset_p, is_superset_p
+from predicate.set_predicates import intersects_p, is_real_subset_p, is_real_superset_p, is_subset_p, is_superset_p
 from predicate.struct_predicate import is_struct_p
 from predicate.tuple_of_predicate import is_tuple_of_p
 
@@ -87,6 +87,8 @@ def from_json(data: dict[str, Any]) -> Predicate:
             return implies_p(from_json(value["predicate"]))
         case "in":
             return in_p(value["v"])
+        case "intersects":
+            return intersects_p(set(value["v"]))
         case "is_close":
             return is_close_p(value["target"], rel_tol=value["rel_tol"], abs_tol=value["abs_tol"])
         case "is_falsy":

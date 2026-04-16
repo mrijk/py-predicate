@@ -14,6 +14,7 @@ from predicate.lt_predicate import LtPredicate
 from predicate.not_in_predicate import NotInPredicate
 from predicate.optimizer.helpers import MaybeOptimized, NotOptimized, Optimized
 from predicate.predicate import AndPredicate, NotPredicate, OrPredicate, Predicate
+from predicate.set_predicates import IntersectsPredicate
 
 
 def optimize_or_predicate[T](predicate: OrPredicate[T]) -> MaybeOptimized[T]:
@@ -62,6 +63,10 @@ def optimize_or_predicate[T](predicate: OrPredicate[T]) -> MaybeOptimized[T]:
         case NotInPredicate(v1), NotInPredicate(v2) if isinstance(v1, Iterable) and isinstance(v2, Iterable):
             # not_in(A) | not_in(B) == not_in(A ∩ B)
             return Optimized(optimize(NotInPredicate(v=set(v1) & set(v2))))
+
+        case IntersectsPredicate(v1), IntersectsPredicate(v2):
+            # intersects(A) | intersects(B) == intersects(A ∪ B)
+            return Optimized(optimize(IntersectsPredicate(v=set(v1) | set(v2))))
 
         case GePredicate(v1), LePredicate(v2) if v1 <= v2:  # ge(a) | le(b) == True when a <= b
             return Optimized(always_true_p)
