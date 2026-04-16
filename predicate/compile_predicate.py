@@ -72,8 +72,12 @@ class CompiledPredicate[T](Predicate[T]):
         return self.predicate.klass
 
 
+def _name(id: str) -> ast.Name:
+    return ast.Name(id=id, ctx=ast.Load())
+
+
 def _x() -> ast.Name:
-    return ast.Name(id="x", ctx=ast.Load())
+    return _name("x")
 
 
 def _const(v) -> ast.Constant:
@@ -87,7 +91,7 @@ def _cmp(ops: list, comparators: list) -> ast.Compare:
 def _delegate(predicate: Predicate, namespace: dict) -> ast.Call:
     key = f"_p{len(namespace)}"
     namespace[key] = predicate
-    return ast.Call(func=ast.Name(id=key, ctx=ast.Load()), args=[_x()], keywords=[])
+    return ast.Call(func=_name(key), args=[_x()], keywords=[])
 
 
 @singledispatch
@@ -152,14 +156,14 @@ def _(predicate: IsNotNonePredicate, namespace: dict) -> ast.expr:
 
 @_to_ast.register
 def _(predicate: IsTruthyPredicate, namespace: dict) -> ast.expr:
-    return ast.Call(func=ast.Name(id="bool", ctx=ast.Load()), args=[_x()], keywords=[])
+    return ast.Call(func=_name("bool"), args=[_x()], keywords=[])
 
 
 @_to_ast.register
 def _(predicate: IsFalsyPredicate, namespace: dict) -> ast.expr:
     return ast.UnaryOp(
         op=ast.Not(),
-        operand=ast.Call(func=ast.Name(id="bool", ctx=ast.Load()), args=[_x()], keywords=[]),
+        operand=ast.Call(func=_name("bool"), args=[_x()], keywords=[]),
     )
 
 
@@ -169,7 +173,7 @@ def _(predicate: InPredicate, namespace: dict) -> ast.expr:
         raise NotCompilableError(f"Cannot compile InPredicate with non-iterable value {predicate.v!r}")
     key = f"_s{len(namespace)}"
     namespace[key] = frozenset(predicate.v)
-    return _cmp([ast.In()], [ast.Name(id=key, ctx=ast.Load())])
+    return _cmp([ast.In()], [_name(key)])
 
 
 @_to_ast.register
@@ -178,7 +182,7 @@ def _(predicate: NotInPredicate, namespace: dict) -> ast.expr:
         raise NotCompilableError(f"Cannot compile NotInPredicate with non-iterable value {predicate.v!r}")
     key = f"_s{len(namespace)}"
     namespace[key] = frozenset(predicate.v)
-    return _cmp([ast.NotIn()], [ast.Name(id=key, ctx=ast.Load())])
+    return _cmp([ast.NotIn()], [_name(key)])
 
 
 @_to_ast.register
@@ -186,7 +190,7 @@ def _(predicate: HasKeyPredicate, namespace: dict) -> ast.expr:
     key = f"_k{len(namespace)}"
     namespace[key] = predicate.key
     return ast.Compare(
-        left=ast.Name(id=key, ctx=ast.Load()),
+        left=_name(key),
         ops=[ast.In()],
         comparators=[_x()],
     )
@@ -244,12 +248,8 @@ def _(predicate: NotPredicate, namespace: dict) -> ast.expr:
 @_to_ast.register
 def _(predicate: XorPredicate, namespace: dict) -> ast.expr:
     # bool(left_expr) ^ bool(right_expr)
-    bool_left = ast.Call(
-        func=ast.Name(id="bool", ctx=ast.Load()), args=[_to_ast(predicate.left, namespace)], keywords=[]
-    )
-    bool_right = ast.Call(
-        func=ast.Name(id="bool", ctx=ast.Load()), args=[_to_ast(predicate.right, namespace)], keywords=[]
-    )
+    bool_left = ast.Call(func=_name("bool"), args=[_to_ast(predicate.left, namespace)], keywords=[])
+    bool_right = ast.Call(func=_name("bool"), args=[_to_ast(predicate.right, namespace)], keywords=[])
     return ast.BinOp(left=bool_left, op=ast.BitXor(), right=bool_right)
 
 
@@ -270,8 +270,8 @@ def _any_all_ast(predicate: AllPredicate | AnyPredicate, fn_name: str, namespace
     loop_var = "_e"
     gen = ast.GeneratorExp(
         elt=ast.Call(
-            func=ast.Name(id=inner_key, ctx=ast.Load()),
-            args=[ast.Name(id=loop_var, ctx=ast.Load())],
+            func=_name(inner_key),
+            args=[_name(loop_var)],
             keywords=[],
         ),
         generators=[
@@ -283,7 +283,7 @@ def _any_all_ast(predicate: AllPredicate | AnyPredicate, fn_name: str, namespace
             )
         ],
     )
-    return ast.Call(func=ast.Name(id=fn_name, ctx=ast.Load()), args=[gen], keywords=[])
+    return ast.Call(func=_name(fn_name), args=[gen], keywords=[])
 
 
 @_to_ast.register
@@ -293,8 +293,8 @@ def _(predicate: AnyPredicate, namespace: dict) -> ast.expr:
 
 def _isinstance_and_all_ast(predicate: Predicate, type_name: str, namespace: dict) -> ast.expr:
     isinstance_check = ast.Call(
-        func=ast.Name(id="isinstance", ctx=ast.Load()),
-        args=[_x(), ast.Name(id=type_name, ctx=ast.Load())],
+        func=_name("isinstance"),
+        args=[_x(), _name(type_name)],
         keywords=[],
     )
     all_check = _any_all_ast(predicate, "all", namespace)
@@ -317,7 +317,7 @@ def _(predicate: IsClosePredicate, namespace: dict) -> ast.expr:
 
     namespace["_isclose"] = math.isclose
     return ast.Call(
-        func=ast.Name(id="_isclose", ctx=ast.Load()),
+        func=_name("_isclose"),
         args=[_x(), _const(predicate.target)],
         keywords=[
             ast.keyword(arg="rel_tol", value=_const(predicate.rel_tol)),
@@ -337,8 +337,8 @@ def _(predicate: CompPredicate, namespace: dict) -> ast.expr:
     p_key = f"_p{len(namespace)}"
     namespace[p_key] = inner_fn
     return ast.Call(
-        func=ast.Name(id=p_key, ctx=ast.Load()),
-        args=[ast.Call(func=ast.Name(id=fn_key, ctx=ast.Load()), args=[_x()], keywords=[])],
+        func=_name(p_key),
+        args=[ast.Call(func=_name(fn_key), args=[_x()], keywords=[])],
         keywords=[],
     )
 
@@ -347,7 +347,7 @@ def _(predicate: CompPredicate, namespace: dict) -> ast.expr:
 def _(predicate: TupleOfPredicate, namespace: dict) -> ast.expr:
     n = len(predicate.predicates)
     len_check = ast.Compare(
-        left=ast.Call(func=ast.Name(id="len", ctx=ast.Load()), args=[_x()], keywords=[]),
+        left=ast.Call(func=_name("len"), args=[_x()], keywords=[]),
         ops=[ast.Eq()],
         comparators=[_const(n)],
     )
@@ -358,7 +358,7 @@ def _(predicate: TupleOfPredicate, namespace: dict) -> ast.expr:
         key = f"_p{len(namespace)}"
         namespace[key] = try_compile_predicate(p)
         return ast.Call(
-            func=ast.Name(id=key, ctx=ast.Load()),
+            func=_name(key),
             args=[ast.Subscript(value=_x(), slice=_const(i), ctx=ast.Load())],
             keywords=[],
         )
