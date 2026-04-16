@@ -55,5 +55,15 @@ def test_is_close_to_yaml():
     assert "target" in result
 
 
+def test_is_close_p_default_rel_tol():
+    predicate = is_close_p(1.0)
+    assert predicate.rel_tol == 1e-9
+
+
+def test_is_close_p_default_abs_tol():
+    predicate = is_close_p(1.0)
+    assert predicate.abs_tol == 0.0
+
+
 def test_is_close_exercise():
     exercise_predicate(is_close_p)

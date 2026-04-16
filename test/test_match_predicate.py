@@ -23,6 +23,11 @@ from predicate.match_predicate import match_p
 from predicate.star_predicate import wildcard
 
 
+def test_match_p_default_full_match():
+    predicate = match_p(is_int_p)
+    assert not predicate.full_match
+
+
 def test_match_first():
     predicate = match_p(is_int_p)
 
@@ -195,6 +200,18 @@ def test_repeat_and_exactly_and_repeat():
     assert predicate([1, 2, 3.0, "foo", "bar"])
 
     assert repr(predicate) == "match_p(repeat(1, 3, is_int_p), is_float_p, repeat(2, 3, is_str_p))"
+
+
+def test_match_star_full_match():
+    # With full_match=True, star followed by is_str_p must consume the entire iterable.
+    # [1, "foo", "bar"] should fail because "bar" is leftover after star+str match.
+    predicate = match_p(star(is_int_p), is_str_p, full_match=True)
+
+    assert predicate([1, "foo"])
+    assert not predicate([1, "foo", "bar"])
+
+    result = explain(predicate, [1, "foo", "bar"])
+    assert result["result"] is False
 
 
 def test_match_star():

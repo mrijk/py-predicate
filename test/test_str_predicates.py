@@ -12,6 +12,7 @@ from predicate import (
     is_upper_p,
     starts_with_p,
 )
+from predicate.str_predicates import create_is_str_p
 
 
 def test_is_alnum_p():
@@ -79,3 +80,9 @@ def test_starts_with_p():
 
     assert not predicate("bar")
     assert predicate("foobar")
+
+
+def test_create_is_str_p():
+    pred = create_is_str_p(str.isupper)
+    assert pred("ABC")
+    assert not pred("abc")
