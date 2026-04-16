@@ -7,11 +7,13 @@ from predicate.optimizer.and_optimizer import optimize_and_predicate
 from predicate.optimizer.any_optimizer import optimize_any_predicate
 from predicate.optimizer.helpers import MaybeOptimized, NotOptimized, Optimized
 from predicate.optimizer.in_optimizer import optimize_in_predicate
+from predicate.optimizer.intersects_optimizer import optimize_intersects_predicate
 from predicate.optimizer.not_in_optimizer import optimize_not_in_predicate
 from predicate.optimizer.not_optimizer import optimize_not_predicate
 from predicate.optimizer.or_optimizer import optimize_or_predicate
 from predicate.optimizer.xor_optimizer import optimize_xor_predicate
 from predicate.predicate import AndPredicate, NotPredicate, OrPredicate, Predicate, XorPredicate
+from predicate.set_predicates import IntersectsPredicate
 
 
 def optimizations[T](predicate: Predicate[T]) -> MaybeOptimized[T]:
@@ -31,6 +33,8 @@ def optimizations[T](predicate: Predicate[T]) -> MaybeOptimized[T]:
             return optimize_xor_predicate(xor_predicate)
         case InPredicate() as in_predicate:
             return optimize_in_predicate(in_predicate)
+        case IntersectsPredicate() as intersects_predicate:
+            return optimize_intersects_predicate(intersects_predicate)
         case NotInPredicate() as not_in_predicate:
             return optimize_not_in_predicate(not_in_predicate)
         case _:
