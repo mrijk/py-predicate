@@ -11,6 +11,7 @@ from predicate.always_false_predicate import AlwaysFalsePredicate
 from predicate.always_true_predicate import AlwaysTruePredicate
 from predicate.any_predicate import AnyPredicate
 from predicate.comp_predicate import CompPredicate
+from predicate.count_predicate import CountPredicate
 from predicate.eq_predicate import EqPredicate
 from predicate.ge_predicate import GePredicate
 from predicate.gt_predicate import GtPredicate
@@ -341,6 +342,34 @@ def _(predicate: CompPredicate, namespace: dict) -> ast.expr:
         args=[ast.Call(func=_name(fn_key), args=[_x()], keywords=[])],
         keywords=[],
     )
+
+
+@_to_ast.register
+def _(predicate: CountPredicate, namespace: dict) -> ast.expr:
+    # sum(1 for _e in x if _filter_p(_e))  — replaces ilen(...) with no extra dependency
+    loop_var = "_e"
+    filter_key = f"_p{len(namespace)}"
+    namespace[filter_key] = try_compile_predicate(predicate.predicate)
+    length_key = f"_p{len(namespace)}"
+    namespace[length_key] = try_compile_predicate(predicate.length_p)
+    count_expr = ast.Call(
+        func=_name("sum"),
+        args=[
+            ast.GeneratorExp(
+                elt=_const(1),
+                generators=[
+                    ast.comprehension(
+                        target=ast.Name(id=loop_var, ctx=ast.Store()),
+                        iter=_x(),
+                        ifs=[ast.Call(func=_name(filter_key), args=[_name(loop_var)], keywords=[])],
+                        is_async=0,
+                    )
+                ],
+            )
+        ],
+        keywords=[],
+    )
+    return ast.Call(func=_name(length_key), args=[count_expr], keywords=[])
 
 
 @_to_ast.register

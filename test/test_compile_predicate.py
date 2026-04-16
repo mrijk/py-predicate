@@ -9,6 +9,7 @@ from predicate import (
     any_p,
     comp_p,
     compile_predicate,
+    count_p,
     eq_p,
     fn_p,
     ge_le_p,
@@ -381,6 +382,31 @@ def test_compile_comp_with_lambda():
     cp = compile_predicate(comp_p(lambda x: x * 2, eq_p(10)))
     assert cp(5)
     assert not cp(4)
+
+
+def test_compile_count():
+    cp = compile_predicate(count_p(gt_p(0), eq_p(2)))
+    assert cp([1, 2, -1])  # exactly 2 positives
+    assert not cp([1, 2, 3])  # 3 positives
+    assert not cp([1, -1, -1])  # 1 positive
+
+
+def test_compile_count_zero():
+    cp = compile_predicate(count_p(gt_p(0), eq_p(0)))
+    assert cp([-1, -2])
+    assert not cp([1, -1])
+
+
+def test_compile_count_empty():
+    cp = compile_predicate(count_p(gt_p(0), eq_p(0)))
+    assert cp([])
+
+
+def test_compile_count_with_range_length():
+    cp = compile_predicate(count_p(gt_p(0), ge_p(2)))
+    assert cp([1, 2, 3])
+    assert cp([1, 2, -1])
+    assert not cp([1, -1, -1])
 
 
 def test_compile_fn_raises():
