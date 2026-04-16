@@ -1,4 +1,4 @@
-from predicate import all_p, always_false_p, always_true_p, any_p, can_optimize, eq_p, optimize
+from predicate import all_p, always_false_p, always_true_p, any_p, can_optimize, eq_p, ge_p, optimize
 
 
 def test_optimize_any_ne():
@@ -44,3 +44,15 @@ def test_optimize_any_not(p):
     optimized = optimize(predicate)
 
     assert optimized == ~all_p(p)
+
+
+def test_optimize_any_inner_change():
+    # any_p(ge(5) | ge(3)): inner simplifies to ge(3), falls to final return
+
+    predicate = any_p(ge_p(5) | ge_p(3))
+
+    assert can_optimize(predicate)
+
+    optimized = optimize(predicate)
+
+    assert optimized == any_p(ge_p(3))
