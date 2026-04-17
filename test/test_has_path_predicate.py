@@ -68,7 +68,7 @@ def test_has_path_predicate_no_dict():
 def test_has_path_predicate_no_dict_explain():
     predicate = has_path_p()
 
-    expected = {"reason": "Value foo is not a dict", "result": False}
+    expected = {"reason": "Value foo is not a Mapping", "result": False}
     assert explain(predicate, "foo") == expected
 
 
@@ -104,5 +104,5 @@ def test_has_path_predicate_non_dict_intermediate_explain():
     has_y = eq_p("y")
     predicate = has_path_p(has_x, has_y)
 
-    expected = {"reason": "Expected a dict at path position 1, got int", "result": False}
+    expected = {"reason": "Expected a Mapping at path position 1, got int", "result": False}
     assert explain(predicate, {"x": 13}) == expected

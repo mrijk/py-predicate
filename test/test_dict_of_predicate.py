@@ -88,7 +88,7 @@ def test_is_dict_of_explain_empty():
 def test_is_dict_of_explain_not_a_dict():
     predicate = is_dict_of_p(("x", is_int_p), (eq_p("y"), is_str_p))
 
-    expected = {"reason": "3 is not an instance of a dict", "result": False}
+    expected = {"reason": "3 is not an instance of a Mapping", "result": False}
     assert explain(predicate, 3) == expected
 
 

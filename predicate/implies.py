@@ -166,7 +166,7 @@ def _(predicate: IsSupersetPredicate, other: Predicate) -> bool:
 def _(predicate: IntersectsPredicate, other: Predicate) -> bool:
     match other:
         case IntersectsPredicate(v):
-            return predicate.v.issubset(v)
+            return predicate.v <= v
         case _:
             return False
 
