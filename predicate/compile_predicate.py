@@ -189,13 +189,7 @@ def _(predicate: NotInPredicate, namespace: dict) -> ast.expr:
 
 @_to_ast.register
 def _(predicate: HasKeyPredicate, namespace: dict) -> ast.expr:
-    key = f"_k{len(namespace)}"
-    namespace[key] = predicate.key
-    return ast.Compare(
-        left=_name(key),
-        ops=[ast.In()],
-        comparators=[_x()],
-    )
+    return _any_all_ast(predicate.key_p, "any", namespace)
 
 
 @_to_ast.register

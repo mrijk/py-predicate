@@ -303,7 +303,7 @@ def test_compile_list_of_nested():
 
 
 def test_compile_has_key():
-    cp = compile_predicate(has_key_p("a"))
+    cp = compile_predicate(has_key_p(eq_p("a")))
     assert cp({"a": 1})
     assert cp({"a": 1, "b": 2})
     assert not cp({"b": 1})

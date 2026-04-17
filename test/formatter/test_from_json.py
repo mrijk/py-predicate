@@ -75,7 +75,7 @@ from predicate.struct_predicate import is_struct_p
         gt_p(5),
         gt_le_p(lower=1, upper=10),
         gt_lt_p(lower=1, upper=10),
-        has_key_p("key"),
+        has_key_p(eq_p("key")),
         has_length_p(eq_p(3)),
         has_path_p(eq_p("a"), eq_p("b")),
         implies_p(always_true_p),

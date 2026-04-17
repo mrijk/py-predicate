@@ -86,7 +86,7 @@ from predicate.is_callable_predicate import is_callable_p as is_callable_signatu
         any_p(is_uuid_p),
         eq_false_p,
         eq_true_p,
-        has_key_p("foo"),
+        has_key_p(eq_p("foo")),
         in_p([2, 3, 4]),
         is_bool_p,
         is_bytes_p,

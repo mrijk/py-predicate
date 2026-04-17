@@ -326,11 +326,11 @@ def test_format_json_is_not_none():
 
 
 def test_format_json_has_key():
-    predicate = has_key_p("name")
+    predicate = has_key_p(eq_p("name"))
 
     json = to_json(predicate)
 
-    assert json == {"has_key": {"key": "name"}}
+    assert json == {"has_key": {"key_p": {"eq": {"v": "name"}}}}
 
 
 def test_format_json_regex():

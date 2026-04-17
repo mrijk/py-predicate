@@ -154,8 +154,8 @@ def render(dot: Digraph, predicate: Predicate, node_nr: count):
             case FnPredicate(predicate_fn):
                 name = predicate_fn.__code__.co_name
                 return add_node("fn", label=f"fn: {name}")
-            case HasKeyPredicate(key):
-                return add_node("has_key", label=f"has_key: {key!r}")
+            case HasKeyPredicate(key_p):
+                return add_node_with_child("has_key", label="has_key", child=key_p)
             case HasLengthPredicate(length_p):
                 return add_node_with_child("has_length", label="has_length", child=length_p)
             case HasPathPredicate(path):

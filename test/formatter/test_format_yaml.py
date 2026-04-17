@@ -192,7 +192,7 @@ def test_format_yaml_juxt():
 
 
 def test_format_yaml_has_key():
-    assert parsed(has_key_p("name")) == to_json(has_key_p("name"))
+    assert parsed(has_key_p(eq_p("name"))) == to_json(has_key_p(eq_p("name")))
 
 
 def test_format_yaml_regex():

@@ -85,7 +85,7 @@ def foo(self) -> bool:
         any_p(is_tuple_of_p(is_uuid_p, in_p({"foo", "bar"}), is_truthy_p)),
         eq_false_p,
         eq_true_p,
-        has_key_p("foo"),
+        has_key_p(eq_p("foo")),
         is_bool_p,
         is_callable_p,
         is_complex_p,

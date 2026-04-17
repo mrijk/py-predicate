@@ -306,8 +306,8 @@ def generate_is_close_p(predicate: IsClosePredicate) -> Iterator:
 
 @generate_true.register
 def generate_has_key(predicate: HasKeyPredicate) -> Iterator:
-    key = predicate.key
-    yield from (d | {key: v} for d, v in zip(random_dicts(), random_anys(), strict=False))
+    keys = generate_true(predicate.key_p)
+    yield from (d | {key: v} for d, v, key in zip(random_dicts(), random_anys(), keys, strict=False))
 
 
 @generate_true.register

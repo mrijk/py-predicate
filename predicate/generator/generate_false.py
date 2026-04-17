@@ -148,7 +148,7 @@ def generate_is_close_p(predicate: IsClosePredicate) -> Iterator:
 
 @generate_false.register
 def generate_has_key(predicate: HasKeyPredicate) -> Iterator:
-    without_predicate_key = ~has_key_p(predicate.key)
+    without_predicate_key = ~has_key_p(predicate.key_p)
 
     yield from (random_dict for random_dict in random_dicts() if without_predicate_key(random_dict))
 

@@ -101,8 +101,8 @@ def to_json(predicate: Predicate) -> dict[str, Any]:
                 fn_info: dict[str, Any] = {"name": name}
                 fn_info.update(get_fn_source(predicate_fn))
                 return "fn", fn_info
-            case HasKeyPredicate(key):
-                return "has_key", {"key": key}
+            case HasKeyPredicate(key_p):
+                return "has_key", {"key_p": to_json(key_p)}
             case HasLengthPredicate(length_p):
                 return "has_length", {"length_p": to_json(length_p)}
             case HasPathPredicate(path):

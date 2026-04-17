@@ -359,7 +359,7 @@ def test_format_dot_exactly():
 
 
 def test_format_dot_has_key():
-    assert to_dot(has_key_p("name"))
+    assert to_dot(has_key_p(eq_p("name")))
 
 
 def test_format_dot_has_length():

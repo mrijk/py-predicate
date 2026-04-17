@@ -78,7 +78,7 @@ def from_json(data: dict[str, Any]) -> Predicate:
         case "gt":
             return gt_p(value["v"])
         case "has_key":
-            return has_key_p(value["key"])
+            return has_key_p(from_json(value["key_p"]))
         case "has_length":
             return has_length_p(from_json(value["length_p"]))
         case "has_path":

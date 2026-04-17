@@ -1,4 +1,4 @@
-from predicate import comp_p, has_key_p, is_dict_p, is_int_p, is_iterable_of_p
+from predicate import comp_p, eq_p, has_key_p, is_dict_p, is_int_p, is_iterable_of_p
 from predicate.explain import explain
 from predicate.list_of_predicate import is_single_or_list_of_p
 from predicate.standard_predicates import (
@@ -13,7 +13,7 @@ from predicate.standard_predicates import (
 
 
 def test_has_key_p():
-    has_key_x = has_key_p("x")
+    has_key_x = has_key_p(eq_p("x"))
 
     assert not has_key_x({})
     assert not has_key_x({"y": 13})
@@ -21,9 +21,9 @@ def test_has_key_p():
 
 
 def test_has_key_explain():
-    predicate = has_key_p("x")
+    predicate = has_key_p(eq_p("x"))
 
-    expected = {"reason": "Key 'x' is missing in {'y': 13}", "result": False}
+    expected = {"reason": "No key satisfying eq_p('x') found in {'y': 13}", "result": False}
     assert explain(predicate, {"y": 13}) == expected
 
 

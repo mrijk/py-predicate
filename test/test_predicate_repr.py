@@ -73,7 +73,7 @@ from predicate.standard_predicates import (
         (gt_le_p(2, 3), "gt_le_p(2, 3)"),
         (ge_lt_p(2, 3), "ge_lt_p(2, 3)"),
         (gt_lt_p(2, 3), "gt_lt_p(2, 3)"),
-        (has_key_p("foo"), 'has_key_p("foo")'),
+        (has_key_p(eq_p("foo")), "has_key_p(eq_p('foo'))"),
         (has_length_p(eq_p(42)), "has_length_p(eq_p(42))"),
         (has_path_p(is_str_p), "has_path_p(is_str_p)"),
         (implies_p(ge_p(2)), "implies_p(ge_p(2))"),
