@@ -699,8 +699,9 @@ def generate_struct(predicate: StructPredicate) -> Iterator:
 
     def false_required_fields() -> Iterator:
         optional_generators = {key: generate_false(value_p) for key, value_p in optional.items()}
-        for false_dict in generate_dict_of_p(dict_of_predicate):
-            yield false_dict | sample_optional_fields(optional, optional_generators)
+        yield from (
+            d | sample_optional_fields(optional, optional_generators) for d in generate_dict_of_p(dict_of_predicate)
+        )
 
     def extra_key_dicts() -> Iterator:
         required_true_generators = {key: generate_true(value_p) for key, value_p in required.items()}

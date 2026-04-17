@@ -307,8 +307,7 @@ def generate_is_close_p(predicate: IsClosePredicate) -> Iterator:
 @generate_true.register
 def generate_has_key(predicate: HasKeyPredicate) -> Iterator:
     key = predicate.key
-    for random_dict, value in zip(random_dicts(), random_anys(), strict=False):
-        yield random_dict | {key: value}
+    yield from (d | {key: v} for d, v in zip(random_dicts(), random_anys(), strict=False))
 
 
 @generate_true.register
@@ -757,5 +756,6 @@ def generate_struct(predicate: StructPredicate) -> Iterator:
     dict_of_predicate = DictOfPredicate(key_value_predicates=list(required.items()))
     optional_generators = {key: generate_true(value_p) for key, value_p in optional.items()}
 
-    for required_dict in generate_dict_of_p(dict_of_predicate):
-        yield required_dict | sample_optional_fields(optional, optional_generators)
+    yield from (
+        d | sample_optional_fields(optional, optional_generators) for d in generate_dict_of_p(dict_of_predicate)
+    )
