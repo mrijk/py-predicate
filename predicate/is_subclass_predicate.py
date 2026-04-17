@@ -36,8 +36,7 @@ class IsSubclassPredicate[T](Predicate[T]):
         def class_names() -> Iterator[str]:
             match self.class_or_tuple:
                 case tuple(klasses):
-                    for klass in klasses:
-                        yield klass.__name__
+                    yield from (klass.__name__ for klass in klasses)
                 case _:
                     yield self.class_or_tuple.__name__  # type: ignore
 

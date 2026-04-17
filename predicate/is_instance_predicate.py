@@ -33,11 +33,7 @@ class IsInstancePredicate[T](Predicate[T]):
 
     @override
     def explain_failure(self, x: T) -> dict:
-        def class_names() -> Iterator[str]:
-            for klass in self.instance_klass:
-                yield klass.__name__
-
-        klasses = join_with_or(list(class_names()))
+        klasses = join_with_or([klass.__name__ for klass in self.instance_klass])
 
         return {"reason": f"{x} is not an instance of type {klasses}"}
 

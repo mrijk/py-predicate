@@ -165,8 +165,7 @@ def random_dicts(
     valid_values = generate_true(value_p)
     valid_sizes = (s for s in generate_true(size_p) if s >= 0)
 
-    for valid_size in valid_sizes:
-        yield dict(zip(take(valid_size, unique_everseen(valid_keys)), valid_values, strict=False))
+    yield from (dict(zip(take(s, unique_everseen(valid_keys)), valid_values, strict=False)) for s in valid_sizes)
 
 
 def random_datetimes(lower: datetime | None = None, upper: datetime | None = None) -> Iterator[datetime]:
@@ -282,8 +281,7 @@ def random_lists(length_p: Predicate = default_length_p, value_p: Predicate = is
 
     valid_lengths = (n for n in generate_true(length_p) if n >= 0)
 
-    for length in valid_lengths:
-        yield take(length, generate_true(value_p))
+    yield from (take(n, generate_true(value_p)) for n in valid_lengths)
 
 
 def random_tuples(length_p: Predicate = default_length_p, value_p: Predicate = is_int_p) -> Iterator[tuple[Any, ...]]:
