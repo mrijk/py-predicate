@@ -3,7 +3,7 @@ import sys
 from collections.abc import Iterable, Iterator
 from datetime import datetime, timedelta
 from functools import singledispatch
-from itertools import cycle, repeat
+from itertools import chain, cycle, repeat
 from types import UnionType
 from typing import Final, get_args
 from uuid import UUID
@@ -568,7 +568,7 @@ def generate_match_p(match_predicate: MatchPredicate) -> Iterator:
                 iter_first = generate_false(predicate)
                 iter_rest: Iterator = generate_false(MatchPredicate(predicates=rest_predicates))
                 while True:
-                    yield [next(iter_first)] + list(next(iter_rest))
+                    yield list(chain([next(iter_first)], next(iter_rest)))
             else:
                 yield from zip(generate_false(predicate), strict=False)
 
@@ -586,7 +586,7 @@ def generate_exactly_n(exactly_predicate: ExactlyPredicate, *, predicates: list[
         iter_first = generate_false(list_of_predicate, length_p=length_p)
         iter_rest: Iterator = generate_false(MatchPredicate(predicates=predicates))
         while True:
-            yield list(next(iter_first)) + list(next(iter_rest))
+            yield list(chain(next(iter_first), next(iter_rest)))
     else:
         yield from generate_false(list_of_predicate, length_p=length_p)
 

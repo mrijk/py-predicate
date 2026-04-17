@@ -1,7 +1,8 @@
 from dataclasses import dataclass
+from itertools import pairwise
 from typing import Callable, Iterable
 
-from more_itertools import pairwise, spy
+from more_itertools import spy
 
 from predicate import always_true_p
 from predicate.predicate import Predicate

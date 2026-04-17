@@ -1,8 +1,8 @@
 from dataclasses import dataclass
-from itertools import takewhile
+from itertools import pairwise, takewhile
 from typing import Callable, Iterable, Iterator, override
 
-from more_itertools import ilen, pairwise, spy
+from more_itertools import ilen, spy
 
 from predicate import always_true_p
 from predicate.predicate import Predicate
