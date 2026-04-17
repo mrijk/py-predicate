@@ -81,6 +81,21 @@ This predicate tests if for any element in an Iterable, the enclosed predicate i
     assert any_int([None, 2, 3])
 
 
+comp_p
+------
+
+This predicate transforms the input with a function and then tests the result against a predicate.
+
+.. code-block:: python
+
+    from predicate import comp_p, ge_p
+
+    # True if the length of the list is >= 3
+    long_enough = comp_p(len, ge_p(3))
+
+    assert long_enough([1, 2, 3])
+    assert not long_enough([1, 2])
+
 count_p
 -------
 
@@ -159,6 +174,37 @@ This predicate can be used to wrap any (lambda) function:
     assert not square_ge_2(1)
     assert square_ge_2(2)
 
+ge_le_p
+-------
+
+This predicate tests if a value satisfies ``lower <= x <= upper``.
+
+.. code-block:: python
+
+    from predicate import ge_le_p
+
+    between_2_and_5 = ge_le_p(2, 5)
+
+    assert between_2_and_5(2)
+    assert between_2_and_5(5)
+    assert not between_2_and_5(1)
+    assert not between_2_and_5(6)
+
+ge_lt_p
+-------
+
+This predicate tests if a value satisfies ``lower <= x < upper``.
+
+.. code-block:: python
+
+    from predicate import ge_lt_p
+
+    predicate = ge_lt_p(2, 5)
+
+    assert predicate(2)
+    assert predicate(4)
+    assert not predicate(5)
+
 ge_p
 ----
 
@@ -172,6 +218,36 @@ This predicates tests for greater or equal a value.
 
     assert ge_2(2)
     assert not ge_2(1)
+
+gt_le_p
+-------
+
+This predicate tests if a value satisfies ``lower < x <= upper``.
+
+.. code-block:: python
+
+    from predicate import gt_le_p
+
+    predicate = gt_le_p(2, 5)
+
+    assert predicate(3)
+    assert predicate(5)
+    assert not predicate(2)
+
+gt_lt_p
+-------
+
+This predicate tests if a value satisfies ``lower < x < upper``.
+
+.. code-block:: python
+
+    from predicate import gt_lt_p
+
+    predicate = gt_lt_p(2, 5)
+
+    assert predicate(3)
+    assert not predicate(2)
+    assert not predicate(5)
 
 gt_p
 ----
@@ -187,6 +263,21 @@ This predicates tests for greater than a value.
     assert not gt_2(2)
     assert gt_2(3)
 
+has_key_p
+---------
+
+This predicate tests if a mapping contains at least one key satisfying a predicate.
+See :doc:`has_key_p` for full documentation and examples.
+
+.. code-block:: python
+
+    from predicate import eq_p, has_key_p
+
+    has_name = has_key_p(eq_p("name"))
+
+    assert has_name({"name": "Alice"})
+    assert not has_name({"age": 30})
+
 has_length_p
 ------------
 
@@ -201,6 +292,22 @@ This predicate tests the length of an iterable against another predicate.
     assert not has_length_lt_2([1, 2, 3])
     assert has_length_lt_2({1})
 
+
+has_path_p
+----------
+
+This predicate tests if a nested mapping contains a path where each step's key satisfies the corresponding predicate.
+
+.. code-block:: python
+
+    from predicate import eq_p, has_path_p
+
+    # True if the dict has key "user" whose value has key "name"
+    has_user_name = has_path_p(eq_p("user"), eq_p("name"))
+
+    assert has_user_name({"user": {"name": "Alice"}})
+    assert not has_user_name({"user": {"age": 30}})
+    assert not has_user_name({"name": "Alice"})
 
 implies_p
 ---------
@@ -387,6 +494,19 @@ This predicate tests if an iterable is empty.
     assert is_empty_p({})
     assert is_empty_p([])
     assert is_empty_p("")
+
+is_even_p
+---------
+
+This predicate tests if an integer is even.
+
+.. code-block:: python
+
+    from predicate import is_even_p
+
+    assert is_even_p(0)
+    assert is_even_p(4)
+    assert not is_even_p(3)
 
 .. _is_falsy_p:
 
@@ -605,6 +725,20 @@ This predicate tests if the value is not ``None``.
     assert not is_not_none_p(None)
     assert is_not_none_p(13)
 
+is_not_empty_p
+--------------
+
+This predicate tests if an iterable is not empty.
+
+.. code-block:: python
+
+    from predicate import is_not_empty_p
+
+    assert is_not_empty_p([1])
+    assert is_not_empty_p("hello")
+    assert not is_not_empty_p([])
+    assert not is_not_empty_p("")
+
 is_number_p
 -----------
 
@@ -620,6 +754,19 @@ This predicate tests if the value is a number (``int``, ``float``, or ``complex`
     assert is_number_p(1 + 2j)
     assert not is_number_p(True)  # bool is excluded
     assert not is_number_p("42")
+
+is_odd_p
+--------
+
+This predicate tests if an integer is odd.
+
+.. code-block:: python
+
+    from predicate import is_odd_p
+
+    assert is_odd_p(1)
+    assert is_odd_p(7)
+    assert not is_odd_p(4)
 
 is_path_p
 ---------
@@ -890,6 +1037,22 @@ This predicates tests for less than a value.
     assert not lt_2(2)
     assert lt_2(1)
 
+match_p
+-------
+
+This predicate tests if a sequence matches a series of predicates in order.
+Each predicate in the series is applied to the corresponding element.
+
+.. code-block:: python
+
+    from predicate import is_int_p, is_str_p, match_p
+
+    int_then_str = match_p(is_int_p, is_str_p)
+
+    assert int_then_str([1, "hello"])
+    assert not int_then_str([1, 2])
+    assert not int_then_str(["hello", 1])
+
 ne_p
 ----
 
@@ -905,6 +1068,32 @@ This predicate tests for non equality
     assert not ne_2(2)
     assert ne_2(3)
 
+
+neg_p
+-----
+
+This predicate tests if a number is negative (strictly less than zero).
+
+.. code-block:: python
+
+    from predicate import neg_p
+
+    assert neg_p(-1)
+    assert not neg_p(0)
+    assert not neg_p(1)
+
+pos_p
+-----
+
+This predicate tests if a number is positive (strictly greater than zero).
+
+.. code-block:: python
+
+    from predicate import pos_p
+
+    assert pos_p(1)
+    assert not pos_p(0)
+    assert not pos_p(-1)
 
 raises_p
 --------
@@ -982,6 +1171,20 @@ the iterable is empty.
 
     assert is_interval_3_p([1, 4, 7])
     assert not is_interval_3_p([1, 3])
+
+regex_p
+-------
+
+This predicate tests if a string matches a regular expression pattern.
+
+.. code-block:: python
+
+    from predicate import regex_p
+
+    is_phone = regex_p(r"\d{3}-\d{4}")
+
+    assert is_phone("555-1234")
+    assert not is_phone("hello")
 
 tee_p
 -----

@@ -13,6 +13,7 @@ and many more features.
 
    predicates
    standard_predicates
+   has_key_p
    lazy_predicates
    formatters
    instrumentation
