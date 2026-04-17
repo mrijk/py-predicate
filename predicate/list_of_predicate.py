@@ -29,7 +29,8 @@ class ListOfPredicate[T](Predicate[T]):
         return f"is_list_of_p({self.predicate})"
 
     @override
-    def get_klass(self) -> type:
+    @property
+    def klass(self) -> type:
         return Predicate[self.predicate.klass]  # type: ignore[name-defined]
 
     @override

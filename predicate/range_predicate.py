@@ -16,7 +16,8 @@ class RangePredicate[T](Predicate[T]):
     upper: ConstrainedT
 
     @override
-    def get_klass(self) -> type:
+    @property
+    def klass(self) -> type:
         return type(self.lower)
 
 

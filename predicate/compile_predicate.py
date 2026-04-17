@@ -70,7 +70,8 @@ class CompiledPredicate[T](Predicate[T]):
         return self.predicate.explain_failure(x)
 
     @override
-    def get_klass(self) -> type:
+    @property
+    def klass(self) -> type:
         return self.predicate.klass
 
 

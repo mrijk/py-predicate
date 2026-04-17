@@ -17,7 +17,8 @@ class EqPredicate[T](Predicate[T]):
         return f"eq_p({self.v!r})"
 
     @override
-    def get_klass(self) -> type:
+    @property
+    def klass(self) -> type:
         return type(self.v)
 
     @override

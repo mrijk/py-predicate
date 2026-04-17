@@ -28,7 +28,8 @@ class IsSubclassPredicate[T](Predicate[T]):
                 return f"is_{klass.__name__.lower()}_p"
 
     @override
-    def get_klass(self) -> type:
+    @property
+    def klass(self) -> type:
         return self.class_or_tuple  # type: ignore
 
     @override

@@ -24,7 +24,8 @@ class SetOfPredicate[T](Predicate[T]):
     def __repr__(self) -> str:
         return f"is_set_of_p({self.predicate})"
 
-    def get_klass(self) -> type:
+    @property
+    def klass(self) -> type:
         return self.predicate.klass
 
     @override

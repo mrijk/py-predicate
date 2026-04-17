@@ -17,7 +17,8 @@ class LtPredicate[T](Predicate[T]):
         return f"lt_p({self.v!r})"
 
     @override
-    def get_klass(self) -> type:
+    @property
+    def klass(self) -> type:
         return type(self.v)
 
     @override

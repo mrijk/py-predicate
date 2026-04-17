@@ -19,7 +19,8 @@ class AlwaysTruePredicate(Predicate):
         yield 1
 
     @override
-    def get_klass(self) -> type:
+    @property
+    def klass(self) -> type:
         return type(Any)
 
 

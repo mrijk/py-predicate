@@ -17,7 +17,8 @@ class GePredicate[T](Predicate[T]):
         return f"ge_p({self.v!r})"
 
     @override
-    def get_klass(self) -> type:
+    @property
+    def klass(self) -> type:
         return type(self.v)
 
     @override

@@ -29,7 +29,7 @@ class Predicate[T]:
 
     def __xor__(self, predicate: "Predicate") -> "Predicate":
         """Return the 'xor' predicate."""
-        return XorPredicate(left=self, right=predicate)
+        return XorPredicate(left=resolve_predicate(self), right=resolve_predicate(predicate))
 
     def __invert__(self) -> "Predicate":
         """Return the 'negated' predicate."""
@@ -46,10 +46,6 @@ class Predicate[T]:
 
     @property
     def klass(self) -> type:
-        return self.get_klass()
-
-    # @abstractmethod
-    def get_klass(self) -> type:
         raise NotImplementedError
 
     def explain(self, x: Any, *args, **kwargs) -> dict:
@@ -84,8 +80,6 @@ def resolve_predicate[T](predicate: Predicate[T]) -> Predicate[T]:
 class AndPredicate[T](Predicate[T]):
     """A predicate class that models the 'and' predicate.
 
-    ```
-
     Attributes
     ----------
     left: Predicate[T]
@@ -115,7 +109,8 @@ class AndPredicate[T](Predicate[T]):
         return predicate == self or predicate in self.left or predicate in self.right
 
     @override
-    def get_klass(self) -> type:
+    @property
+    def klass(self) -> type:
         return self.left.klass
 
     @override
@@ -153,8 +148,6 @@ class AndPredicate[T](Predicate[T]):
 class NotPredicate[T](Predicate[T]):
     """A predicate class that models the 'not' predicate.
 
-    ```
-
     Attributes
     ----------
     predicate: Predicate[T]
@@ -175,7 +168,8 @@ class NotPredicate[T](Predicate[T]):
         return predicate == self or predicate in self.predicate
 
     @override
-    def get_klass(self) -> type:
+    @property
+    def klass(self) -> type:
         return self.predicate.klass
 
     @override
@@ -191,8 +185,6 @@ class NotPredicate[T](Predicate[T]):
 @dataclass
 class OrPredicate[T](Predicate[T]):
     """A predicate class that models the 'or' predicate.
-
-    ```
 
     Attributes
     ----------
@@ -217,13 +209,14 @@ class OrPredicate[T](Predicate[T]):
                 return False
 
     def __repr__(self) -> str:
-        return f"{repr(self.left)} | {repr(self.right)}"
+        return f"{self.left!r} | {self.right!r}"
 
     def __contains__(self, predicate: Predicate[T]) -> bool:
         return predicate == self or predicate in self.left or predicate in self.right
 
     @override
-    def get_klass(self) -> type:
+    @property
+    def klass(self) -> type:
         return self.left.klass
 
     @override
@@ -242,8 +235,6 @@ class OrPredicate[T](Predicate[T]):
 @dataclass
 class XorPredicate[T](Predicate[T]):
     """A predicate class that models the 'xor' predicate.
-
-    ```
 
     Attributes
     ----------
@@ -274,7 +265,8 @@ class XorPredicate[T](Predicate[T]):
         return predicate == self or predicate in self.left or predicate in self.right
 
     @override
-    def get_klass(self) -> type:
+    @property
+    def klass(self) -> type:
         return self.left.klass
 
     @override
