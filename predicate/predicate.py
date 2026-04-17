@@ -45,11 +45,8 @@ class Predicate[T]:
         return 0
 
     @property
+    @abstractmethod
     def klass(self) -> type:
-        return self.get_klass()
-
-    # @abstractmethod
-    def get_klass(self) -> type:
         raise NotImplementedError
 
     def explain(self, x: Any, *args, **kwargs) -> dict:
@@ -113,7 +110,8 @@ class AndPredicate[T](Predicate[T]):
         return predicate == self or predicate in self.left or predicate in self.right
 
     @override
-    def get_klass(self) -> type:
+    @property
+    def klass(self) -> type:
         return self.left.klass
 
     @override
@@ -171,7 +169,8 @@ class NotPredicate[T](Predicate[T]):
         return predicate == self or predicate in self.predicate
 
     @override
-    def get_klass(self) -> type:
+    @property
+    def klass(self) -> type:
         return self.predicate.klass
 
     @override
@@ -217,7 +216,8 @@ class OrPredicate[T](Predicate[T]):
         return predicate == self or predicate in self.left or predicate in self.right
 
     @override
-    def get_klass(self) -> type:
+    @property
+    def klass(self) -> type:
         return self.left.klass
 
     @override
@@ -266,7 +266,8 @@ class XorPredicate[T](Predicate[T]):
         return predicate == self or predicate in self.left or predicate in self.right
 
     @override
-    def get_klass(self) -> type:
+    @property
+    def klass(self) -> type:
         return self.left.klass
 
     @override

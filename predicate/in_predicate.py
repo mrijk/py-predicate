@@ -44,7 +44,8 @@ class InPredicate[T](Predicate[T]):
         return {"reason": f"{x} is not in {self!r}"}
 
     @override
-    def get_klass(self) -> type:
+    @property
+    def klass(self) -> type:
         if isinstance(self.v, Iterable):
             return class_from_set(self.v)
         return Any

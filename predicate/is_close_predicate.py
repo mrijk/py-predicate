@@ -17,7 +17,8 @@ class IsClosePredicate[T](Predicate[T]):
         return math.isclose(x, self.target, rel_tol=self.rel_tol, abs_tol=self.abs_tol)
 
     @override
-    def get_klass(self) -> type:
+    @property
+    def klass(self) -> type:
         return float
 
     def __repr__(self) -> str:

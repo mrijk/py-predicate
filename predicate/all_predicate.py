@@ -23,7 +23,8 @@ class AllPredicate[T](Predicate[T]):
         return f"all_p({self.predicate!r})"
 
     @override
-    def get_klass(self) -> type:
+    @property
+    def klass(self) -> type:
         return self.predicate.klass
 
     @override

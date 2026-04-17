@@ -23,7 +23,8 @@ class AlwaysFalsePredicate(Predicate):
         yield 0
 
     @override
-    def get_klass(self) -> type:
+    @property
+    def klass(self) -> type:
         return type(Any)
 
 

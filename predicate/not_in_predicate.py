@@ -24,7 +24,8 @@ class NotInPredicate[T](Predicate[T]):
         return f"not_in_p({self.v.__class__.__name__}())"
 
     @override
-    def get_klass(self) -> type:
+    @property
+    def klass(self) -> type:
         if isinstance(self.v, Iterable):
             return class_from_set(self.v)
         return Any

@@ -28,7 +28,8 @@ class IsInstancePredicate[T](Predicate[T]):
         return f"is_{name}_p"
 
     @override
-    def get_klass(self) -> type:
+    @property
+    def klass(self) -> type:
         return self.instance_klass  # type: ignore
 
     @override
