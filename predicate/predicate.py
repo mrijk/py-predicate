@@ -45,7 +45,6 @@ class Predicate[T]:
         return 0
 
     @property
-    @abstractmethod
     def klass(self) -> type:
         raise NotImplementedError
 
