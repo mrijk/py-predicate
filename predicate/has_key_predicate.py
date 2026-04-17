@@ -1,3 +1,4 @@
+from collections.abc import Mapping
 from dataclasses import dataclass
 from typing import override
 
@@ -10,14 +11,14 @@ class HasKeyPredicate[T](Predicate[T]):
 
     key: T
 
-    def __call__(self, v: dict) -> bool:
+    def __call__(self, v: Mapping) -> bool:
         return self.key in v.keys()
 
     def __repr__(self) -> str:
         return f'has_key_p("{self.key}")'
 
     @override
-    def explain_failure(self, v: dict) -> dict:
+    def explain_failure(self, v: Mapping) -> dict:
         return {"reason": f"Key '{self.key}' is missing in {v}"}
 
 

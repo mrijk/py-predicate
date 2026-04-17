@@ -1,6 +1,8 @@
 from abc import abstractmethod
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import date, datetime
+from decimal import Decimal
+from fractions import Fraction
 from functools import partial
 from ipaddress import IPv4Address, IPv6Address
 from typing import Any, Callable, Iterable, Iterator, override
@@ -288,7 +290,7 @@ class XorPredicate[T](Predicate[T]):
         }
 
 
-type ConstrainedT[T: (int, str, float, datetime, UUID, IPv4Address, IPv6Address)] = T
+type ConstrainedT[T: (int, str, float, datetime, date, Decimal, Fraction, UUID, IPv4Address, IPv6Address)] = T
 
 
 def predicate_partial[T](

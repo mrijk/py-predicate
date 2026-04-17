@@ -1,4 +1,4 @@
-from collections.abc import Sequence
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from typing import Any, override
 
@@ -19,7 +19,7 @@ class DictOfPredicate(Predicate):
         self.key_value_predicates = [(to_key_p(key_p), value_p) for key_p, value_p in key_value_predicates]
 
     def __call__(self, x: Any) -> bool:
-        if not isinstance(x, dict):
+        if not isinstance(x, Mapping):
             return False
 
         if not x:
@@ -43,8 +43,8 @@ class DictOfPredicate(Predicate):
 
     @override
     def explain_failure(self, x: Any, *args, **kwargs) -> dict:
-        if not isinstance(x, dict):
-            return {"reason": f"{x} is not an instance of a dict"}
+        if not isinstance(x, Mapping):
+            return {"reason": f"{x} is not an instance of a Mapping"}
         if not x:
             return {"reason": "empty dict"}
         if failing := first(

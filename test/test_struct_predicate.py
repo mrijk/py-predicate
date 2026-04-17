@@ -59,7 +59,7 @@ def test_is_struct_with_optional(value, is_person_with_optional_email_p):
 def test_is_struct_p_explain_not_a_dict(is_person_p):
     expected = {
         "result": False,
-        "reason": "42 is not an instance of a dict",
+        "reason": "42 is not an instance of a Mapping",
     }
     assert explain(is_person_p, 42) == expected
 

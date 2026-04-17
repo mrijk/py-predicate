@@ -1,3 +1,4 @@
+from collections.abc import Mapping
 from dataclasses import dataclass
 from typing import Any, override
 
@@ -15,25 +16,24 @@ class StructPredicate[T](Predicate[T]):
     optional: dict[str, Predicate]
 
     def __call__(self, x: Any) -> bool:
-        match x:
-            case dict(d):
-                if set(d) - set(self.required) - set(self.optional):
+        if not isinstance(x, Mapping):
+            return False
+
+        if set(x) - set(self.required) - set(self.optional):
+            return False
+
+        for key, predicate in self.required.items():
+            if key not in x:
+                return False
+            if not predicate(x[key]):
+                return False
+
+        for key, predicate in self.optional.items():
+            if value := x.get(key, None):
+                if not predicate(value):
                     return False
 
-                for key, predicate in self.required.items():
-                    if key not in d:
-                        return False
-                    if not predicate(d[key]):
-                        return False
-
-                for key, predicate in self.optional.items():
-                    if value := d.get(key, None):
-                        if not predicate(value):
-                            return False
-
-                return True
-            case _:
-                return False
+        return True
 
     def __repr__(self) -> str:
         return (
@@ -42,25 +42,24 @@ class StructPredicate[T](Predicate[T]):
 
     @override
     def explain_failure(self, x: Any, *args, **kwargs) -> dict:
-        match x:
-            case dict(d):
-                if additional := first(set(d) - set(self.required) - set(self.optional), None):
-                    return {"reason": f"Field `{additional}` is unknown"}
+        if not isinstance(x, Mapping):
+            return {"reason": f"{x} is not an instance of a Mapping"}
 
-                for key, predicate in self.required.items():
-                    if key not in d:
-                        return {"reason": f"Required field `{key}` missing"}
-                    value = d[key]
-                    if not predicate(value):
-                        return {
-                            "key": key,
-                            "value": value,
-                            "reason": f"Value '{value}' for key '{key}' doesn't satisfy predicate {predicate!r}",
-                        }
+        if additional := first(set(x) - set(self.required) - set(self.optional), None):
+            return {"reason": f"Field `{additional}` is unknown"}
 
-                return {"reason": "Unknown"}
-            case _:
-                return {"reason": f"{x} is not an instance of a dict"}
+        for key, predicate in self.required.items():
+            if key not in x:
+                return {"reason": f"Required field `{key}` missing"}
+            value = x[key]
+            if not predicate(value):
+                return {
+                    "key": key,
+                    "value": value,
+                    "reason": f"Value '{value}' for key '{key}' doesn't satisfy predicate {predicate!r}",
+                }
+
+        return {"reason": "Unknown"}
 
 
 def is_struct_p(
