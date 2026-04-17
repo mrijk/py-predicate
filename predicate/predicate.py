@@ -29,7 +29,7 @@ class Predicate[T]:
 
     def __xor__(self, predicate: "Predicate") -> "Predicate":
         """Return the 'xor' predicate."""
-        return XorPredicate(left=self, right=predicate)
+        return XorPredicate(left=resolve_predicate(self), right=resolve_predicate(predicate))
 
     def __invert__(self) -> "Predicate":
         """Return the 'negated' predicate."""
@@ -83,8 +83,6 @@ def resolve_predicate[T](predicate: Predicate[T]) -> Predicate[T]:
 @dataclass
 class AndPredicate[T](Predicate[T]):
     """A predicate class that models the 'and' predicate.
-
-    ```
 
     Attributes
     ----------
@@ -153,8 +151,6 @@ class AndPredicate[T](Predicate[T]):
 class NotPredicate[T](Predicate[T]):
     """A predicate class that models the 'not' predicate.
 
-    ```
-
     Attributes
     ----------
     predicate: Predicate[T]
@@ -192,8 +188,6 @@ class NotPredicate[T](Predicate[T]):
 class OrPredicate[T](Predicate[T]):
     """A predicate class that models the 'or' predicate.
 
-    ```
-
     Attributes
     ----------
     left: Predicate[T]
@@ -217,7 +211,7 @@ class OrPredicate[T](Predicate[T]):
                 return False
 
     def __repr__(self) -> str:
-        return f"{repr(self.left)} | {repr(self.right)}"
+        return f"{self.left!r} | {self.right!r}"
 
     def __contains__(self, predicate: Predicate[T]) -> bool:
         return predicate == self or predicate in self.left or predicate in self.right
@@ -242,8 +236,6 @@ class OrPredicate[T](Predicate[T]):
 @dataclass
 class XorPredicate[T](Predicate[T]):
     """A predicate class that models the 'xor' predicate.
-
-    ```
 
     Attributes
     ----------
