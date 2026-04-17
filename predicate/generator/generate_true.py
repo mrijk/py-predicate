@@ -376,17 +376,12 @@ def generate_real_subset(predicate: IsRealSubsetPredicate) -> Iterator:
 
 @generate_true.register
 def generate_superset(predicate: IsSupersetPredicate) -> Iterator:
-    yield predicate.v  # v is a superset of itself
-    for extra in random_sets():
-        yield predicate.v | extra
+    yield from (predicate.v | extra for extra in random_sets())
 
 
 @generate_true.register
 def generate_real_superset(predicate: IsRealSupersetPredicate) -> Iterator:
-    for extra in random_sets():
-        candidate = predicate.v | extra
-        if candidate > predicate.v:
-            yield candidate
+    yield from (candidate for extra in random_sets() if (candidate := predicate.v | extra) > predicate.v)
 
 
 @generate_true.register
@@ -394,8 +389,7 @@ def generate_intersects(predicate: IntersectsPredicate) -> Iterator:
     if not predicate.v:
         return
     elements = list(predicate.v)
-    for extra in random_sets():
-        yield extra | {random.choice(elements)}
+    yield from (extra | {random.choice(elements)} for extra in random_sets())
 
 
 @generate_true.register
