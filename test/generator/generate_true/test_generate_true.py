@@ -71,7 +71,7 @@ from predicate import (
     tee_p,
     zero_p,
 )
-from predicate.set_predicates import is_real_subset_p, is_subset_p
+from predicate.set_predicates import intersects_p, is_real_subset_p, is_real_superset_p, is_subset_p, is_superset_p
 
 
 def foo(self) -> bool:
@@ -122,8 +122,11 @@ def foo(self) -> bool:
         pos_p,
         # property_p(cast(Callable, property(fget=foo))),
         zero_p,
+        intersects_p({1, 2, 3}),
         is_real_subset_p({1, 2, 3}),
+        is_real_superset_p({1, 2, 3}),
         is_subset_p({1, 2, 3}),
+        is_superset_p({1, 2, 3}),
     ],
 )
 def test_generate_true(predicate):

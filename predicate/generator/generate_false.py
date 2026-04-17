@@ -75,7 +75,13 @@ from predicate.reduce_predicate import ReducePredicate
 from predicate.regex_predicate import RegexPredicate
 from predicate.repeat_predicate import RepeatPredicate
 from predicate.set_of_predicate import SetOfPredicate
-from predicate.set_predicates import IsRealSubsetPredicate, IsSubsetPredicate
+from predicate.set_predicates import (
+    IntersectsPredicate,
+    IsRealSubsetPredicate,
+    IsRealSupersetPredicate,
+    IsSubsetPredicate,
+    IsSupersetPredicate,
+)
 from predicate.standard_predicates import is_int_p
 from predicate.star_predicate import StarPredicate
 from predicate.struct_predicate import StructPredicate
@@ -640,6 +646,23 @@ def generate_is_subset(predicate: IsSubsetPredicate) -> Iterator:
 @generate_false.register
 def generate_is_real_subset(predicate: IsRealSubsetPredicate) -> Iterator:
     yield predicate.v  # v is not a real subset of itself
+    yield from (s for s in random_sets() if not predicate(s))
+
+
+@generate_false.register
+def generate_is_superset(predicate: IsSupersetPredicate) -> Iterator:
+    yield from (s for s in random_sets() if not predicate(s))
+
+
+@generate_false.register
+def generate_is_real_superset(predicate: IsRealSupersetPredicate) -> Iterator:
+    yield predicate.v  # v is not a real superset of itself
+    yield from (s for s in random_sets() if not predicate(s))
+
+
+@generate_false.register
+def generate_is_intersects(predicate: IntersectsPredicate) -> Iterator:
+    yield set()  # empty set is disjoint from anything
     yield from (s for s in random_sets() if not predicate(s))
 
 
