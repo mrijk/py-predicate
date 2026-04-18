@@ -1,21 +1,28 @@
 from dataclasses import dataclass
+from typing import override
 
 from predicate.implies import Implies
 from predicate.predicate import AndPredicate, NotPredicate, OrPredicate, Predicate, XorPredicate
 
 
 @dataclass
-class NamedPredicate(Predicate):
+class NamedPredicate[T](Predicate[T]):
     """A predicate class to generate_true truth tables."""
 
     name: str
     v: bool = False
 
-    def __call__(self, *args) -> bool:
+    @override
+    def __call__(self, x: T) -> bool:
         return self.v
 
+    @override
     def __repr__(self) -> str:
         return self.name
+
+    @override
+    def explain_failure(self, x: T) -> dict:
+        return {"reason": f"{self.name} is False for {x}"}
 
 
 def _to_named_predicate(predicate: Predicate, names_map: dict[str, NamedPredicate]) -> Predicate:
