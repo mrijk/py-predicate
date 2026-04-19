@@ -1,14 +1,22 @@
+import asyncio
 import math
 from dataclasses import dataclass
 from itertools import repeat
 from typing import Callable, Final, Iterator, override
 
 from predicate.generator.helpers import generate_even_numbers, generate_odd_numbers, random_floats
+from predicate.is_async_predicate import is_async_p
 from predicate.predicate import Predicate
 
 
 def undefined() -> Iterator:
     raise ValueError("Please register generator type")
+
+
+def _call(fn: Callable, x) -> bool:
+    if is_async_p(fn):
+        return asyncio.run(fn(x))
+    return fn(x)
 
 
 @dataclass
@@ -20,7 +28,7 @@ class FnPredicate[T](Predicate[T]):
     generate_true_fn: Callable[[], Iterator] = undefined
 
     def __call__(self, x: T) -> bool:
-        return self.predicate_fn(x)
+        return _call(self.predicate_fn, x)
 
     def __repr__(self) -> str:
         return f"fn_p(predicate_fn={self.predicate_fn.__name__})"

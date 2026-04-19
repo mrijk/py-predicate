@@ -67,6 +67,18 @@ def test_predicate_partial():
     assert not combined(3)
 
 
+async def _async_positive(x: int) -> bool:
+    return x > 0
+
+
+def test_fn_p_async_true():
+    assert fn_p(_async_positive)(5)
+
+
+def test_fn_p_async_false():
+    assert not fn_p(_async_positive)(-1)
+
+
 def test_predicate_partial_with_kwargs():
     # full_match=True kwarg must be preserved; dropping **kwargs makes full_match=False (default)
     partial_match = predicate_partial(match_p, is_int_p, full_match=True)
