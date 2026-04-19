@@ -33,6 +33,8 @@ from predicate.ge_predicate import GePredicate, ge_p
 from predicate.generator.helpers import (
     default_length_p,
     generate_anys,
+    generate_datetimes,
+    generate_floats,
     generate_ints,
     generate_lambda,
     generate_strings,
@@ -449,6 +451,10 @@ def generate_not(predicate: NotPredicate) -> Iterator:
 
 def _generator_for_item(item, predicate: NotInPredicate) -> Iterator:
     match item:
+        case datetime():
+            return generate_datetimes(predicate)
+        case float():
+            return generate_floats(predicate)
         case int():
             return generate_ints(predicate)
         case str():
