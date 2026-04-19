@@ -439,20 +439,24 @@ def generate_not(predicate: NotPredicate) -> Iterator:
     yield from generate_false(predicate.predicate)
 
 
+def _generator_for_item(item, predicate: NotInPredicate) -> Iterator:
+    match item:
+        case int():
+            return generate_ints(predicate)
+        case str():
+            return generate_strings(predicate)
+        case UUID():
+            return generate_uuids(predicate)
+        case _:
+            raise ValueError(f"Can't generate for type {type(item)}")
+
+
 @generate_true.register
 def generate_not_in(predicate: NotInPredicate) -> Iterator:
-    # TODO: not correct yet
     if isinstance(predicate.v, Iterable):
-        for item in predicate.v:
-            match item:
-                case int():
-                    yield from generate_ints(predicate)
-                case str():
-                    yield from generate_strings(predicate)
-                case UUID():
-                    yield from generate_uuids(predicate)
-                case _:
-                    raise ValueError(f"Can't generate for type {type(item)}")
+        generators = {type(item): _generator_for_item(item, predicate) for item in predicate.v}
+        if generators:
+            yield from random_first_from_iterables(*generators.values())
 
 
 @generate_true.register
@@ -706,25 +710,36 @@ def generate_count(count_predicate: CountPredicate) -> Iterator:
     predicate = count_predicate.predicate
     length_p = count_predicate.length_p
 
-    # TODO: this is a minimal set. Also create iterables that contains some false items (which are not counted)
-    yield from generate_all_p(AllPredicate(predicate=predicate), length_p=length_p)
+    valid_counts = generate_true(length_p)
+
+    while True:
+        count = next(valid_counts)
+        true_values = list(take(count, generate_true(predicate)))
+
+        yield list(random_permutation(true_values))
+
+        nr_false = random.randint(1, 5)
+        false_values = list(take(nr_false, generate_false(predicate)))
+        if false_values:
+            yield list(random_permutation(true_values + false_values))
+
+
+def _yield_subclasses(klasses: list[type]) -> Iterator:
+    while True:
+        for klass in klasses:
+            yield klass
+            yield from klass.__subclasses__()
 
 
 @generate_true.register
 def generate_is_subclass(is_subclass_predicate: IsSubclassPredicate) -> Iterator:
     match is_subclass_predicate.class_or_tuple:
         case tuple(klasses):
-            while True:
-                for klass in klasses:
-                    yield from klass.__subclasses__()
+            yield from _yield_subclasses(list(klasses))
         case UnionType() as union_type:
-            while True:
-                for klass in get_args(union_type):
-                    yield from klass.__subclasses__()
+            yield from _yield_subclasses(list(get_args(union_type)))
         case _ as klass:
-            subclasses = klass.__subclasses__()
-            while True:
-                yield from subclasses
+            yield from _yield_subclasses([klass])
 
 
 @generate_true.register

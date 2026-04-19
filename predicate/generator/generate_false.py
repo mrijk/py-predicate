@@ -1,11 +1,12 @@
 import random
 import sys
+import warnings
 from collections.abc import Iterable, Iterator
 from datetime import datetime, timedelta
 from functools import singledispatch
 from itertools import chain, cycle, repeat
 from types import UnionType
-from typing import Final, get_args
+from typing import Final, Hashable, get_args
 from uuid import UUID
 
 from more_itertools import first, flatten, interleave, random_permutation, take
@@ -23,7 +24,6 @@ from predicate.ge_predicate import GePredicate
 from predicate.generator.helpers import (
     default_size_p,
     generate_anys,
-    generate_ints,
     generate_strings,
     generate_uuids,
     random_anys,
@@ -313,14 +313,9 @@ def generate_fn_p(predicate: FnPredicate) -> Iterator:
 
 @generate_false.register
 def generate_in(predicate: InPredicate) -> Iterator:
-    # TODO: combine with generate_not_in true
-    if isinstance(predicate.v, Iterable):
-        for item in predicate.v:
-            match item:
-                case int():
-                    yield from generate_ints(~predicate)
-                case str():
-                    yield from generate_strings(~predicate)
+    from predicate import generate_true
+
+    yield from generate_true(NotInPredicate(v=predicate.v))
 
 
 @generate_false.register
@@ -393,8 +388,6 @@ def generate_truthy(_predicate: IsTruthyPredicate) -> Iterator:
 
 @generate_false.register
 def generate_is_instance_p(predicate: IsInstancePredicate) -> Iterator:
-    from typing import Hashable
-
     if predicate.instance_klass[0] is Hashable:
         yield from random_non_hashables()
         return
@@ -593,16 +586,26 @@ def generate_exactly_n(exactly_predicate: ExactlyPredicate, *, predicates: list[
 
 @generate_false.register
 def generate_count(count_predicate: CountPredicate) -> Iterator:
+    from predicate import generate_true
+
     predicate = count_predicate.predicate
     length_p = count_predicate.length_p
 
-    # TODO: this is a minimal set. Also create iterables that contains some false items (which are not counted)
-    yield from generate_all_p(AllPredicate(predicate=predicate), length_p=length_p)
+    invalid_counts = (c for c in generate_false(length_p) if c >= 0)
+
+    while True:
+        count = next(invalid_counts)
+        true_values = list(take(count, generate_true(predicate)))
+
+        yield list(random_permutation(true_values))
+
+        nr_false = random.randint(1, 5)
+        false_values = list(take(nr_false, generate_false(predicate)))
+        if false_values:
+            yield list(random_permutation(true_values + false_values))
 
 
 def _subclasses(klass: type) -> set:
-    import warnings
-
     with warnings.catch_warnings():
         warnings.simplefilter("ignore", DeprecationWarning)
         return set(klass.__subclasses__())
@@ -614,20 +617,16 @@ def generate_is_subclass(is_subclass_predicate: IsSubclassPredicate) -> Iterator
 
     match is_subclass_predicate.class_or_tuple:
         case tuple(klasses):
-            subclasses = set(flatten(_subclasses(klass) for klass in klasses))
-            if non_subclasses := all_sub_classes - subclasses:
-                while True:
-                    yield from non_subclasses
+            target_klasses = list(klasses)
         case UnionType() as union_type:
-            subclasses = set(flatten(_subclasses(klass) for klass in get_args(union_type)))
-            if non_subclasses := all_sub_classes - subclasses:
-                while True:
-                    yield from non_subclasses
+            target_klasses = list(get_args(union_type))
         case _ as klass:
-            subclasses = _subclasses(klass)
-            if non_subclasses := all_sub_classes - subclasses:
-                while True:
-                    yield from non_subclasses
+            target_klasses = [klass]
+
+    subclasses = set(flatten(_subclasses(klass) for klass in target_klasses))
+    if non_subclasses := all_sub_classes - subclasses:
+        while True:
+            yield from non_subclasses
 
 
 @generate_false.register
