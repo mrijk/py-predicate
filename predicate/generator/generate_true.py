@@ -27,12 +27,14 @@ from predicate.count_predicate import CountPredicate
 from predicate.dict_of_predicate import DictOfPredicate, is_dict_of_p
 from predicate.eq_predicate import EqPredicate, eq_p
 from predicate.exactly_predicate import ExactlyPredicate
+from predicate.exception_predicate import ExceptionPredicate
 from predicate.fn_predicate import FnPredicate
 from predicate.ge_predicate import GePredicate, ge_p
 from predicate.generator.helpers import (
     default_length_p,
     generate_anys,
     generate_ints,
+    generate_lambda,
     generate_strings,
     generate_uuids,
     random_anys,
@@ -64,6 +66,7 @@ from predicate.has_length_predicate import HasLengthPredicate
 from predicate.has_path_predicate import HasPathPredicate
 from predicate.in_predicate import InPredicate
 from predicate.is_async_predicate import IsAsyncPredicate
+from predicate.is_callable_predicate import IsCallablePredicate
 from predicate.is_close_predicate import IsClosePredicate
 from predicate.is_falsy_predicate import IsFalsyPredicate
 from predicate.is_instance_predicate import IsInstancePredicate
@@ -173,6 +176,11 @@ def generate_any_p(any_predicate: AnyPredicate, *, length_p: Predicate = default
 @generate_true.register
 def generate_always_true(_predicate: AlwaysTruePredicate, **_kwargs) -> Iterator:
     yield from random_anys()
+
+
+@generate_true.register
+def generate_exception(_predicate: ExceptionPredicate) -> Iterator:
+    yield from []
 
 
 @generate_true.register
@@ -526,6 +534,16 @@ def generate_is_instance_p(predicate: IsInstancePredicate, **kwargs) -> Iterator
         yield from random_predicates(**kwargs)
     else:
         raise ValueError(f"No generator found for {klass}")
+
+
+@generate_true.register
+def generate_is_callable_p(predicate: IsCallablePredicate) -> Iterator:
+    arg_names = [f"arg{i}" for i in range(len(predicate.params))]
+    fn = generate_lambda(arg_names)
+    fn.__annotations__ = dict(zip(arg_names, predicate.params, strict=False))
+    fn.__annotations__["return"] = predicate.return_type
+    while True:
+        yield fn
 
 
 @generate_true.register

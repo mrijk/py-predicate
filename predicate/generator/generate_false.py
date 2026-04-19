@@ -19,6 +19,7 @@ from predicate.count_predicate import CountPredicate
 from predicate.dict_of_predicate import DictOfPredicate
 from predicate.eq_predicate import EqPredicate
 from predicate.exactly_predicate import ExactlyPredicate
+from predicate.exception_predicate import ExceptionPredicate
 from predicate.fn_predicate import FnPredicate
 from predicate.ge_predicate import GePredicate
 from predicate.generator.helpers import (
@@ -128,6 +129,11 @@ def generate_and(predicate: AndPredicate) -> Iterator:
 
 @generate_false.register
 def generate_always_true(_predicate: AlwaysTruePredicate) -> Iterator:
+    yield from []
+
+
+@generate_false.register
+def generate_exception(_predicate: ExceptionPredicate) -> Iterator:
     yield from []
 
 
