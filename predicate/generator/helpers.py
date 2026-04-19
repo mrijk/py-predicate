@@ -343,6 +343,14 @@ def sample_optional_fields(optional: dict[str, Any], generators: dict[str, Itera
     return {key: next(generators[key]) for key in optional_keys}
 
 
+def generate_datetimes(predicate: Predicate[datetime]) -> Iterator[datetime]:
+    yield from (item for item in random_datetimes() if predicate(item))
+
+
+def generate_floats(predicate: Predicate[float]) -> Iterator[float]:
+    yield from (item for item in random_floats() if predicate(item))
+
+
 def generate_strings(predicate: Predicate[str]) -> Iterator[str]:
     yield from (item for item in random_strings() if predicate(item))
 
