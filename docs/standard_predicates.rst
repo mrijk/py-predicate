@@ -174,6 +174,18 @@ This predicate can be used to wrap any (lambda) function:
     assert not square_ge_2(1)
     assert square_ge_2(2)
 
+Both synchronous and async callables are supported.
+
+.. code-block:: python
+
+    from predicate import fn_p
+
+    async def is_positive(x: int) -> bool:
+        return x > 0
+
+    assert fn_p(is_positive)(5)
+    assert not fn_p(is_positive)(-1)
+
 ge_le_p
 -------
 
@@ -1171,6 +1183,21 @@ the iterable is empty.
 
     assert is_interval_3_p([1, 4, 7])
     assert not is_interval_3_p([1, 3])
+
+Both synchronous and async callables are supported.
+
+.. code-block:: python
+
+    import sys
+    from predicate import reduce_p, ge_p
+
+    async def sorted_step(acc, x):
+        return x, ge_p(acc)
+
+    is_sorted_p = reduce_p(fn=sorted_step, initial=-sys.maxsize - 1)
+
+    assert is_sorted_p([1, 2, 3])
+    assert not is_sorted_p([3, 1, 2])
 
 regex_p
 -------

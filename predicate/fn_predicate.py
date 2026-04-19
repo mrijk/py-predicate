@@ -24,7 +24,7 @@ class FnPredicate[T](Predicate[T]):
 
     def __post_init__(self):
         if is_async_p(self.predicate_fn):
-            self._call = lambda x: asyncio.run(self.predicate_fn(x))
+            self._call = lambda x: asyncio.run(self.predicate_fn(x))  # type: ignore[arg-type]
         else:
             self._call = self.predicate_fn
 
