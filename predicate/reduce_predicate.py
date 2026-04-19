@@ -1,6 +1,8 @@
-from dataclasses import dataclass
+import asyncio
+from dataclasses import dataclass, field
 from typing import Callable, Iterable, override
 
+from predicate.is_async_predicate import is_async_p
 from predicate.predicate import Predicate
 
 
@@ -10,11 +12,18 @@ class ReducePredicate[T](Predicate[T]):
 
     fn: Callable
     initial: T
+    _call: Callable[[T, T], tuple[T, Predicate[T]]] = field(init=False, repr=False)
+
+    def __post_init__(self):
+        if is_async_p(self.fn):
+            self._call = lambda acc, x: asyncio.run(self.fn(acc, x))
+        else:
+            self._call = self.fn
 
     def __call__(self, iterable: Iterable[T]) -> bool:
         acc = self.initial
         for x in iterable:
-            acc, predicate = self.fn(acc, x)
+            acc, predicate = self._call(acc, x)
             if not predicate(x):
                 return False
         return True
@@ -27,7 +36,7 @@ class ReducePredicate[T](Predicate[T]):
     def explain_failure(self, iterable: Iterable[T]) -> dict:
         acc = self.initial
         for index, x in enumerate(iterable):
-            acc, predicate = self.fn(acc, x)
+            acc, predicate = self._call(acc, x)
             if not predicate(x):
                 return {"index": index, "value": x} | predicate.explain_failure(x)
         return {}

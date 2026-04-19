@@ -1,9 +1,11 @@
+import asyncio
 import math
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from itertools import repeat
 from typing import Callable, Final, Iterator, override
 
 from predicate.generator.helpers import generate_even_numbers, generate_odd_numbers, random_floats
+from predicate.is_async_predicate import is_async_p
 from predicate.predicate import Predicate
 
 
@@ -18,9 +20,16 @@ class FnPredicate[T](Predicate[T]):
     predicate_fn: Callable[[T], bool]
     generate_false_fn: Callable[[], Iterator] = undefined
     generate_true_fn: Callable[[], Iterator] = undefined
+    _call: Callable[[T], bool] = field(init=False, repr=False)
+
+    def __post_init__(self):
+        if is_async_p(self.predicate_fn):
+            self._call = lambda x: asyncio.run(self.predicate_fn(x))
+        else:
+            self._call = self.predicate_fn
 
     def __call__(self, x: T) -> bool:
-        return self.predicate_fn(x)
+        return self._call(x)
 
     def __repr__(self) -> str:
         return f"fn_p(predicate_fn={self.predicate_fn.__name__})"

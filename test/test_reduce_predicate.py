@@ -42,6 +42,16 @@ def test_reduce_explain_success():
     assert explain(predicate, [1, 2, 3]) == {"result": True}
 
 
+async def _async_sorted(acc, x):
+    return x, ge_p(acc)
+
+
+def test_reduce_p_async_sorted_asc():
+    predicate = reduce_p(fn=_async_sorted, initial=-sys.maxsize - 1)
+    assert predicate([1, 2, 3])
+    assert not predicate([3, 1, 2])
+
+
 def test_reduce_explain_failure():
     from predicate import explain
 
