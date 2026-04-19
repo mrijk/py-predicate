@@ -1,7 +1,6 @@
 import asyncio
 from dataclasses import dataclass, field
-from itertools import accumulate, islice
-from typing import Any, Callable, Iterable, override
+from typing import Callable, Iterable, override
 
 from predicate.is_async_predicate import is_async_p
 from predicate.predicate import Predicate
@@ -22,15 +21,12 @@ class ReducePredicate[T](Predicate[T]):
             self._call = self.fn
 
     def __call__(self, iterable: Iterable[T]) -> bool:
-        initial: Any = (self.initial, None, None)
-        return all(
-            predicate(x)
-            for _, predicate, x in islice(
-                accumulate(iterable, lambda state, x: (*self._call(state[0], x), x), initial=initial),
-                1,
-                None,
-            )
-        )
+        acc = self.initial
+        for x in iterable:
+            acc, predicate = self._call(acc, x)
+            if not predicate(x):
+                return False
+        return True
 
     def __repr__(self) -> str:
         name = getattr(self.fn, "__name__", str(self.fn))
