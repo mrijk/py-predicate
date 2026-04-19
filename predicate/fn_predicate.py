@@ -20,7 +20,7 @@ class FnPredicate[T](Predicate[T]):
     predicate_fn: Callable[[T], bool]
     generate_false_fn: Callable[[], Iterator] = undefined
     generate_true_fn: Callable[[], Iterator] = undefined
-    _call: Callable = field(init=False, repr=False)
+    _call: Callable[[T], bool] = field(init=False, repr=False)
 
     def __post_init__(self):
         if is_async_p(self.predicate_fn):

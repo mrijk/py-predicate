@@ -12,7 +12,7 @@ class ReducePredicate[T](Predicate[T]):
 
     fn: Callable
     initial: T
-    _call: Callable = field(init=False, repr=False)
+    _call: Callable[[T, T], tuple[T, Predicate[T]]] = field(init=False, repr=False)
 
     def __post_init__(self):
         if is_async_p(self.fn):
