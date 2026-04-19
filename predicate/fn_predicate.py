@@ -1,6 +1,6 @@
 import asyncio
 import math
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from itertools import repeat
 from typing import Callable, Final, Iterator, override
 
@@ -13,12 +13,6 @@ def undefined() -> Iterator:
     raise ValueError("Please register generator type")
 
 
-def _call(fn: Callable, x) -> bool:
-    if is_async_p(fn):
-        return asyncio.run(fn(x))
-    return fn(x)
-
-
 @dataclass
 class FnPredicate[T](Predicate[T]):
     """A predicate class that can hold a function."""
@@ -26,9 +20,16 @@ class FnPredicate[T](Predicate[T]):
     predicate_fn: Callable[[T], bool]
     generate_false_fn: Callable[[], Iterator] = undefined
     generate_true_fn: Callable[[], Iterator] = undefined
+    _call: Callable = field(init=False, repr=False)
+
+    def __post_init__(self):
+        if is_async_p(self.predicate_fn):
+            self._call = lambda x: asyncio.run(self.predicate_fn(x))
+        else:
+            self._call = self.predicate_fn
 
     def __call__(self, x: T) -> bool:
-        return _call(self.predicate_fn, x)
+        return self._call(x)
 
     def __repr__(self) -> str:
         return f"fn_p(predicate_fn={self.predicate_fn.__name__})"
