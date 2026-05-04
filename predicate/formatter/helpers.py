@@ -1,6 +1,7 @@
 from typing import Iterable
 
+from predicate.helpers import join_as_str
+
 
 def set_to_str(v: Iterable) -> str:
-    items = ", ".join(str(item) for item in v)
-    return f"{{{items}}}"
+    return f"{{{join_as_str(v)}}}"
