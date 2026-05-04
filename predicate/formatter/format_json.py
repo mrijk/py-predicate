@@ -37,6 +37,7 @@ from predicate.named_predicate import NamedPredicate
 from predicate.ne_predicate import NePredicate
 from predicate.not_in_predicate import NotInPredicate
 from predicate.optional_predicate import OptionalPredicate
+from predicate.pair_predicate import PairPredicate
 from predicate.predicate import (
     AndPredicate,
     NotPredicate,
@@ -176,6 +177,12 @@ def to_json(predicate: Predicate) -> dict[str, Any]:
                 return "not", {"predicate": to_json(not_predicate)}
             case OptionalPredicate(predicate):
                 return "optional", {"predicate": to_json(predicate)}
+            case PairPredicate(fn, klass):
+                name = getattr(fn, "__name__", str(fn))
+                result: dict[str, Any] = {"fn": name}
+                if klass is not int:
+                    result["klass"] = klass.__name__
+                return "pair", result
             case OrPredicate(left, right):
                 return "or", {"left": to_json(left), "right": to_json(right)}
             case RegexPredicate() as r:

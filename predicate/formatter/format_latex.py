@@ -16,6 +16,7 @@ from predicate.in_predicate import InPredicate
 from predicate.le_predicate import LePredicate
 from predicate.lt_predicate import LtPredicate
 from predicate.ne_predicate import NePredicate
+from predicate.pair_predicate import PairPredicate
 from predicate.predicate import (
     AndPredicate,
     NotPredicate,
@@ -97,6 +98,11 @@ def to_latex(predicate: Predicate, parameter: str = "x") -> str:
             return f"{to_latex(left)} \\vee {to_latex(right)}"
         case XorPredicate(left, right):
             return f"{to_latex(left)} \\oplus {to_latex(right)}"
+        case PairPredicate(fn):
+            fn_name = getattr(fn, "__name__", str(fn))
+            latex_ops = {"lt": r"\lt", "le": r"\le", "eq": "=", "ne": r"\neq", "ge": r"\ge", "gt": r"\gt"}
+            op = latex_ops.get(fn_name, fn_name)
+            return rf"x_1 {op} x_2"
         case ReducePredicate(fn, initial):
             name = getattr(fn, "__name__", str(fn))
             return rf"\text{{reduce}}({name}, {initial!r})"

@@ -1,3 +1,5 @@
+import pytest
+
 from predicate import ge_le_p, ge_lt_p, gt_le_p, gt_lt_p
 from predicate.explain import explain
 
@@ -61,3 +63,23 @@ def test_gt_lt_explain():
 
     expected = {"reason": "2 is not greater than 2 and less than 4", "result": False}
     assert explain(predicate, 2) == expected
+
+
+def test_ge_le_p_invalid_range():
+    with pytest.raises(ValueError, match="lower.*must be <= upper"):
+        ge_le_p(5, 3)
+
+
+def test_ge_lt_p_invalid_range():
+    with pytest.raises(ValueError, match="lower.*must be < upper"):
+        ge_lt_p(3, 3)
+
+
+def test_gt_le_p_invalid_range():
+    with pytest.raises(ValueError, match="lower.*must be < upper"):
+        gt_le_p(5, 3)
+
+
+def test_gt_lt_p_invalid_range():
+    with pytest.raises(ValueError, match="lower.*must be < upper"):
+        gt_lt_p(3, 3)

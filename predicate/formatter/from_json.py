@@ -1,3 +1,4 @@
+import operator
 from typing import Any
 
 from predicate.all_predicate import all_p
@@ -32,6 +33,7 @@ from predicate.named_predicate import NamedPredicate
 from predicate.ne_predicate import ne_p
 from predicate.not_in_predicate import not_in_p
 from predicate.optional_predicate import optional
+from predicate.pair_predicate import pair_p
 from predicate.predicate import Predicate
 from predicate.range_predicate import ge_le_p, ge_lt_p, gt_le_p, gt_lt_p
 from predicate.regex_predicate import regex_p
@@ -135,6 +137,15 @@ def from_json(data: dict[str, Any]) -> Predicate:
             return not_in_p(value["v"])
         case "optional":
             return optional(from_json(value["predicate"]))
+        case "pair":
+            fn = _FN_REGISTRY.get(value["fn"])
+            if fn is None:
+                raise ValueError(f"pair_p cannot be deserialized: unknown function {value['fn']!r}")
+            klass_name = value.get("klass", "int")
+            klass = _CLASS_REGISTRY.get(klass_name)
+            if klass is None:
+                raise ValueError(f"pair_p cannot be deserialized: unknown class {klass_name!r}")
+            return pair_p(fn, klass=klass)
         case "or":
             return from_json(value["left"]) | from_json(value["right"])
         case "reduce":
@@ -156,6 +167,15 @@ def from_json(data: dict[str, Any]) -> Predicate:
         case _:
             raise ValueError(f"Unknown predicate type: {key!r}")
 
+
+_FN_REGISTRY: dict[str, object] = {
+    "lt": operator.lt,
+    "le": operator.le,
+    "eq": operator.eq,
+    "ne": operator.ne,
+    "ge": operator.ge,
+    "gt": operator.gt,
+}
 
 _CLASS_REGISTRY: dict[str, type] = {
     "bool": bool,

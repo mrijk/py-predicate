@@ -68,6 +68,7 @@ from predicate.ne_predicate import NePredicate, ne_p
 from predicate.not_in_predicate import NotInPredicate
 from predicate.optimizer.predicate_optimizer import optimize
 from predicate.optional_predicate import OptionalPredicate
+from predicate.pair_predicate import PairPredicate
 from predicate.plus_predicate import PlusPredicate
 from predicate.predicate import AndPredicate, NotPredicate, OrPredicate, Predicate, XorPredicate
 from predicate.raises_predicate import RaisesPredicate
@@ -716,3 +717,52 @@ def generate_struct(predicate: StructPredicate) -> Iterator:
             yield required_fields | sample_optional_fields(optional, optional_true_generators) | {extra_key: None}
 
     yield from random_first_from_iterables(false_required_fields(), extra_key_dicts())
+
+
+@generate_false.register
+def generate_pair_p(predicate: PairPredicate) -> Iterator:
+    fn = predicate.fn
+    fn_name = getattr(fn, "__name__", "")
+    from predicate.generator.generate_true import generate_true
+
+    value_gen = generate_true(IsInstancePredicate(instance_klass=(predicate.klass,)))
+
+    match fn_name:
+        case "lt":
+            # false when first >= second
+            while True:
+                a, b = next(value_gen), next(value_gen)
+                yield (max(a, b), min(a, b))
+        case "le":
+            # false when first > second
+            while True:
+                a, b = next(value_gen), next(value_gen)
+                if a != b:
+                    yield (max(a, b), min(a, b))
+        case "eq":
+            # false when first != second
+            while True:
+                a, b = next(value_gen), next(value_gen)
+                if a != b:
+                    yield (a, b)
+        case "ne":
+            # false when first == second
+            while True:
+                a = next(value_gen)
+                yield (a, a)
+        case "ge":
+            # false when first < second
+            while True:
+                a, b = next(value_gen), next(value_gen)
+                if a != b:
+                    yield (min(a, b), max(a, b))
+        case "gt":
+            # false when first <= second
+            while True:
+                a, b = next(value_gen), next(value_gen)
+                yield (min(a, b), max(a, b))
+        case _:
+            while True:
+                a, b = next(value_gen), next(value_gen)
+                if not fn(a, b):
+                    yield (a, b)

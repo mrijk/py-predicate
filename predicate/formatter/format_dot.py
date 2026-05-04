@@ -46,6 +46,7 @@ from predicate.ne_predicate import NePredicate
 from predicate.not_in_predicate import NotInPredicate
 from predicate.optimizer.predicate_optimizer import optimize
 from predicate.optional_predicate import OptionalPredicate
+from predicate.pair_predicate import PairPredicate
 from predicate.plus_predicate import PlusPredicate
 from predicate.predicate import (
     AndPredicate,
@@ -248,6 +249,9 @@ def render(dot: Digraph, predicate: Predicate, node_nr: count):
                 return add_node("ne", label=f"x ≠ {v}")
             case OptionalPredicate(predicate):
                 return add_node_with_child("optional", label="?", child=predicate)
+            case PairPredicate(fn):
+                fn_name = getattr(fn, "__name__", str(fn))
+                return add_node("pair", label=f"pair({fn_name})")
             case PlusPredicate(predicate):
                 return add_node_with_child("plus", label="+", child=predicate)
             case NotPredicate(not_predicate):

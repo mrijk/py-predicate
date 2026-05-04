@@ -83,13 +83,12 @@ from predicate.juxt_predicate import JuxtPredicate
 from predicate.le_predicate import LePredicate
 from predicate.list_of_predicate import ListOfPredicate, is_list_of_p
 from predicate.lt_predicate import LtPredicate
-from predicate.match_predicate import (
-    MatchPredicate,
-)
+from predicate.match_predicate import MatchPredicate
 from predicate.ne_predicate import NePredicate
 from predicate.not_in_predicate import NotInPredicate
 from predicate.optimizer.predicate_optimizer import optimize
 from predicate.optional_predicate import OptionalPredicate
+from predicate.pair_predicate import PairPredicate
 from predicate.plus_predicate import PlusPredicate
 from predicate.predicate import (
     AndPredicate,
@@ -785,6 +784,47 @@ def generate_raises(predicate: RaisesPredicate) -> Iterator:
     exc_type = predicate.exception_type
     while True:
         yield lambda: (_ for _ in ()).throw(exc_type())
+
+
+@generate_true.register
+def generate_pair_p(predicate: PairPredicate) -> Iterator:
+    fn = predicate.fn
+    fn_name = getattr(fn, "__name__", "")
+    value_gen = generate_true(IsInstancePredicate(instance_klass=(predicate.klass,)))
+
+    match fn_name:
+        case "lt":
+            while True:
+                a, b = next(value_gen), next(value_gen)
+                if a != b:
+                    yield (min(a, b), max(a, b))
+        case "le":
+            while True:
+                a, b = next(value_gen), next(value_gen)
+                yield (min(a, b), max(a, b))
+        case "eq":
+            while True:
+                a = next(value_gen)
+                yield (a, a)
+        case "ne":
+            while True:
+                a, b = next(value_gen), next(value_gen)
+                if a != b:
+                    yield (a, b)
+        case "ge":
+            while True:
+                a, b = next(value_gen), next(value_gen)
+                yield (max(a, b), min(a, b))
+        case "gt":
+            while True:
+                a, b = next(value_gen), next(value_gen)
+                if a != b:
+                    yield (max(a, b), min(a, b))
+        case _:
+            while True:
+                a, b = next(value_gen), next(value_gen)
+                if fn(a, b):
+                    yield (a, b)
 
 
 @generate_true.register
