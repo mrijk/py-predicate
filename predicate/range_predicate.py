@@ -2,6 +2,7 @@ from abc import abstractmethod
 from dataclasses import dataclass
 from typing import override
 
+from predicate.pair_predicate import pair_le_p, pair_lt_p
 from predicate.predicate import ConstrainedT, Predicate
 
 
@@ -85,20 +86,28 @@ class GtLtPredicate[T](RangePredicate[T]):
 
 
 def ge_le_p(lower: ConstrainedT, upper: ConstrainedT) -> GeLePredicate[ConstrainedT]:
-    """Return True if the value is greater or equal than the constant, otherwise False."""
+    """Return True if lower <= value <= upper, otherwise False."""
+    if not pair_le_p((lower, upper)):
+        raise ValueError(f"lower ({lower!r}) must be <= upper ({upper!r})")
     return GeLePredicate(lower=lower, upper=upper)
 
 
 def ge_lt_p(lower: ConstrainedT, upper: ConstrainedT) -> GeLtPredicate[ConstrainedT]:
-    """Return True if the value is greater or equal than the constant, otherwise False."""
+    """Return True if lower <= value < upper, otherwise False."""
+    if not pair_lt_p((lower, upper)):
+        raise ValueError(f"lower ({lower!r}) must be < upper ({upper!r})")
     return GeLtPredicate(lower=lower, upper=upper)
 
 
 def gt_le_p(lower: ConstrainedT, upper: ConstrainedT) -> GtLePredicate[ConstrainedT]:
-    """Return True if the value is greater or equal than the constant, otherwise False."""
+    """Return True if lower < value <= upper, otherwise False."""
+    if not pair_lt_p((lower, upper)):
+        raise ValueError(f"lower ({lower!r}) must be < upper ({upper!r})")
     return GtLePredicate(lower=lower, upper=upper)
 
 
 def gt_lt_p(lower: ConstrainedT, upper: ConstrainedT) -> GtLtPredicate[ConstrainedT]:
-    """Return True if the value is greater or equal than the constant, otherwise False."""
+    """Return True if lower < value < upper, otherwise False."""
+    if not pair_lt_p((lower, upper)):
+        raise ValueError(f"lower ({lower!r}) must be < upper ({upper!r})")
     return GtLtPredicate(lower=lower, upper=upper)

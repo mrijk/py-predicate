@@ -71,6 +71,7 @@ from predicate.ne_predicate import ne_p
 from predicate.not_in_predicate import not_in_p
 from predicate.optimizer.predicate_optimizer import can_optimize, optimize
 from predicate.optional_predicate import optional
+from predicate.pair_predicate import pair_eq_p, pair_ge_p, pair_gt_p, pair_le_p, pair_lt_p, pair_ne_p, pair_p
 from predicate.plus_predicate import plus
 from predicate.predicate import and_p, or_p, xor_p
 from predicate.raises_predicate import raises_exception_p, raises_p
@@ -242,6 +243,13 @@ __all__ = [
     "optimize",
     "optional",
     "or_p",
+    "pair_eq_p",
+    "pair_ge_p",
+    "pair_gt_p",
+    "pair_le_p",
+    "pair_lt_p",
+    "pair_ne_p",
+    "pair_p",
     "plus",
     "pos_p",
     "recur_p",
