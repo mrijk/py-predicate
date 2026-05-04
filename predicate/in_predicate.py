@@ -2,6 +2,7 @@ from collections.abc import Sized
 from dataclasses import dataclass
 from typing import Any, Container, Iterable, override
 
+from predicate.helpers import join_as_str
 from predicate.predicate import Predicate
 
 
@@ -26,8 +27,7 @@ class InPredicate[T](Predicate[T]):
 
     def __repr__(self) -> str:
         if isinstance(self.v, Iterable):
-            items = ", ".join(str(item) for item in self.v)
-            return f"in_p({items})"
+            return f"in_p({join_as_str(self.v)})"
         return f"in_p({self.v.__class__.__name__}())"
 
     def __eq__(self, other: object) -> bool:

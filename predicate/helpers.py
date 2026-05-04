@@ -27,6 +27,10 @@ def key_value_pairs_repr(pairs: list[tuple[Predicate | str, Predicate]], from_ke
     return ", ".join(f"({from_key(k)}, {v!r})" for k, v in pairs)
 
 
+def join_as_str(v: Iterable) -> str:
+    return ", ".join(str(item) for item in v)
+
+
 def join_with_or(s: list[str]) -> str:
     first = s[:-1]
     last = s[-1]

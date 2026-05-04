@@ -1,6 +1,6 @@
 import pytest
 
-from predicate import not_in_p
+from predicate import explain, not_in_p
 
 
 class Contains13:
@@ -25,6 +25,12 @@ def test_not_in_p():
 def test_repr_in_p(parameter, expected):
     predicate = not_in_p(parameter)
     assert repr(predicate) == expected
+
+
+def test_explain_failure():
+    predicate = not_in_p([1, 2, 3])
+
+    assert explain(predicate, 1) == {"reason": "1 is in not_in_p(1, 2, 3)", "result": False}
 
 
 def test_not_in_p_klass_non_iterable():

@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from typing import Any, Container, Iterable, override
 
+from predicate.helpers import join_as_str
 from predicate.in_predicate import class_from_set
 from predicate.predicate import Predicate
 
@@ -19,9 +20,12 @@ class NotInPredicate[T](Predicate[T]):
 
     def __repr__(self) -> str:
         if isinstance(self.v, Iterable):
-            items = ", ".join(str(item) for item in self.v)
-            return f"not_in_p({items})"
+            return f"not_in_p({join_as_str(self.v)})"
         return f"not_in_p({self.v.__class__.__name__}())"
+
+    @override
+    def explain_failure(self, x: Any) -> dict:
+        return {"reason": f"{x} is in {self!r}"}
 
     @override
     @property

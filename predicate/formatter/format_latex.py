@@ -10,6 +10,7 @@ from predicate.eq_predicate import EqPredicate
 from predicate.ge_predicate import GePredicate
 from predicate.gt_predicate import GtPredicate
 from predicate.has_length_predicate import HasLengthPredicate
+from predicate.helpers import join_as_str
 from predicate.implies_predicate import ImpliesPredicate
 from predicate.in_predicate import InPredicate
 from predicate.le_predicate import LePredicate
@@ -34,8 +35,7 @@ from predicate.set_predicates import (
 
 
 def set_to_latex_set(v: Iterable) -> str:
-    items = ", ".join(str(item) for item in v)
-    return f"\\{{{items}\\}}"
+    return f"\\{{{join_as_str(v)}\\}}"
 
 
 def to_latex(predicate: Predicate, parameter: str = "x") -> str:
