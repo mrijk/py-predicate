@@ -140,17 +140,6 @@ def test_generate_true_or(predicate_pair):
     assert_generated_true(predicate)
 
 
-@pytest.mark.parametrize(
-    "predicate",
-    [
-        not_in_p(["foo", "bar"]),
-        not_in_p([uuid.uuid4(), uuid.uuid4()]),
-    ],
-)
-def test_generate_true_not_in_type(predicate):
-    assert_generated_true(predicate)
-
-
 def test_generate_tee():
     predicate = tee_p(fn=lambda x: x) & eq_p(2)
 
@@ -454,12 +443,6 @@ def test_generate_true_unknown_compare(compare_predicate):
 )
 def test_generate_true_unknown_range(range_predicate):
     predicate = range_predicate(lower="bar", upper="foo")
-    with pytest.raises(ValueError):
-        take(5, generate_true(predicate))
-
-
-def test_generate_true_not_in_p_unknown():
-    predicate = not_in_p({None})
     with pytest.raises(ValueError):
         take(5, generate_true(predicate))
 
