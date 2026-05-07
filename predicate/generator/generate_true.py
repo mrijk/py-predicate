@@ -640,7 +640,7 @@ def generate_xor(predicate: XorPredicate) -> Iterator:
 
 @generate_true.register
 def generate_tee(_predicate: TeePredicate) -> Iterator:
-    yield from []
+    yield from random_anys()
 
 
 @generate_true.register

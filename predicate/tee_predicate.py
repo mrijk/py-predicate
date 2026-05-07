@@ -23,5 +23,5 @@ class TeePredicate[T](Predicate[T]):
 
 
 def tee_p[T](fn: Callable[[T], None]) -> Predicate[T]:
-    """Return the boolean value of the function call."""
+    """Execute fn as a side effect and always return True."""
     return TeePredicate(fn=fn)
