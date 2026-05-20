@@ -1,4 +1,4 @@
-from unittest.mock import Mock
+from unittest.mock import AsyncMock, Mock
 
 from more_itertools import one
 
@@ -8,6 +8,19 @@ from predicate.consumes import consumes
 
 def test_tee():
     log_fn = Mock()
+    log = tee_p(fn=log_fn)
+
+    ge_2 = ge_p(2)
+
+    predicate = all_p(log & ge_2)
+
+    assert predicate(range(2, 5))
+
+    assert log_fn.call_count == 3
+
+
+def test_async_tee():
+    log_fn = AsyncMock()
     log = tee_p(fn=log_fn)
 
     ge_2 = ge_p(2)

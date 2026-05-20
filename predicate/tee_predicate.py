@@ -1,6 +1,8 @@
+import asyncio
 from dataclasses import dataclass
 from typing import Any, Callable, Iterable, Iterator, override
 
+from predicate.is_async_predicate import is_async_p
 from predicate.predicate import Predicate
 
 
@@ -10,8 +12,14 @@ class TeePredicate[T](Predicate[T]):
 
     fn: Callable[[T], None]
 
+    def __post_init__(self):
+        if is_async_p(self.fn):
+            self._call = lambda x: asyncio.run(self.fn(x))  # type: ignore[arg-type]
+        else:
+            self._call = self.fn
+
     def __call__(self, x: T) -> bool:
-        self.fn(x)
+        self._call(x)
         return True
 
     def __repr__(self) -> str:

@@ -83,9 +83,7 @@ from predicate.juxt_predicate import JuxtPredicate
 from predicate.le_predicate import LePredicate
 from predicate.list_of_predicate import ListOfPredicate, is_list_of_p
 from predicate.lt_predicate import LtPredicate
-from predicate.match_predicate import (
-    MatchPredicate,
-)
+from predicate.match_predicate import MatchPredicate
 from predicate.ne_predicate import NePredicate
 from predicate.not_in_predicate import NotInPredicate
 from predicate.optimizer.predicate_optimizer import optimize
@@ -113,10 +111,7 @@ from predicate.set_predicates import (
     IsSubsetPredicate,
     IsSupersetPredicate,
 )
-from predicate.standard_predicates import (
-    is_int_p,
-    is_list_p,
-)
+from predicate.standard_predicates import is_int_p, is_list_p
 from predicate.star_predicate import StarPredicate
 from predicate.struct_predicate import StructPredicate
 from predicate.tee_predicate import TeePredicate
@@ -640,7 +635,7 @@ def generate_xor(predicate: XorPredicate) -> Iterator:
 
 @generate_true.register
 def generate_tee(_predicate: TeePredicate) -> Iterator:
-    yield from []
+    yield from random_anys()
 
 
 @generate_true.register
