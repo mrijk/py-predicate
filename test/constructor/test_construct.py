@@ -66,14 +66,8 @@ def test_construct(predicate):
     assert_generated(predicate)
 
 
-@pytest.mark.parametrize("value", (42, 3.14, "foo", True, datetime.now()))
+@pytest.mark.parametrize("value", (42, 3.14, "foo", False, True, datetime.now()))
 def test_construct_eq(value):
-    predicate = eq_p(value)
-    assert_generated(predicate)
-
-
-@pytest.mark.parametrize("value", [True])
-def test_construct_eq_exact(value):
     predicate = eq_p(value)
     assert_generated_exact(predicate)
 

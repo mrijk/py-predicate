@@ -139,8 +139,17 @@ def generate_exception(_predicate: ExceptionPredicate) -> Iterator:
 
 @generate_false.register
 def generate_eq(predicate: EqPredicate) -> Iterator:
-    source = random_anys() if isinstance(predicate.v, bool) else random_values_of_type(klass=predicate.klass)
-    yield from (value for value in source if not predicate(value))
+    match v := predicate.v:
+        case bool():
+            if not v:
+                yield None  # falsy but != False, rules out is_falsy_p
+            yield from (value for value in random_anys() if not predicate(value))
+        case int():
+            yield v + 1
+            yield v - 1
+            yield from interleave(random_ints(lower=v + 1), random_ints(upper=v - 1))
+        case _:
+            yield from (value for value in random_values_of_type(klass=predicate.klass) if not predicate(value))
 
 
 @generate_false.register
@@ -282,6 +291,7 @@ def generate_ge(predicate: GePredicate) -> Iterator:
         case float():
             yield from random_floats(upper=v - sys.float_info.epsilon)
         case int():
+            yield v - 1
             yield from random_ints(upper=v - 1)
         case str():
             yield from generate_strings(~predicate)
@@ -299,6 +309,7 @@ def generate_gt(predicate: GtPredicate) -> Iterator:
         case float():
             yield from random_floats(upper=v)
         case int():
+            yield v
             yield from random_ints(upper=v)
         case str():
             yield from generate_strings(~predicate)
@@ -333,6 +344,7 @@ def generate_le(predicate: LePredicate) -> Iterator:
         case float():
             yield from random_floats(lower=predicate.v + 0.01)
         case int():
+            yield v + 1
             yield from random_ints(lower=predicate.v + 1)
         case str():
             yield from generate_strings(~predicate)
@@ -350,6 +362,7 @@ def generate_lt(predicate: LtPredicate) -> Iterator:
         case float():
             yield from random_floats(lower=v)
         case int():
+            yield v
             yield from random_ints(lower=v)
         case str():
             yield from generate_strings(~predicate)

@@ -9,7 +9,7 @@ from predicate.gt_predicate import GtPredicate
 from predicate.le_predicate import LePredicate
 from predicate.lt_predicate import LtPredicate
 from predicate.ne_predicate import NePredicate
-from predicate.predicate import Predicate
+from predicate.predicate import AndPredicate, OrPredicate, Predicate, XorPredicate
 
 
 @singledispatch
@@ -22,6 +22,24 @@ def int_value_mutations(n: int, values: list, nr: int) -> Iterator[int]:
     yield choice(values)
     yield n - randint(0, 10)
     yield n + randint(0, 10)
+
+
+@mutations.register
+def _(predicate: AndPredicate, false_set: list, true_set: list, nr: int = 3) -> Iterator[Predicate]:
+    yield from mutations(predicate.left, false_set=false_set, true_set=true_set, nr=nr)
+    yield from mutations(predicate.right, false_set=false_set, true_set=true_set, nr=nr)
+
+
+@mutations.register
+def _(predicate: OrPredicate, false_set: list, true_set: list, nr: int = 3) -> Iterator[Predicate]:
+    yield from mutations(predicate.left, false_set=false_set, true_set=true_set, nr=nr)
+    yield from mutations(predicate.right, false_set=false_set, true_set=true_set, nr=nr)
+
+
+@mutations.register
+def _(predicate: XorPredicate, false_set: list, true_set: list, nr: int = 3) -> Iterator[Predicate]:
+    yield from mutations(predicate.left, false_set=false_set, true_set=true_set, nr=nr)
+    yield from mutations(predicate.right, false_set=false_set, true_set=true_set, nr=nr)
 
 
 @mutations.register
@@ -55,7 +73,7 @@ def _(predicate: GePredicate, false_set, true_set: list, nr: int = 3) -> Iterato
 def _(predicate: GtPredicate, false_set, true_set: list, nr: int = 3) -> Iterator[Predicate]:
     match predicate.v:
         case int(n):
-            yield from (gt_p(v) for v in int_value_mutations(n, true_set, nr))
+            yield from (gt_p(v) for v in int_value_mutations(n, false_set, nr))
         case _:
             pass
 
@@ -73,6 +91,6 @@ def _(predicate: LePredicate, false_set, true_set: list, nr: int = 3) -> Iterato
 def _(predicate: LtPredicate, false_set, true_set: list, nr: int = 3) -> Iterator[Predicate]:
     match predicate.v:
         case int(n):
-            yield from (lt_p(v) for v in int_value_mutations(n, true_set, nr))
+            yield from (lt_p(v) for v in int_value_mutations(n, false_set, nr))
         case _:
             pass
