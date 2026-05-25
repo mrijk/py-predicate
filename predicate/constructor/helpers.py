@@ -3,6 +3,20 @@ from typing import Any
 from predicate.predicate import Predicate
 
 
+def predicate_accepts_value(predicate: Predicate, value: Any) -> bool:
+    try:
+        klass = predicate.klass
+    except NotImplementedError:
+        return True
+    if klass is type(Any):
+        return True
+    if isinstance(klass, tuple):
+        return True
+    if isinstance(value, bool) and klass is int:
+        return False
+    return isinstance(value, klass)
+
+
 def safe_call_false(predicate: Predicate, value: Any) -> bool:
     # For performance reasons type checking is not part of the predicate itself
     try:
@@ -14,7 +28,7 @@ def safe_call_false(predicate: Predicate, value: Any) -> bool:
 def safe_call_true(predicate: Predicate, value: Any) -> bool:
     # For performance reasons type checking is not part of the predicate itself
     try:
-        return predicate(value)
+        return predicate_accepts_value(predicate, value) and predicate(value)
     except TypeError:
         return False
 

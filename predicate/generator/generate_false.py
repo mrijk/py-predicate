@@ -139,7 +139,8 @@ def generate_exception(_predicate: ExceptionPredicate) -> Iterator:
 
 @generate_false.register
 def generate_eq(predicate: EqPredicate) -> Iterator:
-    yield from (value for value in random_values_of_type(klass=predicate.klass) if not predicate(value))
+    source = random_anys() if isinstance(predicate.v, bool) else random_values_of_type(klass=predicate.klass)
+    yield from (value for value in source if not predicate(value))
 
 
 @generate_false.register
