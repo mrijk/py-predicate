@@ -108,6 +108,16 @@ def test_construct_xor(predicate_pair):
     assert_generated(predicate)
 
 
+def test_create_mutations_skips_incompatible_klasses():
+    from predicate.constructor.construct import create_mutations
+
+    candidates = [ge_p(2), eq_p("foo")]
+    results = list(create_mutations(candidates, false_set=[1, "bar"], true_set=[3, "foo"]))
+
+    assert ge_p(2) & eq_p("foo") not in results
+    assert ge_p(2) ^ eq_p("foo") not in results
+
+
 def test_construct_not_possible():
     false_set = [0]
     true_set = [0]

@@ -1,6 +1,7 @@
-from typing import Iterator
+from itertools import permutations
+from typing import Any, Iterator
 
-from more_itertools import first, gray_product, take
+from more_itertools import first, take
 
 from predicate import (
     always_false_p,
@@ -45,15 +46,30 @@ def construct(false_set: list, true_set: list, attempts: int = 30) -> Predicate 
     return None
 
 
+def _compatible_klasses(left: Predicate, right: Predicate) -> bool:
+    def to_set(p: Predicate) -> set[type] | None:
+        try:
+            klass = p.klass
+        except NotImplementedError:
+            return None
+        if klass is type(Any):
+            return None
+        return set(klass) if isinstance(klass, tuple) else {klass}
+
+    left_set = to_set(left)
+    right_set = to_set(right)
+    if left_set is None or right_set is None:
+        return True
+    return bool(left_set & right_set)
+
+
 def create_mutations(candidates: list[Predicate], false_set: list, true_set: list) -> Iterator[Predicate]:
     for candidate in candidates:
         yield from mutations(candidate, false_set=false_set, true_set=true_set)
 
-    pairs = gray_product(candidates, candidates)
-    for pair in pairs:
-        left, right = pair
-        if left != right:
-            yield left | right
+    for left, right in permutations(candidates, 2):
+        yield left | right
+        if _compatible_klasses(left, right):
             yield left & right
             yield left ^ right
 
