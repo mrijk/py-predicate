@@ -112,6 +112,7 @@ from predicate.tee_predicate import tee_p
 from predicate.tuple_of_predicate import is_tuple_of_p
 
 __all__ = [
+    "accepts_predicate",
     "are_equivalent",
     "is_satisfiable",
     "is_tautology",

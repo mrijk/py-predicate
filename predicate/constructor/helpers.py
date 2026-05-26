@@ -1,5 +1,6 @@
 from typing import Any
 
+from predicate.accepts_predicate import accepts_p
 from predicate.predicate import Predicate
 
 
@@ -13,8 +14,9 @@ def safe_call_false(predicate: Predicate, value: Any) -> bool:
 
 def safe_call_true(predicate: Predicate, value: Any) -> bool:
     # For performance reasons type checking is not part of the predicate itself
+    accepts = accepts_p(predicate=predicate)
     try:
-        return predicate(value)
+        return accepts(type(value)) and predicate(value)
     except TypeError:
         return False
 

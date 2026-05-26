@@ -277,6 +277,7 @@ def generate_ge(predicate: GePredicate, **_kwargs) -> Iterator:
         case float():
             yield from random_floats(lower=predicate.v)
         case int():
+            yield v
             yield from random_ints(lower=predicate.v)
         case str():
             yield v
@@ -295,6 +296,7 @@ def generate_gt(predicate: GtPredicate) -> Iterator:
         case float():
             yield from random_floats(lower=predicate.v + sys.float_info.epsilon)
         case int():
+            yield v + 1
             yield from random_ints(lower=predicate.v + 1)
         case str():
             yield from generate_strings(predicate)
@@ -359,6 +361,7 @@ def generate_le(predicate: LePredicate) -> Iterator:
         case float():
             yield from random_floats(upper=predicate.v)
         case int():
+            yield v
             yield from random_ints(upper=predicate.v)
         case str():
             yield from generate_strings(predicate)
@@ -417,6 +420,7 @@ def generate_lt(predicate: LtPredicate) -> Iterator:
         case float():
             yield from random_floats(upper=predicate.v - sys.float_info.epsilon)
         case int():
+            yield v - 1
             yield from random_ints(upper=predicate.v - 1)
         case str():
             yield from generate_strings(predicate)
