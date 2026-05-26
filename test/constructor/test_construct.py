@@ -1,9 +1,9 @@
 from datetime import datetime
 
 import pytest
-from constructor.helpers import assert_generated, assert_generated_exact
 from generator.helpers import combinations_of_2
 
+from constructor.helpers import assert_generated, assert_generated_exact
 from predicate import (
     always_false_p,
     always_true_p,
