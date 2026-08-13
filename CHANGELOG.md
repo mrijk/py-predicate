@@ -1,6 +1,13 @@
 # CHANGELOG.md
 
-## 1.6.0 (unreleased)
+
+## 1.6.0
+
+Features:
+
+- decorator (as_predicate) to turn existing function into a predicate
+
+## 1.6.0
 
 Features:
 

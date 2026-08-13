@@ -2,7 +2,7 @@ import asyncio
 import math
 from dataclasses import dataclass, field
 from itertools import repeat
-from typing import Callable, Final, Iterator, override
+from typing import Callable, Final, Iterator, overload, override
 
 from predicate.generator.helpers import generate_even_numbers, generate_odd_numbers, random_floats
 from predicate.is_async_predicate import is_async_p
@@ -46,6 +46,31 @@ def fn_p[T](
 ) -> Predicate[T]:
     """Return the boolean value of the function call."""
     return FnPredicate(predicate_fn=fn, generate_false_fn=generate_false_fn, generate_true_fn=generate_true_fn)
+
+
+@overload
+def as_predicate[T](fn: Callable[[T], bool]) -> Predicate[T]: ...
+
+
+@overload
+def as_predicate[T](
+    fn: None = None,
+    *,
+    generate_true_fn: Callable[[], Iterator[T]] = undefined,
+    generate_false_fn: Callable[[], Iterator[T]] = undefined,
+) -> Callable[[Callable[[T], bool]], Predicate[T]]: ...
+
+
+def as_predicate[T](
+    fn: Callable[[T], bool] | None = None,
+    *,
+    generate_true_fn: Callable[[], Iterator[T]] = undefined,
+    generate_false_fn: Callable[[], Iterator[T]] = undefined,
+) -> Predicate[T] | Callable[[Callable[[T], bool]], Predicate[T]]:
+    def decorator(f: Callable[[T], bool]) -> Predicate[T]:
+        return fn_p(f, generate_true_fn=generate_true_fn, generate_false_fn=generate_false_fn)
+
+    return decorator if fn is None else decorator(fn)
 
 
 is_even_p: Final[Predicate[int]] = fn_p(

@@ -15,7 +15,7 @@ from predicate.exactly_predicate import exactly_n
 from predicate.exception_predicate import exception_p
 from predicate.compile_predicate import compile_predicate, try_compile_predicate
 from predicate.explain import explain
-from predicate.fn_predicate import fn_p, is_even_p, is_finite_p, is_inf_p, is_nan_p, is_odd_p
+from predicate.fn_predicate import fn_p, is_even_p, is_finite_p, is_inf_p, is_nan_p, is_odd_p, as_predicate
 from predicate.formatter import to_dot, to_json, to_latex, to_yaml
 from predicate.ge_predicate import ge_p
 from predicate.generator.generate_false import generate_false
@@ -114,6 +114,7 @@ from predicate.tuple_of_predicate import is_tuple_of_p
 __all__ = [
     "accepts_predicate",
     "are_equivalent",
+    "as_predicate",
     "is_satisfiable",
     "is_tautology",
     "all_p",

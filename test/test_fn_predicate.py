@@ -3,7 +3,7 @@ import math
 import pytest
 
 from predicate import eq_p, explain, fn_p, is_finite_p, is_inf_p, is_int_p, is_not_none_p, is_str_p, or_p
-from predicate.fn_predicate import generate_inf, undefined
+from predicate.fn_predicate import as_predicate, generate_inf, undefined
 from predicate.match_predicate import match_p
 from predicate.predicate import predicate_partial
 
@@ -85,3 +85,19 @@ def test_predicate_partial_with_kwargs():
     predicate = partial_match(is_str_p)
     assert predicate([1, "foo"])
     assert not predicate([1, "foo", "bar"])  # "bar" leftover, only caught with full_match=True
+
+
+def test_as_predicate():
+    @as_predicate
+    def is_even(x: int):
+        return x % 2 == 0
+
+    @as_predicate
+    def larger_than_10(x: int):
+        return x > 10
+
+    predicate = is_even & larger_than_10
+
+    assert not predicate(0)
+    assert not predicate(9)
+    assert predicate(12)
