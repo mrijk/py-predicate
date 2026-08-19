@@ -26,8 +26,8 @@ le_5 = le_p(5)
 
 between = ge_2 & le_5
 
-between(3)   # True
-between(7)   # False
+between(3)  # True
+between(7)  # False
 
 filtered = [x for x in range(10) if between(x)]  # [2, 3, 4, 5]
 ```
@@ -79,7 +79,7 @@ Predicate trees can be algebraically simplified:
 from predicate import ge_p, le_p, optimize, can_optimize
 
 p = ge_p(2) & le_p(5)
-can_optimize(p)   # True (may simplify to a range predicate, etc.)
+can_optimize(p)  # True (may simplify to a range predicate, etc.)
 optimized = optimize(p)
 ```
 
@@ -95,11 +95,11 @@ from predicate import compile_predicate, ge_p, le_p
 between = ge_p(2) & le_p(5)
 fast = compile_predicate(between)  # returns a CompiledPredicate
 
-fast(3)   # True  — evaluated by a native lambda: lambda x: x >= 2 and x <= 5
-fast(8)   # False
+fast(3)  # True  — evaluated by a native lambda: lambda x: x >= 2 and x <= 5
+fast(8)  # False
 
 # Introspection is preserved
-repr(fast)            # same as repr(between)
+repr(fast)  # same as repr(between)
 fast.explain_failure  # delegates to the original predicate
 ```
 
@@ -121,7 +121,7 @@ from more_itertools import take
 
 between = ge_p(2) & le_p(5)
 
-take(5, generate_true(between))   # e.g. [2, 3, 4, 5, 2]
+take(5, generate_true(between))  # e.g. [2, 3, 4, 5, 2]
 take(5, generate_false(between))  # e.g. [0, 1, 6, 7, -1]
 ```
 
@@ -135,9 +135,9 @@ from predicate import all_p, is_list_p, is_str_p, root_p
 # Matches a string, or a list of strings/lists (recursively)
 str_or_nested = is_str_p | (is_list_p & all_p(root_p))
 
-str_or_nested("hello")            # True
-str_or_nested(["a", ["b", "c"]]) # True
-str_or_nested(["a", 1])          # False
+str_or_nested("hello")  # True
+str_or_nested(["a", ["b", "c"]])  # True
+str_or_nested(["a", 1])  # False
 ```
 
 For mutually recursive predicates, use `mutual_recur_p`.
@@ -149,12 +149,14 @@ Instrument functions with predicate-based contracts that are checked at call tim
 ```python
 from predicate import ge_p, instrument, is_int_p, is_str_p, le_p
 
+
 @instrument({"args": {"x": is_int_p & ge_p(0) & le_p(100)}, "ret": is_str_p})
 def grade(x: int) -> str:
     return "pass" if x >= 50 else "fail"
 
-grade(75)   # "pass"
-grade(-1)   # raises ValueError: Parameter predicate for function grade failed
+
+grade(75)  # "pass"
+grade(-1)  # raises ValueError: Parameter predicate for function grade failed
 ```
 
 You can also instrument all functions in a module or class:
@@ -175,8 +177,8 @@ Check logical properties of predicates:
 ```python
 from predicate import are_equivalent, is_satisfiable, is_tautology, ge_p, le_p, always_p
 
-is_tautology(always_p)               # True
-is_satisfiable(ge_p(5) & le_p(3))   # False (unsatisfiable)
+is_tautology(always_p)  # True
+is_satisfiable(ge_p(5) & le_p(3))  # False (unsatisfiable)
 are_equivalent(~~ge_p(2), ge_p(2))  # True
 ```
 
@@ -189,9 +191,9 @@ from predicate import ge_p, le_p, to_json, to_yaml, to_dot, to_latex
 
 p = ge_p(2) & le_p(5)
 
-to_json(p)   # JSON string
-to_yaml(p)   # YAML string
-to_dot(p)    # Graphviz DOT for visualization
+to_json(p)  # JSON string
+to_yaml(p)  # YAML string
+to_dot(p)  # Graphviz DOT for visualization
 to_latex(p)  # LaTeX expression
 ```
 
