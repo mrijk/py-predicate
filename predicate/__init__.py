@@ -34,6 +34,7 @@ from predicate.gt_predicate import gt_p, pos_p
 from predicate.has_key_predicate import has_key_p
 from predicate.has_length_predicate import has_length_p, is_empty_p, is_not_empty_p
 from predicate.has_path_predicate import has_path_p
+from predicate.implements_protocol_predicate import implements_protocol_p
 from predicate.implies_predicate import implies_p
 from predicate.in_predicate import in_p
 from predicate.is_async_predicate import is_async_p
@@ -71,6 +72,7 @@ from predicate.is_none_predicate import is_none_p, none_is_exception_p, none_is_
 from predicate.is_not_none_predicate import is_not_none_p, none_is_false_p
 from predicate.is_predicate import is_p
 from predicate.is_predicate_of_p import is_predicate_of_p
+from predicate.is_protocol_predicate import is_protocol_p
 from predicate.is_same_predicate import is_same_p
 from predicate.is_subclass_predicate import is_enum_p, is_int_enum_p, is_str_enum_p, is_subclass_p
 from predicate.is_truthy_predicate import is_truthy_p
@@ -97,6 +99,7 @@ from predicate.regex_predicate import regex_p
 from predicate.repeat_predicate import repeat
 from predicate.frozendict_of_predicate import is_frozendict_of_p
 from predicate.frozenset_of_predicate import is_frozenset_of_p
+from predicate.same_signature_predicate import same_signature_p
 from predicate.set_of_predicate import is_set_of_p
 from predicate.set_predicates import (
     intersects_p,
@@ -167,6 +170,7 @@ __all__ = [
     "has_key_p",
     "has_length_p",
     "has_path_p",
+    "implements_protocol_p",
     "implies_p",
     "in_p",
     "intersects_p",
@@ -231,6 +235,7 @@ __all__ = [
     "is_predicate_of_p",
     "is_predicate_p",
     "is_printable_p",
+    "is_protocol_p",
     "is_range_p",
     "is_real_subset_p",
     "is_real_superset_p",
@@ -279,6 +284,7 @@ __all__ = [
     "regex_p",
     "repeat",
     "root_p",
+    "same_signature_p",
     "star",
     "starts_with_p",
     "tee_p",
