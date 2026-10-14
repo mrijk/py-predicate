@@ -7,6 +7,7 @@ Features:
 
 - new type check predicate is_frozendict_p (Python 3.15+, always False on older versions)
 - generator support for frozenset and frozendict
+- new type check predicate is_sentinel_p (Python 3.15+, always False on older versions)
 
 ## 1.7.0
 

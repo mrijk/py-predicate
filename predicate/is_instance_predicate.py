@@ -113,8 +113,12 @@ is_date_p = is_instance_p(date)
 if sys.version_info >= (3, 15):
     is_frozendict_p = is_instance_p(frozendict)  # noqa: F821
     """Returns True if the value is a frozendict, otherwise False."""
+
+    is_sentinel_p = is_instance_p(sentinel)  # noqa: F821
+    """Returns True if the value is a sentinel, otherwise False."""
 else:
     is_frozendict_p = always_false_p
+    is_sentinel_p = always_false_p
 
 is_frozenset_p = is_instance_p(frozenset)
 """Returns True if the value is a frozenset, otherwise False."""

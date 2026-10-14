@@ -27,7 +27,7 @@ from predicate import (
     is_uuid_p,
     zero_p,
 )
-from predicate.is_instance_predicate import is_frozendict_p
+from predicate.is_instance_predicate import is_frozendict_p, is_sentinel_p
 from predicate.named_predicate import NamedPredicate
 from predicate.predicate import Predicate
 from predicate.standard_predicates import (
@@ -129,6 +129,12 @@ if sys.version_info >= (3, 15):
         assert is_frozendict_p(frozendict())  # noqa: F821
 
         assert not is_frozendict_p({})
+
+    def test_is_sentinel_p():
+        assert is_sentinel_p(sentinel("MISSING"))  # noqa: F821
+
+        assert not is_sentinel_p(None)
+        assert not is_sentinel_p(object())
 
 
 def test_is_iterable_p():

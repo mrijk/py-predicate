@@ -832,6 +832,20 @@ This predicate tests if value is a range.
     assert not is_range_p(0)
     assert is_range_p(range(5))
 
+is_sentinel_p
+-------------
+
+This predicate tests if the value is a ``sentinel`` object (Python 3.15+). On older Python versions it always returns ``False``.
+
+.. code-block:: python
+
+    from predicate import is_sentinel_p
+
+    MISSING = sentinel("MISSING")
+
+    assert is_sentinel_p(MISSING)
+    assert not is_sentinel_p(None)
+
 is_sequence_p
 -------------
 
