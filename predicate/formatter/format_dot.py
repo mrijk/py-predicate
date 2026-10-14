@@ -20,6 +20,8 @@ from predicate.eq_predicate import EqPredicate
 from predicate.exactly_predicate import ExactlyPredicate
 from predicate.fn_predicate import FnPredicate
 from predicate.formatter.helpers import set_to_str
+from predicate.frozendict_of_predicate import FrozenDictOfPredicate
+from predicate.frozenset_of_predicate import FrozenSetOfPredicate
 from predicate.ge_predicate import GePredicate
 from predicate.gt_predicate import GtPredicate
 from predicate.has_key_predicate import HasKeyPredicate
@@ -181,8 +183,9 @@ def render(dot: Digraph, predicate: Predicate, node_nr: count):
                 return add_node("intersects", label=f"x ∩ {set_to_str(v)} ≠ ∅")
             case IsClosePredicate(target, rel_tol, abs_tol):
                 return add_node("is_close", label=f"x ≈ {target!r}\nrel={rel_tol}, abs={abs_tol}")
-            case DictOfPredicate(key_value_predicates):
-                node = add_node("dict_of", label="is_dict_of")
+            case DictOfPredicate(key_value_predicates) | FrozenDictOfPredicate(key_value_predicates):
+                name = "dict_of" if isinstance(predicate, DictOfPredicate) else "frozendict_of"
+                node = add_node(name, label=f"is_{name}")
                 for key, value in key_value_predicates:
                     kv = _add_node("kv", label="kv", predicate=None)
                     dot.edge(node, kv)
@@ -265,6 +268,8 @@ def render(dot: Digraph, predicate: Predicate, node_nr: count):
                 return add_node("root", label="root")
             case SetOfPredicate(predicate):
                 return add_node_with_child("set_of", label="is_set_of", child=predicate)
+            case FrozenSetOfPredicate(predicate):
+                return add_node_with_child("frozenset_of", label="is_frozenset_of", child=predicate)
             case StarPredicate(predicate):
                 return add_node_with_child("star", label="*", child=predicate)
             case TeePredicate():

@@ -29,6 +29,8 @@ from predicate.eq_predicate import EqPredicate, eq_p
 from predicate.exactly_predicate import ExactlyPredicate
 from predicate.exception_predicate import ExceptionPredicate
 from predicate.fn_predicate import FnPredicate
+from predicate.frozendict_of_predicate import FrozenDictOfPredicate
+from predicate.frozenset_of_predicate import FrozenSetOfPredicate
 from predicate.ge_predicate import GePredicate, ge_p
 from predicate.generator.helpers import (
     default_length_p,
@@ -594,6 +596,15 @@ def generate_dict_of_p(dict_of_predicate: DictOfPredicate, **kwargs) -> Iterator
 
 
 @generate_true.register
+def generate_frozendict_of_p(frozendict_of_predicate: FrozenDictOfPredicate, **kwargs) -> Iterator:
+    if sys.version_info >= (3, 15):
+        dict_of_predicate = frozendict_of_predicate.dict_of_predicate
+        yield from (frozendict(d) for d in generate_dict_of_p(dict_of_predicate, **kwargs))  # noqa: F821
+    else:
+        yield from []
+
+
+@generate_true.register
 def generate_list_of_p(list_of_predicate: ListOfPredicate, *, length_p: Predicate = default_length_p) -> Iterator:
     predicate = list_of_predicate.predicate
 
@@ -640,6 +651,14 @@ def generate_set_of_p(
         values = take(length, generate_true(predicate))
 
         yield from set_from_list(values, order)
+
+
+@generate_true.register
+def generate_frozenset_of_p(
+    frozenset_of_predicate: FrozenSetOfPredicate, *, length_p: Predicate = default_length_p
+) -> Iterator:
+    set_of_predicate: SetOfPredicate = SetOfPredicate(frozenset_of_predicate.predicate)
+    yield from (frozenset(s) for s in generate_set_of_p(set_of_predicate, length_p=length_p))
 
 
 @generate_true.register

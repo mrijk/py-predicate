@@ -24,6 +24,8 @@ from predicate import (
     is_dict_of_p,
     is_even_p,
     is_falsy_p,
+    is_frozendict_of_p,
+    is_frozenset_of_p,
     is_instance_p,
     is_int_p,
     is_list_of_p,
@@ -379,6 +381,22 @@ def test_format_json_set_of():
     json = to_json(predicate)
 
     assert json == {"set_of": {"predicate": {"is_instance": {"klass": ["int"]}}}}
+
+
+def test_format_json_frozendict_of():
+    predicate = is_frozendict_of_p(("name", is_str_p))
+
+    json = to_json(predicate)
+
+    assert json == {"frozendict_of": {"kv": [[{"eq": {"v": "name"}}, {"is_instance": {"klass": ["str"]}}]]}}
+
+
+def test_format_json_frozenset_of():
+    predicate = is_frozenset_of_p(is_int_p)
+
+    json = to_json(predicate)
+
+    assert json == {"frozenset_of": {"predicate": {"is_instance": {"klass": ["int"]}}}}
 
 
 def test_format_json_optional():

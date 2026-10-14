@@ -92,6 +92,8 @@ from predicate.recur_predicate import recur_p
 from predicate.reduce_predicate import reduce_p
 from predicate.regex_predicate import regex_p
 from predicate.repeat_predicate import repeat
+from predicate.frozendict_of_predicate import is_frozendict_of_p
+from predicate.frozenset_of_predicate import is_frozenset_of_p
 from predicate.set_of_predicate import is_set_of_p
 from predicate.set_predicates import (
     intersects_p,
@@ -186,7 +188,9 @@ __all__ = [
     "is_digit_p",
     "is_dict_of_p",
     "is_dict_p",
+    "is_frozendict_of_p",
     "is_frozendict_p",
+    "is_frozenset_of_p",
     "is_frozenset_p",
     "is_empty_p",
     "is_enum_p",

@@ -561,6 +561,21 @@ This predicate tests if the value is of type ``float``.
     assert is_float_p(3.14)
 
 
+is_frozendict_of_p
+------------------
+
+This predicate tests if the value is of type ``frozendict`` (Python 3.15+) and the keys and values match the predicates,
+like ``is_dict_of_p``. On older Python versions it always returns ``False``.
+
+.. code-block:: python
+
+    from predicate import is_frozendict_of_p, is_int_p
+
+    predicate = is_frozendict_of_p(("x", is_int_p), ("y", is_int_p))
+
+    assert predicate(frozendict({"x": 1, "y": 7}))
+    assert not predicate({"x": 1, "y": 7})  # a dict, not a frozendict
+
 is_frozendict_p
 ---------------
 
@@ -573,6 +588,22 @@ This predicate tests if the value is of type ``frozendict`` (Python 3.15+). On o
     assert not is_frozendict_p({"one": 1})  # a dict, not a frozendict
     assert is_frozendict_p(frozendict({"one": 1}))
     assert is_frozendict_p(frozendict())
+
+is_frozenset_of_p
+-----------------
+
+This predicate tests if the value is a frozenset, where all items in the frozenset conform to
+a given predicate.
+
+.. code-block:: python
+
+    from predicate import is_frozenset_of_p, is_str_p
+
+    is_frozenset_of_str = is_frozenset_of_p(is_str_p)
+
+    assert not is_frozenset_of_str(frozenset({"one", "two", 3}))
+    assert not is_frozenset_of_str({"foo"})  # a set, not a frozenset
+    assert is_frozenset_of_str(frozenset({"foo"}))
 
 is_frozenset_p
 --------------

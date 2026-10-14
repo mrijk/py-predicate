@@ -8,6 +8,8 @@ from predicate.count_predicate import count_p
 from predicate.dict_of_predicate import is_dict_of_p
 from predicate.eq_predicate import eq_p
 from predicate.exactly_predicate import exactly_n
+from predicate.frozendict_of_predicate import is_frozendict_of_p
+from predicate.frozenset_of_predicate import is_frozenset_of_p
 from predicate.ge_predicate import ge_p
 from predicate.gt_predicate import gt_p
 from predicate.has_key_predicate import has_key_p
@@ -61,6 +63,9 @@ def from_json(data: dict[str, Any]) -> Predicate:
         case "dict_of":
             pairs = [(from_json(k), from_json(v)) for k, v in value["kv"]]
             return is_dict_of_p(*pairs)
+        case "frozendict_of":
+            pairs = [(from_json(k), from_json(v)) for k, v in value["kv"]]
+            return is_frozendict_of_p(*pairs)
         case "eq":
             return eq_p(value["v"])
         case "exactly":
@@ -143,6 +148,8 @@ def from_json(data: dict[str, Any]) -> Predicate:
             return regex_p(value["pattern"])
         case "set_of":
             return is_set_of_p(from_json(value["predicate"]))
+        case "frozenset_of":
+            return is_frozenset_of_p(from_json(value["predicate"]))
         case "struct_p":
             required = {k: from_json(v) for k, v in value["required"].items()}
             optional_fields = {k: from_json(v) for k, v in value["optional"].items()}

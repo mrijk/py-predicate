@@ -13,6 +13,8 @@ from predicate.eq_predicate import EqPredicate
 from predicate.exactly_predicate import ExactlyPredicate
 from predicate.fn_predicate import FnPredicate
 from predicate.formatter.fn_source import get_fn_source
+from predicate.frozendict_of_predicate import FrozenDictOfPredicate
+from predicate.frozenset_of_predicate import FrozenSetOfPredicate
 from predicate.ge_predicate import GePredicate
 from predicate.gt_predicate import GtPredicate
 from predicate.has_key_predicate import HasKeyPredicate
@@ -89,6 +91,8 @@ def to_json(predicate: Predicate) -> dict[str, Any]:
                 return "count", {"predicate": to_json(predicate), "length_p": to_json(length_p)}
             case DictOfPredicate(key_value_predicates):
                 return "dict_of", {"kv": [[to_json(k), to_json(v)] for k, v in key_value_predicates]}
+            case FrozenDictOfPredicate(key_value_predicates):
+                return "frozendict_of", {"kv": [[to_json(k), to_json(v)] for k, v in key_value_predicates]}
             case EqPredicate(v):
                 return "eq", {"v": v}
             case ExactlyPredicate(n, predicate):
@@ -182,6 +186,8 @@ def to_json(predicate: Predicate) -> dict[str, Any]:
                 return "regex", {"pattern": r.pattern}
             case SetOfPredicate(predicate):
                 return "set_of", {"predicate": to_json(predicate)}
+            case FrozenSetOfPredicate(predicate):
+                return "frozenset_of", {"predicate": to_json(predicate)}
             case StructPredicate(required, optional):
                 return "struct_p", {"required": dict_to_json(required), "optional": dict_to_json(optional)}
             case TeePredicate():

@@ -37,6 +37,8 @@ from predicate import (
     is_even_p,
     is_falsy_p,
     is_float_p,
+    is_frozendict_of_p,
+    is_frozenset_of_p,
     is_frozenset_p,
     is_hashable_p,
     is_inf_p,
@@ -329,6 +331,12 @@ def test_dict_of(key_value_predicates):
     assert_generated_false(predicate)
 
 
+def test_frozendict_of():
+    predicate = is_frozendict_of_p((is_str_p, is_int_p))
+
+    assert_generated_false(predicate)
+
+
 @pytest.mark.parametrize(
     "iterable_of_p",
     [
@@ -406,6 +414,24 @@ def test_generate_always_true_p(predicate):
 )
 def test_set_of(set_type_p):
     predicate = is_set_of_p(set_type_p)
+
+    assert_generated_false(predicate)
+
+
+@pytest.mark.parametrize(
+    "set_type_p",
+    [
+        is_bool_p,
+        is_datetime_p,
+        is_float_p,
+        is_int_p,
+        is_str_p,
+        is_int_p | is_str_p,
+        is_bool_p | is_datetime_p | is_str_p,
+    ],
+)
+def test_frozenset_of(set_type_p):
+    predicate = is_frozenset_of_p(set_type_p)
 
     assert_generated_false(predicate)
 

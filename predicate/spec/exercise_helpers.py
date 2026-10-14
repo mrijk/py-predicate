@@ -9,6 +9,8 @@ from more_itertools import take
 from predicate import always_true_p, generate_true, is_instance_p
 from predicate.dict_of_predicate import is_dict_of_p
 from predicate.explain import explain
+from predicate.frozendict_of_predicate import is_frozendict_of_p
+from predicate.frozenset_of_predicate import is_frozenset_of_p
 from predicate.implies import implies
 from predicate.in_predicate import in_p
 from predicate.is_none_predicate import is_none_p
@@ -47,9 +49,15 @@ def annotation_to_predicate(annotation: Any) -> Predicate:
     if origin is set:
         (item_type,) = get_args(annotation)
         return is_set_of_p(annotation_to_predicate(item_type))
+    if origin is frozenset:
+        (item_type,) = get_args(annotation)
+        return is_frozenset_of_p(annotation_to_predicate(item_type))
     if origin is dict:
         key_type, value_type = get_args(annotation)
         return is_dict_of_p((annotation_to_predicate(key_type), annotation_to_predicate(value_type)))
+    if sys.version_info >= (3, 15) and origin is frozendict:  # noqa: F821
+        key_type, value_type = get_args(annotation)
+        return is_frozendict_of_p((annotation_to_predicate(key_type), annotation_to_predicate(value_type)))
     if origin is tuple:
         args = get_args(annotation)
         if args and args[-1] is not Ellipsis:
