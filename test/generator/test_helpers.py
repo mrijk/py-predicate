@@ -1,3 +1,4 @@
+import sys
 from datetime import datetime
 from typing import Any
 
@@ -17,6 +18,7 @@ from predicate import (
     is_dict_p,
     is_even_p,
     is_float_p,
+    is_frozendict_p,
     is_frozenset_p,
     is_hashable_p,
     is_instance_p,
@@ -38,6 +40,7 @@ from predicate.generator.helpers import (
     random_datetimes,
     random_dicts,
     random_floats,
+    random_frozendicts,
     random_frozensets,
     random_hashables,
     random_ints,
@@ -91,6 +94,17 @@ def test_random_dicts():
 
     assert first(dicts) == {}
     assert all_dict(dicts)
+
+
+if sys.version_info >= (3, 15):
+
+    def test_random_frozendicts():
+        dicts = take(10, random_frozendicts())
+
+        all_frozendicts = all_p(is_frozendict_p)
+
+        assert first(dicts) == frozendict()  # noqa: F821
+        assert all_frozendicts(dicts)
 
 
 def test_random_dicts_with_value_p():

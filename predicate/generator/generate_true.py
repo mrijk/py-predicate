@@ -48,6 +48,7 @@ from predicate.generator.helpers import (
     random_dicts,
     random_first_from_iterables,
     random_floats,
+    random_frozendicts,
     random_frozensets,
     random_hashables,
     random_ints,
@@ -531,6 +532,9 @@ def generate_is_instance_p(predicate: IsInstancePredicate, **kwargs) -> Iterator
         str: random_strings,
         tuple: random_tuples,
     }
+
+    if sys.version_info >= (3, 15):
+        type_registry[frozendict] = random_frozendicts  # noqa: F821
 
     if generator := type_registry.get(klass):
         yield from generator(**kwargs)

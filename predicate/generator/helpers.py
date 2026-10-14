@@ -168,6 +168,17 @@ def random_dicts(
     yield from (dict(zip(take(s, unique_everseen(valid_keys)), valid_values, strict=False)) for s in valid_sizes)
 
 
+if sys.version_info >= (3, 15):
+
+    def random_frozendicts(
+        key_p: Predicate = is_str_p, value_p: Predicate = is_int_p, size_p: Predicate = default_size_p
+    ) -> Iterator[frozendict[Any, Any]]:  # noqa: F821
+        yield from (
+            frozendict(random_dict)  # noqa: F821
+            for random_dict in random_dicts(key_p=key_p, value_p=value_p, size_p=size_p)
+        )
+
+
 def random_datetimes(lower: datetime | None = None, upper: datetime | None = None) -> Iterator[datetime]:
     start = lower if lower else datetime(year=1980, month=1, day=1)
     end = upper if upper else datetime(year=2050, month=1, day=1)

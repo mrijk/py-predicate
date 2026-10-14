@@ -1,7 +1,14 @@
 # CHANGELOG.md
 
 
-## 1.6.0
+## Unreleased
+
+Features:
+
+- new type check predicate is_frozendict_p (Python 3.15+, always False on older versions)
+- generator support for frozenset and frozendict
+
+## 1.7.0
 
 Features:
 

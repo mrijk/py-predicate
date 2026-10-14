@@ -561,6 +561,19 @@ This predicate tests if the value is of type ``float``.
     assert is_float_p(3.14)
 
 
+is_frozendict_p
+---------------
+
+This predicate tests if the value is of type ``frozendict`` (Python 3.15+). On older Python versions it always returns ``False``.
+
+.. code-block:: python
+
+    from predicate import is_frozendict_p
+
+    assert not is_frozendict_p({"one": 1})  # a dict, not a frozendict
+    assert is_frozendict_p(frozendict({"one": 1}))
+    assert is_frozendict_p(frozendict())
+
 is_frozenset_p
 --------------
 
