@@ -25,6 +25,7 @@ from predicate import (
     is_int_p,
     is_list_p,
     is_odd_p,
+    is_sentinel_p,
     is_set_p,
     is_str_p,
     is_tuple_p,
@@ -45,6 +46,7 @@ from predicate.generator.helpers import (
     random_hashables,
     random_ints,
     random_lists,
+    random_sentinels,
     random_sets,
     random_strings,
     random_tuples,
@@ -105,6 +107,11 @@ if sys.version_info >= (3, 15):
 
         assert first(dicts) == frozendict()  # noqa: F821
         assert all_frozendicts(dicts)
+
+    def test_random_sentinels():
+        sentinels = take(10, random_sentinels())
+
+        assert all_p(is_sentinel_p)(sentinels)
 
 
 def test_random_dicts_with_value_p():

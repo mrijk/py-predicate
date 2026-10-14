@@ -178,6 +178,9 @@ if sys.version_info >= (3, 15):
             for random_dict in random_dicts(key_p=key_p, value_p=value_p, size_p=size_p)
         )
 
+    def random_sentinels() -> Iterator[sentinel]:  # noqa: F821
+        yield from (sentinel(name) for name in random_strings(min_size=1))  # noqa: F821
+
 
 def random_datetimes(lower: datetime | None = None, upper: datetime | None = None) -> Iterator[datetime]:
     start = lower if lower else datetime(year=1980, month=1, day=1)
