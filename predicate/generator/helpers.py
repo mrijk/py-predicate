@@ -208,6 +208,10 @@ def random_sets(length_p: Predicate = default_length_p, value_p: Predicate = is_
             yield result
 
 
+def random_frozensets(length_p: Predicate = default_length_p, value_p: Predicate = is_int_p) -> Iterator[frozenset]:
+    yield from (frozenset(random_set) for random_set in random_sets(length_p=length_p, value_p=value_p))
+
+
 def random_bools() -> Iterator[bool]:
     yield from (False, True)
     yield from repeatfunc(random.choice, None, (False, True))

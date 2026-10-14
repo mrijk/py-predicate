@@ -48,6 +48,7 @@ from predicate.generator.helpers import (
     random_dicts,
     random_first_from_iterables,
     random_floats,
+    random_frozensets,
     random_hashables,
     random_ints,
     random_iterables,
@@ -526,6 +527,7 @@ def generate_is_instance_p(predicate: IsInstancePredicate, **kwargs) -> Iterator
         list: random_lists,
         int: random_ints,
         set: random_sets,
+        frozenset: random_frozensets,
         str: random_strings,
         tuple: random_tuples,
     }

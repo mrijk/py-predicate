@@ -51,6 +51,7 @@ from predicate.is_instance_predicate import (
     is_timedelta_p,
     is_tuple_p,
     is_uuid_p,
+    is_frozendict_p,
 )
 from predicate.is_lambda_predicate import is_lambda_p, is_lambda_with_signature_p
 from predicate.is_none_predicate import is_none_p, none_is_exception_p, none_is_true_p
@@ -173,6 +174,7 @@ __all__ = [
     "is_digit_p",
     "is_dict_of_p",
     "is_dict_p",
+    "is_frozendict_p",
     "is_frozenset_p",
     "is_empty_p",
     "is_enum_p",

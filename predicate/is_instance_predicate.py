@@ -1,3 +1,4 @@
+import sys
 from collections.abc import Callable, Container, Iterable, Mapping, Sequence
 from dataclasses import dataclass
 from datetime import date, datetime, time, timedelta
@@ -5,6 +6,7 @@ from pathlib import PurePath
 from typing import Any, Hashable, Iterator, TypeGuard, get_origin, override
 from uuid import UUID
 
+from predicate import always_false_p
 from predicate.helpers import join_with_or
 from predicate.predicate import Predicate
 
@@ -107,6 +109,12 @@ is_bytes_p = is_instance_p(bytes)
 
 is_date_p = is_instance_p(date)
 """Returns True if the value is a date (or datetime), otherwise False."""
+
+if sys.version_info >= (3, 15):
+    is_frozendict_p = is_instance_p(frozendict)  # noqa: F821
+    """Returns True if the value is a frozenset, otherwise False."""
+else:
+    is_frozen_dict_p = always_false_p
 
 is_frozenset_p = is_instance_p(frozenset)
 """Returns True if the value is a frozenset, otherwise False."""

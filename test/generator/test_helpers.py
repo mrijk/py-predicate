@@ -17,6 +17,7 @@ from predicate import (
     is_dict_p,
     is_even_p,
     is_float_p,
+    is_frozenset_p,
     is_hashable_p,
     is_instance_p,
     is_int_p,
@@ -37,6 +38,7 @@ from predicate.generator.helpers import (
     random_datetimes,
     random_dicts,
     random_floats,
+    random_frozensets,
     random_hashables,
     random_ints,
     random_lists,
@@ -162,6 +164,15 @@ def test_random_sets():
 
     assert first(sets) == set()
     assert all_sets(sets)
+
+
+def test_random_frozensets():
+    sets = take(10, random_frozensets())
+
+    all_frozensets = all_p(is_frozenset_p)
+
+    assert first(sets) == frozenset()
+    assert all_frozensets(sets)
 
 
 def test_random_sets_with_limits():
