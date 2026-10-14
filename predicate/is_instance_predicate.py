@@ -114,7 +114,7 @@ if sys.version_info >= (3, 15):
     is_frozendict_p = is_instance_p(frozendict)  # noqa: F821
     """Returns True if the value is a frozenset, otherwise False."""
 else:
-    is_frozen_dict_p = always_false_p
+    is_frozendict_p = always_false_p
 
 is_frozenset_p = is_instance_p(frozenset)
 """Returns True if the value is a frozenset, otherwise False."""
