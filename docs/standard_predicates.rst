@@ -780,6 +780,21 @@ This predicate tests if the value is a number (``int``, ``float``, or ``complex`
     assert not is_number_p(True)  # bool is excluded
     assert not is_number_p("42")
 
+is_normal_p
+-----------
+
+This predicate tests if the value is a normal float: finite, non-zero and not subnormal.
+
+.. code-block:: python
+
+    import math
+    from predicate import is_normal_p
+
+    assert is_normal_p(1.0)
+    assert not is_normal_p(0.0)
+    assert not is_normal_p(5e-324)  # subnormal
+    assert not is_normal_p(math.inf)
+
 is_odd_p
 --------
 
@@ -918,6 +933,33 @@ This predicate tests if a class is a subclass of the given class.
     assert is_int_subclass(bool)  # bool is a subclass of int
     assert not is_int_subclass(str)
 
+
+is_subnormal_p
+--------------
+
+This predicate tests if the value is a subnormal float: non-zero, but smaller in magnitude than the smallest normal float.
+
+.. code-block:: python
+
+    from predicate import is_subnormal_p
+
+    assert is_subnormal_p(5e-324)
+    assert not is_subnormal_p(0.0)
+    assert not is_subnormal_p(1.0)
+
+is_template_p
+-------------
+
+This predicate tests if the value is a t-string ``Template`` (Python 3.14+). On older Python versions it always returns ``False``.
+
+.. code-block:: python
+
+    from predicate import is_template_p
+
+    name = "world"
+
+    assert is_template_p(t"hello {name}")
+    assert not is_template_p(f"hello {name}")
 
 is_time_p
 ---------

@@ -27,7 +27,7 @@ from predicate import (
     is_uuid_p,
     zero_p,
 )
-from predicate.is_instance_predicate import is_frozendict_p, is_sentinel_p
+from predicate.is_instance_predicate import is_frozendict_p, is_sentinel_p, is_template_p
 from predicate.named_predicate import NamedPredicate
 from predicate.predicate import Predicate
 from predicate.standard_predicates import (
@@ -135,6 +135,16 @@ if sys.version_info >= (3, 15):
 
         assert not is_sentinel_p(None)
         assert not is_sentinel_p(object())
+
+
+if sys.version_info >= (3, 14):
+
+    def test_is_template_p():
+        from string.templatelib import Interpolation, Template
+
+        assert is_template_p(Template("hello ", Interpolation("world", "name")))
+
+        assert not is_template_p("hello world")
 
 
 def test_is_iterable_p():

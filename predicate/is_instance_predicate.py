@@ -120,6 +120,14 @@ else:
     is_frozendict_p = always_false_p
     is_sentinel_p = always_false_p
 
+if sys.version_info >= (3, 14):
+    from string.templatelib import Template
+
+    is_template_p = is_instance_p(Template)
+    """Returns True if the value is a t-string Template, otherwise False."""
+else:
+    is_template_p = always_false_p
+
 is_frozenset_p = is_instance_p(frozenset)
 """Returns True if the value is a frozenset, otherwise False."""
 

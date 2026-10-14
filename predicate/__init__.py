@@ -15,7 +15,17 @@ from predicate.exactly_predicate import exactly_n
 from predicate.exception_predicate import exception_p
 from predicate.compile_predicate import compile_predicate, try_compile_predicate
 from predicate.explain import explain
-from predicate.fn_predicate import fn_p, is_even_p, is_finite_p, is_inf_p, is_nan_p, is_odd_p, as_predicate
+from predicate.fn_predicate import (
+    fn_p,
+    is_even_p,
+    is_finite_p,
+    is_inf_p,
+    is_nan_p,
+    is_normal_p,
+    is_odd_p,
+    is_subnormal_p,
+    as_predicate,
+)
 from predicate.formatter import to_dot, to_json, to_latex, to_yaml
 from predicate.ge_predicate import ge_p
 from predicate.generator.generate_false import generate_false
@@ -48,6 +58,7 @@ from predicate.is_instance_predicate import (
     is_sentinel_p,
     is_sequence_p,
     is_set_p,
+    is_template_p,
     is_time_p,
     is_timedelta_p,
     is_tuple_p,
@@ -200,6 +211,7 @@ __all__ = [
     "is_same_p",
     "is_sentinel_p",
     "is_nan_p",
+    "is_normal_p",
     "is_none_p",
     "is_not_empty_p",
     "is_not_none_p",
@@ -217,6 +229,8 @@ __all__ = [
     "is_sequence_p",
     "is_set_of_p",
     "is_set_p",
+    "is_subnormal_p",
+    "is_template_p",
     "is_space_p",
     "is_str_enum_p",
     "is_str_p",

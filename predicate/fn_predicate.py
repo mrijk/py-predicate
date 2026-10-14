@@ -1,5 +1,7 @@
 import asyncio
 import math
+import random
+import sys
 from dataclasses import dataclass, field
 from itertools import repeat
 from typing import Callable, Final, Iterator, overload, override
@@ -99,3 +101,36 @@ is_inf_p: Final[Predicate] = fn_p(fn=math.isinf, generate_true_fn=generate_inf, 
 
 is_nan_p: Final[Predicate] = fn_p(fn=math.isnan, generate_true_fn=generate_nan, generate_false_fn=random_floats)
 """Return True if value is not a number, otherwise False."""
+
+
+if sys.version_info >= (3, 15):
+    isnormal, issubnormal = math.isnormal, math.issubnormal
+else:
+
+    def isnormal(x: float) -> bool:
+        return math.isfinite(x) and abs(x) >= sys.float_info.min
+
+    def issubnormal(x: float) -> bool:
+        return math.isfinite(x) and 0 < abs(x) < sys.float_info.min
+
+
+def generate_subnormal() -> Iterator:
+    while True:
+        yield random.choice([-1, 1]) * random.uniform(5e-324, sys.float_info.min / 2)
+
+
+def generate_non_normal() -> Iterator:
+    while True:
+        yield 0.0
+        yield from generate_inf()
+        yield math.nan
+        yield next(generate_subnormal())
+
+
+is_normal_p: Final[Predicate] = fn_p(fn=isnormal, generate_true_fn=random_floats, generate_false_fn=generate_non_normal)
+"""Return True if value is a normal float (finite, non-zero, not subnormal), otherwise False."""
+
+is_subnormal_p: Final[Predicate] = fn_p(
+    fn=issubnormal, generate_true_fn=generate_subnormal, generate_false_fn=random_floats
+)
+"""Return True if value is a subnormal float, otherwise False."""

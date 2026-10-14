@@ -182,6 +182,13 @@ if sys.version_info >= (3, 15):
         yield from (sentinel(name) for name in random_strings(min_size=1))  # noqa: F821
 
 
+if sys.version_info >= (3, 14):
+    from string.templatelib import Template
+
+    def random_templates() -> Iterator[Template]:
+        yield from (Template(s) for s in random_strings())
+
+
 def random_datetimes(lower: datetime | None = None, upper: datetime | None = None) -> Iterator[datetime]:
     start = lower if lower else datetime(year=1980, month=1, day=1)
     end = upper if upper else datetime(year=2050, month=1, day=1)

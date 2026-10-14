@@ -44,7 +44,7 @@ Documentation = "https://mrijk.github.io/py-predicate/"
 
 [project.optional-dependencies]
 test = [
-    "mypy",
+    "mypy>=2.4",
     "mypy_extensions",
     "pytest",
     "pytest-asyncio",

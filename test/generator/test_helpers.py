@@ -28,6 +28,7 @@ from predicate import (
     is_sentinel_p,
     is_set_p,
     is_str_p,
+    is_template_p,
     is_tuple_p,
     is_uuid_p,
 )
@@ -41,12 +42,10 @@ from predicate.generator.helpers import (
     random_datetimes,
     random_dicts,
     random_floats,
-    random_frozendicts,
     random_frozensets,
     random_hashables,
     random_ints,
     random_lists,
-    random_sentinels,
     random_sets,
     random_strings,
     random_tuples,
@@ -101,6 +100,8 @@ def test_random_dicts():
 if sys.version_info >= (3, 15):
 
     def test_random_frozendicts():
+        from predicate.generator.helpers import random_frozendicts
+
         dicts = take(10, random_frozendicts())
 
         all_frozendicts = all_p(is_frozendict_p)
@@ -109,9 +110,21 @@ if sys.version_info >= (3, 15):
         assert all_frozendicts(dicts)
 
     def test_random_sentinels():
+        from predicate.generator.helpers import random_sentinels
+
         sentinels = take(10, random_sentinels())
 
         assert all_p(is_sentinel_p)(sentinels)
+
+
+if sys.version_info >= (3, 14):
+
+    def test_random_templates():
+        from predicate.generator.helpers import random_templates
+
+        templates = take(10, random_templates())
+
+        assert all_p(is_template_p)(templates)
 
 
 def test_random_dicts_with_value_p():
