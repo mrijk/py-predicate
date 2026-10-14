@@ -59,7 +59,7 @@ is_bytearray_p = is_instance_p(bytearray)
 is_callable_p: IsInstancePredicate[Callable] = is_instance_p(Callable)  # type: ignore[arg-type]
 """Returns True if the value is a callable, otherwise False."""
 
-is_complex_p = is_instance_p(complex)
+is_complex_p: IsInstancePredicate[complex] = is_instance_p(complex)
 """Returns True if the value is a complex, otherwise False."""
 
 is_container_p: IsInstancePredicate[Container] = is_instance_p(Container)  # type: ignore[type-abstract]
@@ -68,10 +68,10 @@ is_container_p: IsInstancePredicate[Container] = is_instance_p(Container)  # typ
 is_datetime_p = is_instance_p(datetime)
 """Returns True if the value is a datetime, otherwise False."""
 
-is_dict_p = is_instance_p(dict)
+is_dict_p: IsInstancePredicate[dict] = is_instance_p(dict)
 """Returns True if the value is a dict, otherwise False."""
 
-is_float_p = is_instance_p(float)
+is_float_p: IsInstancePredicate[float] = is_instance_p(float)
 """Returns True if the value is a float, otherwise False."""
 
 is_hashable_p: IsInstancePredicate[Hashable] = is_instance_p(Hashable)  # type: ignore[type-abstract]
@@ -80,10 +80,10 @@ is_hashable_p: IsInstancePredicate[Hashable] = is_instance_p(Hashable)  # type: 
 is_iterable_p: IsInstancePredicate[Iterable] = is_instance_p(Iterable)  # type: ignore[type-abstract]
 """Returns True if the value is an Iterable, otherwise False."""
 
-is_int_p = is_instance_p(int)
+is_int_p: IsInstancePredicate[int] = is_instance_p(int)
 """Returns True if the value is an integer, otherwise False."""
 
-is_list_p = is_instance_p(list)
+is_list_p: IsInstancePredicate[list] = is_instance_p(list)
 """Returns True if the value is a list, otherwise False."""
 
 is_predicate_p: IsInstancePredicate[Predicate] = is_instance_p(Predicate)  # type: ignore[type-abstract]
@@ -95,7 +95,7 @@ is_range_p = is_instance_p(range)
 is_set_p = is_instance_p(set)
 """Returns True if the value is a set, otherwise False."""
 
-is_str_p = is_instance_p(str)
+is_str_p: IsInstancePredicate[str] = is_instance_p(str)
 """Returns True if the value is a str, otherwise False."""
 
 is_tuple_p = is_instance_p(tuple)
