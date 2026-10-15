@@ -1,4 +1,4 @@
-from collections.abc import Mapping
+from collections.abc import Iterator, Mapping
 from dataclasses import dataclass
 from typing import Any, override
 
@@ -19,21 +19,21 @@ class StructPredicate[T](Predicate[T]):
         if not isinstance(x, Mapping):
             return False
 
-        if set(x) - set(self.required) - set(self.optional):
-            return False
+        return not any(self._failures(x))
+
+    def _failures(self, x: Mapping) -> Iterator[dict]:
+        if additional := set(x) - set(self.required) - set(self.optional):
+            yield {"reason": f"Field `{first(additional)}` is unknown"}
 
         for key, predicate in self.required.items():
             if key not in x:
-                return False
-            if not predicate(x[key]):
-                return False
+                yield {"reason": f"Required field `{key}` missing"}
+            elif not predicate(value := x[key]):
+                yield value_failure(key, value, predicate)
 
         for key, predicate in self.optional.items():
-            if value := x.get(key, None):
-                if not predicate(value):
-                    return False
-
-        return True
+            if key in x and not predicate(value := x[key]):
+                yield value_failure(key, value, predicate)
 
     def __repr__(self) -> str:
         return (
@@ -45,21 +45,15 @@ class StructPredicate[T](Predicate[T]):
         if not isinstance(x, Mapping):
             return {"reason": f"{x} is not an instance of a Mapping"}
 
-        if additional := first(set(x) - set(self.required) - set(self.optional), None):
-            return {"reason": f"Field `{additional}` is unknown"}
+        return first(self._failures(x), {"reason": "Unknown"})
 
-        for key, predicate in self.required.items():
-            if key not in x:
-                return {"reason": f"Required field `{key}` missing"}
-            value = x[key]
-            if not predicate(value):
-                return {
-                    "key": key,
-                    "value": value,
-                    "reason": f"Value '{value}' for key '{key}' doesn't satisfy predicate {predicate!r}",
-                }
 
-        return {"reason": "Unknown"}
+def value_failure(key: str, value: Any, predicate: Predicate) -> dict:
+    return {
+        "key": key,
+        "value": value,
+        "reason": f"Value '{value}' for key '{key}' doesn't satisfy predicate {predicate!r}",
+    }
 
 
 def is_struct_p(

@@ -98,3 +98,14 @@ def test_is_struct_p_explain_additional_data(is_person_p):
         "reason": "Field `email` is unknown",
     }
     assert explain(is_person_p, value) == expected
+
+
+def test_is_struct_optional_falsy_value_checked():
+    predicate = is_struct_p(optional={"count": ge_p(1)})
+    assert not predicate({"count": 0})
+    assert predicate.explain({"count": 0})["key"] == "count"
+
+
+def test_is_struct_explain_optional(is_person_with_optional_email_p):
+    explanation = is_person_with_optional_email_p.explain({"name": "Alice", "age": 30, "email": "nope"})
+    assert explanation["key"] == "email"

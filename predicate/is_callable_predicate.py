@@ -40,6 +40,8 @@ class IsCallablePredicate[T](Predicate[T]):
                     return {"reason": f"Wrong return type: {return_type}"}
 
                 params = [param for key, param in annotations.items() if key != "return"]
+                if len(params) != len(self.params):
+                    return {"reason": f"Got {len(params)} parameters, expected {len(self.params)}"}
                 combined = zip(self.params, params, strict=False)
                 different = first(
                     (expected_param, param) for expected_param, param in combined if expected_param != param

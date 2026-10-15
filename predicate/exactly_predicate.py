@@ -14,15 +14,14 @@ class ExactlyPredicate[T](Predicate[T]):
     def __call__(self, iterable: Iterable, *, predicates: list[Predicate], full_match: bool) -> bool:
         from predicate.match_predicate import match
 
-        rest = iterable
-        for _ in range(self.n):
-            if not rest:
-                return False
-
-            item, *rest = rest
-            if not self.predicate(item):
-                return False
+        head, rest = self._split(iterable)
+        if len(head) < self.n or not all(self.predicate(item) for item in head):
+            return False
         return match(rest, predicates=predicates, full_match=full_match) if predicates else True
+
+    def _split(self, iterable: Iterable) -> tuple[list, list]:
+        items = list(iterable)
+        return items[: self.n], items[self.n :]
 
     def __repr__(self) -> str:
         return f"exactly({self.n}, {self.predicate!r})"
@@ -31,15 +30,12 @@ class ExactlyPredicate[T](Predicate[T]):
     def explain_failure(self, iterable: Iterable[T], *, predicates: list[Predicate], full_match: bool) -> dict:  # type: ignore
         from predicate.match_predicate import reason
 
-        rest = iterable
-        for _ in range(self.n):
-            if not rest:
-                return {"reason": f"Not enough items in iterable, expected {self.n}"}
-
-            item, *rest = rest
+        head, rest = self._split(iterable)
+        for item in head:
             if not self.predicate(item):
                 return self.predicate.explain(item)
-
+        if len(head) < self.n:
+            return {"reason": f"Not enough items in iterable, expected {self.n}"}
         return reason(rest, predicates=predicates, full_match=full_match)
 
 
