@@ -16,6 +16,21 @@ def test_is_subclass_p_tuple():
     assert predicate(str)
 
 
+def test_is_subclass_p_union_value():
+    predicate = is_subclass_p(int | str)
+
+    assert predicate(int | str)
+    assert predicate(bool | str)
+    assert not predicate(int | float)
+
+
+def test_is_subclass_p_none():
+    predicate = is_subclass_p(type(None))
+
+    assert predicate(None)
+    assert not predicate(1)
+
+
 def test_is_subclass_p_fail():
     predicate = is_subclass_p(int)
 

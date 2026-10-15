@@ -1,3 +1,5 @@
+from collections.abc import Sequence
+
 import pytest
 
 from predicate import explain, same_signature_p
@@ -30,6 +32,18 @@ def test_same_signature_p_idempotent():
     predicate = same_signature_p(f)
 
     assert predicate(f)
+
+
+def test_same_signature_p_abc():
+    def f(x: list) -> Sequence:
+        pass
+
+    def ok_1(x: Sequence) -> list:
+        pass
+
+    predicate = same_signature_p(f)
+
+    assert predicate(ok_1)
 
 
 def test_same_signature_p_return_type_nok():

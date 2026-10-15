@@ -1,44 +1,22 @@
-import types
-import typing
-from collections.abc import Iterator
+from collections.abc import Iterator, Mapping
 from dataclasses import dataclass
 from inspect import Parameter, signature
+from types import NoneType
 from typing import Callable, override
 
+from predicate.is_subclass_predicate import is_subclass_p
 from predicate.predicate import Predicate
 
 
-def get_union_args(cls) -> tuple | None:
-    origin = typing.get_origin(cls)
-    if origin is typing.Union or (hasattr(types, "UnionType") and origin is types.UnionType):
-        return typing.get_args(cls)
-    return None
-
-
-def is_subclass_safe(cls, superclass) -> bool:
+def is_subtype(cls, superclass) -> bool:
     # A "-> None" annotation is stored as None, not as NoneType
-    cls = type(None) if cls is None else cls
-    superclass = type(None) if superclass is None else superclass
-
-    cls_union = get_union_args(cls)
-    if cls_union is not None:
-        # If the child is a Union, ALL types in the union must inherit from the superclass
-        return all(is_subclass_safe(c, superclass) for c in cls_union)
-
-    super_union = get_union_args(superclass)
-    if super_union is not None:
-        return any(is_subclass_safe(cls, s) for s in super_union)
-
-    if not isinstance(cls, type) or not hasattr(cls, "__mro__"):
-        return False
-
-    return superclass in cls.__mro__
+    return is_subclass_p(NoneType if superclass is None else superclass)(cls)
 
 
-def remove_default_args(f_parameters, g_parameters):
-    return types.MappingProxyType(
-        {name: p for name, p in g_parameters.items() if name in f_parameters or p.default is Parameter.empty}
-    )
+def remove_default_args(
+    f_parameters: Mapping[str, Parameter], g_parameters: Mapping[str, Parameter]
+) -> Mapping[str, Parameter]:
+    return {name: p for name, p in g_parameters.items() if name in f_parameters or p.default is Parameter.empty}
 
 
 @dataclass
@@ -58,7 +36,7 @@ class SameSignaturePredicate[T](Predicate[T]):
         # Check return type is covariant
         f_return = f_sig.return_annotation
         g_return = g_sig.return_annotation
-        if not is_subclass_safe(g_return, f_return):
+        if not is_subtype(g_return, f_return):
             yield f"Return type {g_return} is not a subtype of {f_return}"
             return
 
@@ -79,7 +57,7 @@ class SameSignaturePredicate[T](Predicate[T]):
                 yield f"Expected parameter '{f_param_name}', got '{g_param_name}'"
                 return
             # Parameter types are contravariant
-            if not is_subclass_safe(f_param_annotation.annotation, g_param_annotation.annotation):
+            if not is_subtype(f_param_annotation.annotation, g_param_annotation.annotation):
                 yield f"Parameter '{g_param_name}' has incompatible type"
                 return
 
