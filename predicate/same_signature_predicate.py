@@ -28,10 +28,15 @@ def remove_default_args(
 ) -> Mapping[str, Parameter]:
     # Extra parameters in g are fine when they're optional: a default, *args or **kwargs
     optional = (Parameter.VAR_POSITIONAL, Parameter.VAR_KEYWORD)
+    # Positional parameters are matched by position, the others by name
+    positional = (Parameter.POSITIONAL_ONLY, Parameter.POSITIONAL_OR_KEYWORD)
+    nr_positional = sum(p.kind in positional for p in f_parameters.values())
     return {
         name: p
-        for name, p in g_parameters.items()
-        if name in f_parameters or (p.default is Parameter.empty and p.kind not in optional)
+        for i, (name, p) in enumerate(g_parameters.items())
+        if (p.kind in positional and i < nr_positional)
+        or name in f_parameters
+        or (p.default is Parameter.empty and p.kind not in optional)
     }
 
 
@@ -53,8 +58,17 @@ class SameSignaturePredicate[T](Predicate[T]):
         return not any(self._failures(function))
 
     def _failures(self, function: type) -> Iterator[str]:
+        if not callable(function):
+            yield f"{function} is not callable"
+            return
+
         f_sig = signature(self.function, eval_str=True)
-        g_sig = signature(function, eval_str=True)
+        try:
+            g_sig = signature(function, eval_str=True)
+        except ValueError:
+            # Some builtins, like max, have no signature that can be inspected
+            yield f"{function} has no signature"
+            return
 
         # Check return type is covariant
         f_return = f_sig.return_annotation
@@ -76,7 +90,8 @@ class SameSignaturePredicate[T](Predicate[T]):
         for f_param, g_param in zip(ordered(f_parameters), ordered(g_parameters), strict=False):
             f_param_name, f_param_annotation = f_param
             g_param_name, g_param_annotation = g_param
-            if f_param_name != g_param_name:
+            # Callers of f can't pass a positional-only parameter by name, so its name doesn't matter
+            if f_param_annotation.kind != Parameter.POSITIONAL_ONLY and f_param_name != g_param_name:
                 yield f"Expected parameter '{f_param_name}', got '{g_param_name}'"
                 return
             # Callers of f may pass this parameter by position or by name, so g must accept both

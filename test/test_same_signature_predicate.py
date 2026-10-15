@@ -230,3 +230,64 @@ def test_same_signature_p_missing_default_nok():
 
     expected = {"reason": "Parameter 'x' has no default value", "result": False}
     assert explain(predicate, fail_1) == expected
+
+
+def test_same_signature_p_not_callable():
+    def f() -> None: ...
+
+    predicate = same_signature_p(f)
+
+    assert not predicate(42)
+
+    expected = {"reason": "42 is not callable", "result": False}
+    assert explain(predicate, 42) == expected
+
+
+def test_same_signature_p_no_signature():
+    def f(x: int) -> None: ...
+
+    predicate = same_signature_p(f)
+
+    assert not predicate(max)
+
+    expected = {"reason": "<built-in function max> has no signature", "result": False}
+    assert explain(predicate, max) == expected
+
+
+def test_same_signature_p_positional_only_ok():
+    def f(x: int, /) -> None: ...
+
+    def ok_1(x: int) -> None: ...
+
+    def ok_2(y: int) -> None: ...
+
+    def ok_3(y: int, /) -> None: ...
+
+    def ok_4(y: int = 1) -> None: ...
+
+    predicate = same_signature_p(f)
+
+    assert predicate(ok_1)
+    assert predicate(ok_2)
+    assert predicate(ok_3)
+    assert predicate(ok_4)
+
+
+def test_same_signature_p_keyword_only_ok():
+    def f(x: int, *, y: int) -> None: ...
+
+    def ok_1(x: int, y: int) -> None: ...
+
+    predicate = same_signature_p(f)
+
+    assert predicate(ok_1)
+
+
+def test_same_signature_p_additional_default_ok():
+    def f(x: int) -> None: ...
+
+    def ok_1(x: int = 1) -> None: ...
+
+    predicate = same_signature_p(f)
+
+    assert predicate(ok_1)
