@@ -191,3 +191,42 @@ def test_same_signature_p_with_additional_var_args():
 
     assert predicate(ok_1)
     assert predicate(ok_2)
+
+
+def test_same_signature_p_positional_only_nok():
+    def f(x: int) -> None: ...
+
+    def fail_1(x: int, /) -> None: ...
+
+    predicate = same_signature_p(f)
+
+    assert not predicate(fail_1)
+
+    expected = {"reason": "Parameter 'x' is positional-only, expected positional or keyword", "result": False}
+    assert explain(predicate, fail_1) == expected
+
+
+def test_same_signature_p_keyword_only_nok():
+    def f(x: int, y: int) -> None: ...
+
+    def fail_1(x: int, *, y: int) -> None: ...
+
+    predicate = same_signature_p(f)
+
+    assert not predicate(fail_1)
+
+    expected = {"reason": "Parameter 'y' is keyword-only, expected positional or keyword", "result": False}
+    assert explain(predicate, fail_1) == expected
+
+
+def test_same_signature_p_missing_default_nok():
+    def f(x: int = 1) -> None: ...
+
+    def fail_1(x: int) -> None: ...
+
+    predicate = same_signature_p(f)
+
+    assert not predicate(fail_1)
+
+    expected = {"reason": "Parameter 'x' has no default value", "result": False}
+    assert explain(predicate, fail_1) == expected

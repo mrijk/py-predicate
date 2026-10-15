@@ -79,6 +79,15 @@ class SameSignaturePredicate[T](Predicate[T]):
             if f_param_name != g_param_name:
                 yield f"Expected parameter '{f_param_name}', got '{g_param_name}'"
                 return
+            # Callers of f may pass this parameter by position or by name, so g must accept both
+            f_kind, g_kind = f_param_annotation.kind, g_param_annotation.kind
+            if f_kind == Parameter.POSITIONAL_OR_KEYWORD and g_kind != Parameter.POSITIONAL_OR_KEYWORD:
+                yield f"Parameter '{g_param_name}' is {g_kind.description}, expected {f_kind.description}"
+                return
+            # Callers of f may leave out a parameter with a default, so g needs a default too
+            if f_param_annotation.default is not Parameter.empty and g_param_annotation.default is Parameter.empty:
+                yield f"Parameter '{g_param_name}' has no default value"
+                return
             # Parameter types are contravariant
             if not is_subtype(f_param_annotation.annotation, g_param_annotation.annotation):
                 yield (
