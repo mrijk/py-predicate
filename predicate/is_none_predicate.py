@@ -1,5 +1,11 @@
+import sys
 from dataclasses import dataclass
-from typing import Final, TypeGuard, override
+from typing import Final, override
+
+if sys.version_info >= (3, 13):
+    from typing import TypeIs
+else:
+    from typing import TypeGuard as TypeIs  # type: ignore[assignment]  # approximation for Python < 3.13
 
 from predicate import exception_p
 from predicate.predicate import Predicate, or_p, predicate_partial
@@ -9,7 +15,7 @@ from predicate.predicate import Predicate, or_p, predicate_partial
 class IsNonePredicate[T](Predicate[T]):
     """A predicate class that models the 'is none' predicate."""
 
-    def __call__(self, x: object) -> TypeGuard[None]:
+    def __call__(self, x: object) -> TypeIs[None]:
         return x is None
 
     def __repr__(self) -> str:
