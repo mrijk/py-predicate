@@ -44,3 +44,13 @@ def test_is_callable_explain_not_callable():
 
     expected = {"reason": "1 is not a Callable", "result": False}
     assert explain(predicate, 1) == expected
+
+
+def test_is_callable_explain_wrong_number_of_parameters():
+    def extra_param(x: int, y: int) -> bool:
+        return True
+
+    predicate = is_callable_p([int], bool)
+
+    expected = {"reason": "Got 2 parameters, expected 1", "result": False}
+    assert explain(predicate, extra_param) == expected
