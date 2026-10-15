@@ -38,6 +38,7 @@ from predicate import (
     is_falsy_p,
     is_float_p,
     is_frozendict_of_p,
+    is_frozendict_p,
     is_frozenset_of_p,
     is_frozenset_p,
     is_hashable_p,
@@ -50,6 +51,7 @@ from predicate import (
     is_mapping_p,
     is_nan_p,
     is_none_p,
+    is_normal_p,
     is_not_empty_p,
     is_not_none_p,
     is_number_p,
@@ -58,12 +60,15 @@ from predicate import (
     is_predicate_p,
     is_real_subset_p,
     is_real_superset_p,
+    is_sentinel_p,
     is_sequence_p,
     is_set_of_p,
     is_set_p,
     is_str_p,
+    is_subnormal_p,
     is_subset_p,
     is_superset_p,
+    is_template_p,
     is_timedelta_p,
     is_truthy_p,
     is_tuple_of_p,
@@ -144,6 +149,20 @@ def test_generate_false(predicate):
 def test_generate_false_and(predicate_pair):
     predicate_1, predicate_2 = predicate_pair
     predicate = predicate_1 & predicate_2
+    assert_generated_false(predicate)
+
+
+@pytest.mark.parametrize(
+    "predicate",
+    [
+        is_normal_p,
+        is_subnormal_p,
+        is_template_p,
+        is_frozendict_p,
+        is_sentinel_p,
+    ],
+)
+def test_generate_false_new_python_types(predicate):
     assert_generated_false(predicate)
 
 

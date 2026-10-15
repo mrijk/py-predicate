@@ -39,6 +39,7 @@ from predicate import (
     is_falsy_p,
     is_float_p,
     is_frozendict_of_p,
+    is_frozendict_p,
     is_frozenset_of_p,
     is_frozenset_p,
     is_hashable_p,
@@ -51,6 +52,7 @@ from predicate import (
     is_list_p,
     is_nan_p,
     is_none_p,
+    is_normal_p,
     is_not_empty_p,
     is_not_none_p,
     is_number_p,
@@ -58,9 +60,12 @@ from predicate import (
     is_p,
     is_predicate_of_p,
     is_predicate_p,
+    is_sentinel_p,
     is_set_of_p,
     is_set_p,
     is_str_p,
+    is_subnormal_p,
+    is_template_p,
     is_truthy_p,
     is_tuple_of_p,
     is_tuple_p,
@@ -135,6 +140,26 @@ def foo(self) -> bool:
     ],
 )
 def test_generate_true(predicate):
+    assert_generated_true(predicate)
+
+
+@pytest.mark.parametrize(
+    "predicate",
+    [
+        is_normal_p,
+        is_subnormal_p,
+        pytest.param(
+            is_template_p, marks=pytest.mark.skipif(sys.version_info < (3, 14), reason="requires Python 3.14+")
+        ),
+        pytest.param(
+            is_frozendict_p, marks=pytest.mark.skipif(sys.version_info < (3, 15), reason="requires Python 3.15+")
+        ),
+        pytest.param(
+            is_sentinel_p, marks=pytest.mark.skipif(sys.version_info < (3, 15), reason="requires Python 3.15+")
+        ),
+    ],
+)
+def test_generate_true_new_python_types(predicate):
     assert_generated_true(predicate)
 
 
