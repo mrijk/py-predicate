@@ -15,7 +15,8 @@ from predicate.implies import implies
 from predicate.in_predicate import in_p
 from predicate.is_none_predicate import is_none_p
 from predicate.list_of_predicate import is_list_of_p
-from predicate.predicate import Predicate, or_p
+from predicate.or_predicate import or_p
+from predicate.predicate import Predicate
 from predicate.set_of_predicate import is_set_of_p
 from predicate.spec.spec import Spec
 from predicate.tuple_of_predicate import is_tuple_of_p

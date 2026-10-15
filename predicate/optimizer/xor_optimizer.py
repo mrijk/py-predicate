@@ -2,16 +2,14 @@ from typing import Iterable
 
 from predicate.always_false_predicate import AlwaysFalsePredicate, always_false_p
 from predicate.always_true_predicate import AlwaysTruePredicate, always_true_p
+from predicate.and_predicate import AndPredicate
 from predicate.eq_predicate import EqPredicate
 from predicate.implies import implies
 from predicate.in_predicate import InPredicate
+from predicate.not_predicate import NotPredicate
 from predicate.optimizer.helpers import MaybeOptimized, NotOptimized, Optimized
-from predicate.predicate import (
-    AndPredicate,
-    NotPredicate,
-    OrPredicate,
-    XorPredicate,
-)
+from predicate.or_predicate import OrPredicate
+from predicate.xor_predicate import XorPredicate
 
 
 def optimize_xor_predicate[T](predicate: XorPredicate[T]) -> MaybeOptimized[T]:

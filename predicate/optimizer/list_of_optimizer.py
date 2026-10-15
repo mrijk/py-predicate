@@ -6,8 +6,8 @@ from predicate.is_instance_predicate import is_list_p
 from predicate.is_none_predicate import IsNonePredicate
 from predicate.is_not_none_predicate import IsNotNonePredicate
 from predicate.list_of_predicate import ListOfPredicate
+from predicate.not_predicate import NotPredicate
 from predicate.optimizer.helpers import MaybeOptimized, NotOptimized, Optimized
-from predicate.predicate import NotPredicate
 
 
 def optimize_list_of_predicate[T](predicate: ListOfPredicate[T]) -> MaybeOptimized[T]:

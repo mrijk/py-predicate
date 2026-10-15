@@ -5,6 +5,7 @@ from typing import Any, cast, get_args
 from predicate.all_predicate import AllPredicate
 from predicate.always_false_predicate import AlwaysFalsePredicate
 from predicate.always_true_predicate import AlwaysTruePredicate
+from predicate.and_predicate import AndPredicate
 from predicate.any_predicate import AnyPredicate
 from predicate.compile_predicate import CompiledPredicate
 from predicate.count_predicate import CountPredicate
@@ -38,14 +39,10 @@ from predicate.match_predicate import MatchPredicate
 from predicate.named_predicate import NamedPredicate
 from predicate.ne_predicate import NePredicate
 from predicate.not_in_predicate import NotInPredicate
+from predicate.not_predicate import NotPredicate
 from predicate.optional_predicate import OptionalPredicate
-from predicate.predicate import (
-    AndPredicate,
-    NotPredicate,
-    OrPredicate,
-    Predicate,
-    XorPredicate,
-)
+from predicate.or_predicate import OrPredicate
+from predicate.predicate import Predicate
 from predicate.range_predicate import GeLePredicate, GeLtPredicate, GtLePredicate, GtLtPredicate
 from predicate.reduce_predicate import ReducePredicate
 from predicate.regex_predicate import RegexPredicate
@@ -60,6 +57,7 @@ from predicate.set_predicates import (
 from predicate.struct_predicate import StructPredicate
 from predicate.tee_predicate import TeePredicate
 from predicate.tuple_of_predicate import TupleOfPredicate
+from predicate.xor_predicate import XorPredicate
 
 
 def dict_to_json(predicates: dict[str, Predicate]) -> dict[str, Any]:

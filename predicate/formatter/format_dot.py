@@ -11,6 +11,7 @@ from more_itertools import first
 from predicate.all_predicate import AllPredicate
 from predicate.always_false_predicate import AlwaysFalsePredicate
 from predicate.always_true_predicate import AlwaysTruePredicate
+from predicate.and_predicate import AndPredicate
 from predicate.any_predicate import AnyPredicate
 from predicate.comp_predicate import CompPredicate
 from predicate.compile_predicate import CompiledPredicate
@@ -46,16 +47,12 @@ from predicate.match_predicate import MatchPredicate
 from predicate.named_predicate import NamedPredicate
 from predicate.ne_predicate import NePredicate
 from predicate.not_in_predicate import NotInPredicate
+from predicate.not_predicate import NotPredicate
 from predicate.optimizer.predicate_optimizer import optimize
 from predicate.optional_predicate import OptionalPredicate
+from predicate.or_predicate import OrPredicate
 from predicate.plus_predicate import PlusPredicate
-from predicate.predicate import (
-    AndPredicate,
-    NotPredicate,
-    OrPredicate,
-    Predicate,
-    XorPredicate,
-)
+from predicate.predicate import Predicate
 from predicate.range_predicate import GeLePredicate, GeLtPredicate, GtLePredicate, GtLtPredicate
 from predicate.reduce_predicate import ReducePredicate
 from predicate.regex_predicate import RegexPredicate
@@ -73,6 +70,7 @@ from predicate.star_predicate import StarPredicate
 from predicate.tee_predicate import TeePredicate
 from predicate.this_predicate import ThisPredicate, find_this_predicate
 from predicate.tuple_of_predicate import TupleOfPredicate
+from predicate.xor_predicate import XorPredicate
 
 
 def to_dot(predicate: Predicate, predicate_string: str | None = None, show_optimized: bool = False):

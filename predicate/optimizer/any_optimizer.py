@@ -4,8 +4,8 @@ from predicate.always_true_predicate import AlwaysTruePredicate, always_true_p
 from predicate.any_predicate import AnyPredicate
 from predicate.eq_predicate import EqPredicate
 from predicate.ne_predicate import NePredicate
+from predicate.not_predicate import NotPredicate
 from predicate.optimizer.helpers import MaybeOptimized, NotOptimized, Optimized
-from predicate.predicate import NotPredicate
 
 
 def optimize_any_predicate[T](predicate: AnyPredicate[T]) -> MaybeOptimized[T]:

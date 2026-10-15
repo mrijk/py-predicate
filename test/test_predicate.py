@@ -281,7 +281,7 @@ def test_xor_predicate_contains():
 
 def test_xor_p_factory():
     from predicate import ge_p
-    from predicate.predicate import xor_p
+    from predicate.xor_predicate import xor_p
 
     predicate = xor_p(ge_p(2), ge_p(4))
     assert predicate(2)

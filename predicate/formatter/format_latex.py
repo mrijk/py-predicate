@@ -3,6 +3,7 @@ from typing import Iterable
 from predicate.all_predicate import AllPredicate
 from predicate.always_false_predicate import AlwaysFalsePredicate
 from predicate.always_true_predicate import AlwaysTruePredicate
+from predicate.and_predicate import AndPredicate
 from predicate.any_predicate import AnyPredicate
 from predicate.compile_predicate import CompiledPredicate
 from predicate.count_predicate import CountPredicate
@@ -16,13 +17,9 @@ from predicate.in_predicate import InPredicate
 from predicate.le_predicate import LePredicate
 from predicate.lt_predicate import LtPredicate
 from predicate.ne_predicate import NePredicate
-from predicate.predicate import (
-    AndPredicate,
-    NotPredicate,
-    OrPredicate,
-    Predicate,
-    XorPredicate,
-)
+from predicate.not_predicate import NotPredicate
+from predicate.or_predicate import OrPredicate
+from predicate.predicate import Predicate
 from predicate.range_predicate import GeLePredicate, GeLtPredicate, GtLePredicate, GtLtPredicate
 from predicate.reduce_predicate import ReducePredicate
 from predicate.set_predicates import (
@@ -32,6 +29,7 @@ from predicate.set_predicates import (
     IsSubsetPredicate,
     IsSupersetPredicate,
 )
+from predicate.xor_predicate import XorPredicate
 
 
 def set_to_latex_set(v: Iterable) -> str:

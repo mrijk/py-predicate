@@ -5,8 +5,8 @@ from predicate.any_predicate import AnyPredicate
 from predicate.has_length_predicate import is_empty_p
 from predicate.is_none_predicate import IsNonePredicate
 from predicate.is_not_none_predicate import IsNotNonePredicate
+from predicate.not_predicate import NotPredicate
 from predicate.optimizer.helpers import MaybeOptimized, NotOptimized, Optimized
-from predicate.predicate import NotPredicate
 
 
 def optimize_all_predicate[T](predicate: AllPredicate[T]) -> MaybeOptimized[T]:

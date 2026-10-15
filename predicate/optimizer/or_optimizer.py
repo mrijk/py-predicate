@@ -2,6 +2,7 @@ from typing import Iterable
 
 from predicate.all_predicate import AllPredicate
 from predicate.always_true_predicate import AlwaysTruePredicate, always_true_p
+from predicate.and_predicate import AndPredicate
 from predicate.any_predicate import AnyPredicate
 from predicate.eq_predicate import EqPredicate
 from predicate.ge_predicate import GePredicate
@@ -12,8 +13,10 @@ from predicate.in_predicate import InPredicate
 from predicate.le_predicate import LePredicate
 from predicate.lt_predicate import LtPredicate
 from predicate.not_in_predicate import NotInPredicate
+from predicate.not_predicate import NotPredicate
 from predicate.optimizer.helpers import MaybeOptimized, NotOptimized, Optimized
-from predicate.predicate import AndPredicate, NotPredicate, OrPredicate, Predicate
+from predicate.or_predicate import OrPredicate
+from predicate.predicate import Predicate
 from predicate.set_predicates import IntersectsPredicate
 
 

@@ -4,6 +4,7 @@ from typing import Iterable, override
 
 from predicate.always_false_predicate import AlwaysFalsePredicate
 from predicate.always_true_predicate import AlwaysTruePredicate
+from predicate.and_predicate import AndPredicate
 from predicate.eq_predicate import EqPredicate
 from predicate.ge_predicate import GePredicate
 from predicate.gt_predicate import GtPredicate
@@ -13,11 +14,8 @@ from predicate.le_predicate import LePredicate
 from predicate.lt_predicate import LtPredicate
 from predicate.ne_predicate import NePredicate
 from predicate.not_in_predicate import NotInPredicate
-from predicate.predicate import (
-    AndPredicate,
-    OrPredicate,
-    Predicate,
-)
+from predicate.or_predicate import OrPredicate
+from predicate.predicate import Predicate
 from predicate.set_predicates import (
     IntersectsPredicate,
     IsRealSubsetPredicate,

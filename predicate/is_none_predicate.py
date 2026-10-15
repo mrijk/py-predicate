@@ -8,7 +8,8 @@ else:
     from typing import TypeGuard as TypeIs  # type: ignore[assignment]  # approximation for Python < 3.13
 
 from predicate import exception_p
-from predicate.predicate import Predicate, or_p, predicate_partial
+from predicate.or_predicate import or_p
+from predicate.predicate import Predicate, predicate_partial
 
 
 @dataclass

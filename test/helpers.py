@@ -4,13 +4,11 @@ from predicate import exercise, is_instance_p
 from predicate.all_predicate import AllPredicate
 from predicate.always_false_predicate import AlwaysFalsePredicate
 from predicate.always_true_predicate import AlwaysTruePredicate
+from predicate.and_predicate import AndPredicate
 from predicate.eq_predicate import EqPredicate
-from predicate.predicate import (
-    AndPredicate,
-    NotPredicate,
-    OrPredicate,
-    XorPredicate,
-)
+from predicate.not_predicate import NotPredicate
+from predicate.or_predicate import OrPredicate
+from predicate.xor_predicate import XorPredicate
 
 is_all_p = is_instance_p(AllPredicate)
 is_and_p = is_instance_p(AndPredicate)

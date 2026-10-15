@@ -3,6 +3,7 @@ from typing import Iterable
 from predicate.all_predicate import AllPredicate
 from predicate.always_false_predicate import AlwaysFalsePredicate, always_false_p
 from predicate.always_true_predicate import AlwaysTruePredicate, always_true_p
+from predicate.and_predicate import AndPredicate
 from predicate.eq_predicate import EqPredicate
 from predicate.fn_predicate import FnPredicate
 from predicate.ge_predicate import GePredicate
@@ -13,10 +14,12 @@ from predicate.is_instance_predicate import IsInstancePredicate
 from predicate.le_predicate import LePredicate
 from predicate.lt_predicate import LtPredicate
 from predicate.not_in_predicate import NotInPredicate
+from predicate.not_predicate import NotPredicate
 from predicate.optimizer.helpers import MaybeOptimized, NotOptimized, Optimized
-from predicate.predicate import AndPredicate, NotPredicate, OrPredicate, XorPredicate
+from predicate.or_predicate import OrPredicate
 from predicate.range_predicate import GeLePredicate, GeLtPredicate, GtLePredicate, GtLtPredicate
 from predicate.set_predicates import IsSubsetPredicate
+from predicate.xor_predicate import XorPredicate
 
 
 def optimize_and_predicate[T](predicate: AndPredicate[T]) -> MaybeOptimized[T]:
