@@ -1327,6 +1327,47 @@ This predicate tests if a string matches a regular expression pattern.
     assert is_phone("555-1234")
     assert not is_phone("hello")
 
+same_signature_p
+----------------
+
+This predicate tests if a function can be used in place of a given function, based on their signatures.
+The candidate may return a more specific type and accept more general parameter types. Extra parameters
+are only allowed if they're optional: a default value, ``*args`` or ``**kwargs``.
+
+.. code-block:: python
+
+    from predicate import same_signature_p
+
+    def f(x: int) -> int | float: ...
+
+    def ok_1(x: int | float) -> int: ...
+
+    def ok_2(x: int, *, verbose: bool = False) -> float: ...
+
+    def fail_1(y: int) -> int: ...
+
+    def fail_2(x: str) -> int: ...
+
+    predicate = same_signature_p(f)
+
+    assert predicate(ok_1)
+    assert predicate(ok_2)
+    assert not predicate(fail_1)
+    assert not predicate(fail_2)
+
+Use ``explain`` to see why a function doesn't match:
+
+.. code-block:: python
+
+    from predicate import explain, same_signature_p
+
+    def f(x: int) -> None: ...
+
+    def fail_1(x: int, /) -> None: ...
+
+    explain(same_signature_p(f), fail_1)
+    # {'result': False, 'reason': "Parameter 'x' is positional-only, expected positional or keyword"}
+
 tee_p
 -----
 

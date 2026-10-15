@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from enum import Enum, IntEnum, StrEnum
-from types import UnionType
-from typing import Any, Final, Iterator, get_args, override
+from types import NoneType, UnionType
+from typing import Any, Final, Iterator, Union, get_args, get_origin, override
 
 from predicate.helpers import join_with_or
 from predicate.predicate import Predicate
@@ -14,7 +14,11 @@ class IsSubclassPredicate[T](Predicate[T]):
     class_or_tuple: type | UnionType | tuple[Any, ...]
 
     def __call__(self, x: type) -> bool:
-        return issubclass(x, self.class_or_tuple)
+        if x is None:
+            x = NoneType
+        if get_origin(x) in (Union, UnionType):
+            return all(self(arg) for arg in get_args(x))
+        return isinstance(x, type) and issubclass(x, self.class_or_tuple)
 
     def __repr__(self) -> str:
         match self.class_or_tuple:
