@@ -1,3 +1,4 @@
+import sys
 from datetime import datetime
 from uuid import uuid4
 
@@ -13,6 +14,7 @@ from predicate import (
     is_container_p,
     is_datetime_p,
     is_dict_p,
+    is_frozenset_p,
     is_hashable_p,
     is_int_p,
     is_iterable_p,
@@ -25,6 +27,7 @@ from predicate import (
     is_uuid_p,
     zero_p,
 )
+from predicate.is_instance_predicate import is_frozendict_p, is_sentinel_p, is_template_p
 from predicate.named_predicate import NamedPredicate
 from predicate.predicate import Predicate
 from predicate.standard_predicates import (
@@ -104,12 +107,44 @@ def test_is_str_p():
     assert is_str_p("3")
 
 
-def test_is_dict_p():
-    assert not is_dict_p(None)
-    assert not is_dict_p({3})
+@pytest.mark.parametrize("value", [{}, {"x": 3}, dict()])  # noqa: C408
+def test_is_dict_p(value):
+    assert is_dict_p(value)
 
-    assert is_dict_p({})
-    assert is_dict_p({"x": 3})
+
+@pytest.mark.parametrize("value", [None, {3}])
+def test_is_dict_p_fail(value):
+    assert not is_dict_p(value)
+
+
+def test_is_frozenset_p():
+    assert is_frozenset_p(frozenset())
+
+    assert not is_frozenset_p({})
+
+
+if sys.version_info >= (3, 15):
+
+    def test_is_frozendict_p():
+        assert is_frozendict_p(frozendict())  # noqa: F821
+
+        assert not is_frozendict_p({})
+
+    def test_is_sentinel_p():
+        assert is_sentinel_p(sentinel("MISSING"))  # noqa: F821
+
+        assert not is_sentinel_p(None)
+        assert not is_sentinel_p(object())
+
+
+if sys.version_info >= (3, 14):
+
+    def test_is_template_p():
+        from string.templatelib import Interpolation, Template
+
+        assert is_template_p(Template("hello ", Interpolation("world", "name")))
+
+        assert not is_template_p("hello world")
 
 
 def test_is_iterable_p():

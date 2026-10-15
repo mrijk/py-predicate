@@ -1,3 +1,4 @@
+import sys
 from datetime import datetime
 from typing import Any
 
@@ -17,13 +18,17 @@ from predicate import (
     is_dict_p,
     is_even_p,
     is_float_p,
+    is_frozendict_p,
+    is_frozenset_p,
     is_hashable_p,
     is_instance_p,
     is_int_p,
     is_list_p,
     is_odd_p,
+    is_sentinel_p,
     is_set_p,
     is_str_p,
+    is_template_p,
     is_tuple_p,
     is_uuid_p,
 )
@@ -37,6 +42,7 @@ from predicate.generator.helpers import (
     random_datetimes,
     random_dicts,
     random_floats,
+    random_frozensets,
     random_hashables,
     random_ints,
     random_lists,
@@ -89,6 +95,36 @@ def test_random_dicts():
 
     assert first(dicts) == {}
     assert all_dict(dicts)
+
+
+if sys.version_info >= (3, 15):
+
+    def test_random_frozendicts():
+        from predicate.generator.helpers import random_frozendicts
+
+        dicts = take(10, random_frozendicts())
+
+        all_frozendicts = all_p(is_frozendict_p)
+
+        assert first(dicts) == frozendict()  # noqa: F821
+        assert all_frozendicts(dicts)
+
+    def test_random_sentinels():
+        from predicate.generator.helpers import random_sentinels
+
+        sentinels = take(10, random_sentinels())
+
+        assert all_p(is_sentinel_p)(sentinels)
+
+
+if sys.version_info >= (3, 14):
+
+    def test_random_templates():
+        from predicate.generator.helpers import random_templates
+
+        templates = take(10, random_templates())
+
+        assert all_p(is_template_p)(templates)
 
 
 def test_random_dicts_with_value_p():
@@ -162,6 +198,15 @@ def test_random_sets():
 
     assert first(sets) == set()
     assert all_sets(sets)
+
+
+def test_random_frozensets():
+    sets = take(10, random_frozensets())
+
+    all_frozensets = all_p(is_frozenset_p)
+
+    assert first(sets) == frozenset()
+    assert all_frozensets(sets)
 
 
 def test_random_sets_with_limits():

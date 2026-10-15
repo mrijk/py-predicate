@@ -1,7 +1,19 @@
 # CHANGELOG.md
 
 
-## 1.6.0
+## Unreleased
+
+Features:
+
+- new type check predicate is_frozendict_p (Python 3.15+, always False on older versions)
+- generator support for frozenset, frozendict, sentinel and template
+- new type check predicate is_template_p (Python 3.14+, always False on older versions)
+- new predicates is_normal_p and is_subnormal_p
+- new predicates is_frozenset_of_p and is_frozendict_of_p
+- new type check predicate is_module_p
+- new type check predicate is_sentinel_p (Python 3.15+, always False on older versions)
+
+## 1.7.0
 
 Features:
 

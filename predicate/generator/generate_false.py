@@ -21,6 +21,8 @@ from predicate.eq_predicate import EqPredicate
 from predicate.exactly_predicate import ExactlyPredicate
 from predicate.exception_predicate import ExceptionPredicate
 from predicate.fn_predicate import FnPredicate
+from predicate.frozendict_of_predicate import FrozenDictOfPredicate
+from predicate.frozenset_of_predicate import FrozenSetOfPredicate
 from predicate.ge_predicate import GePredicate
 from predicate.generator.helpers import (
     default_size_p,
@@ -479,6 +481,21 @@ def generate_dict_of_p(dict_of_predicate: DictOfPredicate) -> Iterator:
 
 
 @generate_false.register
+def generate_frozendict_of_p(frozendict_of_predicate: FrozenDictOfPredicate) -> Iterator:
+    from predicate import generate_true
+
+    dict_of_predicate = frozendict_of_predicate.dict_of_predicate
+    if sys.version_info >= (3, 15):
+        # interleave invalid frozendicts with dicts that would be valid, but aren't frozen
+        yield from interleave(
+            (frozendict(d) for d in generate_dict_of_p(dict_of_predicate)),  # noqa: F821
+            generate_true(dict_of_predicate),
+        )
+    else:
+        yield from generate_true(dict_of_predicate)
+
+
+@generate_false.register
 def generate_list_of_p(
     list_of_predicate: ListOfPredicate, *, length_p: Predicate = default_at_least_one_length_p
 ) -> Iterator:
@@ -523,6 +540,14 @@ def generate_set_of_p(
         # This check is needed because {False, 0} and {True, 1} result in {False} and {True}
         if not set_of_predicate(result):
             yield result
+
+
+@generate_false.register
+def generate_frozenset_of_p(
+    frozenset_of_predicate: FrozenSetOfPredicate, *, length_p: Predicate = default_at_least_one_length_p
+) -> Iterator:
+    set_of_predicate: SetOfPredicate = SetOfPredicate(frozenset_of_predicate.predicate)
+    yield from (frozenset(s) for s in generate_set_of_p(set_of_predicate, length_p=length_p))
 
 
 @generate_false.register

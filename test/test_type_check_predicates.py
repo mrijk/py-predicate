@@ -1,3 +1,4 @@
+import math
 from collections import OrderedDict
 from datetime import date, datetime, time, timedelta
 from pathlib import Path, PurePosixPath, PureWindowsPath
@@ -9,6 +10,7 @@ from predicate import (
     is_date_p,
     is_frozenset_p,
     is_mapping_p,
+    is_module_p,
     is_number_p,
     is_path_p,
     is_sequence_p,
@@ -109,6 +111,19 @@ def test_is_mapping_p_true(value):
 @pytest.mark.parametrize("value", [[("a", 1)], {1, 2}, "dict", None])
 def test_is_mapping_p_false(value):
     assert not is_mapping_p(value)
+
+
+# is_module_p
+
+
+@pytest.mark.parametrize("value", [math, pytest])
+def test_is_module_p_true(value):
+    assert is_module_p(value)
+
+
+@pytest.mark.parametrize("value", ["math", math.sqrt, None, 42])
+def test_is_module_p_false(value):
+    assert not is_module_p(value)
 
 
 # is_sequence_p

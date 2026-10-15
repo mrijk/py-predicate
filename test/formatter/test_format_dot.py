@@ -23,6 +23,8 @@ from predicate import (
     is_close_p,
     is_dict_of_p,
     is_falsy_p,
+    is_frozendict_of_p,
+    is_frozenset_of_p,
     is_instance_p,
     is_list_of_p,
     is_list_p,
@@ -424,6 +426,14 @@ def test_format_dot_repeat():
 
 def test_format_dot_set_of():
     assert to_dot(is_set_of_p(is_int_p))
+
+
+def test_format_dot_frozendict_of():
+    assert to_dot(is_frozendict_of_p((is_str_p, is_int_p)))
+
+
+def test_format_dot_frozenset_of():
+    assert to_dot(is_frozenset_of_p(is_int_p))
 
 
 def test_format_dot_star():

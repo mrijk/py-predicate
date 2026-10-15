@@ -25,6 +25,7 @@ from predicate import (
     is_close_p,
     is_empty_p,
     is_falsy_p,
+    is_frozenset_of_p,
     is_int_p,
     is_list_of_p,
     is_none_p,
@@ -338,6 +339,15 @@ def test_compile_set_of():
     assert cp(set())
     assert not cp({1, -1, 3})
     assert not cp([1, 2, 3])
+    assert not cp(42)
+
+
+def test_compile_frozenset_of():
+    cp = compile_predicate(is_frozenset_of_p(gt_p(0)))
+    assert cp(frozenset({1, 2, 3}))
+    assert cp(frozenset())
+    assert not cp(frozenset({1, -1, 3}))
+    assert not cp({1, 2, 3})
     assert not cp(42)
 
 

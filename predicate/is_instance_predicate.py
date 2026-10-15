@@ -1,10 +1,13 @@
+import sys
 from collections.abc import Callable, Container, Iterable, Mapping, Sequence
 from dataclasses import dataclass
 from datetime import date, datetime, time, timedelta
 from pathlib import PurePath
+from types import ModuleType
 from typing import Any, Hashable, Iterator, TypeGuard, get_origin, override
 from uuid import UUID
 
+from predicate import always_false_p
 from predicate.helpers import join_with_or
 from predicate.predicate import Predicate
 
@@ -57,7 +60,7 @@ is_bytearray_p = is_instance_p(bytearray)
 is_callable_p: IsInstancePredicate[Callable] = is_instance_p(Callable)  # type: ignore[arg-type]
 """Returns True if the value is a callable, otherwise False."""
 
-is_complex_p = is_instance_p(complex)
+is_complex_p: IsInstancePredicate[complex] = is_instance_p(complex)
 """Returns True if the value is a complex, otherwise False."""
 
 is_container_p: IsInstancePredicate[Container] = is_instance_p(Container)  # type: ignore[type-abstract]
@@ -66,10 +69,10 @@ is_container_p: IsInstancePredicate[Container] = is_instance_p(Container)  # typ
 is_datetime_p = is_instance_p(datetime)
 """Returns True if the value is a datetime, otherwise False."""
 
-is_dict_p = is_instance_p(dict)
+is_dict_p: IsInstancePredicate[dict] = is_instance_p(dict)
 """Returns True if the value is a dict, otherwise False."""
 
-is_float_p = is_instance_p(float)
+is_float_p: IsInstancePredicate[float] = is_instance_p(float)
 """Returns True if the value is a float, otherwise False."""
 
 is_hashable_p: IsInstancePredicate[Hashable] = is_instance_p(Hashable)  # type: ignore[type-abstract]
@@ -78,10 +81,10 @@ is_hashable_p: IsInstancePredicate[Hashable] = is_instance_p(Hashable)  # type: 
 is_iterable_p: IsInstancePredicate[Iterable] = is_instance_p(Iterable)  # type: ignore[type-abstract]
 """Returns True if the value is an Iterable, otherwise False."""
 
-is_int_p = is_instance_p(int)
+is_int_p: IsInstancePredicate[int] = is_instance_p(int)
 """Returns True if the value is an integer, otherwise False."""
 
-is_list_p = is_instance_p(list)
+is_list_p: IsInstancePredicate[list] = is_instance_p(list)
 """Returns True if the value is a list, otherwise False."""
 
 is_predicate_p: IsInstancePredicate[Predicate] = is_instance_p(Predicate)  # type: ignore[type-abstract]
@@ -93,7 +96,7 @@ is_range_p = is_instance_p(range)
 is_set_p = is_instance_p(set)
 """Returns True if the value is a set, otherwise False."""
 
-is_str_p = is_instance_p(str)
+is_str_p: IsInstancePredicate[str] = is_instance_p(str)
 """Returns True if the value is a str, otherwise False."""
 
 is_tuple_p = is_instance_p(tuple)
@@ -108,11 +111,32 @@ is_bytes_p = is_instance_p(bytes)
 is_date_p = is_instance_p(date)
 """Returns True if the value is a date (or datetime), otherwise False."""
 
+if sys.version_info >= (3, 15):
+    is_frozendict_p = is_instance_p(frozendict)  # noqa: F821
+    """Returns True if the value is a frozendict, otherwise False."""
+
+    is_sentinel_p = is_instance_p(sentinel)  # noqa: F821
+    """Returns True if the value is a sentinel, otherwise False."""
+else:
+    is_frozendict_p = always_false_p
+    is_sentinel_p = always_false_p
+
+if sys.version_info >= (3, 14):
+    from string.templatelib import Template
+
+    is_template_p = is_instance_p(Template)
+    """Returns True if the value is a t-string Template, otherwise False."""
+else:
+    is_template_p = always_false_p
+
 is_frozenset_p = is_instance_p(frozenset)
 """Returns True if the value is a frozenset, otherwise False."""
 
 is_mapping_p: IsInstancePredicate[Mapping] = is_instance_p(Mapping)  # type: ignore[type-abstract]
 """Returns True if the value is a Mapping (dict, etc.), otherwise False."""
+
+is_module_p = is_instance_p(ModuleType)
+"""Returns True if the value is a module, otherwise False."""
 
 is_path_p = is_instance_p(PurePath)
 """Returns True if the value is a pathlib.Path (or any PurePath subclass), otherwise False."""

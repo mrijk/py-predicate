@@ -168,6 +168,27 @@ def random_dicts(
     yield from (dict(zip(take(s, unique_everseen(valid_keys)), valid_values, strict=False)) for s in valid_sizes)
 
 
+if sys.version_info >= (3, 15):
+
+    def random_frozendicts(
+        key_p: Predicate = is_str_p, value_p: Predicate = is_int_p, size_p: Predicate = default_size_p
+    ) -> Iterator[frozendict[Any, Any]]:  # noqa: F821
+        yield from (
+            frozendict(random_dict)  # noqa: F821
+            for random_dict in random_dicts(key_p=key_p, value_p=value_p, size_p=size_p)
+        )
+
+    def random_sentinels() -> Iterator[sentinel]:  # noqa: F821
+        yield from (sentinel(name) for name in random_strings(min_size=1))  # noqa: F821
+
+
+if sys.version_info >= (3, 14):
+    from string.templatelib import Template
+
+    def random_templates() -> Iterator[Template]:
+        yield from (Template(s) for s in random_strings())
+
+
 def random_datetimes(lower: datetime | None = None, upper: datetime | None = None) -> Iterator[datetime]:
     start = lower if lower else datetime(year=1980, month=1, day=1)
     end = upper if upper else datetime(year=2050, month=1, day=1)
@@ -206,6 +227,10 @@ def random_sets(length_p: Predicate = default_length_p, value_p: Predicate = is_
         values = take(length, generate_true(value_p))
         if len(result := set(values)) == length:
             yield result
+
+
+def random_frozensets(length_p: Predicate = default_length_p, value_p: Predicate = is_int_p) -> Iterator[frozenset]:
+    yield from (frozenset(random_set) for random_set in random_sets(length_p=length_p, value_p=value_p))
 
 
 def random_bools() -> Iterator[bool]:
@@ -286,6 +311,13 @@ def random_lists(length_p: Predicate = default_length_p, value_p: Predicate = is
 
 def random_tuples(length_p: Predicate = default_length_p, value_p: Predicate = is_int_p) -> Iterator[tuple[Any, ...]]:
     yield from (tuple(random_list) for random_list in random_lists(length_p=length_p, value_p=value_p))
+
+
+def random_modules() -> Iterator[types.ModuleType]:
+    # ponytail: only modules that are already imported, so generating never triggers an import
+    modules = [module for module in sys.modules.values() if isinstance(module, types.ModuleType)]
+    while True:
+        yield random.choice(modules)
 
 
 def random_uuids() -> Iterator[UUID]:

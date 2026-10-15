@@ -2,7 +2,19 @@ import math
 
 import pytest
 
-from predicate import eq_p, explain, fn_p, is_finite_p, is_inf_p, is_int_p, is_not_none_p, is_str_p, or_p
+from predicate import (
+    eq_p,
+    explain,
+    fn_p,
+    is_finite_p,
+    is_inf_p,
+    is_int_p,
+    is_normal_p,
+    is_not_none_p,
+    is_str_p,
+    is_subnormal_p,
+    or_p,
+)
 from predicate.fn_predicate import as_predicate, generate_inf, undefined
 from predicate.match_predicate import match_p
 from predicate.predicate import predicate_partial
@@ -48,6 +60,25 @@ def test_is_inf_p():
 
     assert is_inf_p(-math.inf)
     assert is_inf_p(math.inf)
+
+
+def test_is_normal_p():
+    assert is_normal_p(1.0)
+    assert is_normal_p(-3.14)
+
+    assert not is_normal_p(0.0)
+    assert not is_normal_p(5e-324)
+    assert not is_normal_p(math.inf)
+    assert not is_normal_p(math.nan)
+
+
+def test_is_subnormal_p():
+    assert is_subnormal_p(5e-324)
+    assert is_subnormal_p(-5e-324)
+
+    assert not is_subnormal_p(0.0)
+    assert not is_subnormal_p(1.0)
+    assert not is_subnormal_p(math.nan)
 
 
 def test_undefined_raises_with_message():

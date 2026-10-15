@@ -13,6 +13,7 @@ from predicate.any_predicate import AnyPredicate
 from predicate.comp_predicate import CompPredicate
 from predicate.count_predicate import CountPredicate
 from predicate.eq_predicate import EqPredicate
+from predicate.frozenset_of_predicate import FrozenSetOfPredicate
 from predicate.ge_predicate import GePredicate
 from predicate.gt_predicate import GtPredicate
 from predicate.has_key_predicate import HasKeyPredicate
@@ -331,6 +332,11 @@ def _(predicate: ListOfPredicate, namespace: dict) -> ast.expr:
 @_to_ast.register
 def _(predicate: SetOfPredicate, namespace: dict) -> ast.expr:
     return _isinstance_and_all_ast(predicate.predicate, "set", namespace)
+
+
+@_to_ast.register
+def _(predicate: FrozenSetOfPredicate, namespace: dict) -> ast.expr:
+    return _isinstance_and_all_ast(predicate.predicate, "frozenset", namespace)
 
 
 @_to_ast.register

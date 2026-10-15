@@ -15,7 +15,17 @@ from predicate.exactly_predicate import exactly_n
 from predicate.exception_predicate import exception_p
 from predicate.compile_predicate import compile_predicate, try_compile_predicate
 from predicate.explain import explain
-from predicate.fn_predicate import fn_p, is_even_p, is_finite_p, is_inf_p, is_nan_p, is_odd_p, as_predicate
+from predicate.fn_predicate import (
+    fn_p,
+    is_even_p,
+    is_finite_p,
+    is_inf_p,
+    is_nan_p,
+    is_normal_p,
+    is_odd_p,
+    is_subnormal_p,
+    as_predicate,
+)
 from predicate.formatter import to_dot, to_json, to_latex, to_yaml
 from predicate.ge_predicate import ge_p
 from predicate.generator.generate_false import generate_false
@@ -42,15 +52,19 @@ from predicate.is_instance_predicate import (
     is_instance_p,
     is_iterable_p,
     is_mapping_p,
+    is_module_p,
     is_path_p,
     is_predicate_p,
     is_range_p,
+    is_sentinel_p,
     is_sequence_p,
     is_set_p,
+    is_template_p,
     is_time_p,
     is_timedelta_p,
     is_tuple_p,
     is_uuid_p,
+    is_frozendict_p,
 )
 from predicate.is_lambda_predicate import is_lambda_p, is_lambda_with_signature_p
 from predicate.is_none_predicate import is_none_p, none_is_exception_p, none_is_true_p
@@ -79,6 +93,8 @@ from predicate.recur_predicate import recur_p
 from predicate.reduce_predicate import reduce_p
 from predicate.regex_predicate import regex_p
 from predicate.repeat_predicate import repeat
+from predicate.frozendict_of_predicate import is_frozendict_of_p
+from predicate.frozenset_of_predicate import is_frozenset_of_p
 from predicate.set_of_predicate import is_set_of_p
 from predicate.set_predicates import (
     intersects_p,
@@ -173,6 +189,9 @@ __all__ = [
     "is_digit_p",
     "is_dict_of_p",
     "is_dict_p",
+    "is_frozendict_of_p",
+    "is_frozendict_p",
+    "is_frozenset_of_p",
     "is_frozenset_p",
     "is_empty_p",
     "is_enum_p",
@@ -194,8 +213,11 @@ __all__ = [
     "is_list_p",
     "is_lower_p",
     "is_mapping_p",
+    "is_module_p",
     "is_same_p",
+    "is_sentinel_p",
     "is_nan_p",
+    "is_normal_p",
     "is_none_p",
     "is_not_empty_p",
     "is_not_none_p",
@@ -213,6 +235,8 @@ __all__ = [
     "is_sequence_p",
     "is_set_of_p",
     "is_set_p",
+    "is_subnormal_p",
+    "is_template_p",
     "is_space_p",
     "is_str_enum_p",
     "is_str_p",

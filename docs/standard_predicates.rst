@@ -561,6 +561,50 @@ This predicate tests if the value is of type ``float``.
     assert is_float_p(3.14)
 
 
+is_frozendict_of_p
+------------------
+
+This predicate tests if the value is of type ``frozendict`` (Python 3.15+) and the keys and values match the predicates,
+like ``is_dict_of_p``. On older Python versions it always returns ``False``.
+
+.. code-block:: python
+
+    from predicate import is_frozendict_of_p, is_int_p
+
+    predicate = is_frozendict_of_p(("x", is_int_p), ("y", is_int_p))
+
+    assert predicate(frozendict({"x": 1, "y": 7}))
+    assert not predicate({"x": 1, "y": 7})  # a dict, not a frozendict
+
+is_frozendict_p
+---------------
+
+This predicate tests if the value is of type ``frozendict`` (Python 3.15+). On older Python versions it always returns ``False``.
+
+.. code-block:: python
+
+    from predicate import is_frozendict_p
+
+    assert not is_frozendict_p({"one": 1})  # a dict, not a frozendict
+    assert is_frozendict_p(frozendict({"one": 1}))
+    assert is_frozendict_p(frozendict())
+
+is_frozenset_of_p
+-----------------
+
+This predicate tests if the value is a frozenset, where all items in the frozenset conform to
+a given predicate.
+
+.. code-block:: python
+
+    from predicate import is_frozenset_of_p, is_str_p
+
+    is_frozenset_of_str = is_frozenset_of_p(is_str_p)
+
+    assert not is_frozenset_of_str(frozenset({"one", "two", 3}))
+    assert not is_frozenset_of_str({"foo"})  # a set, not a frozenset
+    assert is_frozenset_of_str(frozenset({"foo"}))
+
 is_frozenset_p
 --------------
 
@@ -697,6 +741,20 @@ This predicate tests if the value is a ``Mapping`` (i.e. any dict-like type).
     assert is_mapping_p(OrderedDict())
     assert not is_mapping_p([("key", "value")])
 
+is_module_p
+-----------
+
+This predicate tests if the value is a module.
+
+.. code-block:: python
+
+    import math
+    from predicate import is_module_p
+
+    assert is_module_p(math)
+    assert not is_module_p("math")
+    assert not is_module_p(math.sqrt)
+
 is_nan_p
 --------
 
@@ -767,6 +825,21 @@ This predicate tests if the value is a number (``int``, ``float``, or ``complex`
     assert not is_number_p(True)  # bool is excluded
     assert not is_number_p("42")
 
+is_normal_p
+-----------
+
+This predicate tests if the value is a normal float: finite, non-zero and not subnormal.
+
+.. code-block:: python
+
+    import math
+    from predicate import is_normal_p
+
+    assert is_normal_p(1.0)
+    assert not is_normal_p(0.0)
+    assert not is_normal_p(5e-324)  # subnormal
+    assert not is_normal_p(math.inf)
+
 is_odd_p
 --------
 
@@ -818,6 +891,20 @@ This predicate tests if value is a range.
 
     assert not is_range_p(0)
     assert is_range_p(range(5))
+
+is_sentinel_p
+-------------
+
+This predicate tests if the value is a ``sentinel`` object (Python 3.15+). On older Python versions it always returns ``False``.
+
+.. code-block:: python
+
+    from predicate import is_sentinel_p
+
+    MISSING = sentinel("MISSING")
+
+    assert is_sentinel_p(MISSING)
+    assert not is_sentinel_p(None)
 
 is_sequence_p
 -------------
@@ -891,6 +978,33 @@ This predicate tests if a class is a subclass of the given class.
     assert is_int_subclass(bool)  # bool is a subclass of int
     assert not is_int_subclass(str)
 
+
+is_subnormal_p
+--------------
+
+This predicate tests if the value is a subnormal float: non-zero, but smaller in magnitude than the smallest normal float.
+
+.. code-block:: python
+
+    from predicate import is_subnormal_p
+
+    assert is_subnormal_p(5e-324)
+    assert not is_subnormal_p(0.0)
+    assert not is_subnormal_p(1.0)
+
+is_template_p
+-------------
+
+This predicate tests if the value is a t-string ``Template`` (Python 3.14+). On older Python versions it always returns ``False``.
+
+.. code-block:: python
+
+    from predicate import is_template_p
+
+    name = "world"
+
+    assert is_template_p(t"hello {name}")
+    assert not is_template_p(f"hello {name}")
 
 is_time_p
 ---------
