@@ -1,4 +1,4 @@
-from collections.abc import Mapping, Sequence
+from collections.abc import Iterator, Mapping, Sequence
 from dataclasses import dataclass
 from typing import Any, override
 
@@ -22,20 +22,20 @@ class DictOfPredicate(Predicate):
         if not isinstance(x, Mapping):
             return False
 
-        if not x:
-            return False
+        return bool(x) and not any(self._failing(x)) and not any(self._unmatched(x))
 
-        # For all values, a predicate must be True
-        for key, value in x.items():
-            if not any(key_p(key) and value_p(value) for key_p, value_p in self.key_value_predicates):
-                return False
+    def _failing(self, x: Mapping) -> Iterator[tuple[Any, Any, Predicate]]:
+        return (
+            (key, value, value_p)
+            for key_p, value_p in self.key_value_predicates
+            for key, value in x.items()
+            if key_p(key) and not value_p(value)
+        )
 
-        # All predicates must be True
-        for key_p, value_p in self.key_value_predicates:
-            if any(key_p(key) and not value_p(value) for key, value in x.items()):
-                return False
-
-        return True
+    def _unmatched(self, x: Mapping) -> Iterator[tuple[Any, Any]]:
+        return (
+            (key, value) for key, value in x.items() if not any(key_p(key) for key_p, _ in self.key_value_predicates)
+        )
 
     def __repr__(self) -> str:
         pairs = [(from_key_p(key_p), value_p) for key_p, value_p in self.key_value_predicates]
@@ -47,25 +47,12 @@ class DictOfPredicate(Predicate):
             return {"reason": f"{x} is not an instance of a Mapping"}
         if not x:
             return {"reason": "empty dict"}
-        if failing := first(
-            (
-                ({"key": key, "value": value} | value_p.explain_failure(value))
-                for key_p, value_p in self.key_value_predicates
-                for key, value in x.items()
-                if key_p(key) and not value_p(value)
-            ),
-            None,
-        ):
-            return failing
-        if unmatched := first(
-            (
-                {"key": key, "value": value, "reason": "no matching predicate for key"}
-                for key, value in x.items()
-                if not any(key_p(key) for key_p, _ in self.key_value_predicates)
-            ),
-            None,
-        ):
-            return unmatched
+        if failing := first(self._failing(x), None):
+            key, value, value_p = failing
+            return {"key": key, "value": value} | value_p.explain_failure(value)
+        if unmatched := first(self._unmatched(x), None):
+            key, value = unmatched
+            return {"key": key, "value": value, "reason": "no matching predicate for key"}
         return {}
 
 
