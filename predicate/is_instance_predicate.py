@@ -3,6 +3,7 @@ from collections.abc import Callable, Container, Iterable, Mapping, Sequence
 from dataclasses import dataclass
 from datetime import date, datetime, time, timedelta
 from pathlib import PurePath
+from types import ModuleType
 from typing import Any, Hashable, Iterator, TypeGuard, get_origin, override
 from uuid import UUID
 
@@ -133,6 +134,9 @@ is_frozenset_p = is_instance_p(frozenset)
 
 is_mapping_p: IsInstancePredicate[Mapping] = is_instance_p(Mapping)  # type: ignore[type-abstract]
 """Returns True if the value is a Mapping (dict, etc.), otherwise False."""
+
+is_module_p = is_instance_p(ModuleType)
+"""Returns True if the value is a module, otherwise False."""
 
 is_path_p = is_instance_p(PurePath)
 """Returns True if the value is a pathlib.Path (or any PurePath subclass), otherwise False."""

@@ -4,7 +4,7 @@ from collections.abc import Callable, Container, Iterable, Iterator
 from datetime import datetime, timedelta
 from functools import singledispatch
 from itertools import cycle, repeat
-from types import UnionType
+from types import ModuleType, UnionType
 from typing import Any, Final, Hashable, get_args
 from uuid import UUID
 
@@ -56,6 +56,7 @@ from predicate.generator.helpers import (
     random_iterables,
     random_lambdas,
     random_lists,
+    random_modules,
     random_predicates,
     random_sets,
     random_strings,
@@ -521,6 +522,7 @@ def generate_is_instance_p(predicate: IsInstancePredicate, **kwargs) -> Iterator
         Iterable: random_iterables,
         Predicate: random_predicates,
         UUID: random_uuids,
+        ModuleType: random_modules,
         bool: random_bools,
         complex: random_complex_numbers,
         datetime: random_datetimes,

@@ -741,6 +741,20 @@ This predicate tests if the value is a ``Mapping`` (i.e. any dict-like type).
     assert is_mapping_p(OrderedDict())
     assert not is_mapping_p([("key", "value")])
 
+is_module_p
+-----------
+
+This predicate tests if the value is a module.
+
+.. code-block:: python
+
+    import math
+    from predicate import is_module_p
+
+    assert is_module_p(math)
+    assert not is_module_p("math")
+    assert not is_module_p(math.sqrt)
+
 is_nan_p
 --------
 

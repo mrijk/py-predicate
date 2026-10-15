@@ -313,6 +313,13 @@ def random_tuples(length_p: Predicate = default_length_p, value_p: Predicate = i
     yield from (tuple(random_list) for random_list in random_lists(length_p=length_p, value_p=value_p))
 
 
+def random_modules() -> Iterator[types.ModuleType]:
+    # ponytail: only modules that are already imported, so generating never triggers an import
+    modules = [module for module in sys.modules.values() if isinstance(module, types.ModuleType)]
+    while True:
+        yield random.choice(modules)
+
+
 def random_uuids() -> Iterator[UUID]:
     yield from repeatfunc(uuid4)
 

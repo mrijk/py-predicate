@@ -49,6 +49,7 @@ from predicate import (
     is_list_of_p,
     is_list_p,
     is_mapping_p,
+    is_module_p,
     is_nan_p,
     is_none_p,
     is_normal_p,
@@ -155,6 +156,7 @@ def test_generate_false_and(predicate_pair):
 @pytest.mark.parametrize(
     "predicate",
     [
+        is_module_p,
         is_normal_p,
         is_subnormal_p,
         is_template_p,
