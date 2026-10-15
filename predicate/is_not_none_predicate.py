@@ -7,7 +7,8 @@ if sys.version_info >= (3, 13):
 else:
     from typing import TypeGuard as TypeIs  # type: ignore[assignment]  # approximation for Python < 3.13
 
-from predicate.predicate import Predicate, and_p, predicate_partial
+from predicate.and_predicate import and_p
+from predicate.predicate import Predicate, predicate_partial
 
 
 @dataclass

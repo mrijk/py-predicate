@@ -86,7 +86,9 @@ from predicate.not_in_predicate import not_in_p
 from predicate.optimizer.predicate_optimizer import can_optimize, optimize
 from predicate.optional_predicate import optional
 from predicate.plus_predicate import plus
-from predicate.predicate import and_p, or_p, xor_p
+from predicate.and_predicate import and_p
+from predicate.or_predicate import or_p
+from predicate.xor_predicate import xor_p
 from predicate.raises_predicate import raises_exception_p, raises_p
 from predicate.range_predicate import ge_le_p, ge_lt_p, gt_le_p, gt_lt_p
 from predicate.recur_predicate import recur_p

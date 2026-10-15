@@ -1,6 +1,7 @@
 from typing import Any, Iterator
 
 from predicate.all_predicate import AllPredicate
+from predicate.and_predicate import AndPredicate
 from predicate.any_predicate import AnyPredicate
 from predicate.eq_predicate import EqPredicate
 from predicate.ge_predicate import GePredicate
@@ -11,9 +12,12 @@ from predicate.le_predicate import LePredicate
 from predicate.lt_predicate import LtPredicate
 from predicate.ne_predicate import NePredicate
 from predicate.not_in_predicate import NotInPredicate
-from predicate.predicate import AndPredicate, NotPredicate, OrPredicate, Predicate, XorPredicate
+from predicate.not_predicate import NotPredicate
+from predicate.or_predicate import OrPredicate
+from predicate.predicate import Predicate
 from predicate.range_predicate import GeLePredicate, GeLtPredicate, GtLePredicate, GtLtPredicate
 from predicate.set_of_predicate import SetOfPredicate
+from predicate.xor_predicate import XorPredicate
 
 
 def generate_predicate(predicate_type: type[Predicate], max_depth: int, klass: type) -> Iterator[Predicate]:

@@ -36,7 +36,7 @@ dependencies = [
     "typer",
 ]
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.12"
 
 [project.urls]
 Source = "https://github.com/mrijk/py-predicate"

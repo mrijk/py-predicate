@@ -14,6 +14,7 @@ from more_itertools import first, flatten, interleave, random_permutation, take
 from predicate.all_predicate import AllPredicate
 from predicate.always_false_predicate import AlwaysFalsePredicate, always_false_p
 from predicate.always_true_predicate import AlwaysTruePredicate, always_true_p
+from predicate.and_predicate import AndPredicate
 from predicate.any_predicate import AnyPredicate
 from predicate.count_predicate import CountPredicate
 from predicate.dict_of_predicate import DictOfPredicate
@@ -68,10 +69,12 @@ from predicate.match_predicate import (
 )
 from predicate.ne_predicate import NePredicate, ne_p
 from predicate.not_in_predicate import NotInPredicate
+from predicate.not_predicate import NotPredicate
 from predicate.optimizer.predicate_optimizer import optimize
 from predicate.optional_predicate import OptionalPredicate
+from predicate.or_predicate import OrPredicate
 from predicate.plus_predicate import PlusPredicate
-from predicate.predicate import AndPredicate, NotPredicate, OrPredicate, Predicate, XorPredicate
+from predicate.predicate import Predicate
 from predicate.raises_predicate import RaisesPredicate
 from predicate.range_predicate import GeLePredicate, GeLtPredicate, GtLePredicate, GtLtPredicate, ge_le_p
 from predicate.reduce_predicate import ReducePredicate
@@ -90,6 +93,7 @@ from predicate.star_predicate import StarPredicate
 from predicate.struct_predicate import StructPredicate
 from predicate.tee_predicate import TeePredicate
 from predicate.tuple_of_predicate import TupleOfPredicate
+from predicate.xor_predicate import XorPredicate
 
 default_at_least_one_length_p: Final = ge_le_p(lower=1, upper=10)
 

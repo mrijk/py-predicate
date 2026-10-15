@@ -23,10 +23,8 @@ from predicate.le_predicate import LePredicate
 from predicate.lt_predicate import LtPredicate
 from predicate.ne_predicate import NePredicate
 from predicate.not_in_predicate import NotInPredicate
-from predicate.predicate import (
-    NotPredicate,
-    Predicate,
-)
+from predicate.not_predicate import NotPredicate
+from predicate.predicate import Predicate
 
 
 @singledispatch

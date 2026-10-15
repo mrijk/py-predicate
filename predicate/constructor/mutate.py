@@ -3,13 +3,16 @@ from random import choice, randint
 from typing import Iterator
 
 from predicate import eq_p, ge_p, gt_p, le_p, lt_p, ne_p
+from predicate.and_predicate import AndPredicate
 from predicate.eq_predicate import EqPredicate
 from predicate.ge_predicate import GePredicate
 from predicate.gt_predicate import GtPredicate
 from predicate.le_predicate import LePredicate
 from predicate.lt_predicate import LtPredicate
 from predicate.ne_predicate import NePredicate
-from predicate.predicate import AndPredicate, OrPredicate, Predicate, XorPredicate
+from predicate.or_predicate import OrPredicate
+from predicate.predicate import Predicate
+from predicate.xor_predicate import XorPredicate
 
 
 @singledispatch

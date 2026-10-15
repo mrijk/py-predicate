@@ -5,15 +5,13 @@ from more_itertools import gray_product
 
 from predicate.always_false_predicate import AlwaysFalsePredicate
 from predicate.always_true_predicate import AlwaysTruePredicate
+from predicate.and_predicate import AndPredicate
 from predicate.implies import Implies
 from predicate.named_predicate import NamedPredicate
-from predicate.predicate import (
-    AndPredicate,
-    NotPredicate,
-    OrPredicate,
-    Predicate,
-    XorPredicate,
-)
+from predicate.not_predicate import NotPredicate
+from predicate.or_predicate import OrPredicate
+from predicate.predicate import Predicate
+from predicate.xor_predicate import XorPredicate
 
 
 def truth_table(predicate: Predicate) -> Iterable[tuple]:

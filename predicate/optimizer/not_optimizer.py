@@ -1,7 +1,10 @@
 from predicate.all_predicate import AllPredicate
+from predicate.and_predicate import AndPredicate
 from predicate.any_predicate import AnyPredicate
+from predicate.not_predicate import NotPredicate
 from predicate.optimizer.helpers import MaybeOptimized, NotOptimized, Optimized
-from predicate.predicate import AndPredicate, NotPredicate, OrPredicate, XorPredicate
+from predicate.or_predicate import OrPredicate
+from predicate.xor_predicate import XorPredicate
 
 
 def optimize_not_predicate[T](predicate: NotPredicate[T]) -> MaybeOptimized[T]:

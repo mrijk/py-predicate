@@ -1,8 +1,12 @@
 from dataclasses import dataclass
 from typing import override
 
+from predicate.and_predicate import AndPredicate
 from predicate.implies import Implies
-from predicate.predicate import AndPredicate, NotPredicate, OrPredicate, Predicate, XorPredicate
+from predicate.not_predicate import NotPredicate
+from predicate.or_predicate import OrPredicate
+from predicate.predicate import Predicate
+from predicate.xor_predicate import XorPredicate
 
 
 @dataclass

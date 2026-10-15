@@ -9,6 +9,7 @@ from typing import override
 from predicate.all_predicate import AllPredicate
 from predicate.always_false_predicate import AlwaysFalsePredicate
 from predicate.always_true_predicate import AlwaysTruePredicate
+from predicate.and_predicate import AndPredicate
 from predicate.any_predicate import AnyPredicate
 from predicate.comp_predicate import CompPredicate
 from predicate.count_predicate import CountPredicate
@@ -31,10 +32,13 @@ from predicate.lt_predicate import LtPredicate
 from predicate.named_predicate import NamedPredicate
 from predicate.ne_predicate import NePredicate
 from predicate.not_in_predicate import NotInPredicate
-from predicate.predicate import AndPredicate, NotPredicate, OrPredicate, Predicate, XorPredicate
+from predicate.not_predicate import NotPredicate
+from predicate.or_predicate import OrPredicate
+from predicate.predicate import Predicate
 from predicate.range_predicate import GeLePredicate, GeLtPredicate, GtLePredicate, GtLtPredicate
 from predicate.set_of_predicate import SetOfPredicate
 from predicate.tuple_of_predicate import TupleOfPredicate
+from predicate.xor_predicate import XorPredicate
 
 
 class NotCompilableError(Exception):
