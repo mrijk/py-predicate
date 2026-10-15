@@ -1,8 +1,6 @@
 # mypy: disable-error-code="empty-body"
 from collections.abc import Sequence
 
-import pytest
-
 from predicate import explain, same_signature_p
 
 
@@ -89,7 +87,6 @@ def test_same_signature_p_args_type_ok():
     assert predicate(ok_1)
 
 
-@pytest.mark.skip("Fix me!")
 def test_same_signature_p_with_additional_default_args():
     def f(x: int) -> int | float: ...
 
@@ -108,6 +105,32 @@ def test_same_signature_p_args_type_nok():
     predicate = same_signature_p(f)
 
     assert not predicate(fail_1)
+
+    expected = {"reason": "Parameter 'x' has type <class 'str'>, expected <class 'float'>", "result": False}
+    assert explain(predicate, fail_1) == expected
+
+
+def test_same_signature_p_with_additional_named_args():
+    def f(x: int, *, y: int, z: int) -> int | float: ...
+
+    def ok_1(x: int, *, z: int, y: int) -> int: ...
+
+    predicate = same_signature_p(f)
+
+    assert predicate(ok_1)
+
+
+def test_same_signature_p_with_additional_named_args_nok():
+    def f(x: int, *, y: int, z: int) -> int | float: ...
+
+    def fail_1(x: int, *, z: int, y: str) -> int: ...
+
+    predicate = same_signature_p(f)
+
+    assert not predicate(fail_1)
+
+    expected = {"reason": "Parameter 'y' has type <class 'str'>, expected <class 'int'>", "result": False}
+    assert explain(predicate, fail_1) == expected
 
 
 def test_same_signature_p_repr():

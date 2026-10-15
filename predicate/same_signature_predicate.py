@@ -19,6 +19,13 @@ def remove_default_args(
     return {name: p for name, p in g_parameters.items() if name in f_parameters or p.default is Parameter.empty}
 
 
+def ordered(parameters: Mapping[str, Parameter]) -> list[tuple[str, Parameter]]:
+    # Keyword-only parameters can be given in any order, so compare them by name
+    return sorted(
+        parameters.items(), key=lambda item: (item[1].kind, item[0] if item[1].kind == Parameter.KEYWORD_ONLY else "")
+    )
+
+
 @dataclass
 class SameSignaturePredicate[T](Predicate[T]):
     """A predicate class that models the 'same signature as predicate."""
@@ -50,7 +57,7 @@ class SameSignaturePredicate[T](Predicate[T]):
             yield f"Expected {len(f_parameters)} parameter(s), got {len(g_parameters)}"
             return
 
-        for f_param, g_param in zip(f_parameters.items(), g_parameters.items(), strict=False):
+        for f_param, g_param in zip(ordered(f_parameters), ordered(g_parameters), strict=False):
             f_param_name, f_param_annotation = f_param
             g_param_name, g_param_annotation = g_param
             if f_param_name != g_param_name:
@@ -58,7 +65,10 @@ class SameSignaturePredicate[T](Predicate[T]):
                 return
             # Parameter types are contravariant
             if not is_subtype(f_param_annotation.annotation, g_param_annotation.annotation):
-                yield f"Parameter '{g_param_name}' has incompatible type"
+                yield (
+                    f"Parameter '{g_param_name}' has type {g_param_annotation.annotation}, "
+                    f"expected {f_param_annotation.annotation}"
+                )
                 return
 
     def __repr__(self) -> str:
