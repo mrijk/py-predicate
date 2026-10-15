@@ -1,22 +1,38 @@
 from collections.abc import Iterator, Mapping
 from dataclasses import dataclass
 from inspect import Parameter, signature
-from types import NoneType
-from typing import Callable, override
+from types import NoneType, UnionType
+from typing import Any, Callable, Union, get_args, get_origin, override
 
 from predicate.is_subclass_predicate import is_subclass_p
 from predicate.predicate import Predicate
 
 
 def is_subtype(cls, superclass) -> bool:
+    # Any is compatible with every type, in both directions. A missing annotation counts as Any
+    if any(t is Any or t is Parameter.empty for t in (cls, superclass)):
+        return True
     # A "-> None" annotation is stored as None, not as NoneType
-    return is_subclass_p(NoneType if superclass is None else superclass)(cls)
+    return is_subclass_p(erase_generic(NoneType if superclass is None else superclass))(erase_generic(cls))
+
+
+def erase_generic(t):
+    # ponytail: type arguments are ignored, so list[str] matches list[int]; compare get_args if that matters
+    if get_origin(t) in (Union, UnionType):
+        return Union[tuple(erase_generic(arg) for arg in get_args(t))]
+    return get_origin(t) or t
 
 
 def remove_default_args(
     f_parameters: Mapping[str, Parameter], g_parameters: Mapping[str, Parameter]
 ) -> Mapping[str, Parameter]:
-    return {name: p for name, p in g_parameters.items() if name in f_parameters or p.default is Parameter.empty}
+    # Extra parameters in g are fine when they're optional: a default, *args or **kwargs
+    optional = (Parameter.VAR_POSITIONAL, Parameter.VAR_KEYWORD)
+    return {
+        name: p
+        for name, p in g_parameters.items()
+        if name in f_parameters or (p.default is Parameter.empty and p.kind not in optional)
+    }
 
 
 def ordered(parameters: Mapping[str, Parameter]) -> list[tuple[str, Parameter]]:
@@ -37,8 +53,8 @@ class SameSignaturePredicate[T](Predicate[T]):
         return not any(self._failures(function))
 
     def _failures(self, function: type) -> Iterator[str]:
-        f_sig = signature(self.function)
-        g_sig = signature(function)
+        f_sig = signature(self.function, eval_str=True)
+        g_sig = signature(function, eval_str=True)
 
         # Check return type is covariant
         f_return = f_sig.return_annotation

@@ -1,5 +1,6 @@
 # mypy: disable-error-code="empty-body"
 from collections.abc import Sequence
+from typing import Any
 
 from predicate import explain, same_signature_p
 
@@ -81,10 +82,12 @@ def test_same_signature_p_args_type_ok():
     def f(x: int) -> int | float: ...
 
     def ok_1(x: int | float) -> int: ...
+    def ok_2(x: int | None) -> int: ...
 
     predicate = same_signature_p(f)
 
     assert predicate(ok_1)
+    assert predicate(ok_2)
 
 
 def test_same_signature_p_with_additional_default_args():
@@ -137,3 +140,54 @@ def test_same_signature_p_repr():
     def f() -> None: ...
 
     assert repr(same_signature_p(f)) == "same_signature_p(f)"
+
+
+def test_same_signature_p_generic():
+    def f(x: list[int]) -> list[int]: ...
+
+    predicate = same_signature_p(f)
+
+    assert predicate(f)
+
+
+def test_same_signature_p_string_annotation():
+    def f(x: "int") -> None: ...
+
+    def ok_1(x: int) -> None: ...
+
+    predicate = same_signature_p(f)
+
+    assert predicate(ok_1)
+
+
+def test_same_signature_p_any():
+    def f(x: int) -> Any: ...
+
+    def ok_1(x: Any) -> int: ...
+
+    predicate = same_signature_p(f)
+
+    assert predicate(ok_1)
+
+
+def test_same_signature_p_unannotated():
+    def f(x): ...
+
+    def ok_1(x: int) -> None: ...
+
+    predicate = same_signature_p(f)
+
+    assert predicate(ok_1)
+
+
+def test_same_signature_p_with_additional_var_args():
+    def f(x: int) -> None: ...
+
+    def ok_1(x: int, *args: int) -> None: ...
+
+    def ok_2(x: int, **kwargs: int) -> None: ...
+
+    predicate = same_signature_p(f)
+
+    assert predicate(ok_1)
+    assert predicate(ok_2)
