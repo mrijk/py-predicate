@@ -1,4 +1,4 @@
-from collections.abc import Iterator, Mapping
+from collections.abc import Mapping
 from dataclasses import dataclass
 from inspect import Parameter, signature
 from types import NoneType, UnionType
@@ -55,27 +55,24 @@ class SameSignaturePredicate[T](Predicate[T]):
     strict: bool
 
     def __call__(self, function: type) -> bool:
-        return not any(self._failures(function))
+        return self._failure(function) is None
 
-    def _failures(self, function: type) -> Iterator[str]:
+    def _failure(self, function: type) -> str | None:
         if not callable(function):
-            yield f"{function} is not callable"
-            return
+            return f"{function} is not callable"
 
         f_sig = signature(self.function, eval_str=True)
         try:
             g_sig = signature(function, eval_str=True)
         except ValueError:
             # Some builtins, like max, have no signature that can be inspected
-            yield f"{function} has no signature"
-            return
+            return f"{function} has no signature"
 
         # Check return type is covariant
         f_return = f_sig.return_annotation
         g_return = g_sig.return_annotation
         if not is_subtype(g_return, f_return):
-            yield f"Return type {g_return} is not a subtype of {f_return}"
-            return
+            return f"Return type {g_return} is not a subtype of {f_return}"
 
         # Check parameters
         f_parameters = f_sig.parameters
@@ -84,39 +81,36 @@ class SameSignaturePredicate[T](Predicate[T]):
         # Leave out default parameters in g if they are not part of f
 
         if len(f_parameters) != len(g_parameters):
-            yield f"Expected {len(f_parameters)} parameter(s), got {len(g_parameters)}"
-            return
+            return f"Expected {len(f_parameters)} parameter(s), got {len(g_parameters)}"
 
         for f_param, g_param in zip(ordered(f_parameters), ordered(g_parameters), strict=False):
             f_param_name, f_param_annotation = f_param
             g_param_name, g_param_annotation = g_param
             # Callers of f can't pass a positional-only parameter by name, so its name doesn't matter
             if f_param_annotation.kind != Parameter.POSITIONAL_ONLY and f_param_name != g_param_name:
-                yield f"Expected parameter '{f_param_name}', got '{g_param_name}'"
-                return
+                return f"Expected parameter '{f_param_name}', got '{g_param_name}'"
             # Callers of f may pass this parameter by position or by name, so g must accept both
             f_kind, g_kind = f_param_annotation.kind, g_param_annotation.kind
             if f_kind == Parameter.POSITIONAL_OR_KEYWORD and g_kind != Parameter.POSITIONAL_OR_KEYWORD:
-                yield f"Parameter '{g_param_name}' is {g_kind.description}, expected {f_kind.description}"
-                return
+                return f"Parameter '{g_param_name}' is {g_kind.description}, expected {f_kind.description}"
             # Callers of f may leave out a parameter with a default, so g needs a default too
             if f_param_annotation.default is not Parameter.empty and g_param_annotation.default is Parameter.empty:
-                yield f"Parameter '{g_param_name}' has no default value"
-                return
+                return f"Parameter '{g_param_name}' has no default value"
             # Parameter types are contravariant
             if not is_subtype(f_param_annotation.annotation, g_param_annotation.annotation):
-                yield (
+                return (
                     f"Parameter '{g_param_name}' has type {g_param_annotation.annotation}, "
                     f"expected {f_param_annotation.annotation}"
                 )
-                return
+
+        return None
 
     def __repr__(self) -> str:
         return f"same_signature_p({self.function.__name__})"
 
     @override
     def explain_failure(self, function: type) -> dict:
-        return {"reason": next(self._failures(function))}
+        return {"reason": self._failure(function)}
 
 
 def same_signature_p(function: Callable, strict: bool = False) -> Predicate:
