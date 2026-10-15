@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from inspect import getmembers, isfunction, signature
-from typing import Any, Protocol
+from typing import Any
 
 from predicate.predicate import Predicate
 
@@ -37,7 +37,7 @@ def _signatures_match(protocol_method: Any, impl_method: Any, strict: bool = Fal
 class ImplementsProtocolPredicate[T](Predicate[T]):
     """A predicate class that models the 'implements a protocol' predicate."""
 
-    protocol: type[Protocol]
+    protocol: type
     args_match: bool
 
     def __call__(self, x: type) -> bool:
@@ -55,6 +55,6 @@ class ImplementsProtocolPredicate[T](Predicate[T]):
         return True
 
 
-def implements_protocol_p(protocol: type[Protocol], args_match: bool = False) -> Predicate:
+def implements_protocol_p(protocol: type, args_match: bool = False) -> Predicate:
     """Return True if value is Protocol, otherwise False."""
     return ImplementsProtocolPredicate(protocol=protocol, args_match=args_match)

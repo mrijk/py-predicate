@@ -1,3 +1,4 @@
+# mypy: disable-error-code="empty-body"
 from collections.abc import Sequence
 
 import pytest
@@ -6,17 +7,13 @@ from predicate import explain, same_signature_p
 
 
 def test_same_signature_p_ok():
-    def f() -> int | str:
-        pass
+    def f() -> int | str: ...
 
-    def ok_1() -> int:
-        pass
+    def ok_1() -> int: ...
 
-    def ok_2() -> str:
-        pass
+    def ok_2() -> str: ...
 
-    def ok_3() -> str | int:
-        pass
+    def ok_3() -> str | int: ...
 
     predicate = same_signature_p(f)
 
@@ -26,8 +23,7 @@ def test_same_signature_p_ok():
 
 
 def test_same_signature_p_idempotent():
-    def f() -> int | str:
-        pass
+    def f() -> int | str: ...
 
     predicate = same_signature_p(f)
 
@@ -35,11 +31,9 @@ def test_same_signature_p_idempotent():
 
 
 def test_same_signature_p_abc():
-    def f(x: list) -> Sequence:
-        pass
+    def f(x: list) -> Sequence: ...
 
-    def ok_1(x: Sequence) -> list:
-        pass
+    def ok_1(x: Sequence) -> list: ...
 
     predicate = same_signature_p(f)
 
@@ -47,11 +41,9 @@ def test_same_signature_p_abc():
 
 
 def test_same_signature_p_return_type_nok():
-    def f() -> None:
-        pass
+    def f() -> None: ...
 
-    def fail_1() -> int:
-        pass
+    def fail_1() -> int: ...
 
     predicate = same_signature_p(f)
 
@@ -62,11 +54,9 @@ def test_same_signature_p_return_type_nok():
 
 
 def test_same_signature_p_args_len_nok():
-    def f() -> None:
-        pass
+    def f() -> None: ...
 
-    def fail_1(x: int) -> None:
-        pass
+    def fail_1(x: int) -> None: ...
 
     predicate = same_signature_p(f)
 
@@ -77,11 +67,9 @@ def test_same_signature_p_args_len_nok():
 
 
 def test_same_signature_p_args_name_nok():
-    def f(x: int) -> None:
-        pass
+    def f(x: int) -> None: ...
 
-    def fail_1(y: int) -> None:
-        pass
+    def fail_1(y: int) -> None: ...
 
     predicate = same_signature_p(f)
 
@@ -92,11 +80,9 @@ def test_same_signature_p_args_name_nok():
 
 
 def test_same_signature_p_args_type_ok():
-    def f(x: int) -> int | float:
-        pass
+    def f(x: int) -> int | float: ...
 
-    def ok_1(x: int | float) -> int:
-        pass
+    def ok_1(x: int | float) -> int: ...
 
     predicate = same_signature_p(f)
 
@@ -105,11 +91,9 @@ def test_same_signature_p_args_type_ok():
 
 @pytest.mark.skip("Fix me!")
 def test_same_signature_p_with_additional_default_args():
-    def f(x: int) -> int | float:
-        pass
+    def f(x: int) -> int | float: ...
 
-    def ok_1(x: int | float, z: int | None = None) -> int:
-        pass
+    def ok_1(x: int | float, z: int | None = None) -> int: ...
 
     predicate = same_signature_p(f)
 
@@ -117,12 +101,16 @@ def test_same_signature_p_with_additional_default_args():
 
 
 def test_same_signature_p_args_type_nok():
-    def f(x: float) -> None:
-        pass
+    def f(x: float) -> None: ...
 
-    def fail_1(x: str) -> None:
-        pass
+    def fail_1(x: str) -> None: ...
 
     predicate = same_signature_p(f)
 
     assert not predicate(fail_1)
+
+
+def test_same_signature_p_repr():
+    def f() -> None: ...
+
+    assert repr(same_signature_p(f)) == "same_signature_p(f)"
