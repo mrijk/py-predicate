@@ -1,6 +1,6 @@
 from typing import Protocol
 
-from predicate import is_protocol_p
+from predicate import explain, is_protocol_p
 
 
 def test_is_protocol_p_ok():
@@ -20,3 +20,12 @@ def test_is_protocol_p_not_ok():
     predicate = is_protocol_p()
     assert not predicate(int)
     assert not predicate(SupportsClose)
+
+
+def test_is_protocol_p_repr():
+    assert repr(is_protocol_p()) == "is_protocol_p"
+
+
+def test_is_protocol_p_explain():
+    expected = {"result": False, "reason": "<class 'int'> is not a Protocol"}
+    assert explain(is_protocol_p(), int) == expected
