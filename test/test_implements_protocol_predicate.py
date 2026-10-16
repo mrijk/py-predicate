@@ -48,3 +48,36 @@ def test_implements_protocol_p_with_args_match_nok():
 
     assert not predicate(AdditionalArg)
     assert not predicate(DifferentReturn)
+
+
+def test_implements_protocol_p_repr():
+    @runtime_checkable
+    class SupportsClose(Protocol):
+        def close(self) -> None: ...
+
+    assert repr(implements_protocol_p(SupportsClose)) == "implements_protocol_p(SupportsClose)"
+    assert repr(implements_protocol_p(SupportsClose, args_match=True)) == (
+        "implements_protocol_p(SupportsClose, args_match=True)"
+    )
+
+
+def test_implements_protocol_p_explain():
+    @runtime_checkable
+    class SupportsClose(Protocol):
+        def close(self) -> None: ...
+
+    class MissingMethod:
+        pass
+
+    class AdditionalArg:
+        def close(self, x: int) -> None:
+            pass
+
+    assert implements_protocol_p(SupportsClose).explain(MissingMethod) == {
+        "result": False,
+        "reason": f"{MissingMethod} does not implement SupportsClose",
+    }
+    assert implements_protocol_p(SupportsClose, args_match=True).explain(AdditionalArg) == {
+        "result": False,
+        "reason": "Method 'close': Expected 1 parameter(s), got 2",
+    }
