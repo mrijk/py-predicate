@@ -4,7 +4,7 @@ import warnings
 from collections.abc import Iterable, Iterator
 from datetime import datetime, timedelta
 from functools import singledispatch
-from inspect import Parameter, signature
+from inspect import Parameter, getmembers, isfunction, signature
 from itertools import chain, cycle, repeat
 from types import UnionType
 from typing import Final, Hashable, get_args
@@ -52,6 +52,7 @@ from predicate.gt_predicate import GtPredicate
 from predicate.has_key_predicate import HasKeyPredicate, has_key_p
 from predicate.has_length_predicate import HasLengthPredicate
 from predicate.has_path_predicate import HasPathPredicate
+from predicate.implements_protocol_predicate import ImplementsProtocolPredicate, protocol_members
 from predicate.in_predicate import InPredicate
 from predicate.is_async_predicate import IsAsyncPredicate
 from predicate.is_callable_predicate import IsCallablePredicate
@@ -85,7 +86,7 @@ from predicate.range_predicate import GeLePredicate, GeLtPredicate, GtLePredicat
 from predicate.reduce_predicate import ReducePredicate
 from predicate.regex_predicate import RegexPredicate
 from predicate.repeat_predicate import RepeatPredicate
-from predicate.same_signature_predicate import SameSignaturePredicate
+from predicate.same_signature_predicate import SameSignaturePredicate, same_signature_p
 from predicate.set_of_predicate import SetOfPredicate
 from predicate.set_predicates import (
     IntersectsPredicate,
@@ -397,6 +398,29 @@ def generate_none(_predicate: IsNonePredicate) -> Iterator:
 @generate_false.register
 def generate_is_protocol(_predicate: IsProtocolPredicate) -> Iterator:
     yield from cycle([int, str, list, dict, object])
+
+
+@generate_false.register
+def generate_implements_protocol(predicate: ImplementsProtocolPredicate) -> Iterator:
+    from predicate import generate_true
+
+    protocol = predicate.protocol
+    valid = next(generate_true(predicate))
+    attributes = {name: getattr(valid, name) for name in protocol_members(protocol)}
+
+    def implementation(members: dict) -> type:
+        return type(f"{protocol.__name__}Implementation", (), members)
+
+    # Leave out one member at a time
+    missing = [implementation({n: v for n, v in attributes.items() if n != name}) for name in attributes]
+    # Give one method at a time the wrong signature
+    wrong_signature = [
+        implementation(attributes | {name: next(generate_false(same_signature_p(method)))})
+        for name, method in getmembers(protocol, isfunction)
+        if predicate.args_match and name in attributes
+    ]
+
+    yield from cycle(missing + wrong_signature)
 
 
 @generate_false.register
