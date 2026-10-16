@@ -4,6 +4,7 @@ import warnings
 from collections.abc import Iterable, Iterator
 from datetime import datetime, timedelta
 from functools import singledispatch
+from inspect import Parameter, signature
 from itertools import chain, cycle, repeat
 from types import UnionType
 from typing import Final, Hashable, get_args
@@ -27,6 +28,7 @@ from predicate.frozenset_of_predicate import FrozenSetOfPredicate
 from predicate.ge_predicate import GePredicate
 from predicate.generator.helpers import (
     default_size_p,
+    function_with_signature,
     generate_anys,
     generate_strings,
     generate_uuids,
@@ -43,6 +45,8 @@ from predicate.generator.helpers import (
     random_strings,
     random_values_of_type,
     sample_optional_fields,
+    unused_name,
+    with_parameters,
 )
 from predicate.gt_predicate import GtPredicate
 from predicate.has_key_predicate import HasKeyPredicate, has_key_p
@@ -81,6 +85,7 @@ from predicate.range_predicate import GeLePredicate, GeLtPredicate, GtLePredicat
 from predicate.reduce_predicate import ReducePredicate
 from predicate.regex_predicate import RegexPredicate
 from predicate.repeat_predicate import RepeatPredicate
+from predicate.same_signature_predicate import SameSignaturePredicate
 from predicate.set_of_predicate import SetOfPredicate
 from predicate.set_predicates import (
     IntersectsPredicate,
@@ -392,6 +397,19 @@ def generate_none(_predicate: IsNonePredicate) -> Iterator:
 @generate_false.register
 def generate_is_protocol(_predicate: IsProtocolPredicate) -> Iterator:
     yield from cycle([int, str, list, dict, object])
+
+
+@generate_false.register
+def generate_same_signature(predicate: SameSignaturePredicate) -> Iterator:
+    sig = signature(predicate.function, eval_str=True)
+    parameters = list(sig.parameters.values())
+
+    required = Parameter(unused_name(sig), Parameter.KEYWORD_ONLY)
+    signatures = [with_parameters(sig, required)]
+    if parameters:
+        signatures.append(sig.replace(parameters=parameters[1:]))
+
+    yield from cycle([*(function_with_signature(s) for s in signatures), None])
 
 
 @generate_false.register
