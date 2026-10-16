@@ -3,6 +3,7 @@ import sys
 from collections.abc import Callable, Container, Iterable, Iterator
 from datetime import datetime, timedelta
 from functools import singledispatch
+from inspect import Parameter, signature
 from itertools import cycle, repeat
 from types import ModuleType, UnionType
 from typing import (
@@ -46,6 +47,7 @@ from predicate.frozenset_of_predicate import FrozenSetOfPredicate
 from predicate.ge_predicate import GePredicate, ge_p
 from predicate.generator.helpers import (
     default_length_p,
+    function_with_signature,
     generate_anys,
     generate_datetimes,
     generate_floats,
@@ -77,6 +79,8 @@ from predicate.generator.helpers import (
     random_values_of_type,
     sample_optional_fields,
     set_from_list,
+    unused_name,
+    with_parameters,
 )
 from predicate.gt_predicate import GtPredicate
 from predicate.has_key_predicate import HasKeyPredicate
@@ -115,6 +119,7 @@ from predicate.range_predicate import GeLePredicate, GeLtPredicate, GtLePredicat
 from predicate.reduce_predicate import ReducePredicate
 from predicate.regex_predicate import RegexPredicate
 from predicate.repeat_predicate import RepeatPredicate
+from predicate.same_signature_predicate import SameSignaturePredicate
 from predicate.set_of_predicate import SetOfPredicate
 from predicate.set_predicates import (
     IntersectsPredicate,
@@ -457,6 +462,26 @@ def generate_none(_predicate: IsNonePredicate) -> Iterator:
 @generate_true.register
 def generate_is_protocol(_predicate: IsProtocolPredicate) -> Iterator:
     yield from cycle([Protocol, SupportsAbs, SupportsBytes, SupportsFloat, SupportsIndex, SupportsInt])
+
+
+@generate_true.register
+def generate_same_signature(predicate: SameSignaturePredicate) -> Iterator:
+    sig = signature(predicate.function, eval_str=True)
+    kinds = {p.kind for p in sig.parameters.values()}
+
+    optional = Parameter(unused_name(sig), Parameter.KEYWORD_ONLY, default=None)
+    var_args = [
+        Parameter(name, kind)
+        for name, kind in (("args", Parameter.VAR_POSITIONAL), ("kwargs", Parameter.VAR_KEYWORD))
+        if kind not in kinds and name not in sig.parameters
+    ]
+    # Any is compatible with every type, for both parameters and return type
+    any_types = sig.replace(
+        parameters=[p.replace(annotation=Any) for p in sig.parameters.values()], return_annotation=Any
+    )
+
+    signatures = [sig, with_parameters(sig, optional), with_parameters(sig, *var_args), any_types]
+    yield from cycle(function_with_signature(s) for s in signatures)
 
 
 @generate_true.register
