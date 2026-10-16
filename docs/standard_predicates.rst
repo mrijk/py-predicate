@@ -321,6 +321,34 @@ This predicate tests if a nested mapping contains a path where each step's key s
     assert not has_user_name({"user": {"age": 30}})
     assert not has_user_name({"name": "Alice"})
 
+implements_protocol_p
+---------------------
+
+This predicate tests if a class implements a ``runtime_checkable`` protocol. The class is instantiated
+without arguments for the check. With ``args_match=True`` the method signatures (parameter names,
+annotations and return type) must also match exactly.
+
+.. code-block:: python
+
+    from typing import Protocol, runtime_checkable
+    from predicate import implements_protocol_p
+
+    @runtime_checkable
+    class SupportsClose(Protocol):
+        def close(self) -> None: ...
+
+    class File:
+        def close(self) -> None:
+            pass
+
+    class Door:
+        def close(self, force: bool) -> None:
+            pass
+
+    assert implements_protocol_p(SupportsClose)(File)
+    assert implements_protocol_p(SupportsClose)(Door)
+    assert not implements_protocol_p(SupportsClose, args_match=True)(Door)
+
 implies_p
 ---------
 
@@ -333,8 +361,8 @@ This predicate tests if one predicate implies another one.
     p = ge_p(2)
     q = ge_p(3)
 
-    assert not implies(p, q)
-    assert implies(q, p)
+    assert not implies_p(q)(p)  # p does not imply q
+    assert implies_p(p)(q)  # q implies p
 
 
 is_bool_p
@@ -879,6 +907,22 @@ This predicate tests if the value is of type ``Predicate``.
 
     assert is_predicate_p(eq_p(1))
     assert not is_predicate_p(42)
+
+is_protocol_p
+-------------
+
+This predicate tests if a type is a ``Protocol``.
+
+.. code-block:: python
+
+    from typing import Protocol
+    from predicate import is_protocol_p
+
+    class SupportsClose(Protocol):
+        def close(self) -> None: ...
+
+    assert is_protocol_p()(SupportsClose)
+    assert not is_protocol_p()(int)
 
 is_range_p
 ----------

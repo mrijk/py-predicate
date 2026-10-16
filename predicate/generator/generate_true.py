@@ -5,7 +5,18 @@ from datetime import datetime, timedelta
 from functools import singledispatch
 from itertools import cycle, repeat
 from types import ModuleType, UnionType
-from typing import Any, Final, Hashable, get_args
+from typing import (
+    Any,
+    Final,
+    Hashable,
+    Protocol,
+    SupportsAbs,
+    SupportsBytes,
+    SupportsFloat,
+    SupportsIndex,
+    SupportsInt,
+    get_args,
+)
 from uuid import UUID
 
 import exrex  # type: ignore
@@ -82,6 +93,7 @@ from predicate.is_none_predicate import IsNonePredicate
 from predicate.is_not_none_predicate import IsNotNonePredicate
 from predicate.is_predicate import IsPredicate
 from predicate.is_predicate_of_p import IsPredicateOfPredicate
+from predicate.is_protocol_predicate import IsProtocolPredicate
 from predicate.is_subclass_predicate import IsSubclassPredicate
 from predicate.is_truthy_predicate import IsTruthyPredicate
 from predicate.juxt_predicate import JuxtPredicate
@@ -440,6 +452,11 @@ def generate_ne(predicate: NePredicate) -> Iterator:
 @generate_true.register
 def generate_none(_predicate: IsNonePredicate) -> Iterator:
     yield from repeat(None)
+
+
+@generate_true.register
+def generate_is_protocol(_predicate: IsProtocolPredicate) -> Iterator:
+    yield from cycle([Protocol, SupportsAbs, SupportsBytes, SupportsFloat, SupportsIndex, SupportsInt])
 
 
 @generate_true.register
