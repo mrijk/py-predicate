@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from inspect import isfunction
+from inspect import getmembers, isfunction
 from typing import override
 
 from predicate.predicate import Predicate
@@ -17,17 +17,21 @@ class ImplementsProtocolPredicate[T](Predicate[T]):
         return self._failure(x) is None
 
     def _failure(self, x: type) -> str | None:
-        if not isinstance(x(), self.protocol):
+        # ponytail: __protocol_attrs__ is private API (3.12+); typing.get_protocol_members once we require 3.13
+        protocol_attrs = self.protocol.__protocol_attrs__  # type: ignore[attr-defined]
+
+        # Check the class itself, so x is never instantiated. Data members count when set or annotated on the class
+        # ponytail: attributes only assigned in __init__ are missed, and annotations aren't inherited
+        if not all(hasattr(x, name) or name in getattr(x, "__annotations__", {}) for name in protocol_attrs):
             return f"{x} does not implement {self.protocol.__name__}"
 
         if self.args_match:
-            # ponytail: __protocol_attrs__ is private API (3.12+); typing.get_protocol_members once we require 3.13
-            for name in self.protocol.__protocol_attrs__:  # type: ignore[attr-defined]
-                method = getattr(self.protocol, name)
-                if not isfunction(method):
-                    continue
-                if reason := same_signature_p(method).explain_failure(getattr(x, name, None))["reason"]:
-                    return f"Method '{name}': {reason}"
+            reasons = (
+                (name, same_signature_p(method).explain_failure(getattr(x, name, None))["reason"])
+                for name, method in getmembers(self.protocol, isfunction)
+                if name in protocol_attrs
+            )
+            return next((f"Method '{name}': {reason}" for name, reason in reasons if reason), None)
 
         return None
 
