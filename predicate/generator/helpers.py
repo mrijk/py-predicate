@@ -5,7 +5,8 @@ import sys
 import types
 from collections.abc import Callable, Iterable
 from datetime import datetime, timedelta
-from itertools import cycle
+from inspect import Parameter, Signature
+from itertools import count, cycle
 from random import choices
 from typing import Any, Final, Iterator
 from uuid import UUID, uuid4
@@ -406,3 +407,21 @@ def generate_even_numbers() -> Iterator[int]:
 
 def generate_odd_numbers() -> Iterator[int]:
     yield from (value for value in random_ints() if value % 2 != 0)
+
+
+def function_with_signature(sig: Signature) -> Callable:
+    # inspect.signature reads __signature__, so the function only needs to carry it
+    def function(*args, **kwargs):
+        return None
+
+    function.__signature__ = sig  # type: ignore[attr-defined]
+    return function
+
+
+def with_parameters(sig: Signature, *parameters: Parameter) -> Signature:
+    # A stable sort on kind keeps the order of the original parameters, so the result is a valid signature
+    return sig.replace(parameters=sorted([*sig.parameters.values(), *parameters], key=lambda p: p.kind))
+
+
+def unused_name(sig: Signature) -> str:
+    return next(name for name in (f"extra{i}" for i in count()) if name not in sig.parameters)
