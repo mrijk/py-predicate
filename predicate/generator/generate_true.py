@@ -3,7 +3,7 @@ import sys
 from collections.abc import Callable, Container, Iterable, Iterator
 from datetime import datetime, timedelta
 from functools import singledispatch
-from inspect import Parameter, signature
+from inspect import Parameter, getmembers, isfunction, signature
 from itertools import cycle, repeat
 from types import ModuleType, UnionType
 from typing import (
@@ -86,6 +86,7 @@ from predicate.gt_predicate import GtPredicate
 from predicate.has_key_predicate import HasKeyPredicate
 from predicate.has_length_predicate import HasLengthPredicate
 from predicate.has_path_predicate import HasPathPredicate
+from predicate.implements_protocol_predicate import ImplementsProtocolPredicate, protocol_members
 from predicate.in_predicate import InPredicate
 from predicate.is_async_predicate import IsAsyncPredicate
 from predicate.is_callable_predicate import IsCallablePredicate
@@ -119,7 +120,7 @@ from predicate.range_predicate import GeLePredicate, GeLtPredicate, GtLePredicat
 from predicate.reduce_predicate import ReducePredicate
 from predicate.regex_predicate import RegexPredicate
 from predicate.repeat_predicate import RepeatPredicate
-from predicate.same_signature_predicate import SameSignaturePredicate
+from predicate.same_signature_predicate import SameSignaturePredicate, same_signature_p
 from predicate.set_of_predicate import SetOfPredicate
 from predicate.set_predicates import (
     IntersectsPredicate,
@@ -462,6 +463,21 @@ def generate_none(_predicate: IsNonePredicate) -> Iterator:
 @generate_true.register
 def generate_is_protocol(_predicate: IsProtocolPredicate) -> Iterator:
     yield from cycle([Protocol, SupportsAbs, SupportsBytes, SupportsFloat, SupportsIndex, SupportsInt])
+
+
+@generate_true.register
+def generate_implements_protocol(predicate: ImplementsProtocolPredicate) -> Iterator:
+    protocol = predicate.protocol
+    members = protocol_members(protocol)
+    methods = {
+        name: generate_true(same_signature_p(method))
+        for name, method in getmembers(protocol, isfunction)
+        if name in members
+    }
+    # Data members only need to exist on the class, so None will do
+    while True:
+        attributes = {name: next(methods[name]) if name in methods else None for name in members}
+        yield type(f"{protocol.__name__}Implementation", (), attributes)
 
 
 @generate_true.register
