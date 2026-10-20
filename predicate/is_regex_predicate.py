@@ -29,6 +29,7 @@ class IsRegexPredicate[T](Predicate[T]):
             re.compile(x)
         except re.error as e:
             return {"reason": f"String {x} is not a valid regex: {e}"}
+        raise AssertionError("unreachable")  # ponytail: only called on failure
 
 
 is_regex_p: Final[IsRegexPredicate] = IsRegexPredicate()
