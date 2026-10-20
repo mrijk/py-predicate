@@ -73,6 +73,7 @@ from predicate.is_not_none_predicate import is_not_none_p, none_is_false_p
 from predicate.is_predicate import is_p
 from predicate.is_predicate_of_p import is_predicate_of_p
 from predicate.is_protocol_predicate import is_protocol_p
+from predicate.is_regex_predicate import is_regex_p
 from predicate.is_same_predicate import is_same_p
 from predicate.is_subclass_predicate import is_enum_p, is_int_enum_p, is_str_enum_p, is_subclass_p
 from predicate.is_truthy_predicate import is_truthy_p
@@ -220,6 +221,7 @@ __all__ = [
     "is_lower_p",
     "is_mapping_p",
     "is_module_p",
+    "is_regex_p",
     "is_same_p",
     "is_sentinel_p",
     "is_nan_p",
