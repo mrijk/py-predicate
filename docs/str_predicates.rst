@@ -131,6 +131,20 @@ Return True if all characters in the string are printable or the string is empty
     assert is_printable_p("")
     assert not is_printable_p("hello\x00")
 
+is_regex_p
+~~~~~~~~~~
+
+Return True if the value is a string that compiles as a valid regular expression, False otherwise.
+
+.. code-block:: python
+
+    from predicate import is_regex_p
+
+    assert is_regex_p(r"^\d{3}$")
+    assert is_regex_p("")
+    assert not is_regex_p("(")
+    assert not is_regex_p(42)
+
 is_space_p
 ~~~~~~~~~~
 

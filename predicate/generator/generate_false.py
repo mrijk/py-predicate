@@ -64,6 +64,7 @@ from predicate.is_none_predicate import IsNonePredicate
 from predicate.is_not_none_predicate import IsNotNonePredicate
 from predicate.is_predicate import IsPredicate
 from predicate.is_protocol_predicate import IsProtocolPredicate
+from predicate.is_regex_predicate import IsRegexPredicate
 from predicate.is_subclass_predicate import IsSubclassPredicate
 from predicate.is_truthy_predicate import IsTruthyPredicate
 from predicate.juxt_predicate import JuxtPredicate
@@ -393,6 +394,11 @@ def generate_ne(predicate: NePredicate) -> Iterator:
 @generate_false.register
 def generate_none(_predicate: IsNonePredicate) -> Iterator:
     yield from generate_anys(IsNotNonePredicate())
+
+
+@generate_false.register
+def generate_is_regex(_predicate: IsRegexPredicate) -> Iterator:
+    yield from cycle(["(", "[a-", "*", "a{2,1}", 42, None])
 
 
 @generate_false.register
