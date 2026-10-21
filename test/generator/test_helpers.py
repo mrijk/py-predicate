@@ -37,12 +37,14 @@ from predicate.generator.helpers import (
     generate_odd_numbers,
     random_anys,
     random_bools,
+    random_callable_objects,
     random_complex_numbers,
     random_containers,
     random_datetimes,
     random_dicts,
     random_floats,
     random_frozensets,
+    random_functions,
     random_hashables,
     random_ints,
     random_lists,
@@ -86,6 +88,24 @@ def test_random_containers():
     all_container = all_p(is_container_p)
 
     assert all_container(containers)
+
+
+def test_random_functions():
+    from inspect import signature
+
+    functions = take(10, random_functions())
+
+    assert all(callable(f) and f.__name__ != "<lambda>" for f in functions)
+    assert all(0 <= len(signature(f).parameters) <= 5 for f in functions)
+
+
+def test_random_callable_objects():
+    from inspect import isfunction, signature
+
+    objects = take(10, random_callable_objects())
+
+    assert all(callable(obj) and not isfunction(obj) for obj in objects)
+    assert all(0 <= len(signature(obj).parameters) <= 5 for obj in objects)
 
 
 def test_random_dicts():

@@ -51,8 +51,8 @@ def random_complex_numbers(radius: float = 1e6) -> Iterator[complex]:
     yield from (to_complex(amplitude, angle) for amplitude, angle in zip(valid_amplitudes, valid_angles, strict=False))
 
 
-def random_callables() -> Iterator[types.FunctionType]:
-    yield from random_lambdas()
+def random_callables() -> Iterator[Callable]:
+    yield from random_first_from_iterables(random_lambdas(), random_functions(), random_callable_objects())
 
 
 def generate_lambda(arg_names: list[str]) -> types.FunctionType:
@@ -152,6 +152,24 @@ def random_lambdas(nr_of_parameters_p: Predicate = default_nr_of_parameters_p) -
 
 
 default_size_p: Final = ge_le_p(lower=0, upper=5)
+
+
+def random_signatures(nr_of_parameters_p: Predicate = default_size_p) -> Iterator[Signature]:
+    value_p = regex_p("[a-z]{2,3}")
+    valid_parameter_lists = random_lists(length_p=nr_of_parameters_p, value_p=value_p)
+
+    def to_signature(names: list[str]) -> Signature:
+        return Signature([Parameter(name, Parameter.POSITIONAL_OR_KEYWORD) for name in unique_everseen(names)])
+
+    yield from (to_signature(names) for names in valid_parameter_lists)
+
+
+def random_functions(nr_of_parameters_p: Predicate = default_size_p) -> Iterator[Callable]:
+    yield from (function_with_signature(sig) for sig in random_signatures(nr_of_parameters_p))
+
+
+def random_callable_objects(nr_of_parameters_p: Predicate = default_size_p) -> Iterator[Callable]:
+    yield from (callable_object_with_signature(sig) for sig in random_signatures(nr_of_parameters_p))
 
 
 def random_dicts(
@@ -416,6 +434,20 @@ def function_with_signature(sig: Signature) -> Callable:
 
     function.__signature__ = sig  # type: ignore[attr-defined]
     return function
+
+
+class CallableObject:
+    """Instance whose class implements __call__, so it is a Callable without being a function."""
+
+    def __call__(self, *args, **kwargs):
+        return None
+
+
+def callable_object_with_signature(sig: Signature) -> Callable:
+    # inspect.signature reads __signature__ from the instance before it looks at type(obj).__call__
+    obj = CallableObject()
+    obj.__signature__ = sig  # type: ignore[attr-defined]
+    return obj
 
 
 def with_parameters(sig: Signature, *parameters: Parameter) -> Signature:
