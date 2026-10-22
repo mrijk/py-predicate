@@ -22,7 +22,7 @@ from predicate.set_predicates import IsSubsetPredicate
 from predicate.xor_predicate import XorPredicate
 
 
-def optimize_and_predicate[T](predicate: AndPredicate[T]) -> MaybeOptimized[T]:
+def optimize_and_predicate[T](predicate: AndPredicate[T]) -> MaybeOptimized[T]:  # noqa: C901
     from predicate.negate import negate
     from predicate.optimizer.predicate_optimizer import optimizations, optimize
 

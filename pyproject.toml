@@ -43,6 +43,7 @@ Source = "https://github.com/mrijk/py-predicate"
 Documentation = "https://mrijk.github.io/py-predicate/"
 
 [project.optional-dependencies]
+rx = ["reactivex"]
 test = [
     "mypy>=2.4",
     "mypy_extensions",
@@ -50,6 +51,7 @@ test = [
     "pytest-asyncio",
     "pytest-benchmark",
     "pytest-cov",
+    "reactivex",
     "ruff",
     "types-PyYAML",
 ]
@@ -65,7 +67,6 @@ name = "predicate"
 
 [tool.ruff]
 lint.ignore = [
-    "C901",
     "D100",
     "D102",
     "D103",
@@ -83,6 +84,9 @@ target-version = "py312"
 
 [lint.pycodestyle]
 #max-doc-length = 180
+
+[tool.ruff.lint.mccabe]
+max-complexity = 10
 
 [tool.ruff.lint.flake8-tidy-imports]
 ban-relative-imports = "all"

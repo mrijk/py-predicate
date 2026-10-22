@@ -30,7 +30,7 @@ if sys.version_info >= (3, 13):  # pragma: no cover
 _union_origins: set = {Union, types.UnionType}
 
 
-def annotation_to_predicate(annotation: Any) -> Predicate:
+def annotation_to_predicate(annotation: Any) -> Predicate:  # noqa: C901
     if annotation is None:
         return is_none_p
     if annotation is Any:

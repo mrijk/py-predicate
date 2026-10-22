@@ -20,7 +20,7 @@ from predicate.predicate import Predicate
 from predicate.set_predicates import IntersectsPredicate
 
 
-def optimize_or_predicate[T](predicate: OrPredicate[T]) -> MaybeOptimized[T]:
+def optimize_or_predicate[T](predicate: OrPredicate[T]) -> MaybeOptimized[T]:  # noqa: C901
     from predicate.negate import negate
     from predicate.optimizer.predicate_optimizer import optimizations, optimize
 

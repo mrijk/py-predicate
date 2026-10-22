@@ -43,7 +43,7 @@ from predicate.struct_predicate import is_struct_p
 from predicate.tuple_of_predicate import is_tuple_of_p
 
 
-def from_json(data: dict[str, Any]) -> Predicate:
+def from_json(data: dict[str, Any]) -> Predicate:  # noqa: C901
     """Parse a predicate from its JSON representation."""
     ((key, value),) = data.items()
 

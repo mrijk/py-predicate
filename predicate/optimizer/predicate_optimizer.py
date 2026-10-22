@@ -22,7 +22,7 @@ from predicate.set_predicates import IntersectsPredicate
 from predicate.xor_predicate import XorPredicate
 
 
-def optimizations[T](predicate: Predicate[T]) -> MaybeOptimized[T]:
+def optimizations[T](predicate: Predicate[T]) -> MaybeOptimized[T]:  # noqa: C901
     """Optimize the given predicate."""
     match predicate:
         case AllPredicate() as all_predicate:
