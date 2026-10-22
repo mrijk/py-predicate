@@ -44,6 +44,8 @@ Operator                  Description
 ``first_or_default_p``    like ``first_p``, but emits ``default_value`` if there is none
 ``last_or_default_p``     like ``last_p``, but emits ``default_value`` if there is none
 ``single_or_default_p``   like ``single_p``, but emits ``default_value`` if there is none
+``find_p``                emits the first item satisfying the predicate, or ``None`` if there is none
+``find_index_p``          emits the index of the first item satisfying the predicate, or ``-1`` if there is none
 ========================  =================================================================================
 
 ``all_p`` and ``count_p`` share their names with core predicates, so alias them when you need both:

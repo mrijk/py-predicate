@@ -7,6 +7,8 @@ from predicate.rx import (
     all_p,
     count_p,
     filter_p,
+    find_index_p,
+    find_p,
     first_or_default_p,
     first_p,
     last_or_default_p,
@@ -131,3 +133,19 @@ def test_single_or_default_p_more_than_one():
         str(collect_error(rx.of(3, 4).pipe(single_or_default_p(gt_p(2), 0))))
         == "Sequence contains more than one element"
     )
+
+
+def test_find_p():
+    assert collect(rx.of(1, 3, 4).pipe(find_p(gt_p(2)))) == [3]
+
+
+def test_find_p_none():
+    assert collect(rx.of(1, 2).pipe(find_p(gt_p(2)))) == [None]
+
+
+def test_find_index_p():
+    assert collect(rx.of(1, 3, 4).pipe(find_index_p(gt_p(2)))) == [1]
+
+
+def test_find_index_p_none():
+    assert collect(rx.of(1, 2).pipe(find_index_p(gt_p(2)))) == [-1]

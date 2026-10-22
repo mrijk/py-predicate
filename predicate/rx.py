@@ -78,3 +78,13 @@ def single_or_default_p[T](
     Errors if more than one item satisfies the predicate.
     """
     return ops.single_or_default(predicate, default_value)
+
+
+def find_p[T](predicate: Predicate[T]) -> Callable[[rx.Observable[T]], rx.Observable[T | None]]:
+    """Return an Rx operator that emits the first item satisfying the predicate, or None if there is none."""
+    return ops.find(lambda item, _index, _source: predicate(item))
+
+
+def find_index_p[T](predicate: Predicate[T]) -> Callable[[rx.Observable[T]], rx.Observable[int | None]]:
+    """Return an Rx operator that emits the index of the first item satisfying the predicate, or -1 if there is none."""
+    return ops.find_index(lambda item, _index, _source: predicate(item))
