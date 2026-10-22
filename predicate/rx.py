@@ -54,3 +54,27 @@ def last_p[T](predicate: Predicate[T]) -> Callable[[rx.Observable[T]], rx.Observ
 def single_p[T](predicate: Predicate[T]) -> Callable[[rx.Observable[T]], rx.Observable[T]]:
     """Return an Rx operator that emits the only item satisfying the predicate, or errors if not exactly one."""
     return ops.single(predicate)
+
+
+def first_or_default_p[T](
+    predicate: Predicate[T], default_value: T | None = None
+) -> Callable[[rx.Observable[T]], rx.Observable[T | None]]:
+    """Return an Rx operator that emits the first item satisfying the predicate, or the default if there is none."""
+    return ops.first_or_default(predicate, default_value)
+
+
+def last_or_default_p[T](
+    predicate: Predicate[T], default_value: T | None = None
+) -> Callable[[rx.Observable[T]], rx.Observable[T | None]]:
+    """Return an Rx operator that emits the last item satisfying the predicate, or the default if there is none."""
+    return ops.last_or_default(default_value, predicate)  # type: ignore[arg-type]  # stub wants default: T, but None is valid
+
+
+def single_or_default_p[T](
+    predicate: Predicate[T], default_value: T | None = None
+) -> Callable[[rx.Observable[T]], rx.Observable[T | None]]:
+    """Return an Rx operator that emits the only item satisfying the predicate, or the default if there is none.
+
+    Errors if more than one item satisfies the predicate.
+    """
+    return ops.single_or_default(predicate, default_value)

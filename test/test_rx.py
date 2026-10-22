@@ -7,9 +7,12 @@ from predicate.rx import (
     all_p,
     count_p,
     filter_p,
+    first_or_default_p,
     first_p,
+    last_or_default_p,
     last_p,
     partition_p,
+    single_or_default_p,
     single_p,
     skip_while_p,
     some_p,
@@ -97,3 +100,34 @@ def test_single_p_none():
 
 def test_single_p_more_than_one():
     assert str(collect_error(rx.of(3, 4).pipe(single_p(gt_p(2))))) == "Sequence contains more than one element"
+
+
+def test_first_or_default_p():
+    assert collect(rx.of(1, 3, 4).pipe(first_or_default_p(gt_p(2), 0))) == [3]
+
+
+def test_first_or_default_p_none():
+    assert collect(rx.of(1, 2).pipe(first_or_default_p(gt_p(2), 0))) == [0]
+
+
+def test_last_or_default_p():
+    assert collect(rx.of(1, 3, 4).pipe(last_or_default_p(gt_p(2), 0))) == [4]
+
+
+def test_last_or_default_p_none():
+    assert collect(rx.of(1, 2).pipe(last_or_default_p(gt_p(2), 0))) == [0]
+
+
+def test_single_or_default_p():
+    assert collect(rx.of(1, 3).pipe(single_or_default_p(gt_p(2), 0))) == [3]
+
+
+def test_single_or_default_p_none():
+    assert collect(rx.of(1, 2).pipe(single_or_default_p(gt_p(2), 0))) == [0]
+
+
+def test_single_or_default_p_more_than_one():
+    assert (
+        str(collect_error(rx.of(3, 4).pipe(single_or_default_p(gt_p(2), 0))))
+        == "Sequence contains more than one element"
+    )
