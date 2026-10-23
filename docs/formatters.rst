@@ -47,4 +47,10 @@ This formatter will output the predicate as a text string in `LaTeX <https://www
 
     latex = to_latex(predicate)
 
-    assert latex == "x \\neq 2"
+    assert latex == "x \\neq 13"
+
+This renders as:
+
+.. math::
+
+    x \neq 13
