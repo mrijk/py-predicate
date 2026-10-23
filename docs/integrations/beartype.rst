@@ -11,9 +11,9 @@ beartype
     from beartype import beartype
     from beartype.vale import Is
 
-    from predicate import ge_p, is_list_of_p, is_str_p, lt_p
+    from predicate import ge_le_p, is_list_of_p, is_str_p
 
-    Percentage = Annotated[int, Is[ge_p(0) & lt_p(101)]]
+    Percentage = Annotated[int, Is[ge_le_p(0, 100)]]
 
 
     @beartype

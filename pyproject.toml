@@ -13,13 +13,13 @@ classifiers = [
     "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python",
-    "Topic :: Internet",
     "Topic :: Software Development :: Libraries :: Python Modules",
     "Topic :: Software Development :: Libraries",
+    "Topic :: Software Development :: Quality Assurance",
+    "Topic :: Software Development :: Testing",
     "Topic :: Software Development",
     "Typing :: Typed",
     "Development Status :: 5 - Production/Stable",
-    "Environment :: Web Environment",
     "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3 :: Only",
     "Programming Language :: Python :: 3.15",
@@ -35,6 +35,7 @@ dependencies = [
     "pyyaml",
     "typer",
 ]
+keywords = ["predicate", "validation", "property-based testing", "beartype", "pandera", "reactivex"]
 readme = "README.md"
 requires-python = ">=3.12"
 
@@ -46,6 +47,8 @@ Documentation = "https://mrijk.github.io/py-predicate/"
 rx = ["reactivex"]
 test = [
     "beartype",
+    "pandera[pandas]",
+    "pandas-stubs",
     "mypy>=2.4",
     "mypy_extensions",
     "pytest",

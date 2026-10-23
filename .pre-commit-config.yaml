@@ -8,8 +8,6 @@ repos:
       - id: check-json
       - id: check-yaml
       - id: debug-statements
-      - id: requirements-txt-fixer
-        exclude: ^requirements/artifactory.txt$
       - id: detect-private-key
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.17.1
