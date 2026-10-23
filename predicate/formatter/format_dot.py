@@ -95,7 +95,7 @@ def to_dot(predicate: Predicate, predicate_string: str | None = None, show_optim
     return dot
 
 
-def render(dot: Digraph, predicate: Predicate, node_nr: count):
+def render(dot: Digraph, predicate: Predicate, node_nr: count):  # noqa: C901
     node_predicate_mapping: dict[str, Predicate] = {}
 
     def _add_node(name: str, *, label: str, predicate: Predicate | None) -> str:
@@ -118,7 +118,7 @@ def render(dot: Digraph, predicate: Predicate, node_nr: count):
         dot.edge(node, to_value(child))
         return node
 
-    def to_value(predicate: Predicate):
+    def to_value(predicate: Predicate):  # noqa: C901
         add_node = partial(_add_node, predicate=predicate)
         add_node_left_right = partial(_add_node_left_right, predicate=predicate)
         add_node_with_child = partial(_add_node_with_child, predicate=predicate)

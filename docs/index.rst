@@ -19,5 +19,6 @@ and many more features.
    instrumentation
    optimization
    generation
+   integrations
    cli
    tutorial/tutorial

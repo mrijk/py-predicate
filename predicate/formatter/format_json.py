@@ -68,10 +68,10 @@ def list_to_json(predicates: list[Predicate]) -> list[dict[str, Any]]:
     return [to_json(predicate) for predicate in predicates]
 
 
-def to_json(predicate: Predicate) -> dict[str, Any]:
+def to_json(predicate: Predicate) -> dict[str, Any]:  # noqa: C901
     """Format predicate as json."""
 
-    def to_value(predicate) -> tuple[str, Any]:
+    def to_value(predicate) -> tuple[str, Any]:  # noqa: C901
         match predicate:
             case CompiledPredicate(predicate=inner):
                 return to_value(inner)

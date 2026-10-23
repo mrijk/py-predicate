@@ -7,7 +7,7 @@ from predicate.or_predicate import OrPredicate
 from predicate.xor_predicate import XorPredicate
 
 
-def optimize_not_predicate[T](predicate: NotPredicate[T]) -> MaybeOptimized[T]:
+def optimize_not_predicate[T](predicate: NotPredicate[T]) -> MaybeOptimized[T]:  # noqa: C901
     from predicate.negate import negate
     from predicate.optimizer.predicate_optimizer import optimize
 

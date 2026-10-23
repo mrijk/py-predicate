@@ -94,7 +94,7 @@ def _check_constraints(spec: Spec, func_name: str, arguments: dict, result: Any)
     return None
 
 
-def instrument_function(func: Callable, spec: Spec, on_error: OnError = _default_on_error) -> Callable:
+def instrument_function(func: Callable, spec: Spec, on_error: OnError = _default_on_error) -> Callable:  # noqa: C901
     if is_instrumented(func):
         return func
     func = unwrap(func)

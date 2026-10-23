@@ -36,7 +36,7 @@ def set_to_latex_set(v: Iterable) -> str:
     return f"\\{{{join_as_str(v)}\\}}"
 
 
-def to_latex(predicate: Predicate, parameter: str = "x") -> str:
+def to_latex(predicate: Predicate, parameter: str = "x") -> str:  # noqa: C901
     """Format predicate as LaTeX."""
     match predicate:
         case CompiledPredicate(predicate=inner):
