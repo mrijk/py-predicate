@@ -6,4 +6,6 @@ returning a ``bool``. For some libraries py-predicate provides ready-made wrappe
 
 .. include:: integrations/beartype.rst
 
+.. include:: integrations/pandera.rst
+
 .. include:: integrations/rx.rst
