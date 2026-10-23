@@ -21,7 +21,7 @@ To generate a truth table:
 
 This will output:
 
-.. code-block:: txt
+.. code-block:: text
 
     p q
     0 0:   0

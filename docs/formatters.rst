@@ -37,7 +37,7 @@ In sample above, we render a simple predicate.
 LaTeX
 -----
 
-This formatter will output the predicate as a text string in `Latex https://www.latex-project.org/`_ format:
+This formatter will output the predicate as a text string in `LaTeX <https://www.latex-project.org/>`_ format:
 
 .. code-block:: python
 

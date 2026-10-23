@@ -19,7 +19,7 @@ extensions: list = ["sphinx.ext.graphviz", "sphinx_copybutton"]
 graphviz_output_format = "svg"
 
 templates_path = ["_templates"]
-exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
+exclude_patterns = ["_build", "Thumbs.db", ".DS_Store", "integrations/*"]
 
 
 # -- Options for HTML output -------------------------------------------------

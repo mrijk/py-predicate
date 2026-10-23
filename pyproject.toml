@@ -45,6 +45,7 @@ Documentation = "https://mrijk.github.io/py-predicate/"
 [project.optional-dependencies]
 rx = ["reactivex"]
 test = [
+    "beartype",
     "mypy>=2.4",
     "mypy_extensions",
     "pytest",
