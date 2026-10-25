@@ -35,7 +35,7 @@ dependencies = [
     "pyyaml",
     "typer",
 ]
-keywords = ["predicate", "validation", "property-based testing", "beartype", "pandera", "reactivex"]
+keywords = ["predicate", "validation", "property-based testing", "beartype", "pandera", "annotated-types", "reactivex"]
 readme = "README.md"
 requires-python = ">=3.12"
 
@@ -49,6 +49,7 @@ test = [
     "beartype",
     "pandera[pandas]",
     "pandas-stubs",
+    "pydantic",
     "mypy>=2.4",
     "mypy_extensions",
     "pytest",
