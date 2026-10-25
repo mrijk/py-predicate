@@ -121,3 +121,19 @@ def test_repr_standard(predicate, representation):
 )
 def test_repr_combined(predicate, representation):
     assert repr(predicate) == representation
+
+
+@pytest.mark.parametrize(
+    ("predicate", "representation"),
+    [
+        (ge_p(2) & (lt_p(10) | eq_p(42)), "ge_p(2) & (lt_p(10) | eq_p(42))"),
+        ((ge_p(2) & lt_p(10)) | eq_p(42), "ge_p(2) & lt_p(10) | eq_p(42)"),
+        (ge_p(1) & (ge_p(2) & ge_p(3)), "ge_p(1) & (ge_p(2) & ge_p(3))"),
+        ((ge_p(1) | eq_p(2)) ^ eq_p(3), "(ge_p(1) | eq_p(2)) ^ eq_p(3)"),
+        (ge_p(1) | eq_p(2) ^ eq_p(3), "ge_p(1) | eq_p(2) ^ eq_p(3)"),
+        (~(ge_p(1) | eq_p(3)), "~(ge_p(1) | eq_p(3))"),
+        (~~ge_p(1), "~~ge_p(1)"),
+    ],
+)
+def test_repr_precedence(predicate, representation):
+    assert repr(predicate) == representation

@@ -1,7 +1,7 @@
 from dataclasses import dataclass
-from typing import override
+from typing import ClassVar, override
 
-from predicate.predicate import Predicate
+from predicate.predicate import Predicate, repr_operand
 
 
 @dataclass
@@ -17,11 +17,13 @@ class NotPredicate[T](Predicate[T]):
 
     predicate: Predicate[T]
 
+    precedence: ClassVar[int] = 4
+
     def __call__(self, x: T) -> bool:
         return not self.predicate(x)
 
     def __repr__(self) -> str:
-        return f"~{self.predicate}"
+        return f"~{repr_operand(self.predicate, 4)}"
 
     def __contains__(self, predicate: Predicate[T]) -> bool:
         return predicate == self or predicate in self.predicate
