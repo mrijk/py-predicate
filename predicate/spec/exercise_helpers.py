@@ -1,7 +1,7 @@
 import sys
 import types
 from inspect import Signature, isroutine, signature
-from itertools import repeat
+from itertools import islice, repeat
 from typing import Any, Callable, Literal, TypeGuard, TypeVar, Union, get_args, get_origin, get_type_hints
 
 from more_itertools import take
@@ -133,10 +133,14 @@ def generate_values(spec: Spec, n: int) -> tuple:
     return_p = spec["ret"]
     if predicates := tuple(parameters.items()):
         candidates = generate_true(is_dict_of_p(*predicates))
-        # ponytail: rejection sampling, hangs if pre is (almost) never true for generated values
         if pre := spec.get("pre"):
-            candidates = (value for value in candidates if pre(**value))
-        values = take(n, candidates)
+            max_attempts = 100 * n
+            candidates = (value for value in islice(candidates, max_attempts) if pre(**value))
+            values = take(n, candidates)
+            if len(values) < n:
+                raise InvalidSpecError(f"Could not generate values satisfying pre after {max_attempts} attempts")
+        else:
+            values = take(n, candidates)
     else:
         values = take(n, repeat({}))
     return return_p, values

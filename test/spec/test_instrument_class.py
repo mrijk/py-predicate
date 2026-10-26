@@ -1,6 +1,7 @@
 import pytest
 
 from predicate.spec.instrument import instrument, instrument_class
+from predicate.spec.spec import SpecViolationError
 
 # --- @instrument on instance methods ---
 
@@ -20,7 +21,7 @@ def test_instrument_method_wrong_arg():
         def add(self, x: int, y: int) -> int:
             return x + y
 
-    with pytest.raises(ValueError, match="Parameter predicate"):
+    with pytest.raises(SpecViolationError, match="Parameter predicate"):
         Adder().add(1, "not an int")  # type: ignore[arg-type]
 
 
@@ -30,7 +31,7 @@ def test_instrument_method_wrong_return():
         def add(self, x: int, y: int) -> int:
             return "oops"  # type: ignore[return-value]
 
-    with pytest.raises(ValueError, match="Return predicate"):
+    with pytest.raises(SpecViolationError, match="Return predicate"):
         Adder().add(1, 2)
 
 
@@ -51,7 +52,7 @@ def test_instrument_class_instruments_all_methods():
     assert calc.add(3, 4) == 7
     assert calc.negate(5) == -5
 
-    with pytest.raises(ValueError, match="Parameter predicate"):
+    with pytest.raises(SpecViolationError, match="Parameter predicate"):
         calc.add(1, "bad")  # type: ignore[arg-type]
 
 
@@ -96,7 +97,7 @@ def test_instrument_decorator_on_class():
     calc = Calculator()
     assert calc.add(1, 2) == 3
 
-    with pytest.raises(ValueError, match="Parameter predicate"):
+    with pytest.raises(SpecViolationError, match="Parameter predicate"):
         calc.add(1, "bad")  # type: ignore[arg-type]
 
 
@@ -129,7 +130,7 @@ def test_instrument_class_skips_already_instrumented_method():
     calc.add(1, 2)
     assert calls == ["fn"], "fn constraint must be called exactly once"
 
-    with pytest.raises(ValueError, match="Parameter predicate"):
+    with pytest.raises(SpecViolationError, match="Parameter predicate"):
         calc.negate("bad")  # type: ignore[arg-type]
 
 
@@ -144,7 +145,7 @@ def test_instrument_class_staticmethod():
     assert C().s(1) == 1
     assert C.s(1) == 1
 
-    with pytest.raises(ValueError, match="Parameter predicate"):
+    with pytest.raises(SpecViolationError, match="Parameter predicate"):
         C.s("bad")  # type: ignore[arg-type]
 
 
@@ -156,8 +157,8 @@ def test_instrument_class_classmethod():
 
     instrument_class(C)
 
-    with pytest.raises(ValueError, match="Return predicate"):
+    with pytest.raises(SpecViolationError, match="Return predicate"):
         C.c(1)
 
-    with pytest.raises(ValueError, match="Return predicate"):
+    with pytest.raises(SpecViolationError, match="Return predicate"):
         C().c(1)

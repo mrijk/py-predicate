@@ -5,7 +5,7 @@ import pytest
 
 from predicate import ge_p, is_instrumented, is_int_p
 from predicate.spec.instrument import enrich_spec, instrument, instrument_function, instrument_module
-from predicate.spec.spec import Spec
+from predicate.spec.spec import Spec, SpecViolationError
 
 
 def test_instrument_ok():
@@ -18,7 +18,7 @@ def test_instrument_wrong_parameter():
     from spec.test_functions.max_int_with_bug import max_int_with_bug
 
     with pytest.raises(
-        ValueError,
+        SpecViolationError,
         match="Parameter predicate for function max_int_with_bug failed. Reason: False is not an instance of type int",
     ):
         max_int_with_bug(4, False)
@@ -28,7 +28,7 @@ def test_instrument_return_fails():
     from spec.test_functions.max_int_with_bug import max_int_with_bug
 
     with pytest.raises(
-        ValueError,
+        SpecViolationError,
         match="Return predicate for function max_int_with_bug failed. Reason: 4 is not an instance of type int",
     ):
         max_int_with_bug(3, 4)
@@ -38,7 +38,7 @@ def test_instrument_using_func():
     from spec.test_functions.uses_max_int_with_bug import uses_max_int_with_bug
 
     with pytest.raises(
-        ValueError,
+        SpecViolationError,
         match="Return predicate for function max_int_with_bug failed. Reason: 13 is not an instance of type int",
     ):
         uses_max_int_with_bug(3, 13)
@@ -63,7 +63,7 @@ def test_instrument_validates_args_before_executing():
         side_effect.append(x)
         return x
 
-    with pytest.raises(ValueError):
+    with pytest.raises(SpecViolationError):
         func_with_side_effect("not-an-int")
 
     assert side_effect == [], "function body must not execute when args are invalid"
@@ -90,7 +90,7 @@ def test_instrument_fn_constraint_fails():
     def broken_max(x: int, y: int) -> int:
         return x  # always returns x, violates fn when y > x
 
-    with pytest.raises(ValueError, match="fn constraint for function broken_max failed"):
+    with pytest.raises(SpecViolationError, match="fn constraint for function broken_max failed"):
         broken_max(3, 7)
 
 
@@ -107,7 +107,7 @@ def test_instrument_fn_p_constraint_fails():
     def bad_add(x: int, y: int) -> int:
         return x  # returns x instead of x+y
 
-    with pytest.raises(ValueError, match="fn_p constraint for function bad_add failed"):
+    with pytest.raises(SpecViolationError, match="fn_p constraint for function bad_add failed"):
         bad_add(2, 3)
 
 
@@ -127,7 +127,7 @@ def test_instrument_pre_fails_before_call():
         calls.append((lo, hi))
         return range(lo, hi)
 
-    with pytest.raises(ValueError, match="pre condition for function make_range failed. Arguments: lo=3, hi=1"):
+    with pytest.raises(SpecViolationError, match="pre condition for function make_range failed. Arguments: lo=3, hi=1"):
         make_range(3, 1)
     assert calls == []
 
@@ -139,7 +139,7 @@ def test_instrument_decorator():
 
     assert add(2, 3) == 5
 
-    with pytest.raises(ValueError, match="Parameter predicate for function add failed"):
+    with pytest.raises(SpecViolationError, match="Parameter predicate for function add failed"):
         add("not-an-int", 3)
 
 
@@ -156,7 +156,7 @@ def test_instrument_async_wrong_parameter():
     async def async_add(x: int, y: int) -> int:
         return x + y
 
-    with pytest.raises(ValueError, match="Parameter predicate for function async_add failed"):
+    with pytest.raises(SpecViolationError, match="Parameter predicate for function async_add failed"):
         asyncio.run(async_add("not-an-int", 3))
 
 
@@ -165,7 +165,7 @@ def test_instrument_async_return_fails():
     async def async_bad(x: int, y: int) -> int:
         return "oops"  # type: ignore
 
-    with pytest.raises(ValueError, match="Return predicate for function async_bad failed"):
+    with pytest.raises(SpecViolationError, match="Return predicate for function async_bad failed"):
         asyncio.run(async_bad(2, 3))
 
 
@@ -240,7 +240,7 @@ def test_instrument_enriches_args_from_annotation() -> None:
 
     assert add(2, 3) == 5
 
-    with pytest.raises(ValueError, match="Parameter predicate for function add failed"):
+    with pytest.raises(SpecViolationError, match="Parameter predicate for function add failed"):
         add("not-an-int", 3)
 
 
@@ -276,7 +276,7 @@ def test_instrument_enriches_ret_from_annotation():
     def bad_add(x: int, y: int) -> int:
         return "oops"  # type: ignore
 
-    with pytest.raises(ValueError, match="Return predicate for function bad_add failed"):
+    with pytest.raises(SpecViolationError, match="Return predicate for function bad_add failed"):
         bad_add(2, 3)
 
 
@@ -293,7 +293,7 @@ def test_instrument_union_return_type_fails():
     def f(x: int) -> int | str:
         return 3.14  # type: ignore
 
-    with pytest.raises(ValueError, match="Return predicate for function f failed"):
+    with pytest.raises(SpecViolationError, match="Return predicate for function f failed"):
         f(1)
 
 
@@ -310,7 +310,7 @@ def test_instrument_none_return_type_fails():
     def f(x: int) -> None:
         return 42  # type: ignore
 
-    with pytest.raises(ValueError, match="Return predicate for function f failed"):
+    with pytest.raises(SpecViolationError, match="Return predicate for function f failed"):
         f(1)
 
 
@@ -339,7 +339,7 @@ def test_instrument_literal_return_type_fails():
     def f(x: int) -> Literal[1, 2, 3]:
         return 4  # type: ignore
 
-    with pytest.raises(ValueError, match="Return predicate for function f failed"):
+    with pytest.raises(SpecViolationError, match="Return predicate for function f failed"):
         f(1)
 
 
@@ -356,7 +356,7 @@ def test_instrument_list_return_type_fails():
     def f() -> list[int]:
         return [1, "oops", 3]  # type: ignore
 
-    with pytest.raises(ValueError, match="Return predicate for function f failed"):
+    with pytest.raises(SpecViolationError, match="Return predicate for function f failed"):
         f()
 
 
@@ -373,7 +373,7 @@ def test_instrument_dict_return_type_fails():
     def f() -> dict[str, int]:
         return {"a": "oops"}  # type: ignore
 
-    with pytest.raises(ValueError, match="Return predicate for function f failed"):
+    with pytest.raises(SpecViolationError, match="Return predicate for function f failed"):
         f()
 
 
@@ -390,7 +390,7 @@ def test_instrument_tuple_return_type_fails():
     def f() -> tuple[int, str]:
         return (1, 2)  # type: ignore
 
-    with pytest.raises(ValueError, match="Return predicate for function f failed"):
+    with pytest.raises(SpecViolationError, match="Return predicate for function f failed"):
         f()
 
 
@@ -410,10 +410,10 @@ def test_instrument_module_instruments_all_annotated_functions():
     assert sample_module.add(2, 3) == 5
     assert sample_module.greet("world") == "Hello, world"
 
-    with pytest.raises(ValueError, match="Parameter predicate for function add failed"):
+    with pytest.raises(SpecViolationError, match="Parameter predicate for function add failed"):
         sample_module.add("oops", 3)
 
-    with pytest.raises(ValueError, match="Parameter predicate for function greet failed"):
+    with pytest.raises(SpecViolationError, match="Parameter predicate for function greet failed"):
         sample_module.greet(42)
 
 
@@ -423,7 +423,7 @@ def test_instrument_module_with_pattern():
 
     assert sample_module.add(2, 3) == 5  # not instrumented, no check
 
-    with pytest.raises(ValueError, match="Parameter predicate for function greet failed"):
+    with pytest.raises(SpecViolationError, match="Parameter predicate for function greet failed"):
         sample_module.greet(42)
 
 
@@ -464,7 +464,7 @@ def test_instrument_raises_unexpected_exception() -> None:
     def f(x: int) -> int:
         raise TypeError("wrong type")
 
-    with pytest.raises(ValueError, match="Unexpected exception TypeError for function f. Expected: ValueError"):
+    with pytest.raises(SpecViolationError, match="Unexpected exception TypeError for function f. Expected: ValueError"):
         f(1)
 
 
@@ -494,7 +494,7 @@ def test_instrument_raises_unexpected_includes_expected_type() -> None:
     def f(x: int) -> int:
         raise TypeError("wrong")
 
-    with pytest.raises(ValueError, match="Expected: ValueError"):
+    with pytest.raises(SpecViolationError, match="Expected: ValueError"):
         f(1)
 
 
@@ -505,7 +505,7 @@ def test_instrument_raises_unexpected_includes_multiple_expected_types() -> None
     def f(x: int) -> int:
         raise TypeError("wrong")
 
-    with pytest.raises(ValueError, match="Expected: ValueError, KeyError"):
+    with pytest.raises(SpecViolationError, match="Expected: ValueError, KeyError"):
         f(1)
 
 
@@ -514,7 +514,7 @@ def test_instrument_fn_constraint_error_includes_arguments() -> None:
     def broken_max(x: int, y: int) -> int:
         return x
 
-    with pytest.raises(ValueError, match=r"Arguments: x=3, y=7, ret=3"):
+    with pytest.raises(SpecViolationError, match=r"Arguments: x=3, y=7, ret=3"):
         broken_max(3, 7)
 
 
@@ -550,7 +550,7 @@ def test_instrument_quoted_annotations():
 
     assert length("ab") == 2
 
-    with pytest.raises(ValueError, match="Parameter predicate for function length failed"):
+    with pytest.raises(SpecViolationError, match="Parameter predicate for function length failed"):
         length(1)
 
 
