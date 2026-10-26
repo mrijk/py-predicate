@@ -6,6 +6,7 @@ import pytest
 
 from predicate.spec.exercise import exercise
 from predicate.spec.instrument import instrument
+from predicate.spec.spec import SpecViolationError
 
 if TYPE_CHECKING:
     from decimal import Decimal
@@ -37,12 +38,12 @@ def test_instrument_postponed_ok():
 
 
 def test_instrument_postponed_wrong_parameter():
-    with pytest.raises(ValueError, match="Parameter predicate for function add failed"):
+    with pytest.raises(SpecViolationError, match="Parameter predicate for function add failed"):
         add(1, "2")
 
 
 def test_instrument_postponed_return_fails():
-    with pytest.raises(ValueError, match="Return predicate for function to_str failed"):
+    with pytest.raises(SpecViolationError, match="Return predicate for function to_str failed"):
         to_str(1)
 
 
@@ -69,5 +70,5 @@ def test_instrument_postponed_quoted_annotations():
 
     assert total([1], [2]) == 3
 
-    with pytest.raises(ValueError, match="Parameter predicate for function total failed"):
+    with pytest.raises(SpecViolationError, match="Parameter predicate for function total failed"):
         total([1], ["2"])

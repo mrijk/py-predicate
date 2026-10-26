@@ -13,6 +13,12 @@ Features:
 - new type check predicate is_module_p
 - new type check predicate is_sentinel_p (Python 3.15+, always False on older versions)
 
+Breaking changes:
+
+- instrument raises SpecViolationError instead of ValueError, exercise raises SpecViolationError or InvalidSpecError
+  instead of AssertionError
+- exercise raises InvalidSpecError when no values satisfying pre can be generated
+
 ## 1.7.0
 
 Features:

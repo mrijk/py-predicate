@@ -415,3 +415,13 @@ async def test_exercise_async_raises_expected():
     result = [r async for r in exercise(fail, spec=spec)]
 
     assert all(isinstance(r, ValueError) for _, r in result)
+
+
+def test_exercise_with_unsatisfiable_pre():
+    def identity(x):
+        return x
+
+    spec: Spec = {"args": {"x": is_int_p}, "ret": is_int_p, "pre": lambda x: False}
+
+    with pytest.raises(InvalidSpecError, match="Could not generate values satisfying pre after 1000 attempts"):
+        list(exercise(identity, spec=spec))

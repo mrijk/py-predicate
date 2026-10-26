@@ -358,8 +358,7 @@ An optional ``pattern`` argument (fnmatch-style) limits which functions are inst
 Custom error handling
 ---------------------
 
-By default, spec violations raise ``SpecViolationError``. It subclasses both ``ValueError`` and
-``AssertionError``, so existing handlers keep working; ``exercise`` raises it too. Catch it to
+By default, spec violations raise ``SpecViolationError``; ``exercise`` raises it too. Catch it to
 handle spec failures specifically:
 
 .. code-block:: python
@@ -372,7 +371,7 @@ handle spec failures specifically:
         print(e)
 
 A spec that is itself invalid (e.g. it names a parameter the function doesn't have) makes ``exercise`` raise
-``InvalidSpecError``, also an ``AssertionError`` subclass.
+``InvalidSpecError``.
 
 Pass ``on_error`` to override:
 
