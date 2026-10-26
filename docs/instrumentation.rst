@@ -373,6 +373,23 @@ handle spec failures specifically:
 A spec that is itself invalid (e.g. it names a parameter the function doesn't have) makes ``exercise`` raise
 ``InvalidSpecError``.
 
+To check a spec up front, without running ``exercise``, use ``is_valid_spec_p``:
+
+.. code-block:: python
+
+    from predicate import explain, is_int_p, is_str_p, is_valid_spec_p
+
+    def f(x: int, y) -> int:
+        return x
+
+    predicate = is_valid_spec_p(f)
+
+    assert predicate({"args": {"y": is_str_p}})
+    assert not predicate({"args": {"z": is_int_p}})
+
+    explain(predicate, {"args": {}})
+    # {'result': False, 'reason': "Unannotated parameter 'y' not in spec"}
+
 Pass ``on_error`` to override:
 
 .. code-block:: python

@@ -80,7 +80,8 @@ def get_return_predicate(sig: Signature) -> Predicate:
 
 
 def validate_args(f: Callable, spec: Spec) -> dict[str, Predicate]:
-    parameters = spec["args"]
+    # Copy, so filling in annotation predicates doesn't change the caller's spec
+    parameters = dict(spec["args"])
     sig = resolved_signature(f)
 
     for key, _ in parameters.items():
@@ -106,7 +107,7 @@ def check_signature_against_spec(f: Callable, spec: Spec) -> Spec:
 
     parameters = validate_args(f, spec)
 
-    spec = get_return_spec(f, spec)
+    spec = get_return_spec(f, spec) | {"args": parameters}
 
     for key in sig.parameters:
         parameter = sig.parameters[key]
