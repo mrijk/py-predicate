@@ -131,9 +131,8 @@ def test_exercise_class_with_fn_fail():
 
     spec: Spec = {"args": {"x": is_int_p}, "ret": is_int_p, "fn": lambda x, ret: ret == x * 2}
 
-    with pytest.raises(AssertionError) as exc:
+    with pytest.raises(AssertionError, match="^Not conform spec: fn constraint failed for inputs"):
         list(exercise(Doubler(), spec=spec))
-    assert exc.value.args[0].startswith("Not conform spec: fn constraint failed for inputs")
 
 
 # --- exercise_class: fn_p in spec ---
@@ -157,9 +156,8 @@ def test_exercise_class_with_fn_p_fail():
 
     spec: Spec = {"args": {"x": is_int_p}, "ret": is_int_p, "fn_p": lambda x: ge_p(x)}
 
-    with pytest.raises(AssertionError) as exc:
+    with pytest.raises(AssertionError, match="^Not conform spec:"):
         list(exercise(Doubler(), spec=spec))
-    assert exc.value.args[0].startswith("Not conform spec:")
 
 
 def test_exercise_predicate_klass_not_implemented():
@@ -267,10 +265,9 @@ async def test_exercise_async_class_with_fn_fail():
 
     spec: Spec = {"args": {"x": is_int_p}, "ret": is_int_p, "fn": lambda x, ret: ret == x * 2}
 
-    with pytest.raises(AssertionError) as exc:
+    with pytest.raises(AssertionError, match="^Not conform spec: fn constraint failed for inputs"):
         async for _ in exercise(AsyncDoubler(), spec=spec):
             pass
-    assert exc.value.args[0].startswith("Not conform spec: fn constraint failed for inputs")
 
 
 @pytest.mark.asyncio
@@ -293,7 +290,6 @@ async def test_exercise_async_class_with_fn_p_fail():
 
     spec: Spec = {"args": {"x": is_int_p}, "ret": is_int_p, "fn_p": lambda x: ge_p(x)}
 
-    with pytest.raises(AssertionError) as exc:
+    with pytest.raises(AssertionError, match="^Not conform spec:"):
         async for _ in exercise(AsyncDoubler(), spec=spec):
             pass
-    assert exc.value.args[0].startswith("Not conform spec:")

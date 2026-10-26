@@ -1,3 +1,4 @@
+import re
 from typing import TypeVar
 
 import pytest
@@ -60,10 +61,8 @@ def test_exercise_with_fn_fail():
         "fn": lambda x, y, ret: ret >= x and ret >= y,
     }
 
-    with pytest.raises(AssertionError) as exc:
+    with pytest.raises(AssertionError, match="^Not conform spec: fn constraint failed for inputs"):
         list(exercise(max_int, spec=spec, n=100))
-
-    assert exc.value.args[0].startswith("Not conform spec: fn constraint failed for inputs")
 
 
 def test_exercise_with_fn_p_happy():
@@ -82,10 +81,8 @@ def test_exercise_with_fn_p_fail():
 
     spec: Spec = {"args": {"x": is_int_p, "y": is_int_p}, "ret": is_int_p, "fn_p": lambda x, y: ge_p(x) & ge_p(y)}
 
-    with pytest.raises(AssertionError) as exc:
+    with pytest.raises(AssertionError, match="^Not conform spec:"):
         list(exercise(max_int, spec=spec, n=100))
-
-    assert exc.value.args[0].startswith("Not conform spec:")
 
 
 def test_exercise_missing_return_annotation_in_spec():
@@ -96,9 +93,8 @@ def test_exercise_missing_return_annotation_in_spec():
         "args": {"x": is_int_p, "y": is_int_p},
     }
 
-    with pytest.raises(AssertionError) as exc:
+    with pytest.raises(AssertionError, match="Return annotation not in spec"):
         list(exercise(adder, spec=spec))
-    assert exc.value.args[0] == "Return annotation not in spec"
 
 
 def test_exercise_no_types_defined():
@@ -128,9 +124,8 @@ def test_exercise_unannotated_parameter_in_spec():
         "ret": is_int_p,
     }
 
-    with pytest.raises(AssertionError) as exc:
+    with pytest.raises(AssertionError, match="Unannotated parameter 'y' not in spec"):
         list(exercise(adder, spec=spec))
-    assert exc.value.args[0] == "Unannotated parameter 'y' not in spec"
 
 
 def test_exercise_wrong_parameter_name():
@@ -139,9 +134,8 @@ def test_exercise_wrong_parameter_name():
 
     spec: Spec = {"args": {"x": is_int_p, "z": is_int_p}, "ret": is_int_p}
 
-    with pytest.raises(AssertionError) as exc:
+    with pytest.raises(AssertionError, match="Parameter 'z' not in function signature"):
         list(exercise(adder, spec=spec))
-    assert exc.value.args[0] == "Parameter 'z' not in function signature"
 
 
 def test_exercise_wrong_return():
@@ -156,9 +150,11 @@ def test_exercise_wrong_return():
         "ret": is_int_p,
     }
 
-    with pytest.raises(AssertionError) as exc:
+    with pytest.raises(
+        AssertionError,
+        match=re.escape("Not conform spec: {'result': False, 'reason': 'None is not an instance of type int'}"),
+    ):
         list(exercise(adder, spec=spec))
-    assert exc.value.args[0] == "Not conform spec: {'result': False, 'reason': 'None is not an instance of type int'}"
 
 
 def test_exercise_with_partial_spec():
@@ -204,9 +200,8 @@ def test_exercise_with_constrained_spec_fail():
         "ret": is_int_p,
     }
 
-    with pytest.raises(AssertionError) as exc:
+    with pytest.raises(AssertionError, match="Spec predicate is not a constrained annotation"):
         list(exercise(adder, spec=spec))
-    assert exc.value.args[0] == "Spec predicate is not a constrained annotation"
 
 
 def test_exercise_annotated_without_spec():
@@ -312,10 +307,9 @@ async def test_exercise_async_function_with_fn_fail():
         "fn": lambda x, y, ret: ret >= x and ret >= y,
     }
 
-    with pytest.raises(AssertionError) as exc:
+    with pytest.raises(AssertionError, match="^Not conform spec: fn constraint failed for inputs"):
         async for _ in exercise(max_int, spec=spec, n=100):
             pass
-    assert exc.value.args[0].startswith("Not conform spec: fn constraint failed for inputs")
 
 
 @pytest.mark.asyncio
@@ -347,7 +341,6 @@ async def test_exercise_async_function_with_fn_p_fail():
 
     spec: Spec = {"args": {"x": is_int_p, "y": is_int_p}, "ret": is_int_p, "fn_p": lambda x, y: ge_p(x) & ge_p(y)}
 
-    with pytest.raises(AssertionError) as exc:
+    with pytest.raises(AssertionError, match="^Not conform spec:"):
         async for _ in exercise(max_int, spec=spec, n=100):
             pass
-    assert exc.value.args[0].startswith("Not conform spec:")
