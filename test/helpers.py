@@ -1,22 +1,12 @@
 from types import FunctionType
 
 from predicate import exercise, is_instance_p
-from predicate.all_predicate import AllPredicate
-from predicate.always_false_predicate import AlwaysFalsePredicate
-from predicate.always_true_predicate import AlwaysTruePredicate
 from predicate.and_predicate import AndPredicate
 from predicate.eq_predicate import EqPredicate
 from predicate.not_predicate import NotPredicate
-from predicate.or_predicate import OrPredicate
-from predicate.xor_predicate import XorPredicate
 
-is_all_p = is_instance_p(AllPredicate)
 is_and_p = is_instance_p(AndPredicate)
 is_not_p = is_instance_p(NotPredicate)
-is_or_p = is_instance_p(OrPredicate)
-is_xor_p = is_instance_p(XorPredicate)
-is_false_p = is_instance_p(AlwaysFalsePredicate)
-is_true_p = is_instance_p(AlwaysTruePredicate)
 is_eq_p = is_instance_p(EqPredicate)
 
 
