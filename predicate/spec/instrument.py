@@ -10,13 +10,13 @@ from more_itertools import consume, side_effect
 from predicate.explain import explain
 from predicate.is_async_predicate import is_async_p
 from predicate.predicate import Predicate
-from predicate.spec.exercise_helpers import annotation_to_predicate, get_return_predicate
+from predicate.spec.exercise_helpers import annotation_to_predicate, get_return_predicate, resolved_signature
 from predicate.spec.spec import Spec
 
 
 def enrich_spec(func: Callable, spec: Spec) -> Spec:
     try:
-        sig = signature(func, eval_str=True)
+        sig = resolved_signature(func)
     except NameError as e:
         raise NameError(f"Cannot resolve annotations of {func.__qualname__}: {e}") from e
 

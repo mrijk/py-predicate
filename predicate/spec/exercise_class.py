@@ -1,4 +1,4 @@
-from inspect import Parameter, signature
+from inspect import Parameter
 from typing import AsyncIterator, Callable, Iterator, TypeVar, get_origin
 
 from predicate import always_true_p, is_instance_p
@@ -7,13 +7,14 @@ from predicate.spec.exercise_helpers import (
     check_signature_against_spec,
     generate_values,
     get_return_predicate,
+    resolved_signature,
     verify_result,
 )
 from predicate.spec.spec import Spec
 
 
 def get_spec_from_class_annotation(f: Callable) -> Spec | None:
-    sig = signature(f.__call__, eval_str=True)  # type: ignore
+    sig = resolved_signature(f.__call__)  # type: ignore
 
     if sig.return_annotation == sig.empty:
         return None

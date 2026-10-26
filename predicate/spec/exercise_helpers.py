@@ -2,7 +2,7 @@ import sys
 import types
 from inspect import Signature, signature
 from itertools import repeat
-from typing import Any, Callable, Literal, TypeGuard, TypeVar, Union, get_args, get_origin
+from typing import Any, Callable, Literal, TypeGuard, TypeVar, Union, get_args, get_origin, get_type_hints
 
 from more_itertools import take
 
@@ -28,6 +28,14 @@ if sys.version_info >= (3, 13):  # pragma: no cover
     _type_narrowing_origins.add(TypeIs)
 
 _union_origins: set = {Union, types.UnionType}
+
+
+def resolved_signature(f: Callable) -> Signature:
+    # get_type_hints also resolves nested string annotations, e.g. x: "str" under `from __future__ import annotations`
+    sig = signature(f)
+    hints = get_type_hints(f)
+    parameters = [p.replace(annotation=hints.get(name, p.annotation)) for name, p in sig.parameters.items()]
+    return sig.replace(parameters=parameters, return_annotation=hints.get("return", sig.return_annotation))
 
 
 def annotation_to_predicate(annotation: Any) -> Predicate:  # noqa: C901
@@ -72,7 +80,7 @@ def get_return_predicate(sig: Signature) -> Predicate:
 
 def validate_args(f: Callable, spec: Spec) -> dict[str, Predicate]:
     parameters = spec["args"]
-    sig = signature(f, eval_str=True)
+    sig = resolved_signature(f)
 
     for key, _ in parameters.items():
         if key not in sig.parameters:
@@ -83,7 +91,7 @@ def validate_args(f: Callable, spec: Spec) -> dict[str, Predicate]:
 
 def get_return_spec(f: Callable, spec: Spec) -> Spec:
     if not spec.get("ret"):
-        sig = signature(f, eval_str=True)
+        sig = resolved_signature(f)
 
         if sig.return_annotation == sig.empty:
             raise AssertionError("Return annotation not in spec")
@@ -92,9 +100,8 @@ def get_return_spec(f: Callable, spec: Spec) -> Spec:
 
 
 def check_signature_against_spec(f: Callable, spec: Spec) -> Spec:
-    from inspect import signature
 
-    sig = signature(f, eval_str=True)
+    sig = resolved_signature(f)
 
     parameters = validate_args(f, spec)
 

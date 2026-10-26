@@ -60,3 +60,14 @@ def test_exercise_postponed():
         return x + y
 
     assert list(exercise(adder, n=3))
+
+
+def test_instrument_postponed_quoted_annotations():
+    @instrument
+    def total(x: "list[int]", y: list["int"]) -> "int":
+        return sum(x) + sum(y)
+
+    assert total([1], [2]) == 3
+
+    with pytest.raises(ValueError, match="Parameter predicate for function total failed"):
+        total([1], ["2"])
