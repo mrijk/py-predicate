@@ -541,3 +541,14 @@ def test_is_instrumented_false() -> None:
         return x
 
     assert not is_instrumented(f)
+
+
+def test_instrument_quoted_annotations():
+    @instrument
+    def length(x: "str") -> "int":
+        return len(x)
+
+    assert length("ab") == 2
+
+    with pytest.raises(ValueError, match="Parameter predicate for function length failed"):
+        length(1)
