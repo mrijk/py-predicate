@@ -55,6 +55,10 @@ def _check_args(spec: Spec, func_name: str, arguments: dict) -> str | None:
         if name in arguments:
             if reason := _get_reason(predicate, value=arguments[name]):
                 return f"Parameter predicate for function {func_name} failed. Reason: {reason}"
+
+    if (pre := spec.get("pre")) and not pre(**arguments):
+        args_str = ", ".join(f"{k}={v!r}" for k, v in arguments.items())
+        return f"pre condition for function {func_name} failed. Arguments: {args_str}"
     return None
 
 

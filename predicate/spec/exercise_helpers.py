@@ -124,7 +124,11 @@ def generate_values(spec: Spec, n: int) -> tuple:
     parameters = spec["args"]
     return_p = spec["ret"]
     if predicates := tuple(parameters.items()):
-        values = take(n, generate_true(is_dict_of_p(*predicates)))
+        candidates = generate_true(is_dict_of_p(*predicates))
+        # ponytail: rejection sampling, hangs if pre is (almost) never true for generated values
+        if pre := spec.get("pre"):
+            candidates = (value for value in candidates if pre(**value))
+        values = take(n, candidates)
     else:
         values = take(n, repeat({}))
     return return_p, values

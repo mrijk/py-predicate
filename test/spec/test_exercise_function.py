@@ -344,3 +344,16 @@ async def test_exercise_async_function_with_fn_p_fail():
     with pytest.raises(AssertionError, match="^Not conform spec:"):
         async for _ in exercise(max_int, spec=spec, n=100):
             pass
+
+
+def test_exercise_with_pre():
+    def span(lo, hi):
+        assert lo <= hi
+        return hi - lo
+
+    spec: Spec = {"args": {"lo": is_int_p, "hi": is_int_p}, "ret": is_int_p, "pre": lambda lo, hi: lo <= hi}
+
+    results = list(exercise(span, spec=spec))
+
+    assert len(results) == 10
+    assert all(ret >= 0 for _, ret in results)

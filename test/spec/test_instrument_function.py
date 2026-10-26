@@ -111,6 +111,27 @@ def test_instrument_fn_p_constraint_fails():
         bad_add(2, 3)
 
 
+def test_instrument_pre_ok():
+    @instrument({"args": {}, "pre": lambda lo, hi: lo <= hi})
+    def make_range(lo: int, hi: int) -> range:
+        return range(lo, hi)
+
+    assert make_range(1, 3) == range(1, 3)
+
+
+def test_instrument_pre_fails_before_call():
+    calls = []
+
+    @instrument({"args": {}, "pre": lambda lo, hi: lo <= hi})
+    def make_range(lo: int, hi: int) -> range:
+        calls.append((lo, hi))
+        return range(lo, hi)
+
+    with pytest.raises(ValueError, match="pre condition for function make_range failed. Arguments: lo=3, hi=1"):
+        make_range(3, 1)
+    assert calls == []
+
+
 def test_instrument_decorator():
     @instrument
     def add(x: int, y: int) -> int:

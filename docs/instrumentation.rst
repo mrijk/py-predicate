@@ -37,6 +37,16 @@ Spec keys
     Predicate that the return value is evaluated against. Omit if you only want to constrain
     arguments or the relationship between inputs and output.
 
+``pre`` *(optional)*
+    A callable that receives all arguments as keyword arguments and returns a ``bool``. It is
+    checked *before* the function is called, so use it for relations between arguments. A
+    failure is reported through ``on_error``. ``exercise`` only generates inputs for which
+    ``pre`` holds.
+
+    .. code-block:: python
+
+        "pre": lambda lo, hi: lo <= hi
+
 ``fn`` *(optional)*
     A callable that receives all arguments plus ``ret`` as keyword arguments and returns a
     ``bool``. Use this to express how inputs and the return value relate to each other.
