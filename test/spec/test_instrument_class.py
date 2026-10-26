@@ -131,3 +131,33 @@ def test_instrument_class_skips_already_instrumented_method():
 
     with pytest.raises(ValueError, match="Parameter predicate"):
         calc.negate("bad")  # type: ignore[arg-type]
+
+
+def test_instrument_class_staticmethod():
+    class C:
+        @staticmethod
+        def s(x: int) -> int:
+            return x
+
+    instrument_class(C)
+
+    assert C().s(1) == 1
+    assert C.s(1) == 1
+
+    with pytest.raises(ValueError, match="Parameter predicate"):
+        C.s("bad")  # type: ignore[arg-type]
+
+
+def test_instrument_class_classmethod():
+    class C:
+        @classmethod
+        def c(cls, x: int) -> int:
+            return "oops"  # type: ignore[return-value]
+
+    instrument_class(C)
+
+    with pytest.raises(ValueError, match="Return predicate"):
+        C.c(1)
+
+    with pytest.raises(ValueError, match="Return predicate"):
+        C().c(1)
