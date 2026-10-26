@@ -1,6 +1,6 @@
 import sys
 from fnmatch import fnmatch
-from functools import wraps
+from functools import cache, wraps
 from inspect import getmembers, isclass, isfunction, signature, unwrap
 from types import ModuleType
 from typing import Any, Callable
@@ -10,12 +10,15 @@ from more_itertools import consume, side_effect
 from predicate.explain import explain
 from predicate.is_async_predicate import is_async_p
 from predicate.predicate import Predicate
-from predicate.spec.exercise_helpers import annotation_to_predicate, get_return_predicate
+from predicate.spec.exercise_helpers import annotation_to_predicate, get_return_predicate, resolved_signature
 from predicate.spec.spec import Spec
 
 
 def enrich_spec(func: Callable, spec: Spec) -> Spec:
-    sig = signature(func)
+    try:
+        sig = resolved_signature(func)
+    except NameError as e:
+        raise NameError(f"Cannot resolve annotations of {func.__qualname__}: {e}") from e
 
     args = dict(spec["args"])
     for name, param in sig.parameters.items():
@@ -103,7 +106,8 @@ def instrument_function(func: Callable, spec: Spec, on_error: OnError = _default
         return func
     func = unwrap(func)
     func_name = func.__name__
-    spec = enrich_spec(func, spec)
+    # resolved on first call, so forward references (e.g. the enclosing class) exist by then
+    resolved_spec = cache(lambda: enrich_spec(func, spec))
 
     if is_async_p(func):
 
@@ -113,6 +117,7 @@ def instrument_function(func: Callable, spec: Spec, on_error: OnError = _default
             bound.apply_defaults()
 
             arguments = bound.arguments
+            spec = resolved_spec()
             if error := _check_args(spec, func_name, arguments):
                 on_error(error)
 
@@ -138,6 +143,7 @@ def instrument_function(func: Callable, spec: Spec, on_error: OnError = _default
             bound.apply_defaults()
 
             arguments = bound.arguments
+            spec = resolved_spec()
             if error := _check_args(spec, func_name, arguments):
                 on_error(error)
 
