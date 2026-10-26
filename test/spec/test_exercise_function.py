@@ -357,3 +357,15 @@ def test_exercise_with_pre():
 
     assert len(results) == 10
     assert all(ret >= 0 for _, ret in results)
+
+
+def test_exercise_raises_spec_violation():
+    from predicate import SpecViolationError
+
+    def double(x):
+        return x * 3
+
+    spec: Spec = {"args": {"x": is_int_p}, "ret": is_int_p, "fn": lambda x, ret: ret == x * 2}
+
+    with pytest.raises(SpecViolationError, match="fn constraint failed"):
+        list(exercise(double, spec=spec))

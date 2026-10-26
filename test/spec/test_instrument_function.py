@@ -552,3 +552,14 @@ def test_instrument_quoted_annotations():
 
     with pytest.raises(ValueError, match="Parameter predicate for function length failed"):
         length(1)
+
+
+def test_instrument_raises_spec_violation():
+    from predicate import SpecViolationError
+
+    @instrument
+    def double(x: int) -> int:
+        return x * 2
+
+    with pytest.raises(SpecViolationError, match="Parameter predicate for function double failed"):
+        double("a")
