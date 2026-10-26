@@ -202,7 +202,9 @@ def instrument_module(module: ModuleType, pattern: str | None = None, on_error: 
 
 
 def instrument_class(cls: type, pattern: str | None = None, on_error: OnError = _default_on_error) -> None:
-    for name, func in getmembers(cls, isfunction):
-        if not is_instrumented(func) and (pattern is None or fnmatch(name, pattern)):
+    for name, member in list(vars(cls).items()):
+        descriptor = type(member) if isinstance(member, (staticmethod, classmethod)) else None
+        func = member.__func__ if descriptor else member
+        if isfunction(func) and not is_instrumented(func) and (pattern is None or fnmatch(name, pattern)):
             wrapped = instrument_function(func, _EMPTY_SPEC, on_error)
-            setattr(cls, name, wrapped)
+            setattr(cls, name, descriptor(wrapped) if descriptor else wrapped)
