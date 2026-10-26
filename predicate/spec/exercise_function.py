@@ -2,6 +2,7 @@ from typing import AsyncIterator, Callable, Iterator, TypeVar
 
 from predicate import always_true_p, is_instance_p
 from predicate.spec.exercise_helpers import (
+    check_exception,
     check_signature_against_spec,
     generate_values,
     get_return_predicate,
@@ -46,7 +47,11 @@ def exercise_function(f: Callable, spec: Spec | None, n: int) -> Iterator[tuple]
     return_p, values = generate_values(spec, n)
 
     for value in values:
-        result = f(**value)
+        try:
+            result = f(**value)
+        except Exception as exc:
+            yield tuple(value.values()), check_exception(spec, value, exc)
+            continue
         verify_result(spec, return_p, value, result)
         yield tuple(value.values()), result
 
@@ -56,6 +61,10 @@ async def async_exercise_function(f: Callable, spec: Spec | None, n: int) -> Asy
     return_p, values = generate_values(spec, n)
 
     for value in values:
-        result = await f(**value)
+        try:
+            result = await f(**value)
+        except Exception as exc:
+            yield tuple(value.values()), check_exception(spec, value, exc)
+            continue
         verify_result(spec, return_p, value, result)
         yield tuple(value.values()), result

@@ -5,6 +5,7 @@ import pytest
 from predicate import ge_p, is_bool_p, is_float_p, is_int_p, pos_p, zero_p
 from predicate.predicate import Predicate
 from predicate.spec.exercise import Spec, exercise
+from predicate.spec.spec import SpecViolationError
 
 
 def test_exercise_zero_p():
@@ -106,7 +107,7 @@ def test_exercise_class_wrong_return():
         def __call__(self, x: int) -> int:
             return None  # type: ignore[return-value]
 
-    with pytest.raises(AssertionError):
+    with pytest.raises(SpecViolationError):
         list(exercise(BadReturn()))
 
 
@@ -131,7 +132,7 @@ def test_exercise_class_with_fn_fail():
 
     spec: Spec = {"args": {"x": is_int_p}, "ret": is_int_p, "fn": lambda x, ret: ret == x * 2}
 
-    with pytest.raises(AssertionError, match="^Not conform spec: fn constraint failed for inputs"):
+    with pytest.raises(SpecViolationError, match="^Not conform spec: fn constraint failed for inputs"):
         list(exercise(Doubler(), spec=spec))
 
 
@@ -156,7 +157,7 @@ def test_exercise_class_with_fn_p_fail():
 
     spec: Spec = {"args": {"x": is_int_p}, "ret": is_int_p, "fn_p": lambda x: ge_p(x)}
 
-    with pytest.raises(AssertionError, match="^Not conform spec:"):
+    with pytest.raises(SpecViolationError, match="^Not conform spec:"):
         list(exercise(Doubler(), spec=spec))
 
 
@@ -240,7 +241,7 @@ async def test_exercise_async_class_wrong_return():
         async def __call__(self, x: int) -> int:
             return None  # type: ignore[return-value]
 
-    with pytest.raises(AssertionError):
+    with pytest.raises(SpecViolationError):
         async for _ in exercise(AsyncBadReturn()):
             pass
 
@@ -265,7 +266,7 @@ async def test_exercise_async_class_with_fn_fail():
 
     spec: Spec = {"args": {"x": is_int_p}, "ret": is_int_p, "fn": lambda x, ret: ret == x * 2}
 
-    with pytest.raises(AssertionError, match="^Not conform spec: fn constraint failed for inputs"):
+    with pytest.raises(SpecViolationError, match="^Not conform spec: fn constraint failed for inputs"):
         async for _ in exercise(AsyncDoubler(), spec=spec):
             pass
 
@@ -290,6 +291,30 @@ async def test_exercise_async_class_with_fn_p_fail():
 
     spec: Spec = {"args": {"x": is_int_p}, "ret": is_int_p, "fn_p": lambda x: ge_p(x)}
 
-    with pytest.raises(AssertionError, match="^Not conform spec:"):
+    with pytest.raises(SpecViolationError, match="^Not conform spec:"):
         async for _ in exercise(AsyncDoubler(), spec=spec):
             pass
+
+
+def test_exercise_class_raises_expected():
+    class Foo:
+        def __call__(self, x: int) -> bool:
+            raise ValueError
+
+    spec: Spec = {"args": {"x": is_int_p}, "ret": is_bool_p, "raises": ValueError}
+
+    result = list(exercise(Foo(), spec=spec))
+
+    assert all(isinstance(r, ValueError) for _, r in result)
+
+
+@pytest.mark.asyncio
+async def test_exercise_async_class_raises_unexpected():
+    class Foo:
+        async def __call__(self, x: int) -> bool:
+            raise KeyError
+
+    spec: Spec = {"args": {"x": is_int_p}, "ret": is_bool_p, "raises": ValueError}
+
+    with pytest.raises(SpecViolationError):
+        [r async for r in exercise(Foo(), spec=spec)]

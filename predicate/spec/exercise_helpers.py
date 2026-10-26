@@ -18,7 +18,7 @@ from predicate.list_of_predicate import is_list_of_p
 from predicate.or_predicate import or_p
 from predicate.predicate import Predicate
 from predicate.set_of_predicate import is_set_of_p
-from predicate.spec.spec import Spec, SpecViolationError
+from predicate.spec.spec import InvalidSpecError, Spec, SpecViolationError
 from predicate.tuple_of_predicate import is_tuple_of_p
 
 _type_narrowing_origins: set = {TypeGuard}
@@ -85,7 +85,7 @@ def validate_args(f: Callable, spec: Spec) -> dict[str, Predicate]:
 
     for key, _ in parameters.items():
         if key not in sig.parameters:
-            raise AssertionError(f"Parameter '{key}' not in function signature")
+            raise InvalidSpecError(f"Parameter '{key}' not in function signature")
 
     return parameters
 
@@ -95,7 +95,7 @@ def get_return_spec(f: Callable, spec: Spec) -> Spec:
         sig = resolved_signature(f)
 
         if sig.return_annotation == sig.empty:
-            raise AssertionError("Return annotation not in spec")
+            raise InvalidSpecError("Return annotation not in spec")
         return spec | {"ret": is_instance_p(sig.return_annotation)}
     return spec
 
@@ -113,17 +113,17 @@ def check_signature_against_spec(f: Callable, spec: Spec) -> Spec:
         annotation = parameter.annotation
         if annotation == parameter.empty:
             if key not in parameters:
-                raise AssertionError(f"Unannotated parameter '{key}' not in spec")
+                raise InvalidSpecError(f"Unannotated parameter '{key}' not in spec")
         elif type(annotation) is TypeVar:
             if key not in parameters:
-                raise AssertionError(f"Unannotated parameter '{key}' not in spec")
+                raise InvalidSpecError(f"Unannotated parameter '{key}' not in spec")
         else:
             annotation_p = is_instance_p(annotation)
             if key not in parameters:
                 parameters[key] = annotation_p
             else:
                 if not implies(parameters[key], annotation_p):
-                    raise AssertionError("Spec predicate is not a constrained annotation")
+                    raise InvalidSpecError("Spec predicate is not a constrained annotation")
 
     return spec
 
@@ -154,3 +154,14 @@ def verify_result(spec: Spec, return_p: Predicate, value: dict, result) -> None:
         fn_p_result = fn_p(**value)
         if not fn_p_result(result):
             raise SpecViolationError(f"Not conform spec: {explain(fn_p_result, result)}")
+
+
+def check_exception(spec: Spec, value: dict, exc: Exception) -> Exception:
+    expected = spec.get("raises")
+    if not expected:
+        raise exc
+    if not isinstance(exc, expected):
+        raise SpecViolationError(
+            f"Not conform spec: unexpected exception {type(exc).__name__} for inputs {value}"
+        ) from exc
+    return exc
