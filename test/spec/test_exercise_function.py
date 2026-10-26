@@ -3,8 +3,9 @@ from typing import TypeVar
 
 import pytest
 
-from predicate import ge_p, is_int_p, is_str_p, pos_p
+from predicate import ge_p, is_float_p, is_int_p, is_str_p, pos_p
 from predicate.spec.exercise import Spec, exercise
+from predicate.spec.spec import InvalidSpecError, SpecViolationError
 
 
 def test_exercise_happy():
@@ -61,7 +62,7 @@ def test_exercise_with_fn_fail():
         "fn": lambda x, y, ret: ret >= x and ret >= y,
     }
 
-    with pytest.raises(AssertionError, match="^Not conform spec: fn constraint failed for inputs"):
+    with pytest.raises(SpecViolationError, match="^Not conform spec: fn constraint failed for inputs"):
         list(exercise(max_int, spec=spec, n=100))
 
 
@@ -81,7 +82,7 @@ def test_exercise_with_fn_p_fail():
 
     spec: Spec = {"args": {"x": is_int_p, "y": is_int_p}, "ret": is_int_p, "fn_p": lambda x, y: ge_p(x) & ge_p(y)}
 
-    with pytest.raises(AssertionError, match="^Not conform spec:"):
+    with pytest.raises(SpecViolationError, match="^Not conform spec:"):
         list(exercise(max_int, spec=spec, n=100))
 
 
@@ -93,7 +94,7 @@ def test_exercise_missing_return_annotation_in_spec():
         "args": {"x": is_int_p, "y": is_int_p},
     }
 
-    with pytest.raises(AssertionError, match="Return annotation not in spec"):
+    with pytest.raises(InvalidSpecError, match="Return annotation not in spec"):
         list(exercise(adder, spec=spec))
 
 
@@ -124,7 +125,7 @@ def test_exercise_unannotated_parameter_in_spec():
         "ret": is_int_p,
     }
 
-    with pytest.raises(AssertionError, match="Unannotated parameter 'y' not in spec"):
+    with pytest.raises(InvalidSpecError, match="Unannotated parameter 'y' not in spec"):
         list(exercise(adder, spec=spec))
 
 
@@ -134,7 +135,7 @@ def test_exercise_wrong_parameter_name():
 
     spec: Spec = {"args": {"x": is_int_p, "z": is_int_p}, "ret": is_int_p}
 
-    with pytest.raises(AssertionError, match="Parameter 'z' not in function signature"):
+    with pytest.raises(InvalidSpecError, match="Parameter 'z' not in function signature"):
         list(exercise(adder, spec=spec))
 
 
@@ -151,7 +152,7 @@ def test_exercise_wrong_return():
     }
 
     with pytest.raises(
-        AssertionError,
+        SpecViolationError,
         match=re.escape("Not conform spec: {'result': False, 'reason': 'None is not an instance of type int'}"),
     ):
         list(exercise(adder, spec=spec))
@@ -200,7 +201,7 @@ def test_exercise_with_constrained_spec_fail():
         "ret": is_int_p,
     }
 
-    with pytest.raises(AssertionError, match="Spec predicate is not a constrained annotation"):
+    with pytest.raises(InvalidSpecError, match="Spec predicate is not a constrained annotation"):
         list(exercise(adder, spec=spec))
 
 
@@ -266,7 +267,7 @@ async def test_exercise_async_wrong_return():
     async def adder(x: int, y: int) -> int:
         return None  # type: ignore[return-value]
 
-    with pytest.raises(AssertionError):
+    with pytest.raises(SpecViolationError):
         async for _ in exercise(adder):
             pass
 
@@ -307,7 +308,7 @@ async def test_exercise_async_function_with_fn_fail():
         "fn": lambda x, y, ret: ret >= x and ret >= y,
     }
 
-    with pytest.raises(AssertionError, match="^Not conform spec: fn constraint failed for inputs"):
+    with pytest.raises(SpecViolationError, match="^Not conform spec: fn constraint failed for inputs"):
         async for _ in exercise(max_int, spec=spec, n=100):
             pass
 
@@ -330,7 +331,7 @@ def test_exercise_function_typevar_param_not_in_spec():
         return 0
 
     spec: Spec = {"args": {}, "ret": is_int_p}
-    with pytest.raises(AssertionError, match="not in spec"):
+    with pytest.raises(InvalidSpecError, match="not in spec"):
         list(exercise(identity, spec=spec))
 
 
@@ -341,7 +342,7 @@ async def test_exercise_async_function_with_fn_p_fail():
 
     spec: Spec = {"args": {"x": is_int_p, "y": is_int_p}, "ret": is_int_p, "fn_p": lambda x, y: ge_p(x) & ge_p(y)}
 
-    with pytest.raises(AssertionError, match="^Not conform spec:"):
+    with pytest.raises(SpecViolationError, match="^Not conform spec:"):
         async for _ in exercise(max_int, spec=spec, n=100):
             pass
 
@@ -369,3 +370,48 @@ def test_exercise_raises_spec_violation():
 
     with pytest.raises(SpecViolationError, match="fn constraint failed"):
         list(exercise(double, spec=spec))
+
+
+def test_exercise_raises_expected():
+    def inverse(x):
+        if x == 0:
+            raise ZeroDivisionError
+        return 1 / x
+
+    spec: Spec = {"args": {"x": is_int_p}, "ret": is_float_p, "raises": ZeroDivisionError}
+
+    result = list(exercise(inverse, spec=spec, n=50))
+
+    assert any(isinstance(r, ZeroDivisionError) for _, r in result)
+
+
+def test_exercise_raises_unexpected():
+    def fail(x):
+        raise KeyError
+
+    spec: Spec = {"args": {"x": is_int_p}, "ret": is_int_p, "raises": ValueError}
+
+    with pytest.raises(SpecViolationError, match="unexpected exception KeyError"):
+        list(exercise(fail, spec=spec))
+
+
+def test_exercise_raises_without_spec():
+    def fail(x):
+        raise KeyError
+
+    spec: Spec = {"args": {"x": is_int_p}, "ret": is_int_p}
+
+    with pytest.raises(KeyError):
+        list(exercise(fail, spec=spec))
+
+
+@pytest.mark.asyncio
+async def test_exercise_async_raises_expected():
+    async def fail(x):
+        raise ValueError
+
+    spec: Spec = {"args": {"x": is_int_p}, "ret": is_int_p, "raises": (KeyError, ValueError)}
+
+    result = [r async for r in exercise(fail, spec=spec)]
+
+    assert all(isinstance(r, ValueError) for _, r in result)

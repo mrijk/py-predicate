@@ -117,7 +117,7 @@ from predicate.spec.instrument import (
     instrument_module,
     is_instrumented,
 )
-from predicate.spec.spec import Spec, SpecViolationError
+from predicate.spec.spec import InvalidSpecError, Spec, SpecViolationError
 from predicate.standard_predicates import (
     is_dict_p,
     is_float_p,
@@ -181,6 +181,7 @@ __all__ = [
     "instrument_function",
     "instrument_module",
     "is_instrumented",
+    "InvalidSpecError",
     "Spec",
     "SpecViolationError",
     "is_alnum_p",

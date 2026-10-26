@@ -10,6 +10,13 @@ class SpecViolationError(ValueError, AssertionError):
     """
 
 
+class InvalidSpecError(AssertionError):
+    """Raised when a Spec itself is invalid, e.g. it doesn't match the function signature.
+
+    Subclasses AssertionError for backwards compatibility.
+    """
+
+
 Spec = TypedDict(
     "Spec",
     {

@@ -371,6 +371,9 @@ handle spec failures specifically:
     except SpecViolationError as e:
         print(e)
 
+A spec that is itself invalid (e.g. it names a parameter the function doesn't have) makes ``exercise`` raise
+``InvalidSpecError``, also an ``AssertionError`` subclass.
+
 Pass ``on_error`` to override:
 
 .. code-block:: python
