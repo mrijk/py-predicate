@@ -11,7 +11,7 @@ from predicate.explain import explain
 from predicate.is_async_predicate import is_async_p
 from predicate.predicate import Predicate
 from predicate.spec.exercise_helpers import annotation_to_predicate, get_return_predicate, resolved_signature
-from predicate.spec.spec import Spec
+from predicate.spec.spec import Spec, SpecViolationError
 
 
 def enrich_spec(func: Callable, spec: Spec) -> Spec:
@@ -39,7 +39,7 @@ _EMPTY_SPEC: Spec = {"args": {}}
 
 
 def _default_on_error(message: str) -> None:
-    raise ValueError(message)
+    raise SpecViolationError(message)
 
 
 def is_instrumented(func: Callable) -> bool:

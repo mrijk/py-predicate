@@ -358,7 +358,20 @@ An optional ``pattern`` argument (fnmatch-style) limits which functions are inst
 Custom error handling
 ---------------------
 
-By default, spec violations raise ``ValueError``. Pass ``on_error`` to override:
+By default, spec violations raise ``SpecViolationError``. It subclasses both ``ValueError`` and
+``AssertionError``, so existing handlers keep working; ``exercise`` raises it too. Catch it to
+handle spec failures specifically:
+
+.. code-block:: python
+
+    from predicate import SpecViolationError
+
+    try:
+        add("oops", 1)
+    except SpecViolationError as e:
+        print(e)
+
+Pass ``on_error`` to override:
 
 .. code-block:: python
 

@@ -18,7 +18,7 @@ from predicate.list_of_predicate import is_list_of_p
 from predicate.or_predicate import or_p
 from predicate.predicate import Predicate
 from predicate.set_of_predicate import is_set_of_p
-from predicate.spec.spec import Spec
+from predicate.spec.spec import Spec, SpecViolationError
 from predicate.tuple_of_predicate import is_tuple_of_p
 
 _type_narrowing_origins: set = {TypeGuard}
@@ -144,13 +144,13 @@ def generate_values(spec: Spec, n: int) -> tuple:
 
 def verify_result(spec: Spec, return_p: Predicate, value: dict, result) -> None:
     if not return_p(result):
-        raise AssertionError(f"Not conform spec: {explain(return_p, result)}")
+        raise SpecViolationError(f"Not conform spec: {explain(return_p, result)}")
 
     if fn := spec.get("fn"):
         if not fn(**value, ret=result):
-            raise AssertionError(f"Not conform spec: fn constraint failed for inputs {value} -> {result}")
+            raise SpecViolationError(f"Not conform spec: fn constraint failed for inputs {value} -> {result}")
 
     if fn_p := spec.get("fn_p"):
         fn_p_result = fn_p(**value)
         if not fn_p_result(result):
-            raise AssertionError(f"Not conform spec: {explain(fn_p_result, result)}")
+            raise SpecViolationError(f"Not conform spec: {explain(fn_p_result, result)}")
