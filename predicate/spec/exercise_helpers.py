@@ -1,6 +1,6 @@
 import sys
 import types
-from inspect import Signature, signature
+from inspect import Signature, isroutine, signature
 from itertools import repeat
 from typing import Any, Callable, Literal, TypeGuard, TypeVar, Union, get_args, get_origin, get_type_hints
 
@@ -33,7 +33,8 @@ _union_origins: set = {Union, types.UnionType}
 def resolved_signature(f: Callable) -> Signature:
     # get_type_hints also resolves nested string annotations, e.g. x: "str" under `from __future__ import annotations`
     sig = signature(f)
-    hints = get_type_hints(f)
+    # Python < 3.14 get_type_hints rejects callable instances, so read the hints from their __call__
+    hints = get_type_hints(f if isroutine(f) else type(f).__call__)
     parameters = [p.replace(annotation=hints.get(name, p.annotation)) for name, p in sig.parameters.items()]
     return sig.replace(parameters=parameters, return_annotation=hints.get("return", sig.return_annotation))
 
