@@ -5,7 +5,7 @@ from decimal import Decimal
 from fractions import Fraction
 from functools import partial
 from ipaddress import IPv4Address, IPv6Address
-from typing import Any, Callable, Iterable, Iterator, final
+from typing import Any, Callable, ClassVar, Iterable, Iterator, final
 from uuid import UUID
 
 from more_itertools import spy
@@ -14,6 +14,9 @@ from more_itertools import spy
 @dataclass
 class Predicate[T]:
     """An abstract class to represent a predicate."""
+
+    # Python operator precedence, used by repr to add parentheses: | < ^ < & < ~ < atoms
+    precedence: ClassVar[int] = 5
 
     @abstractmethod
     def __call__(self, *args, **kwargs) -> bool:
@@ -73,6 +76,11 @@ class Predicate[T]:
 
     def consumes(self, iterable: Iterable[Any]) -> Iterator[int]:
         raise NotImplementedError
+
+
+def repr_operand(predicate: Predicate, precedence: int) -> str:
+    """Return repr of predicate, parenthesized if it binds looser than precedence."""
+    return f"({predicate!r})" if predicate.precedence < precedence else repr(predicate)
 
 
 def resolve_predicate[T](predicate: Predicate[T]) -> Predicate[T]:

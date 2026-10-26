@@ -1,7 +1,7 @@
 from dataclasses import dataclass
-from typing import override
+from typing import ClassVar, override
 
-from predicate.predicate import Predicate
+from predicate.predicate import Predicate, repr_operand
 
 
 @dataclass
@@ -20,6 +20,8 @@ class XorPredicate[T](Predicate[T]):
     left: Predicate[T]
     right: Predicate[T]
 
+    precedence: ClassVar[int] = 2
+
     def __call__(self, x: T) -> bool:
         return self.left(x) ^ self.right(x)
 
@@ -31,7 +33,7 @@ class XorPredicate[T](Predicate[T]):
                 return False
 
     def __repr__(self) -> str:
-        return f"{self.left!r} ^ {self.right!r}"
+        return f"{repr_operand(self.left, 2)} ^ {repr_operand(self.right, 3)}"
 
     def __contains__(self, predicate: Predicate[T]) -> bool:
         return predicate == self or predicate in self.left or predicate in self.right
