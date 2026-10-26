@@ -72,7 +72,7 @@ def get_return_predicate(sig: Signature) -> Predicate:
 
 def validate_args(f: Callable, spec: Spec) -> dict[str, Predicate]:
     parameters = spec["args"]
-    sig = signature(f)
+    sig = signature(f, eval_str=True)
 
     for key, _ in parameters.items():
         if key not in sig.parameters:
@@ -83,7 +83,7 @@ def validate_args(f: Callable, spec: Spec) -> dict[str, Predicate]:
 
 def get_return_spec(f: Callable, spec: Spec) -> Spec:
     if not spec.get("ret"):
-        sig = signature(f)
+        sig = signature(f, eval_str=True)
 
         if sig.return_annotation == sig.empty:
             raise AssertionError("Return annotation not in spec")
@@ -94,7 +94,7 @@ def get_return_spec(f: Callable, spec: Spec) -> Spec:
 def check_signature_against_spec(f: Callable, spec: Spec) -> Spec:
     from inspect import signature
 
-    sig = signature(f)
+    sig = signature(f, eval_str=True)
 
     parameters = validate_args(f, spec)
 

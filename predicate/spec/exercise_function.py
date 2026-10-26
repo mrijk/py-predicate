@@ -12,7 +12,7 @@ from predicate.spec.spec import Spec
 
 
 def get_spec_from_function_annotation(f: Callable) -> Spec | None:
-    sig = signature(f)
+    sig = signature(f, eval_str=True)
 
     if sig.return_annotation == sig.empty:
         return None
