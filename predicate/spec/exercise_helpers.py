@@ -1,10 +1,11 @@
 import sys
 import types
 from inspect import Parameter, Signature, isroutine, signature
-from itertools import islice, repeat
+from itertools import islice, repeat, takewhile
 from typing import (
     Any,
     Callable,
+    Iterator,
     Literal,
     LiteralString,
     Never,
@@ -164,26 +165,25 @@ def var_positional_p(parameter: Parameter, predicate: Predicate) -> Predicate:
     return all_p(predicate) if parameter.kind == Parameter.VAR_POSITIONAL else predicate
 
 
+_positional_kinds = (Parameter.POSITIONAL_ONLY, Parameter.POSITIONAL_OR_KEYWORD, Parameter.VAR_POSITIONAL)
+
+
+def _positional_values(param: Parameter, arg) -> Iterator:
+    yield from arg if param.kind == Parameter.VAR_POSITIONAL else [arg]
+
+
+def _keyword_items(param: Parameter, arg) -> Iterator[tuple[str, Any]]:
+    yield from arg.items() if param.kind == Parameter.VAR_KEYWORD else [(param.name, arg)]
+
+
 def call_args(sig: Signature, value: dict) -> tuple[list, dict]:
     # Leading parameters go positionally (in signature order) so *args and positional-only parameters bind correctly
-    args: list = []
-    kwargs: dict = {}
-    positional = True
-    for name, param in sig.parameters.items():
-        if name not in value:
-            positional = False
-            continue
-        match param.kind:
-            case Parameter.POSITIONAL_ONLY:
-                args.append(value[name])
-            case Parameter.POSITIONAL_OR_KEYWORD if positional:
-                args.append(value[name])
-            case Parameter.VAR_POSITIONAL:
-                args.extend(value[name])
-            case Parameter.VAR_KEYWORD:
-                kwargs.update(value[name])
-            case _:
-                kwargs[name] = value[name]
+    positional = list(
+        takewhile(lambda param: param.name in value and param.kind in _positional_kinds, sig.parameters.values())
+    )
+    keyword = [param for param in list(sig.parameters.values())[len(positional) :] if param.name in value]
+    args = [arg for param in positional for arg in _positional_values(param, value[param.name])]
+    kwargs = dict(item for param in keyword for item in _keyword_items(param, value[param.name]))
     return args, kwargs
 
 
