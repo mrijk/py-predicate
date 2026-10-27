@@ -3,7 +3,7 @@ from typing import TypeVar
 
 import pytest
 
-from predicate import ge_p, is_float_p, is_int_p, is_str_p, pos_p
+from predicate import all_p, ge_p, is_float_p, is_int_p, is_str_p, pos_p
 from predicate.spec.exercise import Spec, exercise
 from predicate.spec.spec import InvalidSpecError, SpecViolationError
 
@@ -444,3 +444,33 @@ def test_exercise_with_fn_ret_name_clash():
 
     with pytest.raises(InvalidSpecError, match="Parameter 'ret' clashes"):
         list(exercise(r, spec=spec, n=5))
+
+
+def test_exercise_var_positional():
+    def total(*xs: int) -> int:
+        return sum(xs)
+
+    assert list(exercise(total, n=3))
+
+
+def test_exercise_positional_only():
+    def double(x: int, /) -> int:
+        return 2 * x
+
+    assert list(exercise(double, n=3))
+
+
+def test_exercise_positional_and_var_positional():
+    def total(x: int, *xs: int, scale: int) -> int:
+        return (x + sum(xs)) * scale
+
+    assert list(exercise(total, n=3))
+
+
+def test_exercise_var_positional_with_spec():
+    def total(*xs):
+        return sum(xs)
+
+    spec: Spec = {"args": {"xs": all_p(is_int_p)}, "ret": is_int_p}
+
+    assert list(exercise(total, spec=spec, n=3))

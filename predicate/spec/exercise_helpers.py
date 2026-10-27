@@ -1,6 +1,6 @@
 import sys
 import types
-from inspect import Signature, isroutine, signature
+from inspect import Parameter, Signature, isroutine, signature
 from itertools import islice, repeat
 from typing import (
     Any,
@@ -19,7 +19,7 @@ from typing import (
 
 from more_itertools import first, take
 
-from predicate import always_false_p, always_true_p, generate_true, is_instance_p
+from predicate import all_p, always_false_p, always_true_p, generate_true, is_instance_p
 from predicate.dict_of_predicate import is_dict_of_p
 from predicate.explain import explain
 from predicate.frozendict_of_predicate import is_frozendict_of_p
@@ -150,7 +150,7 @@ def check_signature_against_spec(f: Callable, spec: Spec) -> Spec:
             if key not in parameters:
                 raise InvalidSpecError(f"Unannotated parameter '{key}' not in spec")
         else:
-            annotation_p = is_instance_p(annotation)
+            annotation_p = var_positional_p(parameter, is_instance_p(annotation))
             if key not in parameters:
                 parameters[key] = annotation_p
             else:
@@ -158,6 +158,33 @@ def check_signature_against_spec(f: Callable, spec: Spec) -> Spec:
                     raise InvalidSpecError("Spec predicate is not a constrained annotation")
 
     return spec
+
+
+def var_positional_p(parameter: Parameter, predicate: Predicate) -> Predicate:
+    return all_p(predicate) if parameter.kind == Parameter.VAR_POSITIONAL else predicate
+
+
+def call_args(sig: Signature, value: dict) -> tuple[list, dict]:
+    # Leading parameters go positionally (in signature order) so *args and positional-only parameters bind correctly
+    args: list = []
+    kwargs: dict = {}
+    positional = True
+    for name, param in sig.parameters.items():
+        if name not in value:
+            positional = False
+            continue
+        match param.kind:
+            case Parameter.POSITIONAL_ONLY:
+                args.append(value[name])
+            case Parameter.POSITIONAL_OR_KEYWORD if positional:
+                args.append(value[name])
+            case Parameter.VAR_POSITIONAL:
+                args.extend(value[name])
+            case Parameter.VAR_KEYWORD:
+                kwargs.update(value[name])
+            case _:
+                kwargs[name] = value[name]
+    return args, kwargs
 
 
 def generate_values(spec: Spec, n: int) -> tuple:
