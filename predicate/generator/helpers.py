@@ -4,12 +4,13 @@ import string
 import sys
 import types
 from collections.abc import Callable, Iterable
-from datetime import datetime, timedelta
+from datetime import date, datetime, time, timedelta
 from enum import Enum, Flag
 from functools import cache, reduce, wraps
 from inspect import Parameter, Signature, signature
 from itertools import count, cycle
 from operator import or_
+from pathlib import PurePath
 from random import choices
 from typing import Any, Final, Iterator
 from uuid import UUID, uuid4
@@ -424,3 +425,31 @@ def random_enum_members(klass: type[Enum]) -> Iterator[Enum]:
         yield from repeatfunc(lambda: reduce(or_, random.sample(members, random.randint(0, len(members))), klass(0)))
     else:
         yield from repeatfunc(random.choice, None, members)
+
+
+def random_bytes(min_size: int = 0, max_size: int = 10) -> Iterator[bytes]:
+    yield from repeatfunc(lambda: random.randbytes(random.randint(min_size, max_size)))
+
+
+def random_bytearrays() -> Iterator[bytearray]:
+    yield from map(bytearray, random_bytes())
+
+
+def random_dates() -> Iterator[date]:
+    yield from (value.date() for value in random_datetimes())
+
+
+def random_times() -> Iterator[time]:
+    yield from (value.time() for value in random_datetimes())
+
+
+def random_timedeltas() -> Iterator[timedelta]:
+    yield timedelta(0)
+    # ponytail: seconds range of about ±100 years, add day/microsecond extremes if functions need them
+    yield from repeatfunc(lambda: timedelta(seconds=random.uniform(-3e9, 3e9)))
+
+
+def random_paths(klass: type[PurePath] = PurePath) -> Iterator[PurePath]:
+    segments = random_strings(min_size=1, max_size=8)
+    while True:
+        yield klass(*take(random.randint(0, 4), segments))
