@@ -417,3 +417,33 @@ Pass ``on_error`` to override:
 
 The same ``on_error`` parameter is accepted by ``instrument_function``,
 ``instrument_class``, and ``instrument_module``.
+
+Disabling instrumentation
+-------------------------
+
+To turn all checks off without removing the decorators, for example in production or while benchmarking,
+set the ``PREDICATE_INSTRUMENT`` environment variable to ``0``, ``false``, ``no`` or ``off``:
+
+.. code-block:: bash
+
+    PREDICATE_INSTRUMENT=0 python app.py
+
+The variable is read once, when ``predicate`` is imported. To switch at runtime, use ``set_instrumentation``:
+
+.. code-block:: python
+
+    from predicate import instrument, is_instrumentation_enabled, set_instrumentation
+
+    @instrument
+    def add(x: int, y: int) -> int:
+        return x + y
+
+    set_instrumentation(False)
+    add(1.5, 1)                     # no checks, returns 2.5
+    is_instrumentation_enabled()    # False
+
+    set_instrumentation(True)
+    add(1.5, 1)                     # raises SpecViolationError again
+
+The switch is global and checked on every call, so it also affects functions instrumented earlier. When it's off,
+an instrumented function calls the original function directly, which costs about as much as one extra function call.
