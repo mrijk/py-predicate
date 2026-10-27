@@ -6,7 +6,7 @@ from predicate.helpers import join_as_str
 from predicate.predicate import Predicate
 
 
-def class_from_set(v: Iterable):
+def class_from_set(v: Iterable) -> Any:
     types = {type(value) for value in v}
     if len(types) == 1:
         return next(iter(types))

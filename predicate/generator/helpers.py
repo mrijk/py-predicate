@@ -215,7 +215,7 @@ def random_floats(lower: float = -1e-6, upper: float = 1e6) -> Iterator[float]:
         yield from between(100.0)
 
 
-def random_ints(lower: int = -sys.maxsize, upper: int = sys.maxsize, **_kwargs) -> Iterator[int]:
+def random_ints(lower: int = -sys.maxsize, upper: int = sys.maxsize, **_kwargs: Any) -> Iterator[int]:
     def between(limit: int) -> Iterator[int]:
         low = max(-limit, lower)
         high = min(limit, upper)

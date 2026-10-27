@@ -74,5 +74,5 @@ class AndPredicate[T](Predicate[T]):
         }
 
 
-def and_p[T](left: Predicate[T], right: Predicate[T]):
+def and_p[T](left: Predicate[T], right: Predicate[T]) -> Predicate[T]:
     return AndPredicate(left=left, right=right)
