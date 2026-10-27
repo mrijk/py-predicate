@@ -11,6 +11,7 @@ from typing import (
     LiteralString,
     Never,
     NoReturn,
+    Tuple,
     TypeGuard,
     TypeVar,
     Union,
@@ -29,7 +30,7 @@ from predicate.frozenset_of_predicate import is_frozenset_of_p
 from predicate.has_length_predicate import is_empty_p
 from predicate.implies import implies
 from predicate.in_predicate import in_p
-from predicate.is_instance_predicate import is_dict_p, is_str_p
+from predicate.is_instance_predicate import is_dict_p, is_str_p, is_tuple_p
 from predicate.is_none_predicate import is_none_p
 from predicate.list_of_predicate import is_list_of_p
 from predicate.or_predicate import or_p
@@ -97,9 +98,13 @@ def annotation_to_predicate(annotation: Any) -> Predicate:  # noqa: C901
         key_type, value_type = get_args(annotation)
         return is_frozendict_of_p((annotation_to_predicate(key_type), annotation_to_predicate(value_type)))
     if origin is tuple:
-        args = get_args(annotation)
-        if args and args[-1] is not Ellipsis:
-            return is_tuple_of_p(*[annotation_to_predicate(t) for t in args])
+        match get_args(annotation):
+            case () if annotation is not Tuple:  # tuple[()]; bare typing.Tuple also has no args
+                return is_tuple_p & is_empty_p
+            case (item_type, types.EllipsisType()):
+                return is_tuple_p & all_p(annotation_to_predicate(item_type))
+            case (_, *_) as item_types:
+                return is_tuple_of_p(*[annotation_to_predicate(t) for t in item_types])
     return is_instance_p(annotation)
 
 
