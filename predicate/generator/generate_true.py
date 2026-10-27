@@ -47,6 +47,7 @@ from predicate.frozendict_of_predicate import FrozenDictOfPredicate
 from predicate.frozenset_of_predicate import FrozenSetOfPredicate
 from predicate.ge_predicate import GePredicate, ge_p
 from predicate.generator.helpers import (
+    accepted_kwargs,
     default_length_p,
     function_with_signature,
     generate_anys,
@@ -56,6 +57,7 @@ from predicate.generator.helpers import (
     generate_lambda,
     generate_strings,
     generate_uuids,
+    ignore_unknown_kwargs,
     random_anys,
     random_bools,
     random_callables,
@@ -140,6 +142,7 @@ from predicate.tuple_of_predicate import TupleOfPredicate
 from predicate.xor_predicate import XorPredicate
 
 
+@ignore_unknown_kwargs
 @singledispatch
 def generate_true[T](predicate: Predicate[T], **_kwargs: Any) -> Iterator[T]:
     """Generate values that satisfy this predicate."""
@@ -429,8 +432,8 @@ def generate_fn_p(predicate: FnPredicate) -> Iterator:
 @generate_true.register
 def generate_in(predicate: InPredicate) -> Iterator:
     if isinstance(predicate.v, Iterable):
-        while True:
-            yield from predicate.v
+        yield from cycle(predicate.v)
+        return
     raise ValueError(f"Can't generate true values for type {predicate.v.__class__.__name__}")
 
 
@@ -616,7 +619,7 @@ def generate_is_instance_p(predicate: IsInstancePredicate, **kwargs: Any) -> Ite
         type_registry[Template] = random_templates
 
     if generator := type_registry.get(klass):
-        yield from generator(**kwargs)
+        yield from generator(**accepted_kwargs(generator, kwargs))
     elif klass is type:
         # For type[X] yield X and its subclasses, for plain type any class
         yield from generate_true(is_subclass_p(first(get_args(annotation), object)))

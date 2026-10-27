@@ -20,3 +20,9 @@ def test_generate_in_fail():
 
     with pytest.raises(ValueError, match="Can't generate true values for type Contains13"):
         take(5, generate_true(predicate))
+
+
+def test_generate_in_empty():
+    predicate = in_p(set())
+
+    assert take(5, generate_true(predicate)) == []

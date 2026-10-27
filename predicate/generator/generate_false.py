@@ -32,6 +32,7 @@ from predicate.generator.helpers import (
     generate_anys,
     generate_strings,
     generate_uuids,
+    ignore_unknown_kwargs,
     random_anys,
     random_datetimes,
     random_dicts,
@@ -106,6 +107,7 @@ from predicate.xor_predicate import XorPredicate
 default_at_least_one_length_p: Final = ge_le_p(lower=1, upper=10)
 
 
+@ignore_unknown_kwargs
 @singledispatch
 def generate_false[T](predicate: Predicate[T], **kwargs: Any) -> Iterator[T]:
     """Generate values that don't satisfy this predicate."""

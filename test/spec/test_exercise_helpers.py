@@ -77,3 +77,12 @@ def test_annotation_to_predicate_literal_string():
 )
 def test_annotation_to_predicate_numeric_tower(annotation, value, expected):
     assert annotation_to_predicate(annotation)(value) is expected
+
+
+def test_annotation_to_predicate_union_of_three():
+    predicate = annotation_to_predicate(int | str | None)
+
+    assert predicate(1) is True
+    assert predicate("a") is True
+    assert predicate(None) is True
+    assert predicate(1.5) is False

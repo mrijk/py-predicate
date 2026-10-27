@@ -44,3 +44,11 @@ def test_is_lambda_with_signature_fail_explain():
 
     expected = {"reason": "Lambda has 0 parameters, expected: 1", "result": False}
     assert explain(predicate, lambda: True) == expected
+
+
+def test_is_lambda_callable_object():
+    class CallableObject:
+        def __call__(self):
+            return True
+
+    assert not is_lambda_p(CallableObject())

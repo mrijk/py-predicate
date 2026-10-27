@@ -8,7 +8,7 @@ from predicate.predicate import Predicate
 
 def func_is_lambda(func: Callable) -> bool:
     lambda_name = (lambda: 0).__name__
-    return func.__name__ == lambda_name
+    return getattr(func, "__name__", None) == lambda_name
 
 
 @dataclass

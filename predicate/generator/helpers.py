@@ -5,7 +5,8 @@ import sys
 import types
 from collections.abc import Callable, Iterable
 from datetime import datetime, timedelta
-from inspect import Parameter, Signature
+from functools import cache, wraps
+from inspect import Parameter, Signature, signature
 from itertools import count, cycle
 from random import choices
 from typing import Any, Final, Iterator
@@ -381,3 +382,32 @@ def with_parameters(sig: Signature, *parameters: Parameter) -> Signature:
 
 def unused_name(sig: Signature) -> str:
     return next(name for name in (f"extra{i}" for i in count()) if name not in sig.parameters)
+
+
+@cache
+def _accepted_names(f: Callable) -> frozenset[str] | None:
+    params = signature(f).parameters.values()
+    if any(p.kind == Parameter.VAR_KEYWORD for p in params):
+        return None  # accepts everything
+    return frozenset(p.name for p in params)
+
+
+def accepted_kwargs(f: Callable, kwargs: dict) -> dict:
+    """Keep only the keyword arguments f accepts, e.g. drop length_p for a generator that has no length."""
+    if not kwargs or (names := _accepted_names(f)) is None:
+        return kwargs
+    return {key: value for key, value in kwargs.items() if key in names}
+
+
+def ignore_unknown_kwargs[F: Callable](dispatcher: F) -> F:
+    """Drop keyword arguments the dispatched generator doesn't accept."""
+
+    @wraps(dispatcher)
+    def wrapper(predicate, /, **kwargs):
+        f = dispatcher.dispatch(type(predicate))  # type: ignore[attr-defined]
+        return f(predicate, **accepted_kwargs(f, kwargs))
+
+    wrapper.register = dispatcher.register  # type: ignore[attr-defined]
+    wrapper.dispatch = dispatcher.dispatch  # type: ignore[attr-defined]
+    wrapper.registry = dispatcher.registry  # type: ignore[attr-defined]
+    return wrapper  # type: ignore[return-value]
