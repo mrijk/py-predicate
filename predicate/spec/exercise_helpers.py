@@ -2,17 +2,31 @@ import sys
 import types
 from inspect import Signature, isroutine, signature
 from itertools import islice, repeat
-from typing import Any, Callable, Literal, TypeGuard, TypeVar, Union, get_args, get_origin, get_type_hints
+from typing import (
+    Any,
+    Callable,
+    Literal,
+    LiteralString,
+    Never,
+    NoReturn,
+    TypeGuard,
+    TypeVar,
+    Union,
+    get_args,
+    get_origin,
+    get_type_hints,
+)
 
 from more_itertools import first, take
 
-from predicate import always_true_p, generate_true, is_instance_p
+from predicate import always_false_p, always_true_p, generate_true, is_instance_p
 from predicate.dict_of_predicate import is_dict_of_p
 from predicate.explain import explain
 from predicate.frozendict_of_predicate import is_frozendict_of_p
 from predicate.frozenset_of_predicate import is_frozenset_of_p
 from predicate.implies import implies
 from predicate.in_predicate import in_p
+from predicate.is_instance_predicate import is_str_p
 from predicate.is_none_predicate import is_none_p
 from predicate.list_of_predicate import is_list_of_p
 from predicate.or_predicate import or_p
@@ -46,6 +60,10 @@ def annotation_to_predicate(annotation: Any) -> Predicate:  # noqa: C901
         return always_true_p
     if type(annotation) is TypeVar:
         return always_true_p
+    if annotation in (Never, NoReturn):
+        return always_false_p  # no value inhabits Never
+    if annotation is LiteralString:
+        return is_str_p  # literal-ness is not observable at runtime
     origin = get_origin(annotation)
     if origin in _type_narrowing_origins:
         return always_true_p  # TypeGuard/TypeIs is bool at runtime
@@ -96,7 +114,7 @@ def get_return_spec(f: Callable, spec: Spec) -> Spec:
 
         if sig.return_annotation == sig.empty:
             raise InvalidSpecError("Return annotation not in spec")
-        return spec | {"ret": is_instance_p(sig.return_annotation)}
+        return spec | {"ret": annotation_to_predicate(sig.return_annotation)}
     return spec
 
 

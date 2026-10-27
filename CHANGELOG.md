@@ -19,6 +19,11 @@ Breaking changes:
   instead of AssertionError
 - exercise raises InvalidSpecError when no values satisfying pre can be generated
 
+Fixes:
+
+- annotation_to_predicate handles Never, NoReturn and LiteralString
+- default return predicate in get_return_spec checks nested types (e.g. list[int] checks its items)
+
 ## 1.7.0
 
 Features:
