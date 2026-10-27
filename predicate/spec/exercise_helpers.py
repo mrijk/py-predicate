@@ -4,7 +4,7 @@ from inspect import Signature, isroutine, signature
 from itertools import islice, repeat
 from typing import Any, Callable, Literal, TypeGuard, TypeVar, Union, get_args, get_origin, get_type_hints
 
-from more_itertools import take
+from more_itertools import first, take
 
 from predicate import always_true_p, generate_true, is_instance_p
 from predicate.dict_of_predicate import is_dict_of_p
@@ -80,12 +80,12 @@ def get_return_predicate(sig: Signature) -> Predicate:
 
 
 def validate_args(f: Callable, spec: Spec) -> dict[str, Predicate]:
-    parameters = spec["args"]
+    # Copy, so filling in annotation predicates doesn't change the caller's spec
+    parameters = dict(spec["args"])
     sig = resolved_signature(f)
 
-    for key, _ in parameters.items():
-        if key not in sig.parameters:
-            raise InvalidSpecError(f"Parameter '{key}' not in function signature")
+    if (key := first((key for key in parameters if key not in sig.parameters), None)) is not None:
+        raise InvalidSpecError(f"Parameter '{key}' not in function signature")
 
     return parameters
 
@@ -106,7 +106,7 @@ def check_signature_against_spec(f: Callable, spec: Spec) -> Spec:
 
     parameters = validate_args(f, spec)
 
-    spec = get_return_spec(f, spec)
+    spec = get_return_spec(f, spec) | {"args": parameters}
 
     for key in sig.parameters:
         parameter = sig.parameters[key]
