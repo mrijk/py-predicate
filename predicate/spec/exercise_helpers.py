@@ -1,3 +1,4 @@
+import collections.abc
 import sys
 import types
 from functools import reduce
@@ -47,6 +48,16 @@ if sys.version_info >= (3, 13):  # pragma: no cover
 
 _union_origins: set = {Union, types.UnionType}
 
+# Abstract collections whose single type argument is the item type; typing.Sequence etc. have the same origins
+_item_collection_origins: set = {
+    collections.abc.Collection,
+    collections.abc.MutableSequence,
+    collections.abc.MutableSet,
+    collections.abc.Sequence,
+    collections.abc.Set,
+}
+_mapping_origins: set = {collections.abc.Mapping, collections.abc.MutableMapping}
+
 
 def resolved_signature(f: Callable) -> Signature:
     # get_type_hints also resolves nested string annotations, e.g. x: "str" under `from __future__ import annotations`
@@ -92,6 +103,14 @@ def annotation_to_predicate(annotation: Any) -> Predicate:  # noqa: C901
         key_type, value_type = get_args(annotation)
         # is_dict_of_p rejects {}, but dict[K, V] includes the empty dict
         return is_dict_p & (
+            is_empty_p | is_dict_of_p((annotation_to_predicate(key_type), annotation_to_predicate(value_type)))
+        )
+    if origin in _item_collection_origins:
+        (item_type,) = get_args(annotation)
+        return is_instance_p(annotation) & all_p(annotation_to_predicate(item_type))
+    if origin in _mapping_origins:
+        key_type, value_type = get_args(annotation)
+        return is_instance_p(annotation) & (
             is_empty_p | is_dict_of_p((annotation_to_predicate(key_type), annotation_to_predicate(value_type)))
         )
     if sys.version_info >= (3, 15) and origin is frozendict:  # noqa: F821

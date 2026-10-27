@@ -184,7 +184,7 @@ def test_generate_tee():
     assert_generated_true(predicate)
 
 
-@pytest.mark.parametrize("all_predicate", [ge_p(2), is_str_p])
+@pytest.mark.parametrize("all_predicate", [ge_p(2), is_str_p, is_list_p])
 def test_generate_all(all_predicate):
     predicate = all_p(all_predicate)
 
