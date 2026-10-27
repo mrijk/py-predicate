@@ -5,7 +5,7 @@ import pytest
 
 from predicate import ge_p, is_instrumented, is_int_p
 from predicate.spec.instrument import enrich_spec, instrument, instrument_function, instrument_module
-from predicate.spec.spec import Spec, SpecViolationError
+from predicate.spec.spec import InvalidSpecError, Spec, SpecViolationError
 
 
 def test_instrument_ok():
@@ -563,3 +563,22 @@ def test_instrument_raises_spec_violation():
 
     with pytest.raises(SpecViolationError, match="Parameter predicate for function double failed"):
         double("a")
+
+
+def test_instrument_function_ret_name():
+    @instrument({"args": {}, "fn": lambda x, ret, result: result == x, "ret_name": "result"})
+    def r(x: int, ret: int) -> int:
+        return ret
+
+    assert r(1, 1) == 1
+    with pytest.raises(SpecViolationError, match=r"Arguments: x=1, ret=2, result=2"):
+        r(1, 2)
+
+
+def test_instrument_function_ret_name_clash():
+    @instrument({"args": {}, "fn": lambda x, ret: True})
+    def r(x: int, ret: int) -> int:
+        return x
+
+    with pytest.raises(InvalidSpecError, match="Parameter 'ret' clashes"):
+        r(1, 2)

@@ -16,6 +16,7 @@ Spec = TypedDict(
     {
         "args": dict[str, Predicate],
         "ret": NotRequired[Predicate],
+        "ret_name": NotRequired[str],
         "pre": NotRequired[Callable[..., bool]],
         "fn": NotRequired[Callable[..., bool]],
         "fn_p": NotRequired[Callable[..., Predicate]],

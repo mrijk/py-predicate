@@ -10,7 +10,13 @@ from more_itertools import consume, side_effect
 from predicate.explain import explain
 from predicate.is_async_predicate import is_async_p
 from predicate.predicate import Predicate
-from predicate.spec.exercise_helpers import annotation_to_predicate, get_return_predicate, resolved_signature
+from predicate.spec.exercise_helpers import (
+    annotation_to_predicate,
+    check_ret_name,
+    get_return_predicate,
+    resolved_signature,
+    ret_name,
+)
 from predicate.spec.spec import Spec, SpecViolationError
 
 
@@ -19,6 +25,8 @@ def enrich_spec(func: Callable, spec: Spec) -> Spec:
         sig = resolved_signature(func)
     except NameError as e:
         raise NameError(f"Cannot resolve annotations of {func.__qualname__}: {e}") from e
+
+    check_ret_name(sig, spec)
 
     args = dict(spec["args"])
     for name, param in sig.parameters.items():
@@ -89,9 +97,10 @@ def _check_exception(spec: Spec, func_name: str, exc: Exception) -> str | None:
 
 def _check_constraints(spec: Spec, func_name: str, arguments: dict, result: Any) -> str | None:
     if fn := spec.get("fn"):
-        if not fn(**arguments, ret=result):
+        name = ret_name(spec)
+        if not fn(**arguments, **{name: result}):
             args_str = ", ".join(f"{k}={v!r}" for k, v in arguments.items())
-            return f"fn constraint for function {func_name} failed. Arguments: {args_str}, ret={result!r}"
+            return f"fn constraint for function {func_name} failed. Arguments: {args_str}, {name}={result!r}"
 
     if fn_p := spec.get("fn_p"):
         p = fn_p(**arguments)
