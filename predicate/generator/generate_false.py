@@ -7,7 +7,7 @@ from functools import singledispatch
 from inspect import Parameter, getmembers, isfunction, signature
 from itertools import chain, cycle, repeat
 from types import UnionType
-from typing import Final, Hashable, get_args
+from typing import Any, Final, Hashable, get_args
 from uuid import UUID
 
 from more_itertools import first, flatten, interleave, random_permutation, take
@@ -107,7 +107,7 @@ default_at_least_one_length_p: Final = ge_le_p(lower=1, upper=10)
 
 
 @singledispatch
-def generate_false[T](predicate: Predicate[T], **kwargs) -> Iterator[T]:
+def generate_false[T](predicate: Predicate[T], **kwargs: Any) -> Iterator[T]:
     """Generate values that don't satisfy this predicate."""
     raise ValueError(f"Please register generator for correct predicate type: {predicate!r}")
 
@@ -184,7 +184,7 @@ def generate_has_key(predicate: HasKeyPredicate) -> Iterator:
 
 
 @generate_false.register
-def generate_has_length(predicate: HasLengthPredicate, *, value_p=is_int_p) -> Iterator:
+def generate_has_length(predicate: HasLengthPredicate, *, value_p: Predicate = is_int_p) -> Iterator:
     yield from random_iterables(length_p=~predicate.length_p, value_p=value_p)
 
 

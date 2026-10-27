@@ -205,7 +205,7 @@ def generate_values(spec: Spec, n: int) -> tuple:
     return return_p, values
 
 
-def verify_result(spec: Spec, return_p: Predicate, value: dict, result) -> None:
+def verify_result(spec: Spec, return_p: Predicate, value: dict, result: Any) -> None:
     if not return_p(result):
         raise SpecViolationError(f"Not conform spec: {explain(return_p, result)}")
 

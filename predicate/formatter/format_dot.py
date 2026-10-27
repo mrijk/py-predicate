@@ -73,7 +73,7 @@ from predicate.tuple_of_predicate import TupleOfPredicate
 from predicate.xor_predicate import XorPredicate
 
 
-def to_dot(predicate: Predicate, predicate_string: str | None = None, show_optimized: bool = False):
+def to_dot(predicate: Predicate, predicate_string: str | None = None, show_optimized: bool = False) -> Digraph:
     """Format predicate as a .dot file."""
     label = predicate_string if predicate_string else repr(predicate)
 

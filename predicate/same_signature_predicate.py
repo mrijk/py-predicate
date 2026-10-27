@@ -8,7 +8,7 @@ from predicate.is_subclass_predicate import is_subclass_p
 from predicate.predicate import Predicate
 
 
-def is_subtype(cls, superclass) -> bool:
+def is_subtype(cls: Any, superclass: Any) -> bool:
     # Any is compatible with every type, in both directions. A missing annotation counts as Any
     if any(t is Any or t is Parameter.empty for t in (cls, superclass)):
         return True
@@ -16,7 +16,7 @@ def is_subtype(cls, superclass) -> bool:
     return is_subclass_p(erase_generic(NoneType if superclass is None else superclass))(erase_generic(cls))
 
 
-def erase_generic(t):
+def erase_generic(t: Any) -> Any:
     # ponytail: type arguments are ignored, so list[str] matches list[int]; compare get_args if that matters
     if get_origin(t) in (Union, UnionType):
         return Union[tuple(erase_generic(arg) for arg in get_args(t))]

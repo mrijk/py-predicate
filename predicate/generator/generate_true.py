@@ -141,7 +141,7 @@ from predicate.xor_predicate import XorPredicate
 
 
 @singledispatch
-def generate_true[T](predicate: Predicate[T], **_kwargs) -> Iterator[T]:
+def generate_true[T](predicate: Predicate[T], **_kwargs: Any) -> Iterator[T]:
     """Generate values that satisfy this predicate."""
     raise ValueError(f"Please register generator for correct predicate type: {predicate}")
 
@@ -193,7 +193,7 @@ def generate_any_p(any_predicate: AnyPredicate, *, length_p: Predicate = default
 
 
 @generate_true.register
-def generate_always_true(_predicate: AlwaysTruePredicate, **_kwargs) -> Iterator:
+def generate_always_true(_predicate: AlwaysTruePredicate, **_kwargs: Any) -> Iterator:
     yield from random_anys()
 
 
@@ -230,7 +230,7 @@ def generate_and(predicate: AndPredicate) -> Iterator:
 
 
 @generate_true.register
-def generate_eq(predicate: EqPredicate, **_kwargs) -> Iterator:
+def generate_eq(predicate: EqPredicate, **_kwargs: Any) -> Iterator:
     yield from repeat(predicate.v)
 
 
@@ -292,7 +292,7 @@ def generate_gt_lt(predicate: GtLtPredicate) -> Iterator:
 
 
 @generate_true.register
-def generate_ge(predicate: GePredicate, **_kwargs) -> Iterator:
+def generate_ge(predicate: GePredicate, **_kwargs: Any) -> Iterator:
     match v := predicate.v:
         case datetime():
             yield from random_datetimes(lower=predicate.v)
@@ -340,7 +340,7 @@ def generate_has_key(predicate: HasKeyPredicate) -> Iterator:
 
 
 @generate_true.register
-def generate_has_length(predicate: HasLengthPredicate, *, value_p=is_int_p) -> Iterator:
+def generate_has_length(predicate: HasLengthPredicate, *, value_p: Predicate = is_int_p) -> Iterator:
     yield from random_iterables(length_p=predicate.length_p, value_p=value_p)
 
 
@@ -570,12 +570,12 @@ def generate_truthy(_predicate: IsTruthyPredicate) -> Iterator:
 
 
 @generate_true.register
-def generate_predicate_of(predicate: IsPredicateOfPredicate, **kwargs) -> Iterator:
+def generate_predicate_of(predicate: IsPredicateOfPredicate, **kwargs: Any) -> Iterator:
     yield from random_predicates(**kwargs, klass=predicate.predicate_klass)
 
 
 @generate_true.register
-def generate_is_instance_p(predicate: IsInstancePredicate, **kwargs) -> Iterator:
+def generate_is_instance_p(predicate: IsInstancePredicate, **kwargs: Any) -> Iterator:
     annotation = predicate.instance_klass[0]  # type: ignore
     # Generic aliases such as Predicate[int], typing.Callable and Iterable[int] map to their origin class
     klass = get_origin(annotation) or annotation
@@ -655,7 +655,7 @@ def generate_is_lambda_p(predicate: IsLambdaPredicate) -> Iterator:
 
 
 @generate_true.register
-def generate_dict_of_p(dict_of_predicate: DictOfPredicate, **kwargs) -> Iterator:
+def generate_dict_of_p(dict_of_predicate: DictOfPredicate, **kwargs: Any) -> Iterator:
     key_value_predicates = dict_of_predicate.key_value_predicates
 
     candidates = zip(
@@ -667,7 +667,7 @@ def generate_dict_of_p(dict_of_predicate: DictOfPredicate, **kwargs) -> Iterator
 
 
 @generate_true.register
-def generate_frozendict_of_p(frozendict_of_predicate: FrozenDictOfPredicate, **kwargs) -> Iterator:
+def generate_frozendict_of_p(frozendict_of_predicate: FrozenDictOfPredicate, **kwargs: Any) -> Iterator:
     if sys.version_info >= (3, 15):
         dict_of_predicate = frozendict_of_predicate.dict_of_predicate
         yield from (frozendict(d) for d in generate_dict_of_p(dict_of_predicate, **kwargs))  # noqa: F821

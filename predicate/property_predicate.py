@@ -34,5 +34,5 @@ class PropertyPredicate[T](Predicate[T]):
         return {"reason": f"Property in Object {object_type} returned False"}
 
 
-def property_p(getter: Callable):
+def property_p(getter: Callable) -> Predicate:
     return PropertyPredicate(getter=getter)

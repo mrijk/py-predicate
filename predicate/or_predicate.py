@@ -56,5 +56,5 @@ class OrPredicate[T](Predicate[T]):
         }
 
 
-def or_p[T](left: Predicate[T], right: Predicate[T]):
+def or_p[T](left: Predicate[T], right: Predicate[T]) -> Predicate[T]:
     return OrPredicate(left=left, right=right)

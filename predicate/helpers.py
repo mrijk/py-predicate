@@ -1,5 +1,5 @@
 from itertools import filterfalse
-from typing import Iterable
+from typing import Any, Callable, Iterable
 
 from more_itertools import first
 
@@ -23,7 +23,7 @@ def dict_predicates_repr(predicates: dict[str, Predicate]) -> str:
     return "{" + items + "}"
 
 
-def key_value_pairs_repr(pairs: list[tuple[Predicate | str, Predicate]], from_key=repr) -> str:
+def key_value_pairs_repr(pairs: list[tuple[Predicate | str, Predicate]], from_key: Callable[[Any], str] = repr) -> str:
     return ", ".join(f"({from_key(k)}, {v!r})" for k, v in pairs)
 
 
