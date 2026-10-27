@@ -4,7 +4,9 @@ from typing import TypeVar
 import pytest
 
 from predicate import all_p, ge_p, is_float_p, is_int_p, is_str_p, pos_p
+from predicate.list_of_predicate import is_list_of_p
 from predicate.spec.exercise import Spec, exercise
+from predicate.spec.exercise_function import get_spec_from_function_annotation
 from predicate.spec.spec import InvalidSpecError, SpecViolationError
 
 
@@ -474,3 +476,39 @@ def test_exercise_var_positional_with_spec():
     spec: Spec = {"args": {"xs": all_p(is_int_p)}, "ret": is_int_p}
 
     assert list(exercise(total, spec=spec, n=3))
+
+
+def test_exercise_annotation_checks_elements():
+    def head(xs: list[int]) -> int:
+        return xs[0] if xs else 0
+
+    spec = get_spec_from_function_annotation(head)
+
+    assert spec["args"]["xs"]([1, 2])
+    assert not spec["args"]["xs"](["a"])
+
+
+def test_exercise_constrained_element_spec():
+    def total(xs: list[int]) -> int:
+        return sum(xs)
+
+    spec: Spec = {"args": {"xs": is_list_of_p(is_int_p & ge_p(0))}, "ret": ge_p(0)}
+
+    assert list(exercise(total, spec=spec))
+
+
+def test_exercise_element_spec_not_constrained_fail():
+    def total(xs: list[int]) -> int:
+        return sum(xs)
+
+    spec: Spec = {"args": {"xs": is_list_of_p(is_str_p)}, "ret": is_int_p}
+
+    with pytest.raises(InvalidSpecError, match="Spec predicate is not a constrained annotation"):
+        list(exercise(total, spec=spec))
+
+
+def test_exercise_var_keyword_annotation():
+    def total(**kwargs: int) -> int:
+        return sum(kwargs.values())
+
+    assert list(exercise(total, n=3))
