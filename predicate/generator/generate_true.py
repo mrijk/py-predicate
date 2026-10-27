@@ -2,6 +2,7 @@ import random
 import sys
 from collections.abc import Callable, Container, Hashable, Iterable, Iterator
 from datetime import datetime, timedelta
+from enum import Enum
 from functools import singledispatch
 from inspect import Parameter, Signature, getmembers, isfunction, signature
 from itertools import cycle, repeat
@@ -65,6 +66,7 @@ from predicate.generator.helpers import (
     random_containers,
     random_datetimes,
     random_dicts,
+    random_enum_members,
     random_first_from_iterables,
     random_floats,
     random_frozensets,
@@ -618,7 +620,9 @@ def generate_is_instance_p(predicate: IsInstancePredicate, **kwargs: Any) -> Ite
 
         type_registry[Template] = random_templates
 
-    if generator := type_registry.get(klass):
+    if isinstance(klass, type) and issubclass(klass, Enum):
+        yield from random_enum_members(klass)
+    elif generator := type_registry.get(klass):
         yield from generator(**accepted_kwargs(generator, kwargs))
     elif klass is type:
         # For type[X] yield X and its subclasses, for plain type any class

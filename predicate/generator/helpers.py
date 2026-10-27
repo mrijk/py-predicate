@@ -5,9 +5,11 @@ import sys
 import types
 from collections.abc import Callable, Iterable
 from datetime import datetime, timedelta
-from functools import cache, wraps
+from enum import Enum, Flag
+from functools import cache, reduce, wraps
 from inspect import Parameter, Signature, signature
 from itertools import count, cycle
+from operator import or_
 from random import choices
 from typing import Any, Final, Iterator
 from uuid import UUID, uuid4
@@ -411,3 +413,14 @@ def ignore_unknown_kwargs[F: Callable](dispatcher: F) -> F:
     wrapper.dispatch = dispatcher.dispatch  # type: ignore[attr-defined]
     wrapper.registry = dispatcher.registry  # type: ignore[attr-defined]
     return wrapper  # type: ignore[return-value]
+
+
+def random_enum_members(klass: type[Enum]) -> Iterator[Enum]:
+    members = list(klass)
+    if not members:
+        raise ValueError(f"Can't generate values for {klass.__name__}: it has no members")
+    if issubclass(klass, Flag):
+        # Flags are meant to be combined, so also yield random combinations, including the empty flag
+        yield from repeatfunc(lambda: reduce(or_, random.sample(members, random.randint(0, len(members))), klass(0)))
+    else:
+        yield from repeatfunc(random.choice, None, members)
