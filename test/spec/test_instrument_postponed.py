@@ -9,7 +9,12 @@ from predicate.spec.instrument import instrument
 from predicate.spec.spec import SpecViolationError
 
 if TYPE_CHECKING:
+    import datetime as dt
     from decimal import Decimal
+
+    from _typeshed import SupportsRead  # only exists for type checkers
+
+    Amount = Decimal | int
 
 
 @instrument
@@ -29,7 +34,22 @@ class Node:
 
 
 @instrument
-def unresolvable(x: Decimal) -> int:
+def type_checking_import(x: Decimal) -> int:
+    return 0
+
+
+@instrument
+def type_checking_module_alias(x: dt.timedelta) -> int:
+    return 0
+
+
+@instrument
+def type_checking_type_alias(x: Amount) -> int:
+    return 0
+
+
+@instrument
+def unresolvable(x: SupportsRead[str]) -> int:
     return 0
 
 
@@ -49,6 +69,38 @@ def test_instrument_postponed_return_fails():
 
 def test_instrument_postponed_forward_reference():
     assert isinstance(Node().clone(), Node)
+
+
+def test_instrument_type_checking_import():
+    from decimal import Decimal
+
+    assert type_checking_import(Decimal(1)) == 0
+
+    with pytest.raises(SpecViolationError, match="parameter 'x' of function type_checking_import failed"):
+        type_checking_import(1)
+
+
+def test_instrument_type_checking_module_alias():
+    from datetime import timedelta
+
+    assert type_checking_module_alias(timedelta(1)) == 0
+
+    with pytest.raises(SpecViolationError, match="parameter 'x' of function type_checking_module_alias failed"):
+        type_checking_module_alias(1)
+
+
+def test_instrument_type_checking_type_alias():
+    from decimal import Decimal
+
+    assert type_checking_type_alias(Decimal(1)) == 0
+    assert type_checking_type_alias(1) == 0
+
+    with pytest.raises(SpecViolationError, match="parameter 'x' of function type_checking_type_alias failed"):
+        type_checking_type_alias("1")
+
+
+def test_exercise_type_checking_import():
+    assert list(exercise(type_checking_module_alias.__wrapped__, n=3))
 
 
 def test_instrument_postponed_unresolvable():
