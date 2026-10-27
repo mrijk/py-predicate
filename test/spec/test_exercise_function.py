@@ -425,3 +425,22 @@ def test_exercise_with_unsatisfiable_pre():
 
     with pytest.raises(InvalidSpecError, match="Could not generate values satisfying pre after 1000 attempts"):
         list(exercise(identity, spec=spec))
+
+
+def test_exercise_with_fn_ret_name():
+    def r(x: int, ret: int) -> int:
+        return x
+
+    spec: Spec = {"args": {}, "fn": lambda x, ret, result: result == x, "ret_name": "result"}
+
+    assert list(exercise(r, spec=spec, n=5))
+
+
+def test_exercise_with_fn_ret_name_clash():
+    def r(x: int, ret: int) -> int:
+        return x
+
+    spec: Spec = {"args": {}, "fn": lambda x, ret: True}
+
+    with pytest.raises(InvalidSpecError, match="Parameter 'ret' clashes"):
+        list(exercise(r, spec=spec, n=5))

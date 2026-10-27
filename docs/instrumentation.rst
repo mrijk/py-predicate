@@ -55,6 +55,15 @@ Spec keys
 
         "fn": lambda x, y, ret: ret >= x and ret >= y
 
+``ret_name`` *(optional)*
+    The keyword under which ``fn`` receives the return value, ``"ret"`` by default. Set it when
+    the function has a parameter named ``ret``; otherwise ``InvalidSpecError`` is raised.
+
+    .. code-block:: python
+
+        "fn": lambda x, ret, result: result == x,
+        "ret_name": "result"
+
 ``fn_p`` *(optional)*
     A callable that receives the arguments and returns a ``Predicate`` which is then applied to
     the return value. Use this when the expected return predicate depends on the input values.

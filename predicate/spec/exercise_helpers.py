@@ -101,10 +101,20 @@ def get_return_predicate(sig: Signature) -> Predicate:
     return annotation_to_predicate(sig.return_annotation)
 
 
+def ret_name(spec: Spec) -> str:
+    return spec.get("ret_name", "ret")
+
+
+def check_ret_name(sig: Signature, spec: Spec) -> None:
+    if "fn" in spec and (name := ret_name(spec)) in sig.parameters:
+        raise InvalidSpecError(f"Parameter '{name}' clashes with the fn return value name, set 'ret_name' in the spec")
+
+
 def validate_args(f: Callable, spec: Spec) -> dict[str, Predicate]:
     # Copy, so filling in annotation predicates doesn't change the caller's spec
     parameters = dict(spec["args"])
     sig = resolved_signature(f)
+    check_ret_name(sig, spec)
 
     if (key := first((key for key in parameters if key not in sig.parameters), None)) is not None:
         raise InvalidSpecError(f"Parameter '{key}' not in function signature")
@@ -173,7 +183,7 @@ def verify_result(spec: Spec, return_p: Predicate, value: dict, result) -> None:
         raise SpecViolationError(f"Not conform spec: {explain(return_p, result)}")
 
     if fn := spec.get("fn"):
-        if not fn(**value, ret=result):
+        if not fn(**value, **{ret_name(spec): result}):
             raise SpecViolationError(f"Not conform spec: fn constraint failed for inputs {value} -> {result}")
 
     if fn_p := spec.get("fn_p"):
