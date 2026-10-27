@@ -131,7 +131,7 @@ triggers the bug and raises:
 
 .. code-block::
 
-    ValueError: Return predicate for function max_int_with_bug failed. Reason: 3 is not an instance of type int
+    SpecViolationError: Return predicate for function max_int_with_bug failed. Reason: 3 is not an instance of type int
 
 Passing a wrong argument type:
 
@@ -143,7 +143,7 @@ raises:
 
 .. code-block::
 
-    ValueError: Parameter predicate for function max_int_with_bug failed. Reason: False is not an instance of type int
+    SpecViolationError: Parameter predicate for parameter 'y' of function max_int_with_bug failed. Reason: False is not an instance of type int
 
 Note that argument predicates are checked *before* the function executes, so no side effects
 occur when an argument is invalid.
@@ -411,8 +411,9 @@ Pass ``on_error`` to override:
     def add(x: int, y: int) -> int:
         return x + y
 
-    add("oops", 1)       # on_error called, but function still runs
-    print(errors)        # ['Parameter predicate for function add failed. Reason: ...']
+    add(1.5, 1)          # on_error called, but function still runs
+    print(errors)        # ["Parameter predicate for parameter 'x' of function add failed. Reason: ...",
+                         #  'Return predicate for function add failed. Reason: ...']
 
 The same ``on_error`` parameter is accepted by ``instrument_function``,
 ``instrument_class``, and ``instrument_module``.

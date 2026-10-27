@@ -5,7 +5,7 @@ from inspect import getmembers, isclass, isfunction, signature, unwrap
 from types import ModuleType
 from typing import Any, Callable
 
-from more_itertools import consume, side_effect
+from more_itertools import consume, first_true, side_effect
 
 from predicate.explain import explain
 from predicate.is_async_predicate import is_async_p
@@ -62,10 +62,14 @@ def _get_reason(predicate: Predicate, value: Any) -> str | None:
 
 
 def _check_args(spec: Spec, func_name: str, arguments: dict) -> str | None:
-    for name, predicate in spec["args"].items():
-        if name in arguments:
-            if reason := _get_reason(predicate, value=arguments[name]):
-                return f"Parameter predicate for function {func_name} failed. Reason: {reason}"
+    failures = (
+        (name, reason)
+        for name, predicate in spec["args"].items()
+        if name in arguments and (reason := _get_reason(predicate, value=arguments[name]))
+    )
+    if failure := first_true(failures):
+        name, reason = failure
+        return f"Parameter predicate for parameter '{name}' of function {func_name} failed. Reason: {reason}"
 
     if (pre := spec.get("pre")) and not pre(**arguments):
         args_str = ", ".join(f"{k}={v!r}" for k, v in arguments.items())

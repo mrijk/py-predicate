@@ -156,7 +156,7 @@ def grade(x: int) -> str:
 
 
 grade(75)  # "pass"
-grade(-1)  # raises ValueError: Parameter predicate for function grade failed
+grade(-1)  # raises SpecViolationError: Parameter predicate for parameter 'x' of function grade failed
 ```
 
 You can also instrument all functions in a module or class:
