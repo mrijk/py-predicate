@@ -1,5 +1,6 @@
+import collections.abc
 import sys
-from typing import LiteralString, Never, NoReturn, Tuple
+from typing import AbstractSet, LiteralString, Never, NoReturn, Tuple
 
 import pytest
 from more_itertools import take
@@ -130,8 +131,63 @@ def test_annotation_to_predicate_tuple_generators(annotation):
     assert not any(predicate(value) for value in take(10, generate_false(predicate)))
 
 
+@pytest.mark.parametrize(
+    ("annotation", "value", "expected"),
+    [
+        (collections.abc.Sequence[int], [1, 2], True),
+        (collections.abc.Sequence[int], (1, 2), True),
+        (collections.abc.Sequence[int], [], True),
+        (collections.abc.Sequence[int], [1, "x"], False),
+        (collections.abc.Sequence[int], {1, 2}, False),
+        (collections.abc.MutableSequence[int], (1, 2), False),
+        (collections.abc.Collection[int], {1, 2}, True),
+        (collections.abc.Collection[int], {"x"}, False),
+        (collections.abc.Set[int], frozenset({1}), True),
+        (collections.abc.Set[int], {"x"}, False),
+        (AbstractSet[int], {1}, True),
+        (collections.abc.MutableSet[int], frozenset({1}), False),
+        (collections.abc.Mapping[str, int], {}, True),
+        (collections.abc.Mapping[str, int], {"a": 1}, True),
+        (collections.abc.Mapping[str, int], {"a": "b"}, False),
+        (collections.abc.Mapping[str, int], [("a", 1)], False),
+        (collections.abc.MutableMapping[str, int], {"a": 1}, True),
+        (collections.abc.Sequence, ["x"], True),
+    ],
+)
+def test_annotation_to_predicate_abc_generics(annotation, value, expected):
+    assert annotation_to_predicate(annotation)(value) is expected
+
+
+@pytest.mark.parametrize(
+    "annotation",
+    [
+        collections.abc.Sequence[int],
+        collections.abc.Sequence[str],
+        collections.abc.MutableSequence[int],
+        collections.abc.Collection[int],
+        collections.abc.Set[str],
+        collections.abc.MutableSet[int],
+        collections.abc.Mapping[int, str],
+        collections.abc.MutableMapping[str, int],
+        collections.abc.Sequence[collections.abc.Sequence[int]],
+    ],
+)
+def test_annotation_to_predicate_abc_generators(annotation):
+    predicate = annotation_to_predicate(annotation)
+
+    assert all(predicate(value) for value in take(10, generate_true(predicate)))
+    assert not any(predicate(value) for value in take(10, generate_false(predicate)))
+
+
 def test_exercise_variadic_tuple():
     def total(values: tuple[int, ...]) -> int:
         return sum(values)
 
     assert take(5, exercise(total))
+
+
+def test_exercise_abc_generics():
+    def count(values: collections.abc.Sequence[str], lookup: collections.abc.Mapping[str, int]) -> int:
+        return sum(lookup.get(value, 0) for value in values)
+
+    assert take(5, exercise(count))

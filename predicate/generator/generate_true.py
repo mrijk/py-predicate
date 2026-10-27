@@ -2,7 +2,21 @@ import os
 import random
 import re
 import sys
-from collections.abc import Callable, Container, Hashable, Iterable, Iterator, Sized
+from collections.abc import (
+    Callable,
+    Collection,
+    Container,
+    Hashable,
+    Iterable,
+    Iterator,
+    Mapping,
+    MutableMapping,
+    MutableSequence,
+    MutableSet,
+    Sequence,
+    Set,
+    Sized,
+)
 from datetime import date, datetime, time, timedelta
 from decimal import Decimal
 from enum import Enum
@@ -186,7 +200,8 @@ def generate_all_p(all_predicate: AllPredicate, *, length_p: Predicate = default
         yield random_combination_with_replacement(values, max_length)
 
         values = take(max_length, generate_true(predicate))
-        yield set(random_combination_with_replacement(values, max_length))
+        if all(isinstance(value, Hashable) for value in values):
+            yield set(random_combination_with_replacement(values, max_length))
 
         values = take(max_length, generate_true(predicate))
         yield list(random_combination_with_replacement(values, max_length))
@@ -609,6 +624,17 @@ _supports_protocols: Final = (
 )
 
 
+_abc_builtins: Final[dict[Any, Any]] = {
+    Collection: list,
+    Sequence: list,
+    MutableSequence: list,
+    Set: set,
+    MutableSet: set,
+    Mapping: dict,
+    MutableMapping: dict,
+}
+
+
 def _family_generator(klass: Any, annotation: Any) -> Iterator | None:
     """Return a generator for a whole family of types (enums, paths, Supports* protocols, patterns), or None."""
     if isinstance(klass, type) and issubclass(klass, Enum):
@@ -635,6 +661,14 @@ def generate_is_instance_p(predicate: IsInstancePredicate, **kwargs: Any) -> Ite
         Container: random_containers,
         Hashable: random_hashables,
         Iterable: random_iterables,
+        # Abstract collections map to the builtin that implements them
+        Collection: random_iterables,
+        Sequence: random_lists,
+        MutableSequence: random_lists,
+        Set: random_sets,
+        MutableSet: random_sets,
+        Mapping: random_dicts,
+        MutableMapping: random_dicts,
         Predicate: random_predicates,
         UUID: random_uuids,
         ModuleType: random_modules,
@@ -673,7 +707,12 @@ def generate_is_instance_p(predicate: IsInstancePredicate, **kwargs: Any) -> Ite
 
         type_registry[Template] = random_templates
 
-    if (family_values := _family_generator(klass, annotation)) is not None:
+    if (builtin := _abc_builtins.get(klass)) and (args := get_args(annotation)):
+        from predicate.spec.exercise_helpers import annotation_to_predicate
+
+        # Sequence[int] -> list[int] etc., so the generated items have the requested types
+        yield from generate_true(annotation_to_predicate(builtin[args]))
+    elif (family_values := _family_generator(klass, annotation)) is not None:
         yield from family_values
     elif generator := type_registry.get(klass):
         yield from generator(**accepted_kwargs(generator, kwargs))
