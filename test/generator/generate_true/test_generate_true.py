@@ -1,4 +1,7 @@
+import collections.abc
+import inspect
 import sys
+import typing
 import uuid
 from datetime import datetime, timedelta
 from ipaddress import IPv4Network
@@ -82,6 +85,7 @@ from predicate import (
     tee_p,
     zero_p,
 )
+from predicate.predicate import Predicate
 from predicate.set_predicates import intersects_p, is_real_subset_p, is_real_superset_p, is_subset_p, is_superset_p
 
 
@@ -504,6 +508,28 @@ def test_generate_true_unknown_range(range_predicate):
     predicate = range_predicate(lower="bar", upper="foo")
     with pytest.raises(ValueError):
         take(5, generate_true(predicate))
+
+
+@pytest.mark.parametrize(
+    "klass",
+    [
+        Predicate[int],
+        typing.Callable,
+        typing.Callable[[int], int],
+        collections.abc.Callable[[int], int],
+        typing.Iterable,
+        collections.abc.Iterable[int],
+        inspect.Signature,
+        type,
+    ],
+)
+def test_generate_true_is_instance_generic(klass):
+    assert_generated_true(is_instance_p(klass))
+
+
+def test_generate_true_is_instance_type_of():
+    values = take(5, generate_true(is_instance_p(type[Exception])))
+    assert all(issubclass(value, Exception) for value in values)
 
 
 def test_generate_true_is_instance_unknown():

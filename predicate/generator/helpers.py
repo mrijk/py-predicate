@@ -56,89 +56,13 @@ def random_callables() -> Iterator[Callable]:
 
 
 def generate_lambda(arg_names: list[str]) -> types.FunctionType:
-    arg_count = len(arg_names)
-    arg_str = tuple(arg_names)
-
-    # Bytecode for "return 0"
-    bytecode = b"d\x00S\x00"  # LOAD_CONST 0; RETURN_VALUE
-
-    # Constants used in the function (0 is at index 0)
-    consts = (0,)
-
-    # Names used in the function (none here)
-    names = ()
-
-    # No local variables other than args
-    varnames = arg_str
-
-    # Flags
-    flags = 0x43  # OPTIMIZED | NEWLOCALS | NOFREE
-
-    # Line numbers etc.
-    filename = "<generated>"
-    name = "<lambda>"
-    firstlineno = 1
-    lnotab = b""
-
-    # Get correct CodeType constructor based on Python version
-    if sys.version_info >= (3, 11):
-        code = types.CodeType(
-            arg_count,  # co_argcount
-            0,  # co_posonlyargcount
-            0,  # co_kwonlyargcount
-            arg_count,  # co_nlocals
-            2,  # co_stacksize
-            flags,  # co_flags
-            bytecode,  # co_code
-            consts,  # co_consts
-            names,  # co_names
-            varnames,  # co_varnames
-            filename,  # co_filename
-            name,  # co_name
-            name,  # co_qualname
-            firstlineno,  # co_firstlineno
-            lnotab,  # co_linetable (Py3.11+)
-            b"",  # co_exceptiontable
-            (),  # co_freevars
-            (),  # co_cellvars
-        )
-    elif sys.version_info >= (3, 8):
-        code = types.CodeType(
-            arg_count,  # co_argcount
-            0,  # co_posonlyargcount
-            0,  # co_kwonlyargcount
-            arg_count,  # co_nlocals
-            2,  # co_stacksize
-            flags,  # co_flags
-            bytecode,  # co_code
-            consts,  # co_consts
-            names,  # co_names
-            varnames,  # co_varnames
-            filename,  # co_filename
-            name,  # co_name
-            firstlineno,  # co_firstlineno
-            lnotab,  # co_lnotab
-            (),  # co_freevars
-            (),  # co_cellvars
-        )
-    else:
-        code = types.CodeType(
-            arg_count,  # co_argcount
-            arg_count,  # co_nlocals
-            2,  # co_stacksize
-            flags,  # co_flags
-            bytecode,  # co_code
-            consts,  # co_consts
-            names,  # co_names
-            varnames,  # co_varnames
-            filename,  # co_filename
-            name,  # co_name
-            firstlineno,  # co_firstlineno
-            lnotab,  # co_lnotab
-            (),  # co_freevars
-            (),  # co_cellvars
-        )
-
+    # Start from a compiled "return 0" so the bytecode is always valid for the running Python version
+    code = (lambda: 0).__code__.replace(
+        co_argcount=len(arg_names),
+        co_nlocals=len(arg_names),
+        co_varnames=tuple(arg_names),
+        co_filename="<generated>",
+    )
     return types.FunctionType(code, {})
 
 

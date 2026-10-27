@@ -1,15 +1,14 @@
 import random
 import sys
-from collections.abc import Callable, Container, Iterable, Iterator
+from collections.abc import Callable, Container, Hashable, Iterable, Iterator
 from datetime import datetime, timedelta
 from functools import singledispatch
-from inspect import Parameter, getmembers, isfunction, signature
+from inspect import Parameter, Signature, getmembers, isfunction, signature
 from itertools import cycle, repeat
 from types import ModuleType, UnionType
 from typing import (
     Any,
     Final,
-    Hashable,
     Protocol,
     SupportsAbs,
     SupportsBytes,
@@ -17,12 +16,14 @@ from typing import (
     SupportsIndex,
     SupportsInt,
     get_args,
+    get_origin,
 )
 from uuid import UUID
 
 import exrex  # type: ignore
 from more_itertools import (
     chunked,
+    first,
     flatten,
     powerset_of_sets,
     random_combination_with_replacement,
@@ -73,6 +74,7 @@ from predicate.generator.helpers import (
     random_modules,
     random_predicates,
     random_sets,
+    random_signatures,
     random_strings,
     random_tuples,
     random_uuids,
@@ -100,7 +102,7 @@ from predicate.is_predicate import IsPredicate
 from predicate.is_predicate_of_p import IsPredicateOfPredicate
 from predicate.is_protocol_predicate import IsProtocolPredicate
 from predicate.is_regex_predicate import IsRegexPredicate
-from predicate.is_subclass_predicate import IsSubclassPredicate
+from predicate.is_subclass_predicate import IsSubclassPredicate, is_subclass_p
 from predicate.is_truthy_predicate import IsTruthyPredicate
 from predicate.juxt_predicate import JuxtPredicate
 from predicate.le_predicate import LePredicate
@@ -574,7 +576,9 @@ def generate_predicate_of(predicate: IsPredicateOfPredicate, **kwargs) -> Iterat
 
 @generate_true.register
 def generate_is_instance_p(predicate: IsInstancePredicate, **kwargs) -> Iterator:
-    klass = predicate.instance_klass[0]  # type: ignore
+    annotation = predicate.instance_klass[0]  # type: ignore
+    # Generic aliases such as Predicate[int], typing.Callable and Iterable[int] map to their origin class
+    klass = get_origin(annotation) or annotation
 
     type_registry: dict[Any, Callable[[], Iterator]] = {
         Callable: random_callables,
@@ -584,6 +588,7 @@ def generate_is_instance_p(predicate: IsInstancePredicate, **kwargs) -> Iterator
         Predicate: random_predicates,
         UUID: random_uuids,
         ModuleType: random_modules,
+        Signature: random_signatures,
         bool: random_bools,
         complex: random_complex_numbers,
         datetime: random_datetimes,
@@ -612,6 +617,9 @@ def generate_is_instance_p(predicate: IsInstancePredicate, **kwargs) -> Iterator
 
     if generator := type_registry.get(klass):
         yield from generator(**kwargs)
+    elif klass is type:
+        # For type[X] yield X and its subclasses, for plain type any class
+        yield from generate_true(is_subclass_p(first(get_args(annotation), object)))
     elif klass == ConstrainedT:
         iterables = [random_ints()]
         yield from random_first_from_iterables(*iterables)
