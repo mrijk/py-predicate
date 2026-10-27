@@ -64,6 +64,10 @@ def annotation_to_predicate(annotation: Any) -> Predicate:  # noqa: C901
         return always_false_p  # no value inhabits Never
     if annotation is LiteralString:
         return is_str_p  # literal-ness is not observable at runtime
+    if annotation is float:
+        return is_instance_p(float, int)  # PEP 484 numeric tower: int is acceptable for float
+    if annotation is complex:
+        return is_instance_p(complex, float, int)
     origin = get_origin(annotation)
     if origin in _type_narrowing_origins:
         return always_true_p  # TypeGuard/TypeIs is bool at runtime

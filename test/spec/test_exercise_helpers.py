@@ -61,3 +61,19 @@ def test_annotation_to_predicate_literal_string():
 
     assert predicate("abc") is True
     assert predicate(1) is False
+
+
+@pytest.mark.parametrize(
+    ("annotation", "value", "expected"),
+    [
+        (float, 1, True),
+        (float, 1.5, True),
+        (float, "1", False),
+        (complex, 1, True),
+        (complex, 1.5, True),
+        (complex, 1j, True),
+        (int, 1.5, False),
+    ],
+)
+def test_annotation_to_predicate_numeric_tower(annotation, value, expected):
+    assert annotation_to_predicate(annotation)(value) is expected
