@@ -1,10 +1,12 @@
 import math
 import random
+import re
 import string
 import sys
 import types
 from collections.abc import Callable, Iterable
 from datetime import date, datetime, time, timedelta
+from decimal import Decimal
 from enum import Enum, Flag
 from functools import cache, reduce, wraps
 from inspect import Parameter, Signature, signature
@@ -453,3 +455,27 @@ def random_paths(klass: type[PurePath] = PurePath) -> Iterator[PurePath]:
     segments = random_strings(min_size=1, max_size=8)
     while True:
         yield klass(*take(random.randint(0, 4), segments))
+
+
+def random_decimals() -> Iterator[Decimal]:
+    yield from (Decimal(0), Decimal("-1.5"), Decimal("0.000001"))
+    # NaN and Infinity are left out: they break most arithmetic code
+    yield from interleave(map(Decimal, random_ints()), map(Decimal, map(str, random_floats())))
+
+
+def random_supports(protocol: type) -> Iterator[Any]:
+    """Generate values for a typing.Supports* protocol, keeping the candidates that implement it."""
+    candidates = interleave(random_ints(), random_floats(), random_complex_numbers(), random_decimals(), random_bytes())
+    yield from (value for value in candidates if isinstance(value, protocol))
+
+
+def random_sized() -> Iterator[Any]:
+    yield from interleave(random_strings(), random_lists(), random_dicts(), random_sets(), random_tuples())
+
+
+_simple_patterns: Final = (r"", r"a", r"\d+", r"[a-z]*", r"^\w+$", r"(ab|cd)?", r".", r"x{2,3}")
+
+
+def random_patterns(kind: type = str) -> Iterator[re.Pattern]:
+    patterns = [pattern if kind is str else pattern.encode() for pattern in _simple_patterns]
+    yield from repeatfunc(lambda: re.compile(random.choice(patterns)))
