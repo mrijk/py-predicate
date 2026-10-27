@@ -1,5 +1,6 @@
 import sys
 import types
+from functools import reduce
 from inspect import Parameter, Signature, isroutine, signature
 from itertools import islice, repeat, takewhile
 from typing import (
@@ -74,7 +75,7 @@ def annotation_to_predicate(annotation: Any) -> Predicate:  # noqa: C901
     if origin in _type_narrowing_origins:
         return always_true_p  # TypeGuard/TypeIs is bool at runtime
     if origin in _union_origins:
-        return or_p(*[annotation_to_predicate(t) for t in get_args(annotation)])
+        return reduce(or_p, [annotation_to_predicate(t) for t in get_args(annotation)])
     if origin is Literal:
         return in_p(get_args(annotation))
     if origin is list:

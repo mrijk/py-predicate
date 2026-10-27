@@ -568,3 +568,8 @@ def test_generate_has_length_p_with_klass(length_p, value_p):
     for value in values:
         assert predicate(value)
         assert values_p(value)
+
+
+def test_generate_true_ignores_unknown_kwargs():
+    assert all(isinstance(value, str) for value in take(5, generate_true(is_str_p, length_p=ge_p(1))))
+    assert take(3, generate_true(eq_p(2), length_p=ge_p(1))) == [2, 2, 2]

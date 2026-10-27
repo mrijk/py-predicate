@@ -522,3 +522,7 @@ def test_generate_false_is_callable_signature():
     predicate = is_callable_signature_p(params=[int], return_type=str)
 
     assert_generated_false(predicate)
+
+
+def test_generate_false_ignores_unknown_kwargs():
+    assert all(value != 2 for value in take(5, generate_false(eq_p(2), length_p=ge_p(1))))
