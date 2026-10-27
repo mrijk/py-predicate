@@ -19,13 +19,14 @@ from typing import (
 
 from more_itertools import first, take
 
-from predicate import always_false_p, always_true_p, generate_true, is_instance_p, is_str_p
+from predicate import always_false_p, always_true_p, generate_true, is_instance_p
 from predicate.dict_of_predicate import is_dict_of_p
 from predicate.explain import explain
 from predicate.frozendict_of_predicate import is_frozendict_of_p
 from predicate.frozenset_of_predicate import is_frozenset_of_p
 from predicate.implies import implies
 from predicate.in_predicate import in_p
+from predicate.is_instance_predicate import is_str_p
 from predicate.is_none_predicate import is_none_p
 from predicate.list_of_predicate import is_list_of_p
 from predicate.or_predicate import or_p
