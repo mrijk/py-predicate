@@ -1,4 +1,5 @@
 import asyncio
+import sys
 from typing import Any
 
 import pytest
@@ -19,7 +20,7 @@ def test_instrument_wrong_parameter():
 
     with pytest.raises(
         SpecViolationError,
-        match="Parameter predicate for function max_int_with_bug failed. Reason: False is not an instance of type int",
+        match="Parameter predicate for parameter 'y' of function max_int_with_bug failed. Reason: False is not an instance of type int",
     ):
         max_int_with_bug(4, False)
 
@@ -139,7 +140,7 @@ def test_instrument_decorator():
 
     assert add(2, 3) == 5
 
-    with pytest.raises(SpecViolationError, match="Parameter predicate for function add failed"):
+    with pytest.raises(SpecViolationError, match="Parameter predicate for parameter 'x' of function add failed"):
         add("not-an-int", 3)
 
 
@@ -156,7 +157,7 @@ def test_instrument_async_wrong_parameter():
     async def async_add(x: int, y: int) -> int:
         return x + y
 
-    with pytest.raises(SpecViolationError, match="Parameter predicate for function async_add failed"):
+    with pytest.raises(SpecViolationError, match="Parameter predicate for parameter 'x' of function async_add failed"):
         asyncio.run(async_add("not-an-int", 3))
 
 
@@ -240,7 +241,7 @@ def test_instrument_enriches_args_from_annotation() -> None:
 
     assert add(2, 3) == 5
 
-    with pytest.raises(SpecViolationError, match="Parameter predicate for function add failed"):
+    with pytest.raises(SpecViolationError, match="Parameter predicate for parameter 'x' of function add failed"):
         add("not-an-int", 3)
 
 
@@ -410,10 +411,10 @@ def test_instrument_module_instruments_all_annotated_functions():
     assert sample_module.add(2, 3) == 5
     assert sample_module.greet("world") == "Hello, world"
 
-    with pytest.raises(SpecViolationError, match="Parameter predicate for function add failed"):
+    with pytest.raises(SpecViolationError, match="Parameter predicate for parameter 'x' of function add failed"):
         sample_module.add("oops", 3)
 
-    with pytest.raises(SpecViolationError, match="Parameter predicate for function greet failed"):
+    with pytest.raises(SpecViolationError, match="Parameter predicate for parameter 'name' of function greet failed"):
         sample_module.greet(42)
 
 
@@ -423,7 +424,7 @@ def test_instrument_module_with_pattern():
 
     assert sample_module.add(2, 3) == 5  # not instrumented, no check
 
-    with pytest.raises(SpecViolationError, match="Parameter predicate for function greet failed"):
+    with pytest.raises(SpecViolationError, match="Parameter predicate for parameter 'name' of function greet failed"):
         sample_module.greet(42)
 
 
@@ -443,7 +444,7 @@ def test_instrument_module_with_on_error():
     sample_module.greet(42)
 
     assert len(errors) == 1
-    assert "Parameter predicate for function greet failed" in errors[0]
+    assert "Parameter predicate for parameter 'name' of function greet failed" in errors[0]
 
 
 def test_instrument_raises_expected_exception() -> None:
@@ -550,7 +551,7 @@ def test_instrument_quoted_annotations():
 
     assert length("ab") == 2
 
-    with pytest.raises(SpecViolationError, match="Parameter predicate for function length failed"):
+    with pytest.raises(SpecViolationError, match="Parameter predicate for parameter 'x' of function length failed"):
         length(1)
 
 
@@ -561,7 +562,7 @@ def test_instrument_raises_spec_violation():
     def double(x: int) -> int:
         return x * 2
 
-    with pytest.raises(SpecViolationError, match="Parameter predicate for function double failed"):
+    with pytest.raises(SpecViolationError, match="Parameter predicate for parameter 'x' of function double failed"):
         double("a")
 
 
@@ -604,3 +605,32 @@ def test_instrument_var_keyword():
     assert varkwargs(a=1, b=2) == 3
     with pytest.raises(SpecViolationError, match="x is not an instance of type int"):
         varkwargs(a=1, b="x")
+
+
+@pytest.mark.skipif(sys.version_info < (3, 14), reason="needs deferred evaluation of annotations (PEP 649)")
+def test_instrument_forward_reference_without_future_import():
+    from spec.test_functions.forward_reference import Node
+
+    assert isinstance(Node().child(Node()), Node)
+
+
+def test_instrument_signature_computed_once(monkeypatch):
+    import predicate.spec.instrument as instrument_module_
+
+    calls = []
+    original = instrument_module_.signature
+
+    def counting_signature(func):
+        calls.append(func)
+        return original(func)
+
+    monkeypatch.setattr(instrument_module_, "signature", counting_signature)
+
+    @instrument
+    def add(x: int, y: int) -> int:
+        return x + y
+
+    for i in range(3):
+        add(i, i)
+
+    assert len(calls) == 1

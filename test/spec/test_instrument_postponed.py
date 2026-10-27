@@ -38,7 +38,7 @@ def test_instrument_postponed_ok():
 
 
 def test_instrument_postponed_wrong_parameter():
-    with pytest.raises(SpecViolationError, match="Parameter predicate for function add failed"):
+    with pytest.raises(SpecViolationError, match="Parameter predicate for parameter 'y' of function add failed"):
         add(1, "2")
 
 
@@ -70,5 +70,5 @@ def test_instrument_postponed_quoted_annotations():
 
     assert total([1], [2]) == 3
 
-    with pytest.raises(SpecViolationError, match="Parameter predicate for function total failed"):
+    with pytest.raises(SpecViolationError, match="Parameter predicate for parameter 'y' of function total failed"):
         total([1], ["2"])
