@@ -14,6 +14,15 @@ def test_annotation_to_predicate_set():
     assert predicate([1, 2, 3]) is False
 
 
+def test_annotation_to_predicate_dict():
+    predicate = annotation_to_predicate(dict[str, int])
+
+    assert predicate({})
+    assert predicate({"a": 1})
+    assert not predicate({"a": "b"})
+    assert not predicate([])
+
+
 def test_annotation_to_predicate_frozenset():
     predicate = annotation_to_predicate(frozenset[int])
 

@@ -10,8 +10,8 @@ def all_true[T](iterable: Iterable[T], predicate: Predicate[T]) -> bool:
     return all(predicate(item) for item in iterable)
 
 
-def first_false[T](iterable: Iterable[T], predicate: Predicate[T]) -> T:
-    return first(filterfalse(predicate, iterable))
+def first_false[T](iterable: Iterable[T], predicate: Predicate[T]) -> T | None:
+    return first(filterfalse(predicate, iterable), default=None)
 
 
 def predicates_repr(predicates: list[Predicate]) -> str:
@@ -32,8 +32,6 @@ def join_as_str(v: Iterable) -> str:
 
 
 def join_with_or(s: list[str]) -> str:
-    first = s[:-1]
-    last = s[-1]
-    if first:
-        return f"{', '.join(first)} or {last}"
-    return last
+    if len(s) < 2:
+        return "".join(s)
+    return f"{', '.join(s[:-1])} or {s[-1]}"

@@ -15,7 +15,7 @@ from predicate import (
     is_subnormal_p,
     or_p,
 )
-from predicate.fn_predicate import as_predicate, generate_inf, undefined
+from predicate.fn_predicate import _undefined, as_predicate, generate_inf
 from predicate.match_predicate import match_p
 from predicate.predicate import predicate_partial
 
@@ -83,7 +83,7 @@ def test_is_subnormal_p():
 
 def test_undefined_raises_with_message():
     with pytest.raises(ValueError, match=r"^Please register generator type$"):
-        undefined()
+        _undefined()
 
 
 def test_generate_inf_first_value_is_negative():

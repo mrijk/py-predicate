@@ -343,3 +343,31 @@ def test_match_explain_plus_repetition_predicate():
     assert not predicate([1, 2])
     result = explain(predicate, [1, 2])
     assert result["result"] is False
+
+
+def test_match_no_predicates():
+    assert match_p()([])
+    assert match_p()([1, 2])
+
+
+def test_match_no_predicates_full_match():
+    predicate = match_p(full_match=True)
+
+    assert predicate([])
+    assert not predicate([1])
+
+    expected = {
+        "reason": {"reason": "Iterable has more items than predicates to match", "result": False},
+        "result": False,
+    }
+    assert explain(predicate, [1]) == expected
+
+
+def test_match_explain_iterable_too_short():
+    predicate = match_p(eq_p(1), eq_p(2))
+
+    expected = {
+        "reason": {"reason": "Iterable has no item left to match against eq_p(2)", "result": False},
+        "result": False,
+    }
+    assert explain(predicate, [1]) == expected

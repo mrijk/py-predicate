@@ -17,6 +17,7 @@ from predicate.in_predicate import InPredicate
 from predicate.le_predicate import LePredicate
 from predicate.lt_predicate import LtPredicate
 from predicate.ne_predicate import NePredicate
+from predicate.not_in_predicate import NotInPredicate
 from predicate.not_predicate import NotPredicate
 from predicate.or_predicate import OrPredicate
 from predicate.predicate import Predicate
@@ -89,6 +90,8 @@ def to_latex(predicate: Predicate, parameter: str = "x") -> str:  # noqa: C901
             return f"{parameter} \\lt {v}"
         case NePredicate(v):
             return f"{parameter} \\neq {v}"
+        case NotInPredicate(v) if isinstance(v, Iterable):
+            return f"x \\notin {set_to_latex_set(v)}"
         case NotPredicate(child):
             return f"\\neg {to_latex(child)}"
         case OrPredicate(left, right):
