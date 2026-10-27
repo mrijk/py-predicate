@@ -52,7 +52,7 @@ test = [
     "pydantic",
     "mypy>=2.4",
     "mypy_extensions",
-    "pytest",
+    "pytest<9.2",  # pytest-benchmark 5.3.0 reads Function._nodeid, removed in 9.2 (ionelmc/pytest-benchmark#321)
     "pytest-asyncio",
     "pytest-benchmark",
     "pytest-cov",
