@@ -201,3 +201,7 @@ def check_exception(spec: Spec, value: dict, exc: Exception) -> Exception:
             f"Not conform spec: unexpected exception {type(exc).__name__} for inputs {value}"
         ) from exc
     return exc
+
+
+def no_spec_error(name: str, missing: str) -> InvalidSpecError:
+    return InvalidSpecError(f"Cannot derive spec for '{name}': {missing}; pass a Spec or annotate it")
