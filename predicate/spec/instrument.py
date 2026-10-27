@@ -1,3 +1,4 @@
+import os
 import sys
 from fnmatch import fnmatch
 from functools import cache, wraps
@@ -18,6 +19,23 @@ from predicate.spec.exercise_helpers import (
     ret_name,
 )
 from predicate.spec.spec import Spec, SpecViolationError
+
+
+def _enabled_from_environment(value: str | None) -> bool:
+    return (value or "").strip().lower() not in {"0", "false", "no", "off"}
+
+
+_enabled = _enabled_from_environment(os.environ.get("PREDICATE_INSTRUMENT"))
+
+
+def set_instrumentation(enabled: bool) -> None:
+    """Turn the checks of all instrumented functions on or off; when off they call the original function directly."""
+    global _enabled
+    _enabled = enabled
+
+
+def is_instrumentation_enabled() -> bool:
+    return _enabled
 
 
 def enrich_spec(func: Callable, spec: Spec) -> Spec:
@@ -125,6 +143,43 @@ def _report(on_error: OnError, error: str | None) -> None:
         on_error(error)
 
 
+def _make_wrapper(
+    func: Callable,
+    before: Callable[[tuple, dict], dict],
+    on_exception: Callable[[Exception], None],
+    after: Callable[[dict, Any], Any],
+) -> Callable:
+    if is_async_p(func):
+
+        @wraps(func)
+        async def wrapped(*args, **kwargs):
+            if not _enabled:
+                return await func(*args, **kwargs)
+            arguments = before(args, kwargs)
+            try:
+                result = await func(*args, **kwargs)
+            except Exception as exc:
+                on_exception(exc)
+                raise
+            return after(arguments, result)
+
+        return wrapped
+
+    @wraps(func)
+    def wrapped_sync(*args, **kwargs):
+        if not _enabled:
+            return func(*args, **kwargs)
+        arguments = before(args, kwargs)
+        try:
+            result = func(*args, **kwargs)
+        except Exception as exc:
+            on_exception(exc)
+            raise
+        return after(arguments, result)
+
+    return wrapped_sync
+
+
 def instrument_function(func: Callable, spec: Spec, on_error: OnError = _default_on_error) -> Callable:
     if is_instrumented(func):
         return func
@@ -148,29 +203,7 @@ def instrument_function(func: Callable, spec: Spec, on_error: OnError = _default
         _report(on_error, _check_constraints(resolved_spec(), func_name, arguments, result))
         return result
 
-    if is_async_p(func):
-
-        @wraps(func)
-        async def wrapped(*args, **kwargs):
-            arguments = _before(args, kwargs)
-            try:
-                result = await func(*args, **kwargs)
-            except Exception as exc:
-                _on_exception(exc)
-                raise
-            return _after(arguments, result)
-    else:
-
-        @wraps(func)
-        def wrapped(*args, **kwargs):
-            arguments = _before(args, kwargs)
-            try:
-                result = func(*args, **kwargs)
-            except Exception as exc:
-                _on_exception(exc)
-                raise
-            return _after(arguments, result)
-
+    wrapped = _make_wrapper(func, _before, _on_exception, _after)
     wrapped.__spec__ = spec  # type: ignore
     _replace_in_module(func, wrapped)
     return wrapped

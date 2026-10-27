@@ -115,7 +115,9 @@ from predicate.spec.instrument import (
     instrument_class,
     instrument_function,
     instrument_module,
+    is_instrumentation_enabled,
     is_instrumented,
+    set_instrumentation,
 )
 from predicate.spec.is_valid_spec_predicate import is_valid_spec_p
 from predicate.spec.spec import InvalidSpecError, Spec, SpecViolationError
@@ -181,6 +183,7 @@ __all__ = [
     "instrument_class",
     "instrument_function",
     "instrument_module",
+    "is_instrumentation_enabled",
     "is_instrumented",
     "is_valid_spec_p",
     "InvalidSpecError",
@@ -293,6 +296,7 @@ __all__ = [
     "repeat",
     "root_p",
     "same_signature_p",
+    "set_instrumentation",
     "star",
     "starts_with_p",
     "tee_p",

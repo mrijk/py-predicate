@@ -170,6 +170,8 @@ instrument_class(MyClass)
 
 Specs can include cross-argument constraints via `fn` or `fn_p` keys, and expected exception types via `raises`.
 
+To turn all checks off without removing the decorators, set `PREDICATE_INSTRUMENT=0` or call `set_instrumentation(False)`.
+
 ## Analysis
 
 Check logical properties of predicates:

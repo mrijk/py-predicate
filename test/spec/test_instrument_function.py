@@ -4,8 +4,14 @@ from typing import Any
 
 import pytest
 
-from predicate import ge_p, is_instrumented, is_int_p
-from predicate.spec.instrument import enrich_spec, instrument, instrument_function, instrument_module
+from predicate import ge_p, is_instrumentation_enabled, is_instrumented, is_int_p, set_instrumentation
+from predicate.spec.instrument import (
+    _enabled_from_environment,
+    enrich_spec,
+    instrument,
+    instrument_function,
+    instrument_module,
+)
 from predicate.spec.spec import InvalidSpecError, Spec, SpecViolationError
 
 
@@ -634,3 +640,62 @@ def test_instrument_signature_computed_once(monkeypatch):
         add(i, i)
 
     assert len(calls) == 1
+
+
+@pytest.fixture
+def instrumentation_off():
+    set_instrumentation(False)
+    yield
+    set_instrumentation(True)
+
+
+def test_instrumentation_enabled_by_default():
+    assert is_instrumentation_enabled()
+
+
+def test_instrumentation_disabled_skips_checks(instrumentation_off):
+    @instrument
+    def add(x: int, y: int) -> int:
+        return x + y
+
+    assert add(1.5, 1) == 2.5
+
+
+def test_instrumentation_disabled_skips_checks_async(instrumentation_off):
+    @instrument
+    async def add(x: int, y: int) -> int:
+        return x + y
+
+    assert asyncio.run(add(1.5, 1)) == 2.5
+
+
+def test_instrumentation_switch_is_checked_at_call_time():
+    @instrument
+    def add(x: int, y: int) -> int:
+        return x + y
+
+    set_instrumentation(False)
+    try:
+        assert add(1.5, 1) == 2.5
+    finally:
+        set_instrumentation(True)
+
+    with pytest.raises(SpecViolationError):
+        add(1.5, 1)
+
+
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
+        (None, True),
+        ("", True),
+        ("1", True),
+        ("yes", True),
+        ("0", False),
+        ("off", False),
+        (" FALSE ", False),
+        ("no", False),
+    ],
+)
+def test_instrumentation_environment_variable(value, expected):
+    assert _enabled_from_environment(value) is expected
