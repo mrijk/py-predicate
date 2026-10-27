@@ -1,4 +1,5 @@
 import asyncio
+import sys
 from typing import Any
 
 import pytest
@@ -604,3 +605,32 @@ def test_instrument_var_keyword():
     assert varkwargs(a=1, b=2) == 3
     with pytest.raises(SpecViolationError, match="x is not an instance of type int"):
         varkwargs(a=1, b="x")
+
+
+@pytest.mark.skipif(sys.version_info < (3, 14), reason="needs deferred evaluation of annotations (PEP 649)")
+def test_instrument_forward_reference_without_future_import():
+    from spec.test_functions.forward_reference import Node
+
+    assert isinstance(Node().child(Node()), Node)
+
+
+def test_instrument_signature_computed_once(monkeypatch):
+    import predicate.spec.instrument as instrument_module_
+
+    calls = []
+    original = instrument_module_.signature
+
+    def counting_signature(func):
+        calls.append(func)
+        return original(func)
+
+    monkeypatch.setattr(instrument_module_, "signature", counting_signature)
+
+    @instrument
+    def add(x: int, y: int) -> int:
+        return x + y
+
+    for i in range(3):
+        add(i, i)
+
+    assert len(calls) == 1
