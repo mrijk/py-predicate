@@ -1,8 +1,10 @@
 import sys
-from typing import LiteralString, Never, NoReturn
+from typing import LiteralString, Never, NoReturn, Tuple
 
 import pytest
+from more_itertools import take
 
+from predicate import exercise, generate_false, generate_true
 from predicate.spec.exercise_helpers import annotation_to_predicate
 
 
@@ -95,3 +97,41 @@ def test_annotation_to_predicate_union_of_three():
     assert predicate("a") is True
     assert predicate(None) is True
     assert predicate(1.5) is False
+
+
+@pytest.mark.parametrize(
+    ("annotation", "value", "expected"),
+    [
+        (tuple[int, ...], (), True),
+        (tuple[int, ...], (1, 2, 3), True),
+        (tuple[int, ...], (1, "x"), False),
+        (tuple[int, ...], [1, 2], False),
+        (Tuple[str, ...], ("a",), True),
+        (Tuple[str, ...], (1,), False),
+        (tuple[()], (), True),
+        (tuple[()], (1,), False),
+        (tuple[()], [], False),
+        (Tuple[()], (), True),
+        (Tuple[()], (1,), False),
+        (Tuple, (1, "x"), True),
+        (tuple[int, str], (1, "x"), True),
+        (tuple[int, str], (1, 2), False),
+    ],
+)
+def test_annotation_to_predicate_tuple(annotation, value, expected):
+    assert annotation_to_predicate(annotation)(value) is expected
+
+
+@pytest.mark.parametrize("annotation", [tuple[int, ...], tuple[()]])
+def test_annotation_to_predicate_tuple_generators(annotation):
+    predicate = annotation_to_predicate(annotation)
+
+    assert all(predicate(value) for value in take(10, generate_true(predicate)))
+    assert not any(predicate(value) for value in take(10, generate_false(predicate)))
+
+
+def test_exercise_variadic_tuple():
+    def total(values: tuple[int, ...]) -> int:
+        return sum(values)
+
+    assert take(5, exercise(total))
