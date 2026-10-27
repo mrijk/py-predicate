@@ -12,6 +12,7 @@ Features:
 - new predicates is_frozenset_of_p and is_frozendict_of_p
 - new type check predicate is_module_p
 - new type check predicate is_sentinel_p (Python 3.15+, always False on older versions)
+- new optional Spec key ret_name to rename the return value passed to fn (avoids clashes with a 'ret' parameter)
 
 Breaking changes:
 
