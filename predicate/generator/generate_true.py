@@ -1,8 +1,10 @@
 import os
 import random
+import re
 import sys
-from collections.abc import Callable, Container, Hashable, Iterable, Iterator
+from collections.abc import Callable, Container, Hashable, Iterable, Iterator, Sized
 from datetime import date, datetime, time, timedelta
+from decimal import Decimal
 from enum import Enum
 from functools import singledispatch
 from inspect import Parameter, Signature, getmembers, isfunction, signature
@@ -15,9 +17,11 @@ from typing import (
     Protocol,
     SupportsAbs,
     SupportsBytes,
+    SupportsComplex,
     SupportsFloat,
     SupportsIndex,
     SupportsInt,
+    SupportsRound,
     get_args,
     get_origin,
 )
@@ -70,6 +74,7 @@ from predicate.generator.helpers import (
     random_containers,
     random_dates,
     random_datetimes,
+    random_decimals,
     random_dicts,
     random_enum_members,
     random_first_from_iterables,
@@ -82,10 +87,13 @@ from predicate.generator.helpers import (
     random_lists,
     random_modules,
     random_paths,
+    random_patterns,
     random_predicates,
     random_sets,
     random_signatures,
+    random_sized,
     random_strings,
+    random_supports,
     random_timedeltas,
     random_times,
     random_tuples,
@@ -587,6 +595,30 @@ def generate_predicate_of(predicate: IsPredicateOfPredicate, **kwargs: Any) -> I
     yield from random_predicates(**kwargs, klass=predicate.predicate_klass)
 
 
+_supports_protocols: Final = (
+    SupportsAbs,
+    SupportsBytes,
+    SupportsComplex,
+    SupportsFloat,
+    SupportsIndex,
+    SupportsInt,
+    SupportsRound,
+)
+
+
+def _family_generator(klass: Any, annotation: Any) -> Iterator | None:
+    """Return a generator for a whole family of types (enums, paths, Supports* protocols, patterns), or None."""
+    if isinstance(klass, type) and issubclass(klass, Enum):
+        return random_enum_members(klass)
+    if isinstance(klass, type) and issubclass(klass, PurePath):
+        return random_paths(klass)
+    if klass in _supports_protocols:
+        return random_supports(klass)
+    if klass is re.Pattern:
+        return random_patterns(first(get_args(annotation), str))
+    return None
+
+
 @generate_true.register
 def generate_is_instance_p(predicate: IsInstancePredicate, **kwargs: Any) -> Iterator:
     annotation = predicate.instance_klass[0]  # type: ignore
@@ -607,6 +639,8 @@ def generate_is_instance_p(predicate: IsInstancePredicate, **kwargs: Any) -> Ite
         bytearray: random_bytearrays,
         bytes: random_bytes,
         date: random_dates,
+        Decimal: random_decimals,
+        Sized: random_sized,
         datetime: random_datetimes,
         os.PathLike: random_paths,
         time: random_times,
@@ -634,10 +668,8 @@ def generate_is_instance_p(predicate: IsInstancePredicate, **kwargs: Any) -> Ite
 
         type_registry[Template] = random_templates
 
-    if isinstance(klass, type) and issubclass(klass, Enum):
-        yield from random_enum_members(klass)
-    elif isinstance(klass, type) and issubclass(klass, PurePath):
-        yield from random_paths(klass)
+    if (family_values := _family_generator(klass, annotation)) is not None:
+        yield from family_values
     elif generator := type_registry.get(klass):
         yield from generator(**accepted_kwargs(generator, kwargs))
     elif klass is type:
