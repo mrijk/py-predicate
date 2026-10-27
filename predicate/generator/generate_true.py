@@ -86,6 +86,8 @@ from predicate.generator.helpers import (
     random_lambdas,
     random_lists,
     random_modules,
+    random_named_tuple_instances,
+    random_named_tuples,
     random_paths,
     random_patterns,
     random_predicates,
@@ -116,6 +118,7 @@ from predicate.is_close_predicate import IsClosePredicate
 from predicate.is_falsy_predicate import IsFalsyPredicate
 from predicate.is_instance_predicate import IsInstancePredicate
 from predicate.is_lambda_predicate import IsLambdaPredicate
+from predicate.is_named_tuple_predicate import IsNamedTuplePredicate, is_named_tuple_class
 from predicate.is_none_predicate import IsNonePredicate
 from predicate.is_not_none_predicate import IsNotNonePredicate
 from predicate.is_predicate import IsPredicate
@@ -616,6 +619,8 @@ def _family_generator(klass: Any, annotation: Any) -> Iterator | None:
         return random_supports(klass)
     if klass is re.Pattern:
         return random_patterns(first(get_args(annotation), str))
+    if is_named_tuple_class(klass):
+        return random_named_tuple_instances(klass)
     return None
 
 
@@ -701,6 +706,11 @@ def generate_is_async_p(predicate: IsAsyncPredicate) -> Iterator:
 
     while True:
         yield _async_fn
+
+
+@generate_true.register
+def generate_is_named_tuple_p(_predicate: IsNamedTuplePredicate) -> Iterator:
+    yield from random_named_tuples()
 
 
 @generate_true.register

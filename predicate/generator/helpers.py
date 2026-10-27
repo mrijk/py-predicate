@@ -4,6 +4,7 @@ import re
 import string
 import sys
 import types
+from collections import namedtuple
 from collections.abc import Callable, Iterable
 from datetime import date, datetime, time, timedelta
 from decimal import Decimal
@@ -14,7 +15,7 @@ from itertools import count, cycle
 from operator import or_
 from pathlib import PurePath
 from random import choices
-from typing import Any, Final, Iterator
+from typing import Any, Final, Iterator, get_type_hints
 from uuid import UUID, uuid4
 
 from more_itertools import interleave, random_permutation, repeatfunc, take, unique_everseen
@@ -275,6 +276,25 @@ def random_uuids() -> Iterator[UUID]:
 
 def random_anys() -> Iterator[Any]:
     yield from interleave(random_bools(), random_ints(), random_strings(), random_floats(), random_datetimes())
+
+
+def random_named_tuples() -> Iterator[tuple]:
+    # ponytail: every value gets a fresh namedtuple class; cache classes if that turns out to be slow
+    field_names = random_lists(length_p=ge_le_p(lower=0, upper=4), value_p=regex_p("[a-z]{2,4}"))
+    for names in field_names:
+        klass = namedtuple("RandomNamedTuple", unique_everseen(names))  # type: ignore[misc]  # noqa: PYI024
+        yield klass(*take(len(klass._fields), random_anys()))
+
+
+def random_named_tuple_instances(klass: type) -> Iterator[tuple]:
+    from predicate import generate_true
+    from predicate.spec.exercise_helpers import annotation_to_predicate
+
+    # Fields without an annotation (collections.namedtuple) accept any value
+    hints = get_type_hints(klass)
+    generators = [generate_true(annotation_to_predicate(hints.get(field, Any))) for field in klass._fields]  # type: ignore[attr-defined]
+    while True:
+        yield klass(*(next(generator) for generator in generators))
 
 
 def random_values_of_type(klass: type) -> Iterator[Any]:

@@ -44,6 +44,7 @@ from predicate.generator.helpers import (
     random_non_hashables,
     random_sets,
     random_strings,
+    random_tuples,
     random_values_of_type,
     sample_optional_fields,
     unused_name,
@@ -61,6 +62,7 @@ from predicate.is_close_predicate import IsClosePredicate
 from predicate.is_falsy_predicate import IsFalsyPredicate
 from predicate.is_instance_predicate import IsInstancePredicate
 from predicate.is_lambda_predicate import IsLambdaPredicate
+from predicate.is_named_tuple_predicate import IsNamedTuplePredicate
 from predicate.is_none_predicate import IsNonePredicate
 from predicate.is_not_none_predicate import IsNotNonePredicate
 from predicate.is_predicate import IsPredicate
@@ -480,6 +482,12 @@ def generate_is_instance_p(predicate: IsInstancePredicate) -> Iterator:
 @generate_false.register
 def generate_is_async_p(predicate: IsAsyncPredicate) -> Iterator:
     yield from random_lambdas()
+
+
+@generate_false.register
+def generate_is_named_tuple_p(predicate: IsNamedTuplePredicate) -> Iterator:
+    # Plain tuples are the interesting near misses
+    yield from interleave(random_tuples(), generate_anys(NotPredicate(predicate=predicate)))
 
 
 @generate_false.register
