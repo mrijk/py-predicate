@@ -783,6 +783,25 @@ This predicate tests if the value is a module.
     assert not is_module_p("math")
     assert not is_module_p(math.sqrt)
 
+is_named_tuple_p
+----------------
+
+This predicate tests if the value is a named tuple, created with ``typing.NamedTuple`` or ``collections.namedtuple``.
+Plain tuples are rejected.
+
+.. code-block:: python
+
+    from typing import NamedTuple
+
+    from predicate import is_named_tuple_p
+
+    class Point(NamedTuple):
+        x: int
+        y: int
+
+    assert is_named_tuple_p(Point(1, 2))
+    assert not is_named_tuple_p((1, 2))
+
 is_nan_p
 --------
 

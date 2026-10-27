@@ -68,6 +68,7 @@ from predicate.is_instance_predicate import (
     is_frozendict_p,
 )
 from predicate.is_lambda_predicate import is_lambda_p, is_lambda_with_signature_p
+from predicate.is_named_tuple_predicate import is_named_tuple_p
 from predicate.is_none_predicate import is_none_p, none_is_exception_p, none_is_true_p
 from predicate.is_not_none_predicate import is_not_none_p, none_is_false_p
 from predicate.is_predicate import is_p
@@ -227,6 +228,7 @@ __all__ = [
     "is_lambda_with_signature_p",
     "is_list_of_p",
     "is_list_p",
+    "is_named_tuple_p",
     "is_lower_p",
     "is_mapping_p",
     "is_module_p",
