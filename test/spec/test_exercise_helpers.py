@@ -191,3 +191,18 @@ def test_exercise_abc_generics():
         return sum(lookup.get(value, 0) for value in values)
 
     assert take(5, exercise(count))
+
+
+def test_annotation_to_predicate_object():
+    predicate = annotation_to_predicate(object)
+
+    assert predicate(None)
+    assert predicate(1)
+    assert predicate(object())
+
+
+def test_exercise_object_parameter():
+    def describe(x: object) -> str:
+        return type(x).__name__
+
+    assert take(5, exercise(describe))

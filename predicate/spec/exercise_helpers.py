@@ -71,8 +71,8 @@ def resolved_signature(f: Callable) -> Signature:
 def annotation_to_predicate(annotation: Any) -> Predicate:  # noqa: C901
     if annotation is None or annotation is types.NoneType:
         return is_none_p
-    if annotation is Any:
-        return always_true_p
+    if annotation in (Any, object):
+        return always_true_p  # every value is an object
     if type(annotation) is TypeVar:
         return always_true_p
     if annotation in (Never, NoReturn):
