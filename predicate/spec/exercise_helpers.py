@@ -25,9 +25,10 @@ from predicate.dict_of_predicate import is_dict_of_p
 from predicate.explain import explain
 from predicate.frozendict_of_predicate import is_frozendict_of_p
 from predicate.frozenset_of_predicate import is_frozenset_of_p
+from predicate.has_length_predicate import is_empty_p
 from predicate.implies import implies
 from predicate.in_predicate import in_p
-from predicate.is_instance_predicate import is_str_p
+from predicate.is_instance_predicate import is_dict_p, is_str_p
 from predicate.is_none_predicate import is_none_p
 from predicate.list_of_predicate import is_list_of_p
 from predicate.or_predicate import or_p
@@ -55,7 +56,7 @@ def resolved_signature(f: Callable) -> Signature:
 
 
 def annotation_to_predicate(annotation: Any) -> Predicate:  # noqa: C901
-    if annotation is None:
+    if annotation is None or annotation is types.NoneType:
         return is_none_p
     if annotation is Any:
         return always_true_p
@@ -151,7 +152,7 @@ def check_signature_against_spec(f: Callable, spec: Spec) -> Spec:
             if key not in parameters:
                 raise InvalidSpecError(f"Unannotated parameter '{key}' not in spec")
         else:
-            annotation_p = var_positional_p(parameter, is_instance_p(annotation))
+            annotation_p = param_predicate(parameter)
             if key not in parameters:
                 parameters[key] = annotation_p
             else:
@@ -161,8 +162,15 @@ def check_signature_against_spec(f: Callable, spec: Spec) -> Spec:
     return spec
 
 
-def var_positional_p(parameter: Parameter, predicate: Predicate) -> Predicate:
-    return all_p(predicate) if parameter.kind == Parameter.VAR_POSITIONAL else predicate
+def param_predicate(param: Parameter) -> Predicate:
+    predicate = annotation_to_predicate(param.annotation)
+    match param.kind:
+        case Parameter.VAR_POSITIONAL:
+            return all_p(predicate)
+        case Parameter.VAR_KEYWORD:
+            return is_dict_p & (is_empty_p | is_dict_of_p((is_str_p, predicate)))
+        case _:
+            return predicate
 
 
 _positional_kinds = (Parameter.POSITIONAL_ONLY, Parameter.POSITIONAL_OR_KEYWORD, Parameter.VAR_POSITIONAL)

@@ -1,5 +1,26 @@
-from predicate import always_false_p, always_true_p, eq_p, ge_p, gt_p, in_p, intersects_p, le_p, lt_p, ne_p, not_in_p
+from predicate import (
+    all_p,
+    always_false_p,
+    always_true_p,
+    eq_p,
+    ge_p,
+    gt_p,
+    in_p,
+    intersects_p,
+    is_float_p,
+    is_instance_p,
+    is_int_p,
+    is_none_p,
+    is_str_p,
+    le_p,
+    lt_p,
+    ne_p,
+    not_in_p,
+)
+from predicate.frozenset_of_predicate import is_frozenset_of_p
 from predicate.implies import implies
+from predicate.list_of_predicate import is_list_of_p
+from predicate.set_of_predicate import is_set_of_p
 from predicate.set_predicates import is_real_subset_p, is_real_superset_p, is_subset_p, is_superset_p
 
 
@@ -190,3 +211,22 @@ def test_implies_is_real_superset_intersects():
     # is_real_superset_p(S) also implies intersects_p(T) when S ∩ T ≠ ∅
     assert implies(is_real_superset_p({1, 2}), intersects_p({1, 2}))
     assert not implies(is_real_superset_p({1, 2}), intersects_p({3, 4}))
+
+
+def test_implies_is_instance_subset():
+    assert implies(is_float_p, is_instance_p(float, int))
+    assert not implies(is_instance_p(float, int), is_float_p)
+
+
+def test_implies_or():
+    assert implies(is_str_p | is_none_p, is_str_p | is_none_p | is_int_p)
+    assert not implies(is_str_p | is_int_p, is_str_p | is_none_p)
+
+
+def test_implies_element_wise():
+    assert implies(is_list_of_p(is_int_p & ge_p(0)), is_list_of_p(is_int_p))
+    assert implies(all_p(is_int_p & ge_p(0)), all_p(is_int_p))
+    assert implies(is_set_of_p(is_int_p & ge_p(0)), is_set_of_p(is_int_p))
+    assert implies(is_frozenset_of_p(is_int_p & ge_p(0)), is_frozenset_of_p(is_int_p))
+    assert not implies(is_list_of_p(is_int_p), is_set_of_p(is_int_p))
+    assert not implies(is_list_of_p(is_str_p), is_list_of_p(is_int_p))

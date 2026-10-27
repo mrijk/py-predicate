@@ -1,6 +1,5 @@
-from typing import AsyncIterator, Callable, Iterator, TypeVar
+from typing import AsyncIterator, Callable, Iterator
 
-from predicate import always_true_p, is_instance_p
 from predicate.spec.exercise_helpers import (
     call_args,
     check_exception,
@@ -8,8 +7,8 @@ from predicate.spec.exercise_helpers import (
     generate_values,
     get_return_predicate,
     no_spec_error,
+    param_predicate,
     resolved_signature,
-    var_positional_p,
     verify_result,
 )
 from predicate.spec.spec import Spec
@@ -29,10 +28,7 @@ def get_spec_from_function_annotation(f: Callable) -> Spec:
 
         if annotation == parameter.empty:
             raise no_spec_error(f.__name__, f"parameter '{key}' has no annotation")
-        if type(annotation) is TypeVar:
-            spec["args"][key] = always_true_p
-        else:
-            spec["args"][key] = var_positional_p(parameter, is_instance_p(annotation))
+        spec["args"][key] = param_predicate(parameter)
 
     return spec
 
