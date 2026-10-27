@@ -582,3 +582,25 @@ def test_instrument_function_ret_name_clash():
 
     with pytest.raises(InvalidSpecError, match="Parameter 'ret' clashes"):
         r(1, 2)
+
+
+def test_instrument_var_positional():
+    @instrument
+    def varargs(*args: int) -> int:
+        return sum(args)
+
+    assert varargs() == 0
+    assert varargs(1, 2) == 3
+    with pytest.raises(SpecViolationError, match="x is not an instance of type int"):
+        varargs(1, "x")
+
+
+def test_instrument_var_keyword():
+    @instrument
+    def varkwargs(**kwargs: int) -> int:
+        return sum(kwargs.values())
+
+    assert varkwargs() == 0
+    assert varkwargs(a=1, b=2) == 3
+    with pytest.raises(SpecViolationError, match="x is not an instance of type int"):
+        varkwargs(a=1, b="x")

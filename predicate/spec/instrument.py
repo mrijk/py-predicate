@@ -1,14 +1,18 @@
 import sys
 from fnmatch import fnmatch
 from functools import cache, wraps
-from inspect import getmembers, isclass, isfunction, signature, unwrap
+from inspect import Parameter, getmembers, isclass, isfunction, signature, unwrap
 from types import ModuleType
 from typing import Any, Callable
 
 from more_itertools import consume, side_effect
 
+from predicate.all_predicate import all_p
+from predicate.dict_of_predicate import is_dict_of_p
 from predicate.explain import explain
+from predicate.has_length_predicate import is_empty_p
 from predicate.is_async_predicate import is_async_p
+from predicate.is_instance_predicate import is_str_p
 from predicate.predicate import Predicate
 from predicate.spec.exercise_helpers import (
     annotation_to_predicate,
@@ -18,6 +22,17 @@ from predicate.spec.exercise_helpers import (
     ret_name,
 )
 from predicate.spec.spec import Spec, SpecViolationError
+
+
+def _param_predicate(param: Parameter) -> Predicate:
+    predicate = annotation_to_predicate(param.annotation)
+    match param.kind:
+        case Parameter.VAR_POSITIONAL:
+            return all_p(predicate)
+        case Parameter.VAR_KEYWORD:
+            return is_empty_p | is_dict_of_p((is_str_p, predicate))
+        case _:
+            return predicate
 
 
 def enrich_spec(func: Callable, spec: Spec) -> Spec:
@@ -31,7 +46,7 @@ def enrich_spec(func: Callable, spec: Spec) -> Spec:
     args = dict(spec["args"])
     for name, param in sig.parameters.items():
         if name not in args and param.annotation is not param.empty:
-            args[name] = annotation_to_predicate(param.annotation)
+            args[name] = _param_predicate(param)
 
     enriched = spec | {"args": args}
 
