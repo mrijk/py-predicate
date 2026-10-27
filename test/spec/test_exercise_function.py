@@ -102,7 +102,7 @@ def test_exercise_no_types_defined():
     def dup(x):
         return x
 
-    with pytest.raises(ValueError, match="Not implemented yet"):
+    with pytest.raises(InvalidSpecError, match="Cannot derive spec for 'dup': missing return annotation"):
         list(exercise(dup))
 
 
@@ -213,11 +213,11 @@ def test_exercise_annotated_without_spec():
     assert result
 
 
-def test_exercise_partially_annotate_without_specd():
+def test_exercise_partially_annotate_without_spec():
     def adder(x: int, y) -> int:
         return x + y
 
-    with pytest.raises(ValueError, match="Not implemented yet"):
+    with pytest.raises(InvalidSpecError, match="Cannot derive spec for 'adder': parameter 'y' has no annotation"):
         list(exercise(adder))
 
 
@@ -277,7 +277,7 @@ async def test_exercise_async_function_no_annotation():
     async def dup(x):
         return x
 
-    with pytest.raises(ValueError, match="Not implemented yet"):
+    with pytest.raises(InvalidSpecError, match="Cannot derive spec for 'dup': missing return annotation"):
         async for _ in exercise(dup):
             pass
 

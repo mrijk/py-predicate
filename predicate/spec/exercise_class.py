@@ -8,17 +8,19 @@ from predicate.spec.exercise_helpers import (
     check_signature_against_spec,
     generate_values,
     get_return_predicate,
+    no_spec_error,
     resolved_signature,
     verify_result,
 )
 from predicate.spec.spec import Spec
 
 
-def get_spec_from_class_annotation(f: Callable) -> Spec | None:
+def get_spec_from_class_annotation(f: Callable) -> Spec:
     sig = resolved_signature(f.__call__)  # type: ignore
+    name = type(f).__name__
 
     if sig.return_annotation == sig.empty:
-        return None
+        raise no_spec_error(name, "missing return annotation")
 
     spec: Spec = {"args": {}, "ret": get_return_predicate(sig)}
 
@@ -35,7 +37,7 @@ def get_spec_from_class_annotation(f: Callable) -> Spec | None:
             if parameter.kind == Parameter.VAR_KEYWORD:
                 continue
 
-            return None
+            raise no_spec_error(name, f"parameter '{key}' has no annotation")
 
         if isinstance(f, Predicate):
             try:
@@ -53,9 +55,7 @@ def get_spec_from_class_annotation(f: Callable) -> Spec | None:
 
 def _resolve_class_spec(f: Callable, spec: Spec | None) -> Spec:
     if not spec:
-        if not (spec_from_annotation := get_spec_from_class_annotation(f)):
-            raise ValueError("Not implemented yet")
-        return spec_from_annotation
+        return get_spec_from_class_annotation(f)
     return check_signature_against_spec(f, spec)
 
 

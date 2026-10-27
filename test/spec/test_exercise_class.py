@@ -5,7 +5,7 @@ import pytest
 from predicate import ge_p, is_bool_p, is_float_p, is_int_p, pos_p, zero_p
 from predicate.predicate import Predicate
 from predicate.spec.exercise import Spec, exercise
-from predicate.spec.spec import SpecViolationError
+from predicate.spec.spec import InvalidSpecError, SpecViolationError
 
 
 def test_exercise_zero_p():
@@ -34,7 +34,7 @@ def test_exercise_class_with_call():
     assert result
 
 
-# --- exercise_class: no return annotation → ValueError ---
+# --- exercise_class: no return annotation → InvalidSpecError ---
 
 
 def test_exercise_class_no_return_annotation():
@@ -42,7 +42,7 @@ def test_exercise_class_no_return_annotation():
         def __call__(self, x: int):
             return x
 
-    with pytest.raises(ValueError, match="Not implemented yet"):
+    with pytest.raises(InvalidSpecError, match="Cannot derive spec for 'NoReturn': missing return annotation"):
         list(exercise(NoReturn()))
 
 
@@ -67,7 +67,7 @@ def test_exercise_class_with_var_keyword():
     assert result
 
 
-# --- exercise_class: unannotated non-variadic param → ValueError ---
+# --- exercise_class: unannotated non-variadic param → InvalidSpecError ---
 
 
 def test_exercise_class_unannotated_param():
@@ -75,7 +75,7 @@ def test_exercise_class_unannotated_param():
         def __call__(self, x) -> int:
             return x
 
-    with pytest.raises(ValueError, match="Not implemented yet"):
+    with pytest.raises(InvalidSpecError, match="Cannot derive spec for 'BadSig': parameter 'x' has no annotation"):
         list(exercise(BadSig()))
 
 
@@ -208,7 +208,7 @@ async def test_exercise_async_class_no_return_annotation():
         async def __call__(self, x: int):
             return x
 
-    with pytest.raises(ValueError, match="Not implemented yet"):
+    with pytest.raises(InvalidSpecError, match="Cannot derive spec for 'AsyncNoReturn': missing return annotation"):
         async for _ in exercise(AsyncNoReturn()):
             pass
 
