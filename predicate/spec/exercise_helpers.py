@@ -1,10 +1,11 @@
 import sys
 import types
-from inspect import Signature, isroutine, signature
-from itertools import islice, repeat
+from inspect import Parameter, Signature, isroutine, signature
+from itertools import islice, repeat, takewhile
 from typing import (
     Any,
     Callable,
+    Iterator,
     Literal,
     LiteralString,
     Never,
@@ -19,7 +20,7 @@ from typing import (
 
 from more_itertools import first, take
 
-from predicate import always_false_p, always_true_p, generate_true, is_instance_p
+from predicate import all_p, always_false_p, always_true_p, generate_true, is_instance_p
 from predicate.dict_of_predicate import is_dict_of_p
 from predicate.explain import explain
 from predicate.frozendict_of_predicate import is_frozendict_of_p
@@ -150,7 +151,7 @@ def check_signature_against_spec(f: Callable, spec: Spec) -> Spec:
             if key not in parameters:
                 raise InvalidSpecError(f"Unannotated parameter '{key}' not in spec")
         else:
-            annotation_p = is_instance_p(annotation)
+            annotation_p = var_positional_p(parameter, is_instance_p(annotation))
             if key not in parameters:
                 parameters[key] = annotation_p
             else:
@@ -158,6 +159,32 @@ def check_signature_against_spec(f: Callable, spec: Spec) -> Spec:
                     raise InvalidSpecError("Spec predicate is not a constrained annotation")
 
     return spec
+
+
+def var_positional_p(parameter: Parameter, predicate: Predicate) -> Predicate:
+    return all_p(predicate) if parameter.kind == Parameter.VAR_POSITIONAL else predicate
+
+
+_positional_kinds = (Parameter.POSITIONAL_ONLY, Parameter.POSITIONAL_OR_KEYWORD, Parameter.VAR_POSITIONAL)
+
+
+def _positional_values(param: Parameter, arg) -> Iterator:
+    yield from arg if param.kind == Parameter.VAR_POSITIONAL else [arg]
+
+
+def _keyword_items(param: Parameter, arg) -> Iterator[tuple[str, Any]]:
+    yield from arg.items() if param.kind == Parameter.VAR_KEYWORD else [(param.name, arg)]
+
+
+def call_args(sig: Signature, value: dict) -> tuple[list, dict]:
+    # Leading parameters go positionally (in signature order) so *args and positional-only parameters bind correctly
+    positional = list(
+        takewhile(lambda param: param.name in value and param.kind in _positional_kinds, sig.parameters.values())
+    )
+    keyword = [param for param in list(sig.parameters.values())[len(positional) :] if param.name in value]
+    args = [arg for param in positional for arg in _positional_values(param, value[param.name])]
+    kwargs = dict(item for param in keyword for item in _keyword_items(param, value[param.name]))
+    return args, kwargs
 
 
 def generate_values(spec: Spec, n: int) -> tuple:

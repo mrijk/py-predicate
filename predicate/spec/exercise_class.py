@@ -4,12 +4,14 @@ from typing import AsyncIterator, Callable, Iterator, TypeVar, get_origin
 from predicate import always_true_p, is_instance_p
 from predicate.predicate import Predicate
 from predicate.spec.exercise_helpers import (
+    call_args,
     check_exception,
     check_signature_against_spec,
     generate_values,
     get_return_predicate,
     no_spec_error,
     resolved_signature,
+    var_positional_p,
     verify_result,
 )
 from predicate.spec.spec import Spec
@@ -48,7 +50,7 @@ def get_spec_from_class_annotation(f: Callable) -> Spec:
         elif type(annotation) is TypeVar:
             spec["args"][key] = always_true_p
         else:
-            spec["args"][key] = is_instance_p(annotation)
+            spec["args"][key] = var_positional_p(parameter, is_instance_p(annotation))
 
     return spec
 
@@ -62,10 +64,12 @@ def _resolve_class_spec(f: Callable, spec: Spec | None) -> Spec:
 def exercise_class(f: Callable, spec: Spec | None, n: int) -> Iterator[tuple]:
     spec = _resolve_class_spec(f, spec)
     return_p, values = generate_values(spec, n)
+    sig = resolved_signature(f.__call__)  # type: ignore
 
     for value in values:
+        args, kwargs = call_args(sig, value)
         try:
-            result = f(**value)
+            result = f(*args, **kwargs)
         except Exception as exc:
             yield tuple(value.values()), check_exception(spec, value, exc)
             continue
@@ -76,10 +80,12 @@ def exercise_class(f: Callable, spec: Spec | None, n: int) -> Iterator[tuple]:
 async def async_exercise_class(f: Callable, spec: Spec | None, n: int) -> AsyncIterator[tuple]:
     spec = _resolve_class_spec(f, spec)
     return_p, values = generate_values(spec, n)
+    sig = resolved_signature(f.__call__)  # type: ignore
 
     for value in values:
+        args, kwargs = call_args(sig, value)
         try:
-            result = await f(**value)
+            result = await f(*args, **kwargs)
         except Exception as exc:
             yield tuple(value.values()), check_exception(spec, value, exc)
             continue
