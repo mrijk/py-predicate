@@ -23,6 +23,7 @@ Fixes:
 
 - annotation_to_predicate handles Never, NoReturn and LiteralString
 - default return predicate in get_return_spec checks nested types (e.g. list[int] checks its items)
+- annotation_to_predicate follows the PEP 484 numeric tower: float accepts int, complex accepts float and int
 
 ## 1.7.0
 
