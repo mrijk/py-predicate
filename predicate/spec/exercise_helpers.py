@@ -89,7 +89,10 @@ def annotation_to_predicate(annotation: Any) -> Predicate:  # noqa: C901
         return is_frozenset_of_p(annotation_to_predicate(item_type))
     if origin is dict:
         key_type, value_type = get_args(annotation)
-        return is_dict_of_p((annotation_to_predicate(key_type), annotation_to_predicate(value_type)))
+        # is_dict_of_p rejects {}, but dict[K, V] includes the empty dict
+        return is_dict_p & (
+            is_empty_p | is_dict_of_p((annotation_to_predicate(key_type), annotation_to_predicate(value_type)))
+        )
     if sys.version_info >= (3, 15) and origin is frozendict:  # noqa: F821
         key_type, value_type = get_args(annotation)
         return is_frozendict_of_p((annotation_to_predicate(key_type), annotation_to_predicate(value_type)))

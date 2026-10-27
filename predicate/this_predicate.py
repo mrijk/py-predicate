@@ -1,7 +1,7 @@
 import inspect
 from dataclasses import dataclass
 from functools import cached_property
-from typing import Any
+from typing import Any, Iterable
 
 from more_itertools import first_true
 
@@ -24,7 +24,7 @@ class ThisPredicate[T](Predicate[T]):
         return "this_p"
 
 
-def find_in_locals(locals: dict, predicate: Predicate) -> Predicate | None:
+def find_in_locals(locals: Iterable[tuple[str, Any]], predicate: Predicate) -> Predicate | None:
     def is_other_predicate(key: str, value: Any) -> bool:
         return isinstance(value, Predicate) and value != predicate and key != "self"
 

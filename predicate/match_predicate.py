@@ -36,12 +36,16 @@ def match_p[T](*predicates: Predicate, full_match: bool = False) -> MatchPredica
 
 
 def reason(iterable: Iterable, *, predicates: list[Predicate], full_match: bool) -> dict:
+    if not predicates:
+        return {"reason": "Iterable has more items than predicates to match", "result": False}
     predicate, *rest_predicates = predicates
     match predicate:
         case OptionalPredicate() | PlusPredicate() | StarPredicate() | ExactlyPredicate() | RepeatPredicate():
             return predicate.explain(iterable, predicates=rest_predicates, full_match=full_match)
         case Predicate():
-            item, *rest = iterable
+            if not (items := list(iterable)):
+                return {"reason": f"Iterable has no item left to match against {predicate!r}", "result": False}
+            item, *rest = items
             if not predicate(item):
                 return predicate.explain(item)
             return reason(rest, predicates=rest_predicates, full_match=full_match)
@@ -50,6 +54,9 @@ def reason(iterable: Iterable, *, predicates: list[Predicate], full_match: bool)
 
 
 def match(iterable: Iterable, *, predicates: list[Predicate], full_match: bool) -> bool:
+    if not predicates:
+        # Nothing left to match: a partial match succeeds, a full match only if the iterable is exhausted
+        return not full_match or not list(iterable)
     predicate, *rest_predicates = predicates
     match predicate:
         case OptionalPredicate() | PlusPredicate() | StarPredicate() | ExactlyPredicate() | RepeatPredicate():

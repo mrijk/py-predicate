@@ -11,7 +11,7 @@ from predicate.is_async_predicate import is_async_p
 from predicate.predicate import Predicate
 
 
-def undefined() -> Iterator:
+def _undefined() -> Iterator:
     raise ValueError("Please register generator type")
 
 
@@ -20,8 +20,8 @@ class FnPredicate[T](Predicate[T]):
     """A predicate class that can hold a function."""
 
     predicate_fn: Callable[[T], bool]
-    generate_false_fn: Callable[[], Iterator] = undefined
-    generate_true_fn: Callable[[], Iterator] = undefined
+    generate_false_fn: Callable[[], Iterator] = _undefined
+    generate_true_fn: Callable[[], Iterator] = _undefined
     _call: Callable[[T], bool] = field(init=False, repr=False)
 
     def __post_init__(self):
@@ -43,8 +43,8 @@ class FnPredicate[T](Predicate[T]):
 
 def fn_p[T](
     fn: Callable[[T], bool],
-    generate_false_fn: Callable[[], Iterator[T]] = undefined,
-    generate_true_fn: Callable[[], Iterator[T]] = undefined,
+    generate_false_fn: Callable[[], Iterator[T]] = _undefined,
+    generate_true_fn: Callable[[], Iterator[T]] = _undefined,
 ) -> Predicate[T]:
     """Return the boolean value of the function call."""
     return FnPredicate(predicate_fn=fn, generate_false_fn=generate_false_fn, generate_true_fn=generate_true_fn)
@@ -58,16 +58,16 @@ def as_predicate[T](fn: Callable[[T], bool]) -> Predicate[T]: ...
 def as_predicate[T](
     fn: None = None,
     *,
-    generate_true_fn: Callable[[], Iterator[T]] = undefined,
-    generate_false_fn: Callable[[], Iterator[T]] = undefined,
+    generate_true_fn: Callable[[], Iterator[T]] = _undefined,
+    generate_false_fn: Callable[[], Iterator[T]] = _undefined,
 ) -> Callable[[Callable[[T], bool]], Predicate[T]]: ...
 
 
 def as_predicate[T](
     fn: Callable[[T], bool] | None = None,
     *,
-    generate_true_fn: Callable[[], Iterator[T]] = undefined,
-    generate_false_fn: Callable[[], Iterator[T]] = undefined,
+    generate_true_fn: Callable[[], Iterator[T]] = _undefined,
+    generate_false_fn: Callable[[], Iterator[T]] = _undefined,
 ) -> Predicate[T] | Callable[[Callable[[T], bool]], Predicate[T]]:
     def decorator(f: Callable[[T], bool]) -> Predicate[T]:
         return fn_p(f, generate_true_fn=generate_true_fn, generate_false_fn=generate_false_fn)
