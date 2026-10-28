@@ -568,5 +568,15 @@ def is_unannotated_var_param(parameter: Parameter) -> bool:
     )
 
 
+def is_private_default_param(parameter: Parameter) -> bool:
+    # `_re: Pattern = re.compile(...)`: an underscore plus a default means "don't pass this"; the default is used
+    return parameter.name.startswith("_") and parameter.default is not parameter.empty
+
+
+def is_skipped_param(parameter: Parameter) -> bool:
+    """Parameters exercise generates no values for, so call_args leaves them out."""
+    return is_unannotated_var_param(parameter) or is_private_default_param(parameter)
+
+
 def no_spec_error(name: str, missing: str) -> InvalidSpecError:
     return InvalidSpecError(f"Cannot derive spec for '{name}': {missing}; pass a Spec or annotate it")

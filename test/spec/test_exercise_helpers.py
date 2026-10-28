@@ -461,3 +461,27 @@ def test_exercise_new_type_return():
         return UserId(len(name))
 
     assert len(list(exercise(normalize, n=5))) == 5
+
+
+@pytest.mark.parametrize(
+    "annotation, item_p",
+    [
+        (collections.abc.Iterator[int], lambda item: isinstance(item, int)),
+        (collections.abc.Generator[str, None, None], lambda item: isinstance(item, str)),
+        (collections.abc.Iterator, lambda item: True),
+    ],
+)
+def test_generate_iterators(annotation, item_p):
+    predicate = annotation_to_predicate(annotation)
+    values = take(10, generate_true(predicate))
+
+    assert all(predicate(value) for value in values)
+    assert all(item_p(item) for value in values for item in value)
+    assert not any(predicate(value) for value in take(10, generate_false(predicate)))
+
+
+def test_exercise_iterator_argument():
+    def total(numbers: collections.abc.Iterator[int]) -> int:
+        return sum(numbers)
+
+    assert len(list(exercise(total, n=5))) == 5

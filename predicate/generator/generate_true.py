@@ -11,6 +11,7 @@ from collections.abc import (
     Callable,
     Collection,
     Container,
+    Generator,
     Hashable,
     Iterable,
     Iterator,
@@ -659,6 +660,15 @@ _abc_builtins: Final[dict[Any, Any]] = {
 }
 
 
+def _random_iterators(annotation: Any) -> Iterator[Iterator]:
+    from predicate.spec.exercise_helpers import annotation_to_predicate
+
+    # A fresh iterator per value: an iterator can only be consumed once. Generator[T, ...] yields T too.
+    item_type = first(get_args(annotation), Any)
+    lists = generate_true(annotation_to_predicate(list[item_type]))  # type: ignore[valid-type]
+    yield from ((item for item in items) for items in lists)
+
+
 def _family_generator(klass: Any, annotation: Any) -> Iterator | None:
     """Return a generator for a whole family of types (enums, paths, Supports* protocols, patterns), or None."""
     if isinstance(klass, type) and issubclass(klass, Enum):
@@ -758,7 +768,9 @@ def generate_is_instance_p(predicate: IsInstancePredicate, **kwargs: Any) -> Ite
 
         type_registry[Template] = random_templates
 
-    if (builtin := _abc_builtins.get(klass)) and (args := get_args(annotation)):
+    if klass in (Iterator, Generator):
+        yield from _random_iterators(annotation)
+    elif (builtin := _abc_builtins.get(klass)) and (args := get_args(annotation)):
         from predicate.spec.exercise_helpers import annotation_to_predicate
 
         # Sequence[int] -> list[int] etc., so the generated items have the requested types
