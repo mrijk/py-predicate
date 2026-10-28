@@ -50,3 +50,29 @@ def test_type_checking_namespace_skips_calls(tmp_path, monkeypatch):
     namespace = type_checking_namespace(with_call.f)
 
     assert namespace == {"Alias": int | None}
+
+
+def test_type_checking_namespace_skips_missing_name(tmp_path, monkeypatch):
+    package = tmp_path / "pkg327"
+    package.mkdir()
+    (package / "__init__.py").write_text("")
+    (package / "types_.py").write_text(
+        "from typing import TYPE_CHECKING\nNumber = int | float\nif TYPE_CHECKING:\n    Sorter = int\n"
+    )
+    (package / "use.py").write_text(
+        "from typing import TYPE_CHECKING\n"
+        "if TYPE_CHECKING:\n"
+        "    from pkg327.types_ import Sorter, Number\n"
+        "def f(x: 'Number') -> int:\n"
+        "    return 0\n"
+    )
+    monkeypatch.syspath_prepend(tmp_path)
+    from pkg327 import use  # type: ignore[import-not-found]  # noqa: PLC0415
+
+    assert type_checking_namespace(use.f) == {"Number": int | float}
+
+
+def test_type_checking_namespace_rewritten_module(monkeypatch):
+    monkeypatch.setattr(ratio, "__module__", "spec")
+
+    assert type_checking_namespace(ratio)["Fraction"] is Fraction

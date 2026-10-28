@@ -6,6 +6,7 @@ used as ``localns`` when resolving type hints. Nothing else from the block is ex
 """
 
 import ast
+import contextlib
 import importlib
 import importlib.util
 import inspect
@@ -56,8 +57,9 @@ def _import_from(node: ast.ImportFrom, module: ModuleType, namespace: dict[str, 
         try:
             namespace[name] = getattr(source, alias.name)
         except AttributeError:
-            # `from pkg import submodule`
-            namespace[name] = importlib.import_module(f"{source.__name__}.{alias.name}")
+            # `from pkg import submodule`; a name that doesn't exist at runtime is skipped, the others still import
+            with contextlib.suppress(ImportError):
+                namespace[name] = importlib.import_module(f"{source.__name__}.{alias.name}")
 
 
 # Node types a type expression like `dict[str, int | None]` or `t.Optional["X"]` is built from; no calls, lambdas etc.
@@ -125,5 +127,6 @@ def _run_if_possible(statement: ast.stmt, module: ModuleType, namespace: dict[st
 
 def type_checking_namespace(f: Callable) -> dict[str, Any]:
     """Return the names f's module only imports under ``if TYPE_CHECKING:``, or {} if there are none."""
-    module_name = getattr(f, "__module__", None)
+    # The defining module, not __module__: libraries rewrite that to the public package (e.g. pandas' @set_module)
+    module_name = getattr(inspect.unwrap(f), "__globals__", {}).get("__name__") or getattr(f, "__module__", None)
     return _namespace_for_module(module_name) if module_name else {}
