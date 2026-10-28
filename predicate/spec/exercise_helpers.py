@@ -9,6 +9,7 @@ from inspect import Parameter, Signature, isroutine, signature
 from itertools import islice, repeat, takewhile
 from typing import (
     IO,
+    Annotated,
     Any,
     BinaryIO,
     Callable,
@@ -18,11 +19,13 @@ from typing import (
     Literal,
     LiteralString,
     Never,
+    NewType,
     NoReturn,
     NotRequired,
     Required,
     TextIO,
     Tuple,
+    TypeAliasType,
     TypeGuard,
     TypeVar,
     Union,
@@ -279,7 +282,27 @@ def _typed_dict_predicate(klass: type) -> Predicate:
     )
 
 
+def _unwrap_alias(annotation: Any) -> Any:
+    """Return the type behind NewType, Annotated and PEP 695 `type` aliases, which isinstance() can't check."""
+    match annotation:
+        case NewType():
+            return _unwrap_alias(annotation.__supertype__)
+        case TypeAliasType():
+            return _unwrap_alias(annotation.__value__)
+        case _ if get_origin(annotation) is Annotated:
+            return _unwrap_alias(
+                annotation.__origin__
+            )  # ponytail: the metadata (e.g. annotated-types bounds) is ignored
+        case _ if isinstance(get_origin(annotation), TypeAliasType):
+            # A generic alias such as G[int] with `type G[T] = list[T]`
+            alias = get_origin(annotation)
+            return _unwrap_alias(alias.__value__[get_args(annotation)] if alias.__type_params__ else alias.__value__)
+        case _:
+            return annotation
+
+
 def annotation_to_predicate(annotation: Any) -> Predicate:  # noqa: C901
+    annotation = _unwrap_alias(annotation)
     if annotation is None or annotation is types.NoneType:
         return is_none_p
     if is_typed_dict_class(annotation):

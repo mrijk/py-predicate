@@ -7,11 +7,13 @@ from collections.abc import Callable
 from typing import (
     IO,
     AbstractSet,
+    Annotated,
     Any,
     BinaryIO,
     LiteralString,
     NamedTuple,
     Never,
+    NewType,
     NoReturn,
     Required,
     TextIO,
@@ -424,3 +426,38 @@ def test_exercise_spec_annotated_function():
     instrumented = instrument_function(exercise, {"args": {}})
 
     assert len(list(instrumented(double, {"args": {}}))) > 0
+
+
+UserId = NewType("UserId", int)
+AdminId = NewType("AdminId", UserId)
+type IntList = list[int]
+type StrDict[V] = dict[str, V]
+
+
+@pytest.mark.parametrize(
+    "annotation, accepted, rejected",
+    [
+        (UserId, [1, -5], ["1", 1.5]),
+        (AdminId, [1], ["1"]),
+        (list[UserId], [[1, 2], []], [["a"]]),
+        (UserId | None, [1, None], ["1"]),
+        (Annotated[int, "metadata"], [1], ["1"]),
+        (Annotated[IntList, "metadata"], [[1]], [["a"]]),
+        (IntList, [[1, 2], []], [["a"], (1,)]),
+        (StrDict[float], [{"a": 1.5}, {}], [{"a": "x"}, {1: 1.5}]),
+    ],
+)
+def test_annotation_to_predicate_aliases(annotation, accepted, rejected):
+    predicate = annotation_to_predicate(annotation)
+
+    assert all(predicate(value) for value in accepted)
+    assert not any(predicate(value) for value in rejected)
+    assert all(predicate(value) for value in take(10, generate_true(predicate)))
+    assert not any(predicate(value) for value in take(10, generate_false(predicate)))
+
+
+def test_exercise_new_type_return():
+    def normalize(name: str) -> UserId:
+        return UserId(len(name))
+
+    assert len(list(exercise(normalize, n=5))) == 5

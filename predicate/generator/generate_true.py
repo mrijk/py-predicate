@@ -1,6 +1,7 @@
 import ast
 import asyncio
 import io
+import ipaddress
 import logging
 import os
 import random
@@ -24,6 +25,7 @@ from collections.abc import (
 from datetime import date, datetime, time, timedelta, timezone, tzinfo
 from decimal import Decimal
 from enum import Enum
+from fractions import Fraction
 from functools import singledispatch
 from inspect import Parameter, Signature, getmembers, isfunction, signature
 from itertools import cycle, repeat
@@ -104,10 +106,13 @@ from predicate.generator.helpers import (
     random_first_from_iterables,
     random_floats,
     random_forward_refs,
+    random_fractions,
     random_frozensets,
     random_hashables,
     random_ints,
     random_ios,
+    random_ipv4_addresses,
+    random_ipv6_addresses,
     random_iterables,
     random_lambdas,
     random_lists,
@@ -708,6 +713,9 @@ def generate_is_instance_p(predicate: IsInstancePredicate, **kwargs: Any) -> Ite
         date: random_dates,
         Decimal: random_decimals,
         slice: random_slices,
+        Fraction: random_fractions,
+        ipaddress.IPv4Address: random_ipv4_addresses,
+        ipaddress.IPv6Address: random_ipv6_addresses,
         logging.LogRecord: random_log_records,
         logging.Logger: random_loggers,
         asyncio.AbstractEventLoop: random_event_loops,
