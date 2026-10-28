@@ -1,7 +1,19 @@
 import pytest
 from more_itertools import take
 
-from predicate import is_predicate_of_p
+from predicate import (
+    always_false_p,
+    always_true_p,
+    is_async_p,
+    is_falsy_p,
+    is_lambda_p,
+    is_named_tuple_p,
+    is_none_p,
+    is_not_none_p,
+    is_predicate_of_p,
+    is_regex_p,
+    is_truthy_p,
+)
 from predicate.all_predicate import AllPredicate
 from predicate.and_predicate import AndPredicate
 from predicate.any_predicate import AnyPredicate
@@ -27,6 +39,7 @@ from predicate.not_predicate import NotPredicate
 from predicate.or_predicate import OrPredicate
 from predicate.range_predicate import GeLePredicate, GeLtPredicate, GtLePredicate, GtLtPredicate
 from predicate.set_of_predicate import SetOfPredicate
+from predicate.tee_predicate import TeePredicate
 from predicate.xor_predicate import XorPredicate
 
 AMOUNT_TO_GENERATE = 100
@@ -149,3 +162,33 @@ def test_generate_any_predicates_depth_zero():
 
 def test_generate_set_of_predicates_depth_zero():
     assert list(take(3, generate_set_of_predicates(max_depth=0, klass=int))) == []
+
+
+@pytest.mark.parametrize(
+    "predicate",
+    (
+        always_false_p,
+        always_true_p,
+        is_async_p,
+        is_falsy_p,
+        is_lambda_p,
+        is_named_tuple_p,
+        is_none_p,
+        is_not_none_p,
+        is_regex_p,
+        is_truthy_p,
+    ),
+)
+def test_generate_constant_predicate(predicate):
+    assert take(3, generate_predicate(type(predicate), max_depth=1, klass=int)) == [predicate] * 3
+
+
+def test_generate_any_predicate_via_registry():
+    predicates = take(5, generate_predicate(AnyPredicate, max_depth=2, klass=int))
+    assert predicates
+    assert all(isinstance(predicate, AnyPredicate) for predicate in predicates)
+
+
+def test_generate_unknown_predicate():
+    with pytest.raises(ValueError, match="No generator found for <class 'predicate.tee_predicate.TeePredicate'>"):
+        take(1, generate_predicate(TeePredicate, max_depth=1, klass=int))

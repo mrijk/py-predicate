@@ -1,13 +1,24 @@
+from itertools import repeat
 from typing import Any, Iterator
 
 from predicate.all_predicate import AllPredicate
+from predicate.always_false_predicate import always_false_p
+from predicate.always_true_predicate import always_true_p
 from predicate.and_predicate import AndPredicate
 from predicate.any_predicate import AnyPredicate
 from predicate.eq_predicate import EqPredicate
 from predicate.ge_predicate import GePredicate
 from predicate.gt_predicate import GtPredicate
 from predicate.in_predicate import InPredicate
+from predicate.is_async_predicate import is_async_p
+from predicate.is_falsy_predicate import is_falsy_p
 from predicate.is_instance_predicate import is_instance_p
+from predicate.is_lambda_predicate import is_lambda_p
+from predicate.is_named_tuple_predicate import is_named_tuple_p
+from predicate.is_none_predicate import is_none_p
+from predicate.is_not_none_predicate import is_not_none_p
+from predicate.is_regex_predicate import is_regex_p
+from predicate.is_truthy_predicate import is_truthy_p
 from predicate.le_predicate import LePredicate
 from predicate.lt_predicate import LtPredicate
 from predicate.ne_predicate import NePredicate
@@ -28,10 +39,18 @@ def generate_predicate(predicate_type: type[Predicate], max_depth: int, klass: t
 
 
 def predicate_type_registry() -> dict[type, Any]:
+    return typed_predicate_type_registry() | {
+        type(predicate): _constant_predicates(predicate) for predicate in _constant_predicate_instances
+    }
+
+
+def typed_predicate_type_registry() -> dict[type, Any]:
+    """Return the generators for predicates over values of a given klass; random_predicates combines these."""
     return {
         # TODO: AllPredicate works on iterables
         AllPredicate: generate_all_predicates,
         AndPredicate: generate_and_predicates,
+        AnyPredicate: generate_any_predicates,
         EqPredicate: generate_eq_predicates,
         GeLePredicate: generate_ge_le_predicates,
         GeLtPredicate: generate_ge_lt_predicates,
@@ -48,6 +67,25 @@ def predicate_type_registry() -> dict[type, Any]:
         OrPredicate: generate_or_predicates,
         XorPredicate: generate_xor_predicates,
     }
+
+
+# Predicates without parameters: the module-level instance is the only value there is
+_constant_predicate_instances: list[Predicate] = [
+    always_false_p,
+    always_true_p,
+    is_async_p,
+    is_falsy_p,
+    is_lambda_p,
+    is_named_tuple_p,
+    is_none_p,
+    is_not_none_p,
+    is_regex_p,
+    is_truthy_p,
+]
+
+
+def _constant_predicates(predicate: Predicate) -> Any:
+    return lambda max_depth, klass: repeat(predicate)
 
 
 def generate_random_predicate_pairs(max_depth: int, klass: type) -> Iterator:
