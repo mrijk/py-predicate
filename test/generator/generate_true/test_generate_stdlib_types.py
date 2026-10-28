@@ -1,10 +1,13 @@
 import os
 import re
+import time as time_module
+import types
 from collections.abc import Sized
-from datetime import date, datetime, time, timedelta
+from datetime import date, datetime, time, timedelta, timezone, tzinfo
 from decimal import Decimal
 from pathlib import Path, PurePath, PureWindowsPath
 from typing import (
+    ForwardRef,
     SupportsAbs,
     SupportsBytes,
     SupportsComplex,
@@ -43,6 +46,15 @@ from predicate import generate_true, is_instance_p
         SupportsIndex,
         SupportsInt,
         SupportsRound,
+        slice,
+        range,
+        time_module.struct_time,
+        tzinfo,
+        timezone,
+        BaseException,
+        Exception,
+        ForwardRef,
+        types.CodeType,
     ],
 )
 def test_generate_stdlib_type(klass):
@@ -70,3 +82,13 @@ def test_generate_pattern_keeps_kind():
 
 def test_generate_supports_index_is_only_ints():
     assert all(type(value) is int for value in take(50, generate_true(is_instance_p(SupportsIndex))))
+
+
+def test_generated_values_are_usable():
+    assert all(len(range(100)[s]) >= 0 for s in take(50, generate_true(is_instance_p(slice))))
+    assert all(time_module.strftime("%Y", t) for t in take(20, generate_true(is_instance_p(time_module.struct_time))))
+    assert all(
+        datetime(2024, 1, 1, tzinfo=tz).utcoffset() is not None for tz in take(20, generate_true(is_instance_p(tzinfo)))
+    )
+    assert all(eval(ref.__forward_arg__) for ref in take(20, generate_true(is_instance_p(ForwardRef))))  # noqa: S307
+    assert all(eval(code, {"x": 1}) is not ... for code in take(20, generate_true(is_instance_p(types.CodeType))))  # noqa: S307
