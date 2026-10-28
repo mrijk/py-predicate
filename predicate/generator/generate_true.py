@@ -20,6 +20,7 @@ from collections.abc import (
     MutableMapping,
     MutableSequence,
     MutableSet,
+    Reversible,
     Sequence,
     Set,
     Sized,
@@ -655,6 +656,7 @@ _abc_builtins: Final[dict[Any, Any]] = {
     Collection: list,
     Sequence: list,
     MutableSequence: list,
+    Reversible: list,
     Set: set,
     MutableSet: set,
     Mapping: dict,
@@ -802,6 +804,7 @@ def generate_is_instance_p(predicate: IsInstancePredicate, **kwargs: Any) -> Ite
         # Abstract collections map to the builtin that implements them
         Collection: random_iterables,
         Sequence: random_lists,
+        Reversible: random_lists,
         MutableSequence: random_lists,
         Set: random_sets,
         MutableSet: random_sets,
