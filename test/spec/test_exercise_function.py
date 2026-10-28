@@ -548,3 +548,12 @@ def _length(r: range) -> int:
 @pytest.mark.parametrize("f", [_width, _year, _offset, _exception_name, _code_name, _ref_name, _length])
 def test_exercise_stdlib_annotations(f):
     assert len(list(exercise(f, n=5))) == 5
+
+
+def test_exercise_unannotated_var_args():
+    def f(x: int, *args, **kwargs) -> int:
+        assert args == ()
+        assert kwargs == {}
+        return x
+
+    assert len(list(exercise(f, n=3))) == 3

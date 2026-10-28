@@ -1,4 +1,3 @@
-from inspect import Parameter
 from typing import AsyncIterator, Callable, Iterator, TypeVar, get_origin
 
 from predicate import always_true_p, is_instance_p
@@ -9,6 +8,7 @@ from predicate.spec.exercise_helpers import (
     check_signature_against_spec,
     generate_values,
     get_return_predicate,
+    is_unannotated_var_param,
     no_spec_error,
     param_predicate,
     resolved_signature,
@@ -26,19 +26,17 @@ def get_spec_from_class_annotation(f: Callable) -> Spec:
 
     spec: Spec = {"args": {}, "ret": get_return_predicate(sig)}
 
-    parameters = {key: sig.parameters[key] for key in sig.parameters if key != "self"}
+    parameters = {
+        key: parameter
+        for key, parameter in sig.parameters.items()
+        if key != "self" and not is_unannotated_var_param(parameter)
+    }
 
     for key in parameters:
         parameter = parameters[key]
         annotation = parameter.annotation
 
         if annotation == parameter.empty:
-            if parameter.kind == Parameter.VAR_POSITIONAL:
-                continue
-
-            if parameter.kind == Parameter.VAR_KEYWORD:
-                continue
-
             raise no_spec_error(name, f"parameter '{key}' has no annotation")
 
         if isinstance(f, Predicate):
