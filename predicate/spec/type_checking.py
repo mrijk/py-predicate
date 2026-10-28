@@ -6,6 +6,7 @@ used as ``localns`` when resolving type hints. Nothing else from the block is ex
 """
 
 import ast
+import builtins
 import contextlib
 import importlib
 import importlib.util
@@ -102,15 +103,21 @@ def _run(statement: ast.stmt, module: ModuleType, namespace: dict[str, Any]) -> 
 
 
 @cache
-def _namespace_for_module(module_name: str) -> dict[str, Any]:
+def _parse(module_name: str) -> tuple[ModuleType, ast.Module] | None:
     module = sys.modules.get(module_name)
     if module is None:
-        return {}
+        return None
     try:
-        tree = ast.parse(inspect.getsource(module))
+        return module, ast.parse(inspect.getsource(module))
     except (OSError, TypeError, SyntaxError):
-        return {}  # no source available, e.g. a C extension or a frozen module
+        return None  # no source available, e.g. a C extension or a frozen module
 
+
+@cache
+def _namespace_for_module(module_name: str) -> dict[str, Any]:
+    if (parsed := _parse(module_name)) is None:
+        return {}
+    module, tree = parsed
     namespace: dict[str, Any] = {}
     for statement in _type_checking_statements(tree):
         _run_if_possible(statement, module, namespace)
@@ -125,8 +132,39 @@ def _run_if_possible(statement: ast.stmt, module: ModuleType, namespace: dict[st
         return
 
 
+def _module_name(f: Callable) -> str | None:
+    # The defining module, not __module__: libraries rewrite that to the public package (e.g. pandas' @set_module)
+    return getattr(inspect.unwrap(f), "__globals__", {}).get("__name__") or getattr(f, "__module__", None)
+
+
 def type_checking_namespace(f: Callable) -> dict[str, Any]:
     """Return the names f's module only imports under ``if TYPE_CHECKING:``, or {} if there are none."""
-    # The defining module, not __module__: libraries rewrite that to the public package (e.g. pandas' @set_module)
-    module_name = getattr(inspect.unwrap(f), "__globals__", {}).get("__name__") or getattr(f, "__module__", None)
+    module_name = _module_name(f)
     return _namespace_for_module(module_name) if module_name else {}
+
+
+def _imported_from(module_name: str) -> Iterator[str]:
+    if (parsed := _parse(module_name)) is None:
+        return
+    module, tree = parsed
+    statements = [*tree.body, *_type_checking_statements(tree)]
+    yield from (_resolve_module(node, module) for node in statements if isinstance(node, ast.ImportFrom))
+
+
+def imported_namespace(f: Callable) -> dict[str, Any]:
+    """Like type_checking_namespace, plus the globals and TYPE_CHECKING names of every module f's module imports from.
+
+    An alias like ``PolarsDataType = Union["DataTypeClass", "DataType"]`` holds quoted names that resolve in its own
+    module (its globals or its TYPE_CHECKING imports), not in f's. Builtins and f's own module take precedence, so
+    e.g. ``polars.list`` doesn't shadow ``list``.
+    """
+    if not (module_name := _module_name(f)):
+        return {}
+    namespaces = (_module_namespace(name) for name in _imported_from(module_name))
+    borrowed = {k: v for namespace in namespaces for k, v in namespace.items() if k not in vars(builtins)}
+    return borrowed | _module_namespace(module_name)
+
+
+def _module_namespace(module_name: str) -> dict[str, Any]:
+    module = sys.modules.get(module_name)
+    return (vars(module) if module else {}) | _namespace_for_module(module_name)
