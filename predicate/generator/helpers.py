@@ -1,4 +1,8 @@
+import ast
+import asyncio
+import atexit
 import io
+import logging
 import math
 import random
 import re
@@ -564,3 +568,69 @@ def random_typed_dict_classes() -> Iterator[type]:
     field_types = [int, str, float, bool, list[int]]
     for names in field_names:
         yield TypedDict("RandomTypedDict", {name: random.choice(field_types) for name in names})  # type: ignore[operator]
+
+
+# Valid on every supported Python (3.12+); together they contain nearly every concrete ast node class
+_AST_SNIPPETS: Final = (
+    "import os\nfrom a import b as c\nglobal g\nassert x, 'msg'\ntype T[U, *Ts, **P] = int",
+    "def f(a, b=1, /, *args, c: int = 2, **kw) -> int:\n    'doc'\n    x = y = a + b\n    x += 1\n"
+    "    z = [i * 2 for i in a if i] + [*a] + list(i for i in a) + list({i for i in a})\n"
+    "    return {k: v for k, v in kw.items()}",
+    "for i in range(3):\n    if i and not x or i < 2 or i in y or i is None:\n        continue\nwhile False:\n    break",
+    "with open(p) as fh:\n    pass\ntry:\n    raise ValueError(x)\nexcept ValueError as e:\n    del e\nfinally:\n    pass",
+    "try:\n    pass\nexcept* OSError:\n    pass",
+    "async def g():\n    async with x as y:\n        await y\n    async for z in y:\n        yield z\n"
+    "def h():\n    def i():\n        nonlocal x\n    yield from x",
+    "class C(B, metaclass=M):\n    attr: int = 1\n    @property\n    def p(self):\n        return lambda q: q[1:2]",
+    "match x:\n    case [1, *rest]:\n        pass\n    case {'k': v}:\n        pass\n    case P(a=1) | None:\n        pass",
+    "f'{x!r:>10}'\n(a := 1)\nb if c else d\n-a + ~b - +c\n{1, 2}\n[1, 2]\n{1: 2}\n"
+    "a / b // c % d ** e @ f << g >> h & i | j ^ k\na == b != c < d <= e > f >= g not in h is not i",
+)
+
+
+def random_ast_nodes(klass: type[ast.AST] = ast.AST) -> Iterator[ast.AST]:
+    """Yield nodes from parsed snippets that are instances of klass, e.g. ast.FunctionDef or ast.expr."""
+    # Template strings (t"...") only parse on 3.14+
+    snippets = (*_AST_SNIPPETS, "t'{x}'") if sys.version_info >= (3, 14) else _AST_SNIPPETS
+    nodes = [node for snippet in snippets for node in ast.walk(ast.parse(snippet)) if isinstance(node, klass)]
+    nodes += [
+        node
+        for node in (
+            ast.parse("x", mode="eval"),
+            ast.parse("()->int", mode="func_type"),
+            ast.parse("x", mode="single"),
+            *ast.parse("x = 1  # type: ignore", type_comments=True).type_ignores,
+        )
+        if isinstance(node, klass)
+    ]
+    if not nodes:
+        return  # deprecated classes such as ast.Index or ast.Param never appear in a parsed tree
+    while True:
+        yield random.choice(nodes)
+
+
+def random_log_records() -> Iterator[logging.LogRecord]:
+    levels = [logging.DEBUG, logging.INFO, logging.WARNING, logging.ERROR, logging.CRITICAL]
+    names = random_strings(min_size=1)
+    # msg is used as a %-format string by getMessage(), so it must not contain a % without matching args
+    messages = (message.replace("%", "%%") for message in random_strings())
+    while True:
+        level = random.choice(levels)
+        yield logging.LogRecord(next(names), level, "<generated>", random.randint(1, 1000), next(messages), (), None)
+
+
+def random_loggers() -> Iterator[logging.Logger]:
+    # ponytail: real loggers registered under a "predicate.generated" prefix; logging keeps them for the process
+    yield from (logging.getLogger(f"predicate.generated.{name}") for name in random_strings(min_size=1))
+
+
+_event_loops: list[asyncio.AbstractEventLoop] = []
+
+
+def random_event_loops() -> Iterator[asyncio.AbstractEventLoop]:
+    # ponytail: a small pool, reused for every value and closed at exit, so generating doesn't leak sockets
+    if not _event_loops:
+        _event_loops.extend(asyncio.new_event_loop() for _ in range(3))
+        atexit.register(lambda: [loop.close() for loop in _event_loops])
+    while True:
+        yield random.choice(_event_loops)

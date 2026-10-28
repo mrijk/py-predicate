@@ -1,3 +1,6 @@
+import ast
+import asyncio
+import logging
 import os
 import re
 import time as time_module
@@ -55,6 +58,15 @@ from predicate import generate_true, is_instance_p
         Exception,
         ForwardRef,
         types.CodeType,
+        ast.AST,
+        ast.FunctionDef,
+        ast.expr,
+        ast.stmt,
+        ast.TypeAlias,
+        logging.LogRecord,
+        logging.Logger,
+        asyncio.AbstractEventLoop,
+        asyncio.BaseEventLoop,
     ],
 )
 def test_generate_stdlib_type(klass):
@@ -92,3 +104,37 @@ def test_generated_values_are_usable():
     )
     assert all(eval(ref.__forward_arg__) for ref in take(20, generate_true(is_instance_p(ForwardRef))))  # noqa: S307
     assert all(eval(code, {"x": 1}) is not ... for code in take(20, generate_true(is_instance_p(types.CodeType))))  # noqa: S307
+
+
+def _ast_classes(klass=ast.AST):
+    for subclass in klass.__subclasses__():
+        yield subclass
+        yield from _ast_classes(subclass)
+
+
+# Deprecated since 3.8/3.9 (removed in 3.14) or never part of a parsed tree
+_unparsed_ast_classes = {
+    *("AugLoad", "AugStore", "ExtSlice", "Index", "Param", "Suite", "slice"),
+    *("Num", "Str", "Bytes", "NameConstant", "Ellipsis"),
+}
+
+
+def test_generate_every_ast_node_class():
+    missing = [
+        klass.__name__
+        for klass in set(_ast_classes())
+        if klass.__name__ not in _unparsed_ast_classes and not take(1, generate_true(is_instance_p(klass)))
+    ]
+
+    assert missing == []
+
+
+def test_generate_log_records_have_valid_messages():
+    assert all(isinstance(r.getMessage(), str) for r in take(50, generate_true(is_instance_p(logging.LogRecord))))
+
+
+def test_generate_event_loops_are_reused():
+    loops = take(20, generate_true(is_instance_p(asyncio.AbstractEventLoop)))
+
+    assert len({id(loop) for loop in loops}) <= 3
+    assert not any(loop.is_closed() for loop in loops)

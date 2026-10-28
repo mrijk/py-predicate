@@ -1,4 +1,7 @@
+import ast
+import asyncio
 import datetime
+import logging
 import re
 import time
 import types
@@ -545,7 +548,38 @@ def _length(r: range) -> int:
     return len(r)
 
 
-@pytest.mark.parametrize("f", [_width, _year, _offset, _exception_name, _code_name, _ref_name, _length])
+def _dump(node: ast.AST) -> str:
+    return ast.dump(node)
+
+
+def _signature_args(node: ast.FunctionDef) -> int:
+    return len(node.args.args)
+
+
+def _message(record: logging.LogRecord) -> str:
+    return record.getMessage()
+
+
+def _is_running(loop: asyncio.AbstractEventLoop) -> bool:
+    return loop.is_running()
+
+
+@pytest.mark.parametrize(
+    "f",
+    [
+        _width,
+        _year,
+        _offset,
+        _exception_name,
+        _code_name,
+        _ref_name,
+        _length,
+        _dump,
+        _signature_args,
+        _message,
+        _is_running,
+    ],
+)
 def test_exercise_stdlib_annotations(f):
     assert len(list(exercise(f, n=5))) == 5
 

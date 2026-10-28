@@ -1,4 +1,7 @@
+import ast
+import asyncio
 import io
+import logging
 import os
 import random
 import re
@@ -83,6 +86,7 @@ from predicate.generator.helpers import (
     generate_uuids,
     ignore_unknown_kwargs,
     random_anys,
+    random_ast_nodes,
     random_bools,
     random_bytearrays,
     random_bytes,
@@ -95,6 +99,7 @@ from predicate.generator.helpers import (
     random_decimals,
     random_dicts,
     random_enum_members,
+    random_event_loops,
     random_exceptions,
     random_first_from_iterables,
     random_floats,
@@ -106,6 +111,8 @@ from predicate.generator.helpers import (
     random_iterables,
     random_lambdas,
     random_lists,
+    random_log_records,
+    random_loggers,
     random_modules,
     random_named_tuple_instances,
     random_named_tuples,
@@ -659,6 +666,8 @@ def _family_generator(klass: Any, annotation: Any) -> Iterator | None:
         return random_patterns(first(get_args(annotation), str))
     if is_named_tuple_class(klass):
         return random_named_tuple_instances(klass)
+    if isinstance(klass, type) and issubclass(klass, ast.AST):
+        return random_ast_nodes(klass)
     return None
 
 
@@ -699,6 +708,10 @@ def generate_is_instance_p(predicate: IsInstancePredicate, **kwargs: Any) -> Ite
         date: random_dates,
         Decimal: random_decimals,
         slice: random_slices,
+        logging.LogRecord: random_log_records,
+        logging.Logger: random_loggers,
+        asyncio.AbstractEventLoop: random_event_loops,
+        asyncio.BaseEventLoop: random_event_loops,
         io.IOBase: random_ios,
         io.TextIOBase: random_text_ios,
         range: random_ranges,
