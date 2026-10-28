@@ -13,6 +13,7 @@ from typing import (
     NamedTuple,
     Never,
     NoReturn,
+    Required,
     TextIO,
     Tuple,
     TypedDict,
@@ -25,6 +26,8 @@ from more_itertools import take
 
 from predicate import exercise, generate_false, generate_true, is_instance_p
 from predicate.spec.exercise_helpers import annotation_to_predicate
+from predicate.spec.instrument import instrument, instrument_function
+from spec.test_functions.typed_dicts_postponed import Options
 
 
 def test_annotation_to_predicate_set():
@@ -355,3 +358,69 @@ def test_exercise_type_of_named_tuple():
         return cls._fields
 
     assert len(list(exercise(fields, n=5))) == 5
+
+
+class Config(TypedDict):
+    name: str
+    debug: bool
+
+
+class PartialConfig(TypedDict, total=False):
+    level: int
+    tag: Required[str]
+
+
+class Tree(TypedDict):
+    value: int
+    children: list["Tree"]
+
+
+@pytest.mark.parametrize(
+    "annotation, accepted, rejected",
+    [
+        (
+            Config,
+            [{"name": "x", "debug": False}],
+            [{"name": "x"}, {"name": 1, "debug": False}, {"name": "x", "debug": True, "extra": 1}, None],
+        ),
+        (PartialConfig, [{"tag": "a"}, {"tag": "a", "level": 1}], [{}, {"level": 1}, {"tag": "a", "level": "x"}]),
+        (
+            Tree,
+            [{"value": 1, "children": []}, {"value": 1, "children": [{"value": 2, "children": []}]}],
+            [{"value": 1}],
+        ),
+        (Options, [{"name": "x"}, {"name": "x", "verbose": True}], [{"verbose": True}, {"name": "x", "verbose": 1}]),
+        (Config | None, [None, {"name": "x", "debug": True}], [{}]),
+    ],
+)
+def test_annotation_to_predicate_typed_dict(annotation, accepted, rejected):
+    predicate = annotation_to_predicate(annotation)
+
+    assert all(predicate(value) for value in accepted)
+    assert not any(predicate(value) for value in rejected)
+    assert all(predicate(value) for value in take(10, generate_true(predicate)))
+    assert not any(predicate(value) for value in take(10, generate_false(predicate)))
+
+
+def test_exercise_typed_dict_argument_and_return():
+    def rename(config: Config, name: str) -> Config:
+        return config | {"name": name}
+
+    assert len(list(exercise(rename, n=5))) == 5
+
+
+def test_instrument_typed_dict_return():
+    @instrument
+    def make() -> Config:
+        return {"name": "x", "debug": False}
+
+    assert make() == {"name": "x", "debug": False}
+
+
+def test_exercise_spec_annotated_function():
+    def double(x: int) -> int:
+        return x * 2
+
+    instrumented = instrument_function(exercise, {"args": {}})
+
+    assert len(list(instrumented(double, {"args": {}}))) > 0
