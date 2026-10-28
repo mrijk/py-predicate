@@ -17,6 +17,8 @@ from typing import (
     LiteralString,
     Never,
     NoReturn,
+    NotRequired,
+    Required,
     TextIO,
     Tuple,
     TypeGuard,
@@ -49,6 +51,7 @@ from predicate.predicate import Predicate
 from predicate.set_of_predicate import is_set_of_p
 from predicate.spec.spec import InvalidSpecError, Spec, SpecViolationError
 from predicate.spec.type_checking import imported_namespace, resolve_forward_ref, type_checking_namespace
+from predicate.struct_predicate import is_struct_p
 from predicate.tuple_of_predicate import is_tuple_of_p
 
 _type_narrowing_origins: set = {TypeGuard}
@@ -190,9 +193,42 @@ def _io_predicate(annotation: Any) -> Predicate | None:
     return None
 
 
+_typed_dicts_in_progress: set[type] = set()
+
+
+def _typed_dict_keys(klass: type, hints: dict[str, Any]) -> tuple[set[str], set[str]]:
+    # Under `from __future__ import annotations` the class can't see NotRequired[...] in its string annotations, so
+    # __required_keys__ lists those keys as required; read Required / NotRequired from the resolved hints instead
+    optional = set(klass.__optional_keys__)  # type: ignore[attr-defined]
+    optional |= {key for key, hint in hints.items() if get_origin(hint) is NotRequired}
+    optional -= {key for key, hint in hints.items() if get_origin(hint) is Required}
+    return set(hints) - optional, optional
+
+
+def _typed_dict_predicate(klass: type) -> Predicate:
+    # ponytail: extra keys are rejected (like a dict literal for a type checker); a TypedDict subtype passed for its
+    # base would fail. A recursive reference (children: list["Node"]) is only checked to be a dict.
+    if klass in _typed_dicts_in_progress:
+        return is_dict_p
+    _typed_dicts_in_progress.add(klass)
+    try:
+        localns = type_checking_namespace(klass)
+        required, optional = _typed_dict_keys(klass, get_type_hints(klass, localns=localns, include_extras=True))
+        hints = get_type_hints(klass, localns=localns)  # without Required / NotRequired / Annotated
+        predicates = {key: annotation_to_predicate(hint) for key, hint in hints.items()}
+    finally:
+        _typed_dicts_in_progress.discard(klass)
+    return is_struct_p(
+        required={key: predicates[key] for key in required}, optional={key: predicates[key] for key in optional}
+    )
+
+
 def annotation_to_predicate(annotation: Any) -> Predicate:  # noqa: C901
     if annotation is None or annotation is types.NoneType:
         return is_none_p
+    if is_typed_dict_class(annotation):
+        # isinstance() rejects TypedDicts; check keys and values instead (#283)
+        return _typed_dict_predicate(annotation)
     if annotation in (Any, object):
         return always_true_p  # every value is an object
     if type(annotation) is TypeVar:
