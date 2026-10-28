@@ -8,7 +8,7 @@ from predicate.spec.exercise_helpers import (
     check_signature_against_spec,
     generate_values,
     get_return_predicate,
-    is_unannotated_var_param,
+    is_skipped_param,
     no_spec_error,
     param_predicate,
     resolved_signature,
@@ -27,9 +27,7 @@ def get_spec_from_class_annotation(f: Callable) -> Spec:
     spec: Spec = {"args": {}, "ret": get_return_predicate(sig)}
 
     parameters = {
-        key: parameter
-        for key, parameter in sig.parameters.items()
-        if key != "self" and not is_unannotated_var_param(parameter)
+        key: parameter for key, parameter in sig.parameters.items() if key != "self" and not is_skipped_param(parameter)
     }
 
     for key in parameters:

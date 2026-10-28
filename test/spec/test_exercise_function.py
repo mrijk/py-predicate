@@ -591,3 +591,21 @@ def test_exercise_unannotated_var_args():
         return x
 
     assert len(list(exercise(f, n=3))) == 3
+
+
+def _snake(name: str, _pattern: re.Pattern[str] = re.compile("[a-z][A-Z]")) -> str:
+    return _pattern.sub(lambda match: f"{match[0][0]}_{match[0][1]}", name)
+
+
+def test_exercise_skips_private_parameters_with_default():
+    values = list(exercise(_snake, n=5))
+
+    assert len(values) == 5
+    assert all(len(args) == 1 for args, _ in values)  # only `name` is generated
+
+
+def test_exercise_generates_private_parameter_without_default():
+    def private(_x: int) -> int:
+        return _x
+
+    assert all(args for args, _ in exercise(private, n=3))

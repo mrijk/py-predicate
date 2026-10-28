@@ -8,7 +8,7 @@ from predicate.spec.exercise_helpers import (
     check_signature_against_spec,
     generate_values,
     get_return_predicate,
-    is_unannotated_var_param,
+    is_skipped_param,
     no_spec_error,
     param_predicate,
     resolved_signature,
@@ -18,7 +18,7 @@ from predicate.spec.spec import Spec
 
 
 def _annotatable_parameters(parameters: Mapping[str, Parameter]) -> Iterator[tuple[str, Parameter]]:
-    yield from ((key, parameter) for key, parameter in parameters.items() if not is_unannotated_var_param(parameter))
+    yield from ((key, parameter) for key, parameter in parameters.items() if not is_skipped_param(parameter))
 
 
 def get_spec_from_function_annotation(f: Callable) -> Spec:
