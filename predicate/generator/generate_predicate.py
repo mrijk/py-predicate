@@ -21,7 +21,14 @@ from predicate.xor_predicate import XorPredicate
 
 
 def generate_predicate(predicate_type: type[Predicate], max_depth: int, klass: type) -> Iterator[Predicate]:
-    predicate_type_registry: dict[type, Any] = {
+    if generator := predicate_type_registry().get(predicate_type):
+        yield from generator(max_depth=max_depth, klass=klass)
+    else:
+        raise ValueError(f"No generator found for {predicate_type}")
+
+
+def predicate_type_registry() -> dict[type, Any]:
+    return {
         # TODO: AllPredicate works on iterables
         AllPredicate: generate_all_predicates,
         AndPredicate: generate_and_predicates,
@@ -41,12 +48,6 @@ def generate_predicate(predicate_type: type[Predicate], max_depth: int, klass: t
         OrPredicate: generate_or_predicates,
         XorPredicate: generate_xor_predicates,
     }
-
-    if generator := predicate_type_registry.get(predicate_type):
-        yield from generator(max_depth=max_depth, klass=klass)
-    else:
-        yield from []
-        # raise ValueError(f"No generator defined for predicate type {predicate_type}")
 
 
 def generate_random_predicate_pairs(max_depth: int, klass: type) -> Iterator:

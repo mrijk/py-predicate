@@ -29,7 +29,7 @@ from uuid import UUID, uuid4
 from more_itertools import interleave, random_permutation, repeatfunc, take, unique_everseen
 
 from predicate.eq_predicate import eq_p
-from predicate.generator.generate_predicate import generate_predicate
+from predicate.generator.generate_predicate import generate_predicate, predicate_type_registry
 from predicate.predicate import Predicate
 from predicate.range_predicate import ge_le_p
 from predicate.regex_predicate import regex_p
@@ -164,7 +164,7 @@ def random_datetimes(lower: datetime | None = None, upper: datetime | None = Non
 
 
 def random_predicates(*, max_depth: int = 10, klass: type = int) -> Iterator[Predicate]:
-    subclasses = Predicate.__subclasses__()
+    subclasses = [subclass for subclass in Predicate.__subclasses__() if subclass in predicate_type_registry()]
 
     iterables = [generate_predicate(subclass, max_depth=max_depth, klass=klass) for subclass in subclasses]  # type: ignore
 

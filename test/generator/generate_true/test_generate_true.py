@@ -85,8 +85,12 @@ from predicate import (
     tee_p,
     zero_p,
 )
+from predicate.and_predicate import AndPredicate
+from predicate.in_predicate import InPredicate
+from predicate.not_predicate import NotPredicate
 from predicate.predicate import Predicate
 from predicate.set_predicates import intersects_p, is_real_subset_p, is_real_superset_p, is_subset_p, is_superset_p
+from predicate.tee_predicate import TeePredicate
 
 
 def foo(self) -> bool:
@@ -536,6 +540,18 @@ def test_generate_true_is_instance_unknown():
     predicate = is_instance_p(IPv4Network)
     with pytest.raises(ValueError, match="No generator found"):
         take(5, generate_true(predicate))
+
+
+@pytest.mark.parametrize("predicate_class", [AndPredicate, InPredicate, NotPredicate])
+def test_generate_true_is_instance_predicate_subclass(predicate_class):
+    values = take(5, generate_true(is_instance_p(predicate_class)))
+    assert values
+    assert all(isinstance(value, predicate_class) for value in values)
+
+
+def test_generate_true_is_instance_predicate_subclass_unknown():
+    with pytest.raises(ValueError, match="No generator found for <class 'predicate.tee_predicate.TeePredicate'>"):
+        take(5, generate_true(is_instance_p(TeePredicate)))
 
 
 @pytest.mark.parametrize(
