@@ -1,7 +1,9 @@
 import collections.abc
+import inspect
 import io
 import sys
 import types
+import warnings
 from functools import reduce
 from inspect import Parameter, Signature, isroutine, signature
 from itertools import islice, repeat, takewhile
@@ -49,7 +51,7 @@ from predicate.list_of_predicate import is_list_of_p
 from predicate.or_predicate import or_p
 from predicate.predicate import Predicate
 from predicate.set_of_predicate import is_set_of_p
-from predicate.spec.spec import InvalidSpecError, Spec, SpecViolationError
+from predicate.spec.spec import InvalidSpecError, Spec, SpecViolationError, UnresolvedAnnotationWarning
 from predicate.spec.type_checking import imported_namespace, resolve_forward_ref, type_checking_namespace
 from predicate.struct_predicate import is_struct_p
 from predicate.tuple_of_predicate import is_tuple_of_p
@@ -95,11 +97,59 @@ def _type_hints(owner: Callable, localns: dict[str, Any]) -> dict[str, Any]:
         from annotationlib import Format
 
         hints = get_type_hints(owner, localns=localns, format=Format.FORWARDREF)
-        # ponytail: names that are still unresolved raise NameError as before; treating them as Any is fix 1 of #292
+        # Names that are still unresolved raise NameError here; resolved_signature then falls back per annotation
         for ref in (ref for hint in hints.values() for ref in _forward_refs(hint)):
             ref.evaluate(locals=localns)
         return hints
     return get_type_hints(owner, localns=localns)  # pragma: no cover
+
+
+def _hints_or_any(owner: Callable, localns: dict[str, Any]) -> dict[str, Any]:
+    """Resolve each annotation on its own; one that can't be evaluated at runtime becomes Any, with a warning (#292)."""
+    annotations = _raw_annotations(owner)
+    hints: dict[str, Any] = {}
+    for name in annotations:
+        probe = types.FunctionType(_empty_code, {}, name)  # a function with just this one annotation
+        probe.__annotations__ = {name: annotations[name]}
+        probe.__module__ = owner.__module__
+        probe.__globals__.update(getattr(inspect.unwrap(owner), "__globals__", {}))
+        try:
+            hints |= _type_hints(probe, localns)
+        except (NameError, TypeError, AttributeError) as e:
+            hints[name] = Any
+            _warn_unresolved(owner, name, e)
+    return hints
+
+
+def _warn_unresolved(owner: Callable, name: str, error: Exception) -> None:
+    # Attributed to the function's own source line; the registry makes the default filter show it once per annotation
+    code = getattr(inspect.unwrap(owner), "__code__", None)
+    warnings.warn_explicit(
+        f"Annotation of {name!r} in {owner.__qualname__} can't be evaluated at runtime ({error}); treated as Any",
+        UnresolvedAnnotationWarning,
+        filename=code.co_filename if code else "<unknown>",
+        lineno=code.co_firstlineno if code else 0,
+        module=owner.__module__,
+        registry=_unresolved_warning_registry,
+    )
+
+
+_unresolved_warning_registry: dict = {}
+
+
+def _raw_annotations(owner: Callable) -> dict[str, Any]:
+    if sys.version_info >= (3, 14):  # pragma: no cover
+        from annotationlib import Format, get_annotations
+
+        # Reading __annotations__ evaluates them on 3.14; FORWARDREF keeps unresolvable ones as ForwardRef
+        return dict(get_annotations(owner, format=Format.FORWARDREF))
+    return dict(getattr(owner, "__annotations__", {}))  # pragma: no cover
+
+
+def _empty() -> None: ...
+
+
+_empty_code = _empty.__code__
 
 
 def resolved_signature(f: Callable) -> Signature:
@@ -111,8 +161,14 @@ def resolved_signature(f: Callable) -> Signature:
     try:
         hints = _type_hints(owner, type_checking_namespace(owner))
     except NameError:
-        # A quoted name inside an alias imported from another module, e.g. Union["DataTypeClass", ...] (#333)
-        hints = _type_hints(owner, imported_namespace(owner))
+        try:
+            # A quoted name inside an alias imported from another module, e.g. Union["DataTypeClass", ...] (#333)
+            hints = _type_hints(owner, imported_namespace(owner))
+        except (NameError, TypeError, AttributeError):
+            hints = _hints_or_any(owner, imported_namespace(owner))
+    except (TypeError, AttributeError):
+        # e.g. classmethod[Any, Any, Any]: only subscriptable for type checkers before 3.14
+        hints = _hints_or_any(owner, imported_namespace(owner))
     parameters = [p.replace(annotation=hints.get(name, p.annotation)) for name, p in sig.parameters.items()]
     return sig.replace(parameters=parameters, return_annotation=hints.get("return", sig.return_annotation))
 

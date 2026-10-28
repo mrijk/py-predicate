@@ -6,7 +6,7 @@ import pytest
 
 from predicate.spec.exercise import exercise
 from predicate.spec.instrument import instrument
-from predicate.spec.spec import SpecViolationError
+from predicate.spec.spec import SpecViolationError, UnresolvedAnnotationWarning
 
 if TYPE_CHECKING:
     import datetime as dt
@@ -104,8 +104,9 @@ def test_exercise_type_checking_import():
 
 
 def test_instrument_postponed_unresolvable():
-    with pytest.raises(NameError, match="Cannot resolve annotations of unresolvable"):
-        unresolvable(0)
+    # SupportsRead only exists for type checkers: the parameter is treated as Any, with a warning (#292)
+    with pytest.warns(UnresolvedAnnotationWarning, match="'x' in unresolvable can't be evaluated"):
+        assert unresolvable(0) == 0
 
 
 def test_exercise_postponed():

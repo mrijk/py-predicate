@@ -39,10 +39,7 @@ def is_instrumentation_enabled() -> bool:
 
 
 def enrich_spec(func: Callable, spec: Spec) -> Spec:
-    try:
-        sig = resolved_signature(func)
-    except NameError as e:
-        raise NameError(f"Cannot resolve annotations of {func.__qualname__}: {e}") from e
+    sig = resolved_signature(func)  # unresolvable annotations become Any, with an UnresolvedAnnotationWarning
 
     check_ret_name(sig, spec)
 
