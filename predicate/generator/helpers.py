@@ -550,3 +550,17 @@ def random_text_ios() -> Iterator[io.StringIO]:
 
 def random_ios() -> Iterator[io.IOBase]:
     yield from interleave(map(io.BytesIO, random_bytes()), random_text_ios())
+
+
+def random_named_tuple_classes() -> Iterator[type]:
+    field_names = random_lists(length_p=ge_le_p(lower=0, upper=4), value_p=regex_p("[a-z]{2,4}"))
+    yield from (namedtuple("RandomNamedTuple", unique_everseen(names)) for names in field_names)  # type: ignore[misc]  # noqa: PYI024
+
+
+def random_typed_dict_classes() -> Iterator[type]:
+    from typing import TypedDict
+
+    field_names = random_lists(length_p=ge_le_p(lower=0, upper=4), value_p=regex_p("[a-z]{2,4}"))
+    field_types = [int, str, float, bool, list[int]]
+    for names in field_names:
+        yield TypedDict("RandomTypedDict", {name: random.choice(field_types) for name in names})  # type: ignore[operator]
