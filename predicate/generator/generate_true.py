@@ -39,7 +39,6 @@ from typing import (
     SupportsIndex,
     SupportsInt,
     SupportsRound,
-    TypeVar,
     get_args,
     get_origin,
 )
@@ -664,10 +663,10 @@ def _family_generator(klass: Any, annotation: Any) -> Iterator | None:
 
 
 def _type_arg_classes(arg: Any) -> Any:
-    from predicate.spec.exercise_helpers import type_var_classes
+    from predicate.spec.exercise_helpers import type_arg_classes
 
-    # For type[T] with T a TypeVar: the classes within the bound or constraints of T
-    return type_var_classes(arg) if isinstance(arg, TypeVar) else arg
+    # TypeVar -> its bound or constraints, None -> NoneType, Function[Any] -> Function
+    return type_arg_classes(arg)
 
 
 @generate_true.register

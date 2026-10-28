@@ -44,7 +44,7 @@ from predicate.or_predicate import or_p
 from predicate.predicate import Predicate
 from predicate.set_of_predicate import is_set_of_p
 from predicate.spec.spec import InvalidSpecError, Spec, SpecViolationError
-from predicate.spec.type_checking import imported_namespace, type_checking_namespace
+from predicate.spec.type_checking import imported_namespace, resolve_forward_ref, type_checking_namespace
 from predicate.tuple_of_predicate import is_tuple_of_p
 
 _type_narrowing_origins: set = {TypeGuard}
@@ -110,9 +110,31 @@ def resolved_signature(f: Callable) -> Signature:
     return sig.replace(parameters=parameters, return_annotation=hints.get("return", sig.return_annotation))
 
 
-def type_var_classes(type_var: TypeVar) -> tuple[Any, ...]:
-    """Return the classes a TypeVar stands for: its constraints, its bound, or object."""
-    return type_var.__constraints__ or (type_var.__bound__ or object,)
+def _type_arg_class(arg: Any, module_name: str) -> Any:
+    if isinstance(arg, str | ForwardRef):
+        arg = resolve_forward_ref(arg, module_name)
+    if arg is None:
+        return types.NoneType
+    if arg is Any:
+        return object
+    return get_origin(arg) or arg  # Function[Any] -> Function
+
+
+def type_arg_classes(arg: Any) -> tuple[Any, ...]:
+    """Return the classes type[arg] stands for: a TypeVar's constraints or bound (else object), or arg itself."""
+    if isinstance(arg, TypeVar):
+        classes = arg.__constraints__ or (arg.__bound__ or object,)
+        return tuple(_type_arg_class(klass, arg.__module__) for klass in _flatten_unions(classes))
+    return tuple(_type_arg_class(klass, "") for klass in _flatten_unions((arg,)))
+
+
+def _flatten_unions(classes: tuple[Any, ...]) -> Iterator[Any]:
+    # A union inside type[...] stands for each of its members
+    for klass in classes:
+        if get_origin(klass) in _union_origins:
+            yield from _flatten_unions(get_args(klass))
+        else:
+            yield klass
 
 
 def _io_predicate(annotation: Any) -> Predicate | None:
@@ -150,9 +172,9 @@ def annotation_to_predicate(annotation: Any) -> Predicate:  # noqa: C901
         return reduce(or_p, [annotation_to_predicate(t) for t in get_args(annotation)])
     if origin is Literal:
         return in_p(get_args(annotation))
-    if origin is type and (args := get_args(annotation)) and type(args[0]) is TypeVar:
-        # A class within the bound or constraints of T (binding T to other arguments is #258)
-        return is_instance_p(type) & is_subclass_p(type_var_classes(args[0]))
+    if origin is type and (args := get_args(annotation)):
+        # A subclass of X; for a TypeVar its bound or constraints (binding T to other arguments is #258)
+        return is_instance_p(type) & is_subclass_p(type_arg_classes(args[0]))
     if origin is list:
         (item_type,) = get_args(annotation)
         return is_list_of_p(annotation_to_predicate(item_type))

@@ -15,7 +15,7 @@ import sys
 from collections.abc import Callable, Iterator
 from functools import cache
 from types import ModuleType
-from typing import Any
+from typing import Any, ForwardRef
 
 
 def _is_type_checking_test(test: ast.expr) -> bool:
@@ -177,3 +177,9 @@ def imported_namespace(f: Callable) -> dict[str, Any]:
 def _module_namespace(module_name: str) -> dict[str, Any]:
     module = sys.modules.get(module_name)
     return (vars(module) if module else {}) | _namespace_for_module(module_name)
+
+
+def resolve_forward_ref(ref: str | ForwardRef, module_name: str) -> Any:
+    """Evaluate a string reference, e.g. a TypeVar bound "ds.Accept", in its module plus its TYPE_CHECKING names."""
+    expression = ref.__forward_arg__ if isinstance(ref, ForwardRef) else ref
+    return eval(expression, _module_namespace(module_name))  # noqa: S307  same as get_type_hints does
