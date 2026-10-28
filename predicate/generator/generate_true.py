@@ -1065,7 +1065,7 @@ def generate_struct(predicate: StructPredicate) -> Iterator:
 
     dict_of_predicate = DictOfPredicate(key_value_predicates=list(required.items()))
     optional_generators = {key: generate_true(value_p) for key, value_p in optional.items()}
+    # Without required keys there is nothing to zip, so start from an endless supply of empty dicts
+    required_dicts = generate_dict_of_p(dict_of_predicate) if required else repeat({})
 
-    yield from (
-        d | sample_optional_fields(optional, optional_generators) for d in generate_dict_of_p(dict_of_predicate)
-    )
+    yield from (d | sample_optional_fields(optional, optional_generators) for d in required_dicts)

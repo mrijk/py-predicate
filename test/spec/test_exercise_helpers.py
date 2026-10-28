@@ -15,20 +15,23 @@ from typing import (
     Never,
     NewType,
     NoReturn,
+    NotRequired,
     Required,
     TextIO,
     Tuple,
     TypedDict,
     TypeVar,
+    Unpack,
 )
 
 import pytest
 import typing_extensions
 from more_itertools import take
 
-from predicate import exercise, generate_false, generate_true, is_instance_p
+from predicate import exercise, generate_false, generate_true, is_instance_p, is_int_p, is_struct_p
 from predicate.spec.exercise_helpers import annotation_to_predicate
 from predicate.spec.instrument import instrument, instrument_function
+from predicate.spec.spec import SpecViolationError
 from spec.test_functions.typed_dicts_postponed import Options
 
 
@@ -485,3 +488,54 @@ def test_exercise_iterator_argument():
         return sum(numbers)
 
     assert len(list(exercise(total, n=5))) == 5
+
+
+class ParserOptions(TypedDict, total=False):
+    max_errors: int
+    level: str
+
+
+class NamedOptions(TypedDict):
+    name: str
+    debug: NotRequired[bool]
+
+
+def test_exercise_unpack_typed_dict_kwargs():
+    calls = []
+
+    def parse(sql: str, **opts: Unpack[ParserOptions]) -> str:
+        calls.append(opts)
+        return sql
+
+    assert len(list(exercise(parse, n=10))) == 10
+    assert all(set(opts) <= {"max_errors", "level"} for opts in calls)
+    assert all(isinstance(opts.get("max_errors", 0), int) for opts in calls)
+    assert all(isinstance(opts.get("level", ""), str) for opts in calls)
+
+
+def test_exercise_unpack_typed_dict_required_key():
+    def describe(**opts: Unpack[NamedOptions]) -> str:
+        return opts["name"]
+
+    assert len(list(exercise(describe, n=5))) == 5
+
+
+def test_instrument_unpack_typed_dict_kwargs():
+    @instrument
+    def parse(**opts: Unpack[ParserOptions]) -> int:
+        return len(opts)
+
+    assert parse(max_errors=3) == 1
+    with pytest.raises(SpecViolationError, match="parameter 'opts'"):
+        parse(max_errors="three")
+    with pytest.raises(SpecViolationError, match="parameter 'opts'"):
+        parse(unknown=1)
+
+
+def test_generate_struct_without_required_keys():
+    predicate = is_struct_p(optional={"n": is_int_p})
+
+    values = take(20, generate_true(predicate))
+
+    assert len(values) == 20
+    assert all(predicate(value) for value in values)

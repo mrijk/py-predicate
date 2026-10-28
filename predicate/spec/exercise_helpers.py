@@ -29,6 +29,7 @@ from typing import (
     TypeGuard,
     TypeVar,
     Union,
+    Unpack,
     get_args,
     get_origin,
     get_type_hints,
@@ -485,6 +486,9 @@ def check_signature_against_spec(f: Callable, spec: Spec) -> Spec:
 
 
 def param_predicate(param: Parameter) -> Predicate:
+    if param.kind == Parameter.VAR_KEYWORD and get_origin(param.annotation) is Unpack:
+        # **kwargs: Unpack[TD] (PEP 692): the kwargs dict itself must match TD, not each of its values (#343)
+        return annotation_to_predicate(first(get_args(param.annotation)))
     predicate = annotation_to_predicate(param.annotation)
     match param.kind:
         case Parameter.VAR_POSITIONAL:
