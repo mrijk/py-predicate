@@ -167,8 +167,12 @@ def imported_namespace(f: Callable) -> dict[str, Any]:
     module (its globals or its TYPE_CHECKING imports), not in f's. Builtins and f's own module take precedence, so
     e.g. ``polars.list`` doesn't shadow ``list``.
     """
-    if not (module_name := _module_name(f)):
-        return {}
+    module_name = _module_name(f)
+    return imported_namespace_for_module(module_name) if module_name else {}
+
+
+def imported_namespace_for_module(module_name: str) -> dict[str, Any]:
+    """imported_namespace for the functions and classes defined in module_name."""
     namespaces = (_module_namespace(name) for name in _imported_from(module_name))
     borrowed = {k: v for namespace in namespaces for k, v in namespace.items() if k not in vars(builtins)}
     return borrowed | _module_namespace(module_name)

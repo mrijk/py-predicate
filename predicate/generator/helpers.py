@@ -23,7 +23,7 @@ from operator import or_
 from pathlib import PurePath
 from random import choices
 from time import gmtime, struct_time
-from typing import Any, Final, ForwardRef, Iterator, get_type_hints
+from typing import Any, Final, ForwardRef, Iterator
 from uuid import UUID, uuid4
 
 from more_itertools import interleave, random_permutation, repeatfunc, take, unique_everseen
@@ -296,10 +296,10 @@ def random_named_tuples() -> Iterator[tuple]:
 
 def random_named_tuple_instances(klass: type) -> Iterator[tuple]:
     from predicate import generate_true
-    from predicate.spec.exercise_helpers import annotation_to_predicate
+    from predicate.spec.exercise_helpers import annotation_to_predicate, class_hints
 
     # Fields without an annotation (collections.namedtuple) accept any value
-    hints = get_type_hints(klass)
+    hints = class_hints(klass)
     generators = [generate_true(annotation_to_predicate(hints.get(field, Any))) for field in klass._fields]  # type: ignore[attr-defined]
     while True:
         yield klass(*(next(generator) for generator in generators))

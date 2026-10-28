@@ -13,6 +13,7 @@ from predicate.spec.type_checking import type_checking_namespace
 from spec.test_functions import sample_module
 from spec.test_functions.runtime_unsubscriptable import is_dispatch_method, misspelt
 from spec.test_functions.type_checking_names import first, ratio
+from spec.test_functions.type_checking_only_classes import bound, bound_type, config_name, pair_first
 
 
 def test_type_checking_namespace():
@@ -181,3 +182,19 @@ def test_unresolvable_annotation_warning_can_be_an_error():
         warnings.simplefilter("error", UnresolvedAnnotationWarning)
         with pytest.raises(UnresolvedAnnotationWarning):
             resolved_signature(misspelt)
+
+
+@pytest.mark.parametrize(
+    "f, message",
+    [
+        (bound, "'Hidden' in the bound of TypeVar HiddenT"),
+        (bound_type, "'Hidden' in the bound of TypeVar HiddenT"),
+        (config_name, "field 'hidden' in Config"),
+        (pair_first, "field 'hidden' in Pair"),
+    ],
+)
+def test_exercise_type_checking_only_class_is_any(f, message):
+    with pytest.warns(UnresolvedAnnotationWarning, match=message):
+        values = list(exercise(f, n=3))
+
+    assert len(values) == 3
