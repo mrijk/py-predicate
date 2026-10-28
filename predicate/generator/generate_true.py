@@ -17,17 +17,19 @@ from collections.abc import (
     Set,
     Sized,
 )
-from datetime import date, datetime, time, timedelta
+from datetime import date, datetime, time, timedelta, timezone, tzinfo
 from decimal import Decimal
 from enum import Enum
 from functools import singledispatch
 from inspect import Parameter, Signature, getmembers, isfunction, signature
 from itertools import cycle, repeat
 from pathlib import PurePath
-from types import ModuleType, UnionType
+from time import struct_time
+from types import CodeType, ModuleType, UnionType
 from typing import (
     Any,
     Final,
+    ForwardRef,
     Protocol,
     SupportsAbs,
     SupportsBytes,
@@ -84,6 +86,7 @@ from predicate.generator.helpers import (
     random_bytearrays,
     random_bytes,
     random_callables,
+    random_code_objects,
     random_complex_numbers,
     random_containers,
     random_dates,
@@ -91,8 +94,10 @@ from predicate.generator.helpers import (
     random_decimals,
     random_dicts,
     random_enum_members,
+    random_exceptions,
     random_first_from_iterables,
     random_floats,
+    random_forward_refs,
     random_frozensets,
     random_hashables,
     random_ints,
@@ -105,14 +110,18 @@ from predicate.generator.helpers import (
     random_paths,
     random_patterns,
     random_predicates,
+    random_ranges,
     random_sets,
     random_signatures,
     random_sized,
+    random_slices,
     random_strings,
+    random_struct_times,
     random_supports,
     random_timedeltas,
     random_times,
     random_tuples,
+    random_tzinfos,
     random_uuids,
     random_values_of_type,
     sample_optional_fields,
@@ -679,6 +688,15 @@ def generate_is_instance_p(predicate: IsInstancePredicate, **kwargs: Any) -> Ite
         bytes: random_bytes,
         date: random_dates,
         Decimal: random_decimals,
+        slice: random_slices,
+        range: random_ranges,
+        struct_time: random_struct_times,
+        tzinfo: random_tzinfos,
+        timezone: random_tzinfos,
+        BaseException: random_exceptions,
+        Exception: random_exceptions,
+        ForwardRef: random_forward_refs,
+        CodeType: random_code_objects,
         Sized: random_sized,
         datetime: random_datetimes,
         os.PathLike: random_paths,

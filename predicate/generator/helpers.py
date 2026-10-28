@@ -6,7 +6,7 @@ import sys
 import types
 from collections import namedtuple
 from collections.abc import Callable, Iterable
-from datetime import date, datetime, time, timedelta
+from datetime import date, datetime, time, timedelta, timezone, tzinfo
 from decimal import Decimal
 from enum import Enum, Flag
 from functools import cache, reduce, wraps
@@ -15,7 +15,8 @@ from itertools import count, cycle
 from operator import or_
 from pathlib import PurePath
 from random import choices
-from typing import Any, Final, Iterator, get_type_hints
+from time import gmtime, struct_time
+from typing import Any, Final, ForwardRef, Iterator, get_type_hints
 from uuid import UUID, uuid4
 
 from more_itertools import interleave, random_permutation, repeatfunc, take, unique_everseen
@@ -499,3 +500,44 @@ _simple_patterns: Final = (r"", r"a", r"\d+", r"[a-z]*", r"^\w+$", r"(ab|cd)?", 
 def random_patterns(kind: type = str) -> Iterator[re.Pattern]:
     patterns = [pattern if kind is str else pattern.encode() for pattern in _simple_patterns]
     yield from repeatfunc(lambda: re.compile(random.choice(patterns)))
+
+
+def random_slices() -> Iterator[slice]:
+    small = list(range(-5, 6))
+    steps = [None, *(n for n in small if n)]  # step 0 raises ValueError on use
+    while True:
+        yield slice(random.choice([None, *small]), random.choice([None, *small]), random.choice(steps))
+
+
+def random_ranges() -> Iterator[range]:
+    while True:
+        yield range(random.randint(-10, 10), random.randint(-10, 10), random.choice([1, 2, 3, -1, -2]))
+
+
+def random_struct_times() -> Iterator[struct_time]:
+    # 1970..2100, so time.mktime and strftime accept them on every platform
+    while True:
+        yield gmtime(random.randint(0, 4_102_444_800))
+
+
+def random_tzinfos() -> Iterator[tzinfo]:
+    yield timezone.utc
+    while True:
+        yield timezone(timedelta(minutes=random.randint(-23 * 60, 23 * 60)))
+
+
+def random_exceptions() -> Iterator[Exception]:
+    kinds = [ValueError, TypeError, KeyError, RuntimeError, OSError, Exception]
+    yield from (random.choice(kinds)(message) for message in random_strings())
+
+
+def random_forward_refs() -> Iterator[ForwardRef]:
+    names = ["int", "str", "float", "bool", "bytes", "list[int]", "dict[str, int]", "int | None"]
+    while True:
+        yield ForwardRef(random.choice(names))
+
+
+def random_code_objects() -> Iterator[types.CodeType]:
+    sources = ["0", "x", "x + 1", "[i for i in range(3)]", "'a' * 2", "None"]
+    while True:
+        yield compile(random.choice(sources), "<generated>", "eval")

@@ -1,5 +1,8 @@
+import datetime
 import re
-from typing import TypeVar
+import time
+import types
+from typing import ForwardRef, TypeVar
 
 import pytest
 
@@ -512,3 +515,36 @@ def test_exercise_var_keyword_annotation():
         return sum(kwargs.values())
 
     assert list(exercise(total, n=3))
+
+
+def _width(s: slice) -> int:
+    return len(range(100)[s])
+
+
+def _year(t: time.struct_time) -> str:
+    return time.strftime("%Y", t)
+
+
+def _offset(tz: datetime.tzinfo) -> datetime.timedelta | None:
+    return datetime.datetime(2024, 1, 1, tzinfo=tz).utcoffset()
+
+
+def _exception_name(e: BaseException) -> str:
+    return type(e).__name__
+
+
+def _code_name(c: types.CodeType) -> str:
+    return c.co_name
+
+
+def _ref_name(ref: ForwardRef) -> str:
+    return ref.__forward_arg__
+
+
+def _length(r: range) -> int:
+    return len(r)
+
+
+@pytest.mark.parametrize("f", [_width, _year, _offset, _exception_name, _code_name, _ref_name, _length])
+def test_exercise_stdlib_annotations(f):
+    assert len(list(exercise(f, n=5))) == 5
