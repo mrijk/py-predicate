@@ -1,3 +1,4 @@
+from collections.abc import Callable
 from fractions import Fraction
 from typing import Any
 
@@ -128,3 +129,26 @@ def test_resolved_signature_alias_does_not_shadow_builtins(tmp_path, monkeypatch
 
     parameters = resolved_signature(use.f).parameters
     assert parameters["y"].annotation == list[int]
+
+
+def test_type_checking_namespace_type_vars(tmp_path, monkeypatch):
+    (tmp_path / "with_type_vars.py").write_text(
+        "import typing\n"
+        "from collections.abc import Callable\n"
+        "from typing import TYPE_CHECKING, Any, TypeVar\n"
+        "if TYPE_CHECKING:\n"
+        "    F = TypeVar('F', bound=Callable[..., Any])\n"
+        "    N = typing.TypeVar('N', int, float)\n"
+        "    Called = TypeVar(print('side effect'))\n"
+        "    Bound = TypeVar('Bound', bound=print('side effect'))\n"
+        "def f(x: 'F') -> 'N':\n"
+        "    return 0\n"
+    )
+    monkeypatch.syspath_prepend(tmp_path)
+    import with_type_vars  # type: ignore[import-not-found]  # noqa: PLC0415
+
+    namespace = type_checking_namespace(with_type_vars.f)
+
+    assert set(namespace) == {"F", "N"}
+    assert namespace["F"].__bound__ == Callable[..., Any]
+    assert namespace["N"].__constraints__ == (int, float)

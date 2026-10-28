@@ -1,3 +1,4 @@
+import io
 import os
 import random
 import re
@@ -38,6 +39,7 @@ from typing import (
     SupportsIndex,
     SupportsInt,
     SupportsRound,
+    TypeVar,
     get_args,
     get_origin,
 )
@@ -101,6 +103,7 @@ from predicate.generator.helpers import (
     random_frozensets,
     random_hashables,
     random_ints,
+    random_ios,
     random_iterables,
     random_lambdas,
     random_lists,
@@ -118,6 +121,7 @@ from predicate.generator.helpers import (
     random_strings,
     random_struct_times,
     random_supports,
+    random_text_ios,
     random_timedeltas,
     random_times,
     random_tuples,
@@ -659,6 +663,13 @@ def _family_generator(klass: Any, annotation: Any) -> Iterator | None:
     return None
 
 
+def _type_arg_classes(arg: Any) -> Any:
+    from predicate.spec.exercise_helpers import type_var_classes
+
+    # For type[T] with T a TypeVar: the classes within the bound or constraints of T
+    return type_var_classes(arg) if isinstance(arg, TypeVar) else arg
+
+
 @generate_true.register
 def generate_is_instance_p(predicate: IsInstancePredicate, **kwargs: Any) -> Iterator:
     annotation = predicate.instance_klass[0]  # type: ignore
@@ -689,6 +700,8 @@ def generate_is_instance_p(predicate: IsInstancePredicate, **kwargs: Any) -> Ite
         date: random_dates,
         Decimal: random_decimals,
         slice: random_slices,
+        io.IOBase: random_ios,
+        io.TextIOBase: random_text_ios,
         range: random_ranges,
         struct_time: random_struct_times,
         tzinfo: random_tzinfos,
@@ -736,7 +749,7 @@ def generate_is_instance_p(predicate: IsInstancePredicate, **kwargs: Any) -> Ite
         yield from generator(**accepted_kwargs(generator, kwargs))
     elif klass is type:
         # For type[X] yield X and its subclasses, for plain type any class
-        yield from generate_true(is_subclass_p(first(get_args(annotation), object)))
+        yield from generate_true(is_subclass_p(_type_arg_classes(first(get_args(annotation), object))))
     elif klass == ConstrainedT:
         iterables = [random_ints()]
         yield from random_first_from_iterables(*iterables)

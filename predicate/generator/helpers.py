@@ -1,3 +1,4 @@
+import io
 import math
 import random
 import re
@@ -541,3 +542,11 @@ def random_code_objects() -> Iterator[types.CodeType]:
     sources = ["0", "x", "x + 1", "[i for i in range(3)]", "'a' * 2", "None"]
     while True:
         yield compile(random.choice(sources), "<generated>", "eval")
+
+
+def random_text_ios() -> Iterator[io.StringIO]:
+    yield from map(io.StringIO, random_strings())
+
+
+def random_ios() -> Iterator[io.IOBase]:
+    yield from interleave(map(io.BytesIO, random_bytes()), random_text_ios())

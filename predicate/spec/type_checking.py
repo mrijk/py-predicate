@@ -82,12 +82,21 @@ def _is_type_expression(node: ast.expr) -> bool:
     return all(isinstance(child, _TYPE_EXPRESSION_NODES) for child in ast.walk(ast.Expression(body=node)))
 
 
+def _is_type_var_call(node: ast.expr) -> bool:
+    # `TypeVar("T", bound=...)` or `t.TypeVar(...)`: no side effects when every argument is a type expression
+    match node:
+        case ast.Call(func=ast.Name(id="TypeVar") | ast.Attribute(attr="TypeVar"), args=[ast.Constant(str()), *rest]):
+            return all(_is_type_expression(arg) for arg in [*rest, *(keyword.value for keyword in node.keywords)])
+        case _:
+            return False
+
+
 def _alias(node: ast.Assign | ast.AnnAssign, module: ModuleType, namespace: dict[str, Any]) -> None:
-    # Simple aliases only, e.g. `NumberOrString: TypeAlias = float | str`; anything that could call code is skipped
+    # Simple aliases and TypeVars only, e.g. `NumberOrString: TypeAlias = float | str`; other calls are skipped
     match node:
         case (
             ast.Assign(targets=[ast.Name(id=name)], value=value) | ast.AnnAssign(target=ast.Name(id=name), value=value)
-        ) if value is not None and _is_type_expression(value):
+        ) if value is not None and (_is_type_expression(value) or _is_type_var_call(value)):
             expression = ast.Expression(body=value)
             namespace[name] = eval(compile(expression, module.__name__, "eval"), vars(module) | namespace)  # noqa: S307
 

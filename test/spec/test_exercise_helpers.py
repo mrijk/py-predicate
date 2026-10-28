@@ -1,6 +1,8 @@
 import collections.abc
+import io
 import sys
-from typing import AbstractSet, LiteralString, Never, NoReturn, Tuple
+import tempfile
+from typing import IO, AbstractSet, Any, BinaryIO, LiteralString, Never, NoReturn, TextIO, Tuple, TypeVar
 
 import pytest
 from more_itertools import take
@@ -206,3 +208,59 @@ def test_exercise_object_parameter():
         return type(x).__name__
 
     assert take(5, exercise(describe))
+
+
+T = TypeVar("T")
+BoundT = TypeVar("BoundT", bound=int)
+ConstrainedT = TypeVar("ConstrainedT", int, str)
+
+
+@pytest.mark.parametrize(
+    "annotation, accepted, rejected",
+    [
+        (type[T], [int, str, object], [3, "a"]),
+        (type[BoundT], [int, bool], [str, 3]),
+        (type[ConstrainedT], [int, bool, str], [float, 3]),
+    ],
+)
+def test_annotation_to_predicate_type_of_type_var(annotation, accepted, rejected):
+    predicate = annotation_to_predicate(annotation)
+
+    assert all(predicate(value) for value in accepted)
+    assert not any(predicate(value) for value in rejected)
+    assert all(predicate(value) for value in take(20, generate_true(predicate)))
+
+
+def test_exercise_type_of_type_var():
+    def name(cls: type[BoundT]) -> str:
+        assert issubclass(cls, int)
+        return cls.__name__
+
+    assert len(list(exercise(name, n=5))) == 5
+
+
+@pytest.mark.parametrize(
+    "annotation, accepted, rejected",
+    [
+        (IO[bytes], [io.BytesIO(), tempfile.SpooledTemporaryFile()], [io.StringIO(), b"x"]),
+        (BinaryIO, [io.BytesIO()], [io.StringIO()]),
+        (IO[str], [io.StringIO()], [io.BytesIO(), "x"]),
+        (TextIO, [io.StringIO()], [io.BytesIO()]),
+        (IO, [io.BytesIO(), io.StringIO()], ["x"]),
+        (IO[Any], [io.BytesIO(), io.StringIO()], [b"x"]),
+    ],
+)
+def test_annotation_to_predicate_io(annotation, accepted, rejected):
+    predicate = annotation_to_predicate(annotation)
+
+    assert all(predicate(value) for value in accepted)
+    assert not any(predicate(value) for value in rejected)
+    assert all(predicate(value) for value in take(10, generate_true(predicate)))
+
+
+def test_exercise_io():
+    def read_all(stream: IO[bytes]) -> IO[bytes]:
+        stream.read()
+        return stream
+
+    assert len(list(exercise(read_all, n=5))) == 5

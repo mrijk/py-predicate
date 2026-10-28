@@ -1,11 +1,14 @@
 import collections.abc
+import io
 import sys
 import types
 from functools import reduce
 from inspect import Parameter, Signature, isroutine, signature
 from itertools import islice, repeat, takewhile
 from typing import (
+    IO,
     Any,
+    BinaryIO,
     Callable,
     ForwardRef,
     Iterator,
@@ -13,6 +16,7 @@ from typing import (
     LiteralString,
     Never,
     NoReturn,
+    TextIO,
     Tuple,
     TypeGuard,
     TypeVar,
@@ -34,6 +38,7 @@ from predicate.implies import implies
 from predicate.in_predicate import in_p
 from predicate.is_instance_predicate import is_dict_p, is_str_p, is_tuple_p
 from predicate.is_none_predicate import is_none_p
+from predicate.is_subclass_predicate import is_subclass_p
 from predicate.list_of_predicate import is_list_of_p
 from predicate.or_predicate import or_p
 from predicate.predicate import Predicate
@@ -105,6 +110,22 @@ def resolved_signature(f: Callable) -> Signature:
     return sig.replace(parameters=parameters, return_annotation=hints.get("return", sig.return_annotation))
 
 
+def type_var_classes(type_var: TypeVar) -> tuple[Any, ...]:
+    """Return the classes a TypeVar stands for: its constraints, its bound, or object."""
+    return type_var.__constraints__ or (type_var.__bound__ or object,)
+
+
+def _io_predicate(annotation: Any) -> Predicate | None:
+    # typing.IO classes are for type checkers only: io.BytesIO() isn't an instance of typing.IO, but is an io.IOBase
+    if annotation is BinaryIO or annotation == IO[bytes]:
+        return is_instance_p(io.IOBase) & ~is_instance_p(io.TextIOBase)  # SpooledTemporaryFile isn't BufferedIOBase
+    if annotation is TextIO or annotation == IO[str]:
+        return is_instance_p(io.TextIOBase)
+    if annotation is IO or get_origin(annotation) is IO:
+        return is_instance_p(io.IOBase)
+    return None
+
+
 def annotation_to_predicate(annotation: Any) -> Predicate:  # noqa: C901
     if annotation is None or annotation is types.NoneType:
         return is_none_p
@@ -120,6 +141,8 @@ def annotation_to_predicate(annotation: Any) -> Predicate:  # noqa: C901
         return is_instance_p(float, int)  # PEP 484 numeric tower: int is acceptable for float
     if annotation is complex:
         return is_instance_p(complex, float, int)
+    if (io_predicate := _io_predicate(annotation)) is not None:
+        return io_predicate
     origin = get_origin(annotation)
     if origin in _type_narrowing_origins:
         return always_true_p  # TypeGuard/TypeIs is bool at runtime
@@ -127,6 +150,9 @@ def annotation_to_predicate(annotation: Any) -> Predicate:  # noqa: C901
         return reduce(or_p, [annotation_to_predicate(t) for t in get_args(annotation)])
     if origin is Literal:
         return in_p(get_args(annotation))
+    if origin is type and (args := get_args(annotation)) and type(args[0]) is TypeVar:
+        # A class within the bound or constraints of T (binding T to other arguments is #258)
+        return is_instance_p(type) & is_subclass_p(type_var_classes(args[0]))
     if origin is list:
         (item_type,) = get_args(annotation)
         return is_list_of_p(annotation_to_predicate(item_type))
