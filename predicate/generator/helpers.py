@@ -2,6 +2,7 @@ import ast
 import asyncio
 import atexit
 import io
+import ipaddress
 import logging
 import math
 import random
@@ -14,6 +15,7 @@ from collections.abc import Callable, Iterable
 from datetime import date, datetime, time, timedelta, timezone, tzinfo
 from decimal import Decimal
 from enum import Enum, Flag
+from fractions import Fraction
 from functools import cache, reduce, wraps
 from inspect import Parameter, Signature, signature
 from itertools import count, cycle
@@ -634,3 +636,21 @@ def random_event_loops() -> Iterator[asyncio.AbstractEventLoop]:
         atexit.register(lambda: [loop.close() for loop in _event_loops])
     while True:
         yield random.choice(_event_loops)
+
+
+def random_ipv4_addresses() -> Iterator[ipaddress.IPv4Address]:
+    yield from (ipaddress.IPv4Address(0), ipaddress.IPv4Address("127.0.0.1"))
+    while True:
+        yield ipaddress.IPv4Address(random.getrandbits(32))
+
+
+def random_ipv6_addresses() -> Iterator[ipaddress.IPv6Address]:
+    yield from (ipaddress.IPv6Address(0), ipaddress.IPv6Address("::1"))
+    while True:
+        yield ipaddress.IPv6Address(random.getrandbits(128))
+
+
+def random_fractions() -> Iterator[Fraction]:
+    yield from (Fraction(0), Fraction(1, 3), Fraction(-7, 2))
+    while True:
+        yield Fraction(random.randint(-1000, 1000), random.randint(1, 1000))

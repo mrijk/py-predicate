@@ -1,5 +1,6 @@
 import ast
 import asyncio
+import ipaddress
 import logging
 import os
 import re
@@ -8,6 +9,7 @@ import types
 from collections.abc import Sized
 from datetime import date, datetime, time, timedelta, timezone, tzinfo
 from decimal import Decimal
+from fractions import Fraction
 from pathlib import Path, PurePath, PureWindowsPath
 from typing import (
     ForwardRef,
@@ -67,6 +69,9 @@ from predicate import generate_true, is_instance_p
         logging.Logger,
         asyncio.AbstractEventLoop,
         asyncio.BaseEventLoop,
+        Fraction,
+        ipaddress.IPv4Address,
+        ipaddress.IPv6Address,
     ],
 )
 def test_generate_stdlib_type(klass):
