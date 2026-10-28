@@ -127,5 +127,6 @@ def _run_if_possible(statement: ast.stmt, module: ModuleType, namespace: dict[st
 
 def type_checking_namespace(f: Callable) -> dict[str, Any]:
     """Return the names f's module only imports under ``if TYPE_CHECKING:``, or {} if there are none."""
-    module_name = getattr(f, "__module__", None)
+    # The defining module, not __module__: libraries rewrite that to the public package (e.g. pandas' @set_module)
+    module_name = getattr(inspect.unwrap(f), "__globals__", {}).get("__name__") or getattr(f, "__module__", None)
     return _namespace_for_module(module_name) if module_name else {}

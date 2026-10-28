@@ -70,3 +70,9 @@ def test_type_checking_namespace_skips_missing_name(tmp_path, monkeypatch):
     from pkg327 import use  # type: ignore[import-not-found]  # noqa: PLC0415
 
     assert type_checking_namespace(use.f) == {"Number": int | float}
+
+
+def test_type_checking_namespace_rewritten_module(monkeypatch):
+    monkeypatch.setattr(ratio, "__module__", "spec")
+
+    assert type_checking_namespace(ratio)["Fraction"] is Fraction
