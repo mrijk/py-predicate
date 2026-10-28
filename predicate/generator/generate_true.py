@@ -76,6 +76,7 @@ from predicate.fn_predicate import FnPredicate
 from predicate.frozendict_of_predicate import FrozenDictOfPredicate
 from predicate.frozenset_of_predicate import FrozenSetOfPredicate
 from predicate.ge_predicate import GePredicate, ge_p
+from predicate.generator.generate_predicate import generate_predicate
 from predicate.generator.helpers import (
     accepted_kwargs,
     default_length_p,
@@ -686,6 +687,13 @@ def _family_generator(klass: Any, annotation: Any) -> Iterator | None:
     return None
 
 
+def _random_predicates_of_type(klass: type[Predicate], kwargs: dict) -> Iterator[Predicate]:
+    if klass is Predicate:
+        return random_predicates(**kwargs)
+    # A concrete predicate class, e.g. InPredicate; raises for classes generate_predicate doesn't know
+    return generate_predicate(klass, **{"max_depth": 10, "klass": int} | accepted_kwargs(random_predicates, kwargs))
+
+
 def _type_arg_predicate(arg: Any) -> Predicate:
     from predicate.spec.exercise_helpers import type_arg_predicate
 
@@ -785,8 +793,8 @@ def generate_is_instance_p(predicate: IsInstancePredicate, **kwargs: Any) -> Ite
     elif klass == ConstrainedT:
         iterables = [random_ints()]
         yield from random_first_from_iterables(*iterables)
-    elif klass == Predicate:  # TODO
-        yield from random_predicates(**kwargs)
+    elif isinstance(klass, type) and issubclass(klass, Predicate):
+        yield from _random_predicates_of_type(klass, kwargs)
     else:
         raise ValueError(f"No generator found for {klass}")
 
