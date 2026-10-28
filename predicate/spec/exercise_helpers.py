@@ -10,6 +10,7 @@ from typing import (
     Any,
     BinaryIO,
     Callable,
+    Final,
     ForwardRef,
     Iterator,
     Literal,
@@ -31,12 +32,15 @@ from more_itertools import first, take
 from predicate import all_p, always_false_p, always_true_p, generate_true, is_instance_p
 from predicate.dict_of_predicate import is_dict_of_p
 from predicate.explain import explain
+from predicate.fn_predicate import fn_p
 from predicate.frozendict_of_predicate import is_frozendict_of_p
 from predicate.frozenset_of_predicate import is_frozenset_of_p
+from predicate.generator.helpers import random_named_tuple_classes, random_typed_dict_classes
 from predicate.has_length_predicate import is_empty_p
 from predicate.implies import implies
 from predicate.in_predicate import in_p
 from predicate.is_instance_predicate import is_dict_p, is_str_p, is_tuple_p
+from predicate.is_named_tuple_predicate import is_named_tuple_class
 from predicate.is_none_predicate import is_none_p
 from predicate.is_subclass_predicate import is_subclass_p
 from predicate.list_of_predicate import is_list_of_p
@@ -128,6 +132,44 @@ def type_arg_classes(arg: Any) -> tuple[Any, ...]:
     return tuple(_type_arg_class(klass, "") for klass in _flatten_unions((arg,)))
 
 
+def type_var_annotation(type_var: TypeVar) -> Any:
+    """Return what a plain TypeVar stands for: the union of its constraints, its bound, or Any."""
+    classes = type_var.__constraints__ or (type_var.__bound__ or Any,)
+    resolved = [resolve_forward_ref(c, type_var.__module__) if isinstance(c, str | ForwardRef) else c for c in classes]
+    return Union[tuple(resolved)]  # noqa: UP007  Union of a tuple; a single member stays itself
+
+
+# typing.NamedTuple and typing.TypedDict are functions at runtime: issubclass() and __subclasses__() reject them
+_named_tuple_class_p: Final[Predicate] = fn_p(is_named_tuple_class, generate_true_fn=random_named_tuple_classes)
+
+
+def is_typed_dict_class(klass: Any) -> bool:
+    # typing.is_typeddict doesn't recognise typing_extensions.TypedDict classes before Python 3.14
+    return isinstance(klass, type) and issubclass(klass, dict) and hasattr(klass, "__required_keys__")
+
+
+_typed_dict_class_p: Final[Predicate] = fn_p(is_typed_dict_class, generate_true_fn=random_typed_dict_classes)
+
+
+def _is_typing_special(klass: Any, name: str) -> bool:
+    # typing.TypedDict and typing_extensions.TypedDict are different objects
+    return getattr(klass, "__name__", None) == name and getattr(klass, "__module__", None) in (
+        "typing",
+        "typing_extensions",
+    )
+
+
+def type_arg_predicate(arg: Any) -> Predicate:
+    """Return the predicate for the classes type[arg] stands for (without checking that the value is a class)."""
+    match type_arg_classes(arg):
+        case (klass,) if _is_typing_special(klass, "NamedTuple"):
+            return _named_tuple_class_p
+        case (klass,) if _is_typing_special(klass, "TypedDict"):
+            return _typed_dict_class_p
+        case classes:
+            return is_subclass_p(classes)
+
+
 def _flatten_unions(classes: tuple[Any, ...]) -> Iterator[Any]:
     # A union inside type[...] stands for each of its members
     for klass in classes:
@@ -154,7 +196,8 @@ def annotation_to_predicate(annotation: Any) -> Predicate:  # noqa: C901
     if annotation in (Any, object):
         return always_true_p  # every value is an object
     if type(annotation) is TypeVar:
-        return always_true_p
+        # A value within T's bound or constraints (binding T to other arguments is #258)
+        return annotation_to_predicate(type_var_annotation(annotation))
     if annotation in (Never, NoReturn):
         return always_false_p  # no value inhabits Never
     if annotation is LiteralString:
@@ -174,7 +217,7 @@ def annotation_to_predicate(annotation: Any) -> Predicate:  # noqa: C901
         return in_p(get_args(annotation))
     if origin is type and (args := get_args(annotation)):
         # A subclass of X; for a TypeVar its bound or constraints (binding T to other arguments is #258)
-        return is_instance_p(type) & is_subclass_p(type_arg_classes(args[0]))
+        return is_instance_p(type) & type_arg_predicate(args[0])
     if origin is list:
         (item_type,) = get_args(annotation)
         return is_list_of_p(annotation_to_predicate(item_type))

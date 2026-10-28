@@ -1,13 +1,29 @@
+import collections
 import collections.abc
 import io
 import sys
 import tempfile
-from typing import IO, AbstractSet, Any, BinaryIO, LiteralString, Never, NoReturn, TextIO, Tuple, TypeVar
+from collections.abc import Callable
+from typing import (
+    IO,
+    AbstractSet,
+    Any,
+    BinaryIO,
+    LiteralString,
+    NamedTuple,
+    Never,
+    NoReturn,
+    TextIO,
+    Tuple,
+    TypedDict,
+    TypeVar,
+)
 
 import pytest
+import typing_extensions
 from more_itertools import take
 
-from predicate import exercise, generate_false, generate_true
+from predicate import exercise, generate_false, generate_true, is_instance_p
 from predicate.spec.exercise_helpers import annotation_to_predicate
 
 
@@ -270,3 +286,72 @@ def test_exercise_io():
         return stream
 
     assert len(list(exercise(read_all, n=5))) == 5
+
+
+CallableT = TypeVar("CallableT", bound=Callable[..., Any])
+StringBoundT = TypeVar("StringBoundT", bound="int")
+NamedTupleT = TypeVar("NamedTupleT", bound=NamedTuple)
+
+
+@pytest.mark.parametrize(
+    "annotation, accepted, rejected",
+    [
+        (T, [1, "a", None], []),
+        (BoundT, [1, -5], ["a", 1.5]),
+        (ConstrainedT, [1, "a"], [1.5, None]),
+        (StringBoundT, [1], ["a"]),
+        (CallableT, [len, lambda: 0], [1, "a"]),
+    ],
+)
+def test_annotation_to_predicate_type_var(annotation, accepted, rejected):
+    predicate = annotation_to_predicate(annotation)
+
+    assert all(predicate(value) for value in accepted)
+    assert not any(predicate(value) for value in rejected)
+    assert all(predicate(value) for value in take(20, generate_true(predicate)))
+
+
+def test_exercise_type_var_bound():
+    def decorate(f: CallableT) -> CallableT:
+        assert callable(f)
+        return f
+
+    assert len(list(exercise(decorate, n=5))) == 5
+
+
+class Point(NamedTuple):
+    x: int
+    y: int
+
+
+class Movie(TypedDict):
+    title: str
+
+
+class ExtensionsMovie(typing_extensions.TypedDict):
+    title: str
+
+
+@pytest.mark.parametrize(
+    "annotation, accepted, rejected",
+    [
+        (type[NamedTuple], [Point, collections.namedtuple("P", "a b")], [tuple, Point(1, 2), dict]),
+        (type[NamedTupleT], [Point], [tuple]),
+        (type[TypedDict], [Movie, ExtensionsMovie], [dict, {"title": "x"}]),
+        (type[typing_extensions.TypedDict], [Movie, ExtensionsMovie], [dict]),
+    ],
+)
+def test_annotation_to_predicate_type_of_named_tuple_and_typed_dict(annotation, accepted, rejected):
+    predicate = annotation_to_predicate(annotation)
+
+    assert all(predicate(value) for value in accepted)
+    assert not any(predicate(value) for value in rejected)
+    assert all(predicate(value) for value in take(10, generate_true(predicate)))
+    assert all(predicate(value) for value in take(10, generate_true(is_instance_p(annotation))))
+
+
+def test_exercise_type_of_named_tuple():
+    def fields(cls: type[NamedTuple]) -> tuple[str, ...]:
+        return cls._fields
+
+    assert len(list(exercise(fields, n=5))) == 5

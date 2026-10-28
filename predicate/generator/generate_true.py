@@ -151,7 +151,7 @@ from predicate.is_predicate import IsPredicate
 from predicate.is_predicate_of_p import IsPredicateOfPredicate
 from predicate.is_protocol_predicate import IsProtocolPredicate
 from predicate.is_regex_predicate import IsRegexPredicate
-from predicate.is_subclass_predicate import IsSubclassPredicate, is_subclass_p
+from predicate.is_subclass_predicate import IsSubclassPredicate
 from predicate.is_truthy_predicate import IsTruthyPredicate
 from predicate.juxt_predicate import JuxtPredicate
 from predicate.le_predicate import LePredicate
@@ -662,11 +662,11 @@ def _family_generator(klass: Any, annotation: Any) -> Iterator | None:
     return None
 
 
-def _type_arg_classes(arg: Any) -> Any:
-    from predicate.spec.exercise_helpers import type_arg_classes
+def _type_arg_predicate(arg: Any) -> Predicate:
+    from predicate.spec.exercise_helpers import type_arg_predicate
 
-    # TypeVar -> its bound or constraints, None -> NoneType, Function[Any] -> Function
-    return type_arg_classes(arg)
+    # Same rules as the check: TypeVar -> its bound, None -> NoneType, NamedTuple -> namedtuple classes, ...
+    return type_arg_predicate(arg)
 
 
 @generate_true.register
@@ -748,7 +748,7 @@ def generate_is_instance_p(predicate: IsInstancePredicate, **kwargs: Any) -> Ite
         yield from generator(**accepted_kwargs(generator, kwargs))
     elif klass is type:
         # For type[X] yield X and its subclasses, for plain type any class
-        yield from generate_true(is_subclass_p(_type_arg_classes(first(get_args(annotation), object))))
+        yield from generate_true(_type_arg_predicate(first(get_args(annotation), object)))
     elif klass == ConstrainedT:
         iterables = [random_ints()]
         yield from random_first_from_iterables(*iterables)
