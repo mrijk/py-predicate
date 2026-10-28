@@ -303,5 +303,13 @@ def check_exception(spec: Spec, value: dict, exc: Exception) -> Exception:
     return exc
 
 
+def is_unannotated_var_param(parameter: Parameter) -> bool:
+    # Unannotated *args / **kwargs get no values: call_args then passes () and {}
+    return parameter.annotation is parameter.empty and parameter.kind in (
+        Parameter.VAR_POSITIONAL,
+        Parameter.VAR_KEYWORD,
+    )
+
+
 def no_spec_error(name: str, missing: str) -> InvalidSpecError:
     return InvalidSpecError(f"Cannot derive spec for '{name}': {missing}; pass a Spec or annotate it")

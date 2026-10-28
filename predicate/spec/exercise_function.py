@@ -1,3 +1,5 @@
+from collections.abc import Mapping
+from inspect import Parameter
 from typing import AsyncIterator, Callable, Iterator
 
 from predicate.spec.exercise_helpers import (
@@ -6,12 +8,17 @@ from predicate.spec.exercise_helpers import (
     check_signature_against_spec,
     generate_values,
     get_return_predicate,
+    is_unannotated_var_param,
     no_spec_error,
     param_predicate,
     resolved_signature,
     verify_result,
 )
 from predicate.spec.spec import Spec
+
+
+def _annotatable_parameters(parameters: Mapping[str, Parameter]) -> Iterator[tuple[str, Parameter]]:
+    yield from ((key, parameter) for key, parameter in parameters.items() if not is_unannotated_var_param(parameter))
 
 
 def get_spec_from_function_annotation(f: Callable) -> Spec:
@@ -22,11 +29,8 @@ def get_spec_from_function_annotation(f: Callable) -> Spec:
 
     spec: Spec = {"args": {}, "ret": get_return_predicate(sig)}
 
-    for key in sig.parameters:
-        parameter = sig.parameters[key]
-        annotation = parameter.annotation
-
-        if annotation == parameter.empty:
+    for key, parameter in _annotatable_parameters(sig.parameters):
+        if parameter.annotation == parameter.empty:
             raise no_spec_error(f.__name__, f"parameter '{key}' has no annotation")
         spec["args"][key] = param_predicate(parameter)
 
