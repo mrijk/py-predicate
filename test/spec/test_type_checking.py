@@ -1,4 +1,5 @@
 from fractions import Fraction
+from typing import Any
 
 from more_itertools import take
 
@@ -76,3 +77,54 @@ def test_type_checking_namespace_rewritten_module(monkeypatch):
     monkeypatch.setattr(ratio, "__module__", "spec")
 
     assert type_checking_namespace(ratio)["Fraction"] is Fraction
+
+
+def test_resolved_signature_alias_from_other_module(tmp_path, monkeypatch):
+    package = tmp_path / "pkg333"
+    package.mkdir()
+    (package / "__init__.py").write_text("")
+    (package / "types_.py").write_text(
+        "from typing import TYPE_CHECKING, Union\n"
+        "if TYPE_CHECKING:\n"
+        "    from fractions import Fraction\n"
+        "Number = Union[int, 'Fraction']\n"
+    )
+    (package / "use.py").write_text("from pkg333.types_ import Number\ndef f(x: Number) -> int:\n    return 0\n")
+    monkeypatch.syspath_prepend(tmp_path)
+    from pkg333 import use  # type: ignore[import-not-found]  # noqa: PLC0415
+
+    assert type_checking_namespace(use.f) == {}
+    assert resolved_signature(use.f).parameters["x"].annotation == int | Fraction
+
+
+def test_resolved_signature_alias_with_runtime_name_from_other_module(tmp_path, monkeypatch):
+    package = tmp_path / "pkg333b"
+    package.mkdir()
+    (package / "__init__.py").write_text("")
+    (package / "types_.py").write_text("from typing import Any, Union\nItems = Union[int, 'list[Any]']\n")
+    (package / "use.py").write_text("from pkg333b.types_ import Items\ndef f(x: Items) -> int:\n    return 0\n")
+    monkeypatch.syspath_prepend(tmp_path)
+    from pkg333b import use  # type: ignore[import-not-found]  # noqa: PLC0415
+
+    assert resolved_signature(use.f).parameters["x"].annotation == int | list[Any]
+
+
+def test_resolved_signature_alias_does_not_shadow_builtins(tmp_path, monkeypatch):
+    package = tmp_path / "pkg333c"
+    package.mkdir()
+    (package / "__init__.py").write_text("def list(): ...\n")
+    (package / "types_.py").write_text(
+        "from typing import Union\nNumber = Union[int, 'Fraction']\nfrom fractions import Fraction\n"
+    )
+    (package / "use.py").write_text(
+        "from __future__ import annotations\n"
+        "from pkg333c import list as _list\n"
+        "from pkg333c.types_ import Number\n"
+        "def f(x: Number, y: list[int]) -> int:\n"
+        "    return 0\n"
+    )
+    monkeypatch.syspath_prepend(tmp_path)
+    from pkg333c import use  # type: ignore[import-not-found]  # noqa: PLC0415
+
+    parameters = resolved_signature(use.f).parameters
+    assert parameters["y"].annotation == list[int]

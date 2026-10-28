@@ -39,7 +39,7 @@ from predicate.or_predicate import or_p
 from predicate.predicate import Predicate
 from predicate.set_of_predicate import is_set_of_p
 from predicate.spec.spec import InvalidSpecError, Spec, SpecViolationError
-from predicate.spec.type_checking import type_checking_namespace
+from predicate.spec.type_checking import imported_namespace, type_checking_namespace
 from predicate.tuple_of_predicate import is_tuple_of_p
 
 _type_narrowing_origins: set = {TypeGuard}
@@ -70,22 +70,37 @@ def _signature(f: Callable) -> Signature:
     return signature(f)  # pragma: no cover
 
 
+def _forward_refs(hint: Any) -> Iterator[ForwardRef]:
+    # Also nested ones, e.g. int | ForwardRef("Fraction") from an alias in another module
+    if isinstance(hint, ForwardRef):
+        yield hint
+    for arg in get_args(hint):
+        yield from _forward_refs(arg)
+
+
+def _type_hints(owner: Callable, localns: dict[str, Any]) -> dict[str, Any]:
+    if sys.version_info >= (3, 14):  # pragma: no cover
+        from annotationlib import Format
+
+        hints = get_type_hints(owner, localns=localns, format=Format.FORWARDREF)
+        # ponytail: names that are still unresolved raise NameError as before; treating them as Any is fix 1 of #292
+        for ref in (ref for hint in hints.values() for ref in _forward_refs(hint)):
+            ref.evaluate(locals=localns)
+        return hints
+    return get_type_hints(owner, localns=localns)  # pragma: no cover
+
+
 def resolved_signature(f: Callable) -> Signature:
     # get_type_hints also resolves nested string annotations, e.g. x: "str" under `from __future__ import annotations`
     sig = _signature(f)
     # Python < 3.14 get_type_hints rejects callable instances, so read the hints from their __call__
     owner = f if isroutine(f) else type(f).__call__
     # Names the module only imports under `if TYPE_CHECKING:` are re-imported into localns
-    localns = type_checking_namespace(owner)
-    if sys.version_info >= (3, 14):  # pragma: no cover
-        from annotationlib import Format
-
-        hints = get_type_hints(owner, localns=localns, format=Format.FORWARDREF)
-        # ponytail: names that are still unresolved raise NameError as before; treating them as Any is fix 1 of #292
-        for hint in (hint for hint in hints.values() if isinstance(hint, ForwardRef)):
-            hint.evaluate(locals=localns)
-    else:  # pragma: no cover
-        hints = get_type_hints(owner, localns=localns)
+    try:
+        hints = _type_hints(owner, type_checking_namespace(owner))
+    except NameError:
+        # A quoted name inside an alias imported from another module, e.g. Union["DataTypeClass", ...] (#333)
+        hints = _type_hints(owner, imported_namespace(owner))
     parameters = [p.replace(annotation=hints.get(name, p.annotation)) for name, p in sig.parameters.items()]
     return sig.replace(parameters=parameters, return_annotation=hints.get("return", sig.return_annotation))
 
