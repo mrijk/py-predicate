@@ -1,13 +1,17 @@
+import warnings
 from collections.abc import Callable
 from fractions import Fraction
 from typing import Any
 
+import pytest
 from more_itertools import take
 
 from predicate.spec.exercise import exercise
 from predicate.spec.exercise_helpers import resolved_signature
+from predicate.spec.spec import UnresolvedAnnotationWarning
 from predicate.spec.type_checking import type_checking_namespace
 from spec.test_functions import sample_module
+from spec.test_functions.runtime_unsubscriptable import is_dispatch_method, misspelt
 from spec.test_functions.type_checking_names import first, ratio
 
 
@@ -152,3 +156,28 @@ def test_type_checking_namespace_type_vars(tmp_path, monkeypatch):
     assert set(namespace) == {"F", "N"}
     assert namespace["F"].__bound__ == Callable[..., Any]
     assert namespace["N"].__constraints__ == (int, float)
+
+
+def test_resolved_signature_runtime_unsubscriptable():
+    with pytest.warns(UnresolvedAnnotationWarning, match="'return' in is_dispatch_method"):
+        sig = resolved_signature(is_dispatch_method)
+
+    assert sig.return_annotation is Any
+    assert sig.parameters["obj"].annotation is Any
+
+
+def test_exercise_unresolvable_annotation_is_any():
+    with pytest.warns(UnresolvedAnnotationWarning, match="'x' in misspelt"):
+        sig = resolved_signature(misspelt)
+        values = list(exercise(misspelt, n=3))
+
+    assert sig.parameters["x"].annotation is Any
+    assert sig.parameters["y"].annotation is int
+    assert len(values) == 3
+
+
+def test_unresolvable_annotation_warning_can_be_an_error():
+    with warnings.catch_warnings():
+        warnings.simplefilter("error", UnresolvedAnnotationWarning)
+        with pytest.raises(UnresolvedAnnotationWarning):
+            resolved_signature(misspelt)

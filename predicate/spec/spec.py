@@ -11,6 +11,10 @@ class InvalidSpecError(Exception):
     """Raised when a Spec itself is invalid, e.g. it doesn't match the function signature."""
 
 
+class UnresolvedAnnotationWarning(UserWarning):
+    """Issued when an annotation can't be evaluated at runtime and is treated as Any."""
+
+
 Spec = TypedDict(
     "Spec",
     {
