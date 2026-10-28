@@ -213,6 +213,7 @@ def test_exercise_object_parameter():
 T = TypeVar("T")
 BoundT = TypeVar("BoundT", bound=int)
 ConstrainedT = TypeVar("ConstrainedT", int, str)
+ForwardBoundT = TypeVar("ForwardBoundT", bound="io.BytesIO")
 
 
 @pytest.mark.parametrize(
@@ -221,6 +222,11 @@ ConstrainedT = TypeVar("ConstrainedT", int, str)
         (type[T], [int, str, object], [3, "a"]),
         (type[BoundT], [int, bool], [str, 3]),
         (type[ConstrainedT], [int, bool, str], [float, 3]),
+        (type[ForwardBoundT], [io.BytesIO], [io.StringIO, 3]),
+        (type[None], [type(None)], [int, None]),
+        (type[int | str], [int, bool, str], [float, 3]),
+        (type[Any], [int, object], [3]),
+        (type[list[int]], [list], [tuple, [1]]),
     ],
 )
 def test_annotation_to_predicate_type_of_type_var(annotation, accepted, rejected):
