@@ -55,7 +55,12 @@ from predicate.or_predicate import or_p
 from predicate.predicate import Predicate
 from predicate.set_of_predicate import is_set_of_p
 from predicate.spec.spec import InvalidSpecError, Spec, SpecViolationError, UnresolvedAnnotationWarning
-from predicate.spec.type_checking import imported_namespace, resolve_forward_ref, type_checking_namespace
+from predicate.spec.type_checking import (
+    imported_namespace,
+    imported_namespace_for_module,
+    resolve_forward_ref,
+    type_checking_namespace,
+)
 from predicate.struct_predicate import is_struct_p
 from predicate.tuple_of_predicate import is_tuple_of_p
 
@@ -125,14 +130,18 @@ def _hints_or_any(owner: Callable, localns: dict[str, Any]) -> dict[str, Any]:
 
 
 def _warn_unresolved(owner: Callable, name: str, error: Exception) -> None:
-    # Attributed to the function's own source line; the registry makes the default filter show it once per annotation
-    code = getattr(inspect.unwrap(owner), "__code__", None)
+    message = f"Annotation of {name!r} in {owner.__qualname__} can't be evaluated at runtime ({error}); treated as Any"
+    _warn(message, getattr(inspect.unwrap(owner), "__code__", None), owner.__module__)
+
+
+def _warn(message: str, code: types.CodeType | None, module: str) -> None:
+    # Attributed to the function's own source line; the registry makes the default filter show it once per message
     warnings.warn_explicit(
-        f"Annotation of {name!r} in {owner.__qualname__} can't be evaluated at runtime ({error}); treated as Any",
+        message,
         UnresolvedAnnotationWarning,
-        filename=code.co_filename if code else "<unknown>",
+        filename=code.co_filename if code else module,
         lineno=code.co_firstlineno if code else 0,
-        module=owner.__module__,
+        module=module,
         registry=_unresolved_warning_registry,
     )
 
@@ -176,9 +185,19 @@ def resolved_signature(f: Callable) -> Signature:
     return sig.replace(parameters=parameters, return_annotation=hints.get("return", sig.return_annotation))
 
 
-def _type_arg_class(arg: Any, module_name: str) -> Any:
+def _resolve_or_any(ref: str | ForwardRef, module_name: str, owner: str) -> Any:
+    try:
+        return resolve_forward_ref(ref, module_name)
+    except (NameError, TypeError, AttributeError) as e:
+        # e.g. a TypeVar bound to a class that only exists under TYPE_CHECKING
+        text = ref.__forward_arg__ if isinstance(ref, ForwardRef) else ref
+        _warn(f"{text!r} in {owner} can't be evaluated at runtime ({e}); treated as Any", None, module_name)
+        return Any
+
+
+def _type_arg_class(arg: Any, module_name: str, owner: str) -> Any:
     if isinstance(arg, str | ForwardRef):
-        arg = resolve_forward_ref(arg, module_name)
+        arg = _resolve_or_any(arg, module_name, owner)
     if arg is None:
         return types.NoneType
     if arg is Any:
@@ -190,14 +209,20 @@ def type_arg_classes(arg: Any) -> tuple[Any, ...]:
     """Return the classes type[arg] stands for: a TypeVar's constraints or bound (else object), or arg itself."""
     if isinstance(arg, TypeVar):
         classes = arg.__constraints__ or (arg.__bound__ or object,)
-        return tuple(_type_arg_class(klass, arg.__module__) for klass in _flatten_unions(classes))
-    return tuple(_type_arg_class(klass, "") for klass in _flatten_unions((arg,)))
+        owner = f"the bound of TypeVar {arg.__name__}"
+        return tuple(_type_arg_class(klass, arg.__module__, owner) for klass in _flatten_unions(classes))
+    return tuple(_type_arg_class(klass, "", "a type[...] annotation") for klass in _flatten_unions((arg,)))
 
 
 def type_var_annotation(type_var: TypeVar) -> Any:
     """Return what a plain TypeVar stands for: the union of its constraints, its bound, or Any."""
     classes = type_var.__constraints__ or (type_var.__bound__ or Any,)
-    resolved = [resolve_forward_ref(c, type_var.__module__) if isinstance(c, str | ForwardRef) else c for c in classes]
+    resolved = [
+        _resolve_or_any(c, type_var.__module__, f"the bound of TypeVar {type_var.__name__}")
+        if isinstance(c, str | ForwardRef)
+        else c
+        for c in classes
+    ]
     return Union[tuple(resolved)]  # noqa: UP007  Union of a tuple; a single member stays itself
 
 
@@ -264,6 +289,33 @@ def _typed_dict_keys(klass: type, hints: dict[str, Any]) -> tuple[set[str], set[
     return set(hints) - optional, optional
 
 
+def class_hints(klass: type, include_extras: bool = False) -> dict[str, Any]:
+    """Return the field annotations of a TypedDict or NamedTuple; ones that can't be evaluated become Any (#292)."""
+    localns = type_checking_namespace(klass)
+    try:
+        return get_type_hints(klass, localns=localns, include_extras=include_extras)
+    except (NameError, TypeError, AttributeError):
+        module = sys.modules.get(klass.__module__)
+        globalns = imported_namespace_for_module(klass.__module__) | (vars(module) if module else {})
+        return {
+            name: _class_hint(klass, name, raw, globalns | localns, include_extras)
+            for name, raw in _raw_annotations(klass).items()
+        }
+
+
+def _class_hint(klass: type, name: str, raw: Any, namespace: dict[str, Any], include_extras: bool) -> Any:
+    probe = types.SimpleNamespace(__annotations__={name: raw}, __module__=klass.__module__, __mro__=())
+    try:
+        return get_type_hints(probe, globalns=namespace, include_extras=include_extras)[name]
+    except (NameError, TypeError, AttributeError) as e:
+        _warn(
+            f"Annotation of field {name!r} in {klass.__qualname__} can't be evaluated at runtime ({e}); treated as Any",
+            None,
+            klass.__module__,
+        )
+        return Any
+
+
 def _typed_dict_predicate(klass: type) -> Predicate:
     # ponytail: extra keys are rejected (like a dict literal for a type checker); a TypedDict subtype passed for its
     # base would fail. A recursive reference (children: list["Node"]) is only checked to be a dict.
@@ -271,9 +323,8 @@ def _typed_dict_predicate(klass: type) -> Predicate:
         return is_dict_p
     _typed_dicts_in_progress.add(klass)
     try:
-        localns = type_checking_namespace(klass)
-        required, optional = _typed_dict_keys(klass, get_type_hints(klass, localns=localns, include_extras=True))
-        hints = get_type_hints(klass, localns=localns)  # without Required / NotRequired / Annotated
+        required, optional = _typed_dict_keys(klass, class_hints(klass, include_extras=True))
+        hints = class_hints(klass)  # without Required / NotRequired / Annotated
         predicates = {key: annotation_to_predicate(hint) for key, hint in hints.items()}
     finally:
         _typed_dicts_in_progress.discard(klass)
