@@ -1,5 +1,6 @@
 import ast
 import asyncio
+import inspect
 import io
 import ipaddress
 import logging
@@ -687,6 +688,77 @@ def _family_generator(klass: Any, annotation: Any) -> Iterator | None:
     return None
 
 
+# A class built from its __init__ may need another such class as an argument, but not deeper than this
+_MAX_CONSTRUCT_DEPTH: Final = 2
+# Consecutive constructor failures before giving up on a class
+_MAX_CONSTRUCT_ATTEMPTS: Final = 20
+_construct_depth = 0
+
+
+def _constructed_instances(klass: Any) -> Iterator:
+    """Return instances of a class built from its fully annotated __init__ (#305); the last resort for a class."""
+    if (params := _init_params(klass)) is None:
+        raise ValueError(f"No generator found for {klass}")
+    return _random_constructed(klass, params)
+
+
+def _init_params(klass: Any) -> list[Parameter] | None:
+    """Return the __init__ parameters to generate, or None if the class can't be built from its annotations."""
+    if not isinstance(klass, type) or inspect.isabstract(klass) or getattr(klass, "_is_protocol", False):
+        return None
+    if _construct_depth >= _MAX_CONSTRUCT_DEPTH:
+        return None
+    from predicate.spec.exercise_helpers import resolved_signature
+
+    try:
+        # A class without its own __init__ has object's (self, /, *args, **kwargs): it's built without arguments
+        init_signature = resolved_signature(klass.__init__)  # type: ignore[misc]
+    except (TypeError, ValueError, NameError):
+        return None
+    params = [
+        param
+        for name, param in list(init_signature.parameters.items())[1:]  # skip self
+        if param.kind not in (Parameter.VAR_POSITIONAL, Parameter.VAR_KEYWORD) and not name.startswith("_")
+    ]
+    return None if any(param.annotation is Parameter.empty for param in params) else params
+
+
+def _random_constructed(klass: type, params: list[Parameter]) -> Iterator:
+    errors: list[str] = []
+    while len(errors) < _MAX_CONSTRUCT_ATTEMPTS:
+        value, error = _try_construct(klass, params)
+        if error:
+            errors.append(error)
+        else:
+            errors.clear()
+            yield value
+    most_common = max(set(errors), key=errors.count)
+    raise ValueError(f"No generator found for {klass}: its constructor keeps raising ({most_common})")
+
+
+def _try_construct(klass: type, params: list[Parameter]) -> tuple[Any, str | None]:
+    try:
+        return _construct(klass, params), None
+    except Exception as e:  # noqa: BLE001  any constructor error just rejects this candidate
+        return None, f"{type(e).__name__}: {e}"
+
+
+def _construct(klass: type, params: list[Parameter]) -> Any:
+    from predicate.spec.exercise_helpers import param_predicate
+
+    global _construct_depth
+    # Optional parameters are left out half the time, so the defaults are used too
+    chosen = [param for param in params if param.default is Parameter.empty or random.random() < 0.5]
+    _construct_depth += 1
+    try:
+        values = {param.name: first(generate_true(param_predicate(param))) for param in chosen}
+    finally:
+        _construct_depth -= 1
+    args = [values[param.name] for param in chosen if param.kind == Parameter.POSITIONAL_ONLY]
+    kwargs = {param.name: values[param.name] for param in chosen if param.kind != Parameter.POSITIONAL_ONLY}
+    return klass(*args, **kwargs)
+
+
 def _random_predicates_of_type(klass: type[Predicate], kwargs: dict) -> Iterator[Predicate]:
     if klass is Predicate:
         return random_predicates(**kwargs)
@@ -796,7 +868,7 @@ def generate_is_instance_p(predicate: IsInstancePredicate, **kwargs: Any) -> Ite
     elif isinstance(klass, type) and issubclass(klass, Predicate):
         yield from _random_predicates_of_type(klass, kwargs)
     else:
-        raise ValueError(f"No generator found for {klass}")
+        yield from _constructed_instances(klass)
 
 
 @generate_true.register

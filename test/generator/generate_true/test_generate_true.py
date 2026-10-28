@@ -3,6 +3,8 @@ import inspect
 import sys
 import typing
 import uuid
+from abc import ABC, abstractmethod
+from dataclasses import dataclass
 from datetime import datetime, timedelta
 from ipaddress import IPv4Network
 
@@ -552,6 +554,65 @@ def test_generate_true_is_instance_predicate_subclass(predicate_class):
 def test_generate_true_is_instance_predicate_subclass_unknown():
     with pytest.raises(ValueError, match="No generator found for <class 'predicate.tee_predicate.TeePredicate'>"):
         take(5, generate_true(is_instance_p(TeePredicate)))
+
+
+class Point:
+    def __init__(self, x: int, y: int = 0, *, label: str | None = None):
+        self.x, self.y, self.label = x, y, label
+
+
+@dataclass
+class Segment:
+    start: Point
+    end: Point
+
+
+class Plain:
+    pass
+
+
+class Unannotated:
+    def __init__(self, x):
+        self.x = x
+
+
+class AlwaysRaises:
+    def __init__(self, x: int):
+        raise ValueError("never")
+
+
+class Shape(ABC):
+    def __init__(self, size: int):
+        self.size = size
+
+    @abstractmethod
+    def area(self) -> float: ...
+
+
+def test_generate_true_constructed_from_init():
+    values = take(10, generate_true(is_instance_p(Point)))
+    assert len(values) == 10
+    assert all(isinstance(value, Point) and isinstance(value.x, int) for value in values)
+
+
+def test_generate_true_constructed_without_init():
+    assert all(isinstance(value, Plain) for value in take(3, generate_true(is_instance_p(Plain))))
+
+
+def test_generate_true_constructed_dataclass_with_class_fields():
+    values = take(5, generate_true(is_instance_p(Segment)))
+    assert all(isinstance(value.start, Point) and isinstance(value.end, Point) for value in values)
+
+
+@pytest.mark.parametrize("klass", [Unannotated, Shape])
+def test_generate_true_constructed_not_possible(klass):
+    with pytest.raises(ValueError, match="No generator found"):
+        take(1, generate_true(is_instance_p(klass)))
+
+
+def test_generate_true_constructed_constructor_keeps_raising():
+    with pytest.raises(ValueError, match=r"constructor keeps raising \(ValueError: never\)"):
+        take(1, generate_true(is_instance_p(AlwaysRaises)))
 
 
 @pytest.mark.parametrize(
