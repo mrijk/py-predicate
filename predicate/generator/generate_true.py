@@ -78,7 +78,7 @@ from predicate.fn_predicate import FnPredicate
 from predicate.frozendict_of_predicate import FrozenDictOfPredicate
 from predicate.frozenset_of_predicate import FrozenSetOfPredicate
 from predicate.ge_predicate import GePredicate, ge_p
-from predicate.generator.generate_predicate import generate_predicate
+from predicate.generator.generate_predicate import generate_predicate, predicate_type_registry
 from predicate.generator.helpers import (
     accepted_kwargs,
     default_length_p,
@@ -780,7 +780,10 @@ def _construct(klass: type, params: list[Parameter]) -> Any:
 def _random_predicates_of_type(klass: type[Predicate], kwargs: dict) -> Iterator[Predicate]:
     if klass is Predicate:
         return random_predicates(**kwargs)
-    # A concrete predicate class, e.g. InPredicate; raises for classes generate_predicate doesn't know
+    if klass not in predicate_type_registry():
+        # No dedicated generator, e.g. ListOfPredicate: build it from its annotated __init__
+        return _constructed_instances(klass)
+    # A concrete predicate class with a dedicated generator, e.g. InPredicate
     return generate_predicate(klass, **{"max_depth": 10, "klass": int} | accepted_kwargs(random_predicates, kwargs))
 
 
