@@ -231,11 +231,20 @@ def generate_all_p(all_predicate: AllPredicate, *, length_p: Predicate = default
         yield random_combination_with_replacement(values, max_length)
 
         values = take(max_length, generate_true(predicate))
-        if all(isinstance(value, Hashable) for value in values):
+        # isinstance(value, Hashable) isn't enough: a tuple is Hashable even when its items aren't
+        if all(_is_hashable(value) for value in values):
             yield set(random_combination_with_replacement(values, max_length))
 
         values = take(max_length, generate_true(predicate))
         yield list(random_combination_with_replacement(values, max_length))
+
+
+def _is_hashable(value: Any) -> bool:
+    try:
+        hash(value)
+    except TypeError:
+        return False
+    return True
 
 
 default_any_length_p: Final = ge_le_p(lower=1, upper=10)
