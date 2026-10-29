@@ -6,9 +6,9 @@ import uuid
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from datetime import datetime, timedelta
-from ipaddress import IPv4Network
 
 import pytest
+from graphviz import Digraph
 from more_itertools import take
 
 from generator.generate_true.helpers import assert_generated_true
@@ -540,7 +540,7 @@ def test_generate_true_is_instance_type_of():
 
 
 def test_generate_true_is_instance_unknown():
-    predicate = is_instance_p(IPv4Network)
+    predicate = is_instance_p(Digraph)
     with pytest.raises(ValueError, match="No generator found"):
         take(5, generate_true(predicate))
 
@@ -634,6 +634,10 @@ class Literal(Node):
 
     def sql(self) -> str:
         return str(self.value)
+
+
+def test_generate_true_callables_have_a_name():
+    assert all(isinstance(value.__name__, str) for value in take(30, generate_true(is_callable_p)))
 
 
 def test_generate_true_constructed_from_init():

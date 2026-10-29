@@ -103,6 +103,23 @@ def random_signatures(nr_of_parameters_p: Predicate = default_size_p) -> Iterato
     yield from (to_signature(names) for names in valid_parameter_lists)
 
 
+def random_parameters() -> Iterator[Parameter]:
+    kinds = [
+        Parameter.POSITIONAL_ONLY,
+        Parameter.POSITIONAL_OR_KEYWORD,
+        Parameter.VAR_POSITIONAL,
+        Parameter.KEYWORD_ONLY,
+        Parameter.VAR_KEYWORD,
+    ]
+    annotations = [Parameter.empty, int, str, Any]
+    while True:
+        yield Parameter(
+            random.choice(["a", "b", "x", "value", "items"]),
+            random.choice(kinds),
+            annotation=random.choice(annotations),
+        )
+
+
 def random_functions(nr_of_parameters_p: Predicate = default_size_p) -> Iterator[Callable]:
     yield from (function_with_signature(sig) for sig in random_signatures(nr_of_parameters_p))
 
@@ -397,6 +414,9 @@ def function_with_signature(sig: Signature) -> Callable:
 class CallableObject:
     """Instance whose class implements __call__, so it is a Callable without being a function."""
 
+    # Callables usually have a name; code that reports on them (e.g. instrument) reads it
+    __name__ = "callable_object"
+
     def __call__(self, *args, **kwargs):
         return None
 
@@ -648,6 +668,16 @@ def random_ipv6_addresses() -> Iterator[ipaddress.IPv6Address]:
     yield from (ipaddress.IPv6Address(0), ipaddress.IPv6Address("::1"))
     while True:
         yield ipaddress.IPv6Address(random.getrandbits(128))
+
+
+def random_ipv4_networks() -> Iterator[ipaddress.IPv4Network]:
+    while True:
+        yield ipaddress.IPv4Network((random.getrandbits(32), random.randint(0, 32)), strict=False)
+
+
+def random_ipv6_networks() -> Iterator[ipaddress.IPv6Network]:
+    while True:
+        yield ipaddress.IPv6Network((random.getrandbits(128), random.randint(0, 128)), strict=False)
 
 
 def random_fractions() -> Iterator[Fraction]:
