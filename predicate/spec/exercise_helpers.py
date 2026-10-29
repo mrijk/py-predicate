@@ -64,6 +64,7 @@ from predicate.spec.type_checking import (
 )
 from predicate.struct_predicate import is_struct_p
 from predicate.tuple_of_predicate import is_tuple_of_p
+from predicate.type_var_predicate import ConstrainedTypeVarPredicate, FreeTypeVarPredicate
 
 _type_narrowing_origins: set = {TypeGuard}
 if sys.version_info >= (3, 13):  # pragma: no cover
@@ -235,6 +236,17 @@ def _type_var_annotation(type_var: TypeVar) -> Any:
     return Union[tuple(resolved)]  # noqa: UP007  Union of a tuple; a single member stays itself
 
 
+def _type_var_predicate(type_var: TypeVar) -> Predicate:
+    """Return a predicate for a value within T's bound or constraints (binding T to other arguments is #258)."""
+    if type_var.__constraints__:
+        union = _type_var_annotation(type_var)
+        constraints = get_args(union) if get_origin(union) in _union_origins else (union,)
+        return reduce(ConstrainedTypeVarPredicate, [annotation_to_predicate(c) for c in constraints])
+    if type_var.__bound__ is None:
+        return FreeTypeVarPredicate()
+    return annotation_to_predicate(_type_var_annotation(type_var))
+
+
 # typing.NamedTuple and typing.TypedDict are functions at runtime: issubclass() and __subclasses__() reject them
 _named_tuple_class_p: Final[Predicate] = fn_p(is_named_tuple_class, generate_true_fn=random_named_tuple_classes)
 
@@ -371,8 +383,7 @@ def annotation_to_predicate(annotation: Any) -> Predicate:  # noqa: C901
     if annotation in (Any, object):
         return always_true_p  # every value is an object
     if type(annotation) is TypeVar:
-        # A value within T's bound or constraints (binding T to other arguments is #258)
-        return annotation_to_predicate(_type_var_annotation(annotation))
+        return _type_var_predicate(annotation)
     if annotation in (Never, NoReturn):
         return always_false_p  # no value inhabits Never
     if annotation is LiteralString:
