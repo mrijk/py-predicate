@@ -70,12 +70,13 @@ class Predicate[T]:
     def explain_failure(self, x: Any, /, *args, **kwargs) -> dict:
         raise NotImplementedError
 
-    def consumes_single(self, iterable: Iterable[Any]) -> Iterator[int]:
+    def consumes(self, iterable: Iterable[Any]) -> Iterator[int]:
+        """Yield how many items from the start of the iterable this predicate can match, for match_p.
+
+        By default a predicate matches a single item; predicates over several items (all_p, any_p, ...) override it.
+        """
         [item], _ = spy(iterable)
         yield 1 if self(item) else 0
-
-    def consumes(self, iterable: Iterable[Any]) -> Iterator[int]:
-        raise NotImplementedError
 
 
 def repr_operand(predicate: Predicate, precedence: int) -> str:

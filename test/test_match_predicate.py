@@ -13,6 +13,8 @@ from predicate import (
     is_int_p,
     is_str_p,
     le_p,
+    lt_p,
+    ne_p,
     optional,
     plus,
     recur_p,
@@ -371,3 +373,32 @@ def test_match_explain_iterable_too_short():
         "result": False,
     }
     assert explain(predicate, [1]) == expected
+
+
+@pytest.mark.parametrize(
+    "predicate, value, expected",
+    [
+        (ge_p(0), [0, 1], True),
+        (ge_p(1), [0, 1], False),
+        (ne_p(1), [0, 1], True),
+        (lt_p(0), [0, 1], False),
+        (eq_p(0) | ge_p(5), [0, 1], True),
+        (eq_p(1) & ge_p(5), [1, 0], False),
+        (~eq_p(0), [0, 1], False),
+    ],
+)
+def test_match_single_item_predicates(predicate, value, expected):
+    # Predicates without their own consumes match a single item; they used to raise NotImplementedError
+    assert match_p(predicate)(value) is expected
+
+
+def test_match_single_item_predicates_full_match():
+    assert match_p(is_int_p, ge_p(1), full_match=True)([0, 1])
+    assert not match_p(is_int_p, ge_p(5), full_match=True)([0, 1])
+    assert not match_p(ge_p(0), full_match=True)([0, 1])
+
+
+def test_match_single_item_predicate_explain():
+    expected = {"result": False, "reason": {"result": False, "reason": "-1 is not greater or equal to 0"}}
+
+    assert explain(match_p(ge_p(0)), [-1]) == expected
