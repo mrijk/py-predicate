@@ -230,6 +230,36 @@ def test_exercise_abc_generics():
     assert take(5, exercise(count))
 
 
+@pytest.mark.parametrize(
+    ("annotation", "item_check"),
+    [
+        (collections.abc.Iterable[str], lambda item: isinstance(item, str)),
+        (collections.abc.Iterable[tuple[str, int]], lambda item: isinstance(item, tuple) and isinstance(item[0], str)),
+    ],
+)
+def test_generate_iterable_items_have_the_item_type(annotation, item_check):
+    # #372: Iterable[X] generated items of any type, e.g. ints for Iterable[str]
+    values = take(10, generate_true(annotation_to_predicate(annotation)))
+
+    assert all(item_check(item) for value in values for item in value)
+    assert any(values)
+
+
+def test_exercise_iterable_of_str():
+    def shout(words: collections.abc.Iterable[str]) -> str:
+        return " ".join(word.upper() for word in words)
+
+    assert len(take(5, exercise(shout))) == 5
+
+
+def test_annotation_to_predicate_iterable_doesnt_consume_iterators():
+    # Checking the items would use up an iterator argument before the function gets it
+    values = iter([1, 2, 3])
+
+    assert annotation_to_predicate(collections.abc.Iterable[int])(values)
+    assert list(values) == [1, 2, 3]
+
+
 def test_annotation_to_predicate_object():
     predicate = annotation_to_predicate(object)
 

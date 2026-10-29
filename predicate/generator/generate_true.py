@@ -681,6 +681,7 @@ _supports_protocols: Final = (
 
 _abc_builtins: Final[dict[Any, Any]] = {
     Collection: list,
+    Iterable: list,  # only generated: checking items would consume an iterator argument (#372)
     Sequence: list,
     MutableSequence: list,
     Reversible: list,
