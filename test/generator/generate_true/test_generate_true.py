@@ -6,9 +6,9 @@ import uuid
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from datetime import datetime, timedelta
+from threading import Condition
 
 import pytest
-from graphviz import Digraph
 from more_itertools import take
 
 from generator.generate_true.helpers import assert_generated_true
@@ -540,7 +540,7 @@ def test_generate_true_is_instance_type_of():
 
 
 def test_generate_true_is_instance_unknown():
-    predicate = is_instance_p(Digraph)
+    predicate = is_instance_p(Condition)
     with pytest.raises(ValueError, match="No generator found"):
         take(5, generate_true(predicate))
 
