@@ -716,8 +716,26 @@ def _random_iterators(annotation: Any) -> Iterator[Iterator]:
     yield from ((item for item in items) for items in lists)
 
 
+def _random_returning_callables(return_type: Any) -> Iterator[Callable]:
+    from predicate.spec.exercise_helpers import annotation_to_predicate
+
+    # Callable[[A], R]: a function returning a fresh R on each call (#296); it accepts any arguments
+    return_p = annotation_to_predicate(return_type)
+    while True:
+        yield _returning(generate_true(return_p))
+
+
+def _returning(values: Iterator) -> Callable:
+    def function(*_args: Any, **_kwargs: Any) -> Any:
+        return next(values)
+
+    return function
+
+
 def _family_generator(klass: Any, annotation: Any) -> Iterator | None:
-    """Return a generator for a whole family of types (enums, paths, Supports* protocols, patterns), or None."""
+    """Return a generator for a whole family of types (enums, paths, Supports* protocols, patterns, ...), or None."""
+    if klass is Callable and (args := get_args(annotation)) and args[-1] is not Any:
+        return _random_returning_callables(args[-1])
     if isinstance(klass, type) and issubclass(klass, Enum):
         return random_enum_members(klass)
     if isinstance(klass, type) and issubclass(klass, PurePath):

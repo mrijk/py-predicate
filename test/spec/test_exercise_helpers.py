@@ -382,6 +382,35 @@ def test_exercise_sort_of_type_var():
     assert len(take(10, exercise(smallest, n=10))) == 10
 
 
+@pytest.mark.parametrize(
+    ("annotation", "returns"),
+    [
+        (Callable[[str], str], str),
+        (Callable[..., int], int),
+        (Callable[[str], list[int]], list),
+        (Callable[[str], None], type(None)),
+    ],
+)
+def test_generate_callable_returns_its_return_type(annotation, returns):
+    # #296: generated callables returned None or 0, whatever the annotation said
+    functions = take(5, generate_true(annotation_to_predicate(annotation)))
+
+    assert all(isinstance(function("x"), returns) for function in functions for _ in range(5))
+
+
+def test_generate_callable_returns_fresh_values():
+    function = take(1, generate_true(annotation_to_predicate(Callable[[str], int])))[0]
+
+    assert len({function("x") for _ in range(20)}) > 1
+
+
+def test_exercise_with_typed_key_function():
+    def join_keys(words: list[str], key: Callable[[str], str]) -> str:
+        return "".join(key(word) for word in words)
+
+    assert len(take(5, exercise(join_keys, n=5))) == 5
+
+
 CallableT = TypeVar("CallableT", bound=Callable[..., Any])
 StringBoundT = TypeVar("StringBoundT", bound="int")
 NamedTupleT = TypeVar("NamedTupleT", bound=NamedTuple)
