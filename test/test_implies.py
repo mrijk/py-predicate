@@ -42,6 +42,16 @@ def test_implies_and(p, q):
     assert implies(p & q, q)
 
 
+def test_implies_and_itself(p, q):
+    assert implies(p & q, p & q)
+
+
+def test_implies_and_narrowing_one_part(p, q, r):
+    # p & q => p & (q | r): a spec that narrows one part of an annotation (#306)
+    assert implies(p & q, p & (q | r))
+    assert not implies(p & q, p & r)
+
+
 def test_implies_ge_ge():
     p = ge_p(2)
     q = ge_p(3)

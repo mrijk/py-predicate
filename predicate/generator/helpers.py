@@ -274,8 +274,14 @@ def random_ints(lower: int = -sys.maxsize, upper: int = sys.maxsize, **_kwargs: 
 
 
 def random_iterables(length_p: Predicate = default_length_p, value_p: Predicate = is_int_p) -> Iterator[Iterable]:
-    # A list or a tuple of each length, so the empty one comes once instead of once per kind
-    yield from (random.choice((list, tuple))(values) for values in random_lists(length_p=length_p, value_p=value_p))
+    # A list or a tuple of each length, so the empty one comes once instead of once per kind; an empty one can be any
+    # empty iterable, so e.g. is_dict_p & is_empty_p and is_str_p & is_empty_p still find values
+    kinds = (list, tuple)
+    empty_kinds = (list, tuple, dict, str)
+    yield from (
+        random.choice(kinds)(values) if values else random.choice(empty_kinds)()
+        for values in random_lists(length_p=length_p, value_p=value_p)
+    )
 
 
 def random_lists(length_p: Predicate = default_length_p, value_p: Predicate = is_int_p) -> Iterator[list[Any]]:

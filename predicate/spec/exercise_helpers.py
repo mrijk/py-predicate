@@ -39,6 +39,7 @@ from more_itertools import first, take
 
 from predicate import all_p, always_false_p, always_true_p, generate_true, is_instance_p
 from predicate.dict_of_predicate import is_dict_of_p
+from predicate.eq_predicate import eq_p
 from predicate.explain import explain
 from predicate.fn_predicate import fn_p
 from predicate.frozendict_of_predicate import is_frozendict_of_p
@@ -494,14 +495,25 @@ def check_signature_against_spec(f: Callable, spec: Spec) -> Spec:
             if key not in parameters:
                 raise InvalidSpecError(f"Unannotated parameter '{key}' not in spec")
         else:
-            annotation_p = param_predicate(parameter)
             if key not in parameters:
-                parameters[key] = annotation_p
+                parameters[key] = exercise_param_predicate(parameter)
             else:
-                if not implies(parameters[key], annotation_p):
+                if not implies(parameters[key], param_predicate(parameter)):
                     raise InvalidSpecError("Spec predicate is not a constrained annotation")
 
     return spec
+
+
+def exercise_param_predicate(param: Parameter) -> Predicate:
+    """Return the predicate exercise generates arguments from, when the spec doesn't name the parameter.
+
+    A plain **kwargs gets no keywords: it's almost always forwarded to a callee with a fixed set of keywords, so random
+    names only make the callee fail (#306). Name it in the spec to generate keywords. **kwargs: Unpack[TD] keeps its
+    keywords, since TD lists them.
+    """
+    if param.kind == Parameter.VAR_KEYWORD and get_origin(param.annotation) is not Unpack:
+        return eq_p({})  # yields {} forever; is_dict_p & is_empty_p would run out after one
+    return param_predicate(param)
 
 
 def param_predicate(param: Parameter) -> Predicate:

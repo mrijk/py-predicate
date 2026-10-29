@@ -6,11 +6,11 @@ from predicate.spec.exercise_helpers import (
     call_args,
     check_exception,
     check_signature_against_spec,
+    exercise_param_predicate,
     generate_values,
     get_return_predicate,
     is_skipped_param,
     no_spec_error,
-    param_predicate,
     resolved_signature,
     verify_result,
 )
@@ -46,7 +46,7 @@ def _get_spec_from_class_annotation(f: Callable) -> Spec:
         elif type(annotation) is TypeVar:
             spec["args"][key] = always_true_p
         else:
-            spec["args"][key] = param_predicate(parameter)
+            spec["args"][key] = exercise_param_predicate(parameter)
 
     return spec
 

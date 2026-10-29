@@ -7,11 +7,11 @@ from predicate.spec.exercise_helpers import (
     callable_name,
     check_exception,
     check_signature_against_spec,
+    exercise_param_predicate,
     generate_values,
     get_return_predicate,
     is_skipped_param,
     no_spec_error,
-    param_predicate,
     resolved_signature,
     verify_result,
 )
@@ -33,7 +33,7 @@ def get_spec_from_function_annotation(f: Callable) -> Spec:
     for key, parameter in _annotatable_parameters(sig.parameters):
         if parameter.annotation == parameter.empty:
             raise no_spec_error(callable_name(f), f"parameter '{key}' has no annotation")
-        spec["args"][key] = param_predicate(parameter)
+        spec["args"][key] = exercise_param_predicate(parameter)
 
     return spec
 

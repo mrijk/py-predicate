@@ -6,11 +6,11 @@ import re
 import time
 import types
 from functools import partial
-from typing import ForwardRef, TypeVar
+from typing import Any, ForwardRef, TypeVar
 
 import pytest
 
-from predicate import all_p, ge_p, is_float_p, is_int_p, is_str_p, pos_p
+from predicate import all_p, ge_p, is_dict_of_p, is_dict_p, is_empty_p, is_float_p, is_int_p, is_str_p, pos_p
 from predicate.list_of_predicate import is_list_of_p
 from predicate.spec.exercise import Spec, exercise
 from predicate.spec.exercise_function import get_spec_from_function_annotation
@@ -528,6 +528,39 @@ def test_exercise_var_keyword_annotation():
         return sum(kwargs.values())
 
     assert list(exercise(total, n=3))
+
+
+def _callee(text: str, *, end: str = "\n") -> str:
+    return text + end
+
+
+def test_exercise_var_keyword_defaults_to_no_keywords():
+    # #306: **kwargs is usually forwarded to a callee that only takes a few keywords, so random names fail
+    def proxy(text: str, **kwargs: Any) -> str:
+        return _callee(text, **kwargs)
+
+    calls = list(exercise(proxy, n=5))
+
+    assert len(calls) == 5
+    assert all(args[-1] == {} for args, _ in calls)
+
+
+def test_exercise_var_keyword_named_in_spec():
+    def total(**kwargs: int) -> int:
+        return sum(kwargs.values())
+
+    spec: Spec = {"args": {"kwargs": is_dict_p & (is_empty_p | is_dict_of_p((is_str_p, is_int_p)))}, "ret": is_int_p}
+
+    assert any(args[-1] for args, _ in exercise(total, spec=spec, n=10))
+
+
+def test_exercise_var_keyword_narrowed_in_spec():
+    def total(**kwargs: int) -> int:
+        return sum(kwargs.values())
+
+    spec: Spec = {"args": {"kwargs": is_dict_p & is_empty_p}, "ret": is_int_p}
+
+    assert len(list(exercise(total, spec=spec, n=5))) == 5
 
 
 def _width(s: slice) -> int:
