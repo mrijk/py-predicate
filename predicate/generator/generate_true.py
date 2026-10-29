@@ -646,6 +646,9 @@ def generate_not_in(predicate: NotInPredicate) -> Iterator:
         generators = {type(item): _generator_for_item(item, predicate) for item in predicate.v}
         if generators:
             yield from random_first_from_iterables(*generators.values())
+        else:
+            # Nothing is in an empty container, so any value is not in it
+            yield from random_anys()
 
 
 @generate_true.register

@@ -71,6 +71,7 @@ from predicate import (
     is_set_of_p,
     is_set_p,
     is_str_p,
+    is_struct_p,
     is_subnormal_p,
     is_template_p,
     is_truthy_p,
@@ -141,6 +142,10 @@ def foo(self) -> bool:
         is_uuid_p,
         ne_p(2),
         not_in_p([2, "foo", uuid.uuid4()]),
+        # Nothing is in an empty set: not_in_p(set()) generated no values, so any_p(...) got empty iterables
+        not_in_p(set()),
+        any_p(not_in_p(set())),
+        is_struct_p(optional={"x": not_in_p(set())}),
         regex_p("^foo"),
         neg_p,
         pos_p,
