@@ -10,6 +10,10 @@ import random
 import re
 import sys
 from collections.abc import (
+    AsyncGenerator,
+    AsyncIterable,
+    AsyncIterator,
+    Awaitable,
     Callable,
     Collection,
     Container,
@@ -726,6 +730,46 @@ def _random_iterators(annotation: Any) -> Iterator[Iterator]:
     yield from ((item for item in items) for items in lists)
 
 
+def _random_async_iterators(annotation: Any) -> Iterator[AsyncIterator]:
+    from predicate.spec.exercise_helpers import annotation_to_predicate
+
+    # AsyncIterable[T]: a fresh async generator over a generated list[T] per value, like _random_iterators (#315)
+    item_type = first(get_args(annotation), Any)
+    lists = generate_true(annotation_to_predicate(list[item_type]))  # type: ignore[valid-type]
+    yield from (_async_iterator(items) for items in lists)
+
+
+async def _async_iterator(items: list) -> AsyncIterator:
+    for item in items:
+        yield item
+
+
+def _random_awaitables(annotation: Any) -> Iterator[Awaitable]:
+    from predicate.spec.exercise_helpers import annotation_to_predicate
+
+    # Awaitable[T]: something that gives a generated T when awaited (#315)
+    values = generate_true(annotation_to_predicate(first(get_args(annotation), Any)))
+    yield from (_Ready(value) for value in values)
+
+
+class _Ready:
+    """An awaitable that resolves to its value at once.
+
+    Not a coroutine: an unused coroutine warns 'coroutine was never awaited' when it's garbage collected, and exercise
+    generates values it never uses. This one can also be awaited more than once.
+    """
+
+    def __init__(self, value: Any) -> None:
+        self.value = value
+
+    def __await__(self) -> Generator[Any, None, Any]:
+        return self.value
+        yield  # makes __await__ a generator, as await requires
+
+    def __repr__(self) -> str:
+        return f"awaitable({self.value!r})"
+
+
 def _random_returning_callables(return_type: Any) -> Iterator[Callable]:
     from predicate.spec.exercise_helpers import annotation_to_predicate
 
@@ -762,12 +806,23 @@ def _random_classes_with_metaclass(metaclass: type) -> Iterator[type]:
         yield random.choice(candidates)
 
 
-def _family_generator(klass: Any, annotation: Any) -> Iterator | None:
-    """Return a generator for a whole family of types (enums, paths, Supports* protocols, patterns, ...), or None."""
+def _typed_generator(klass: Any, annotation: Any) -> Iterator | None:
+    """Return a generator for callables, metaclasses and async types, which depend on the annotation, or None."""
     if klass is Callable and (args := get_args(annotation)) and args[-1] is not Any:
         return _random_returning_callables(args[-1])
     if isinstance(klass, type) and issubclass(klass, type) and klass is not type:
         return _random_classes_with_metaclass(klass)
+    if klass in (AsyncIterable, AsyncIterator, AsyncGenerator):
+        return _random_async_iterators(annotation)
+    if klass is Awaitable:
+        return _random_awaitables(annotation)
+    return None
+
+
+def _family_generator(klass: Any, annotation: Any) -> Iterator | None:
+    """Return a generator for a whole family of types (enums, paths, Supports* protocols, patterns, ...), or None."""
+    if (values := _typed_generator(klass, annotation)) is not None:
+        return values
     if isinstance(klass, type) and issubclass(klass, Enum):
         return random_enum_members(klass)
     if isinstance(klass, type) and issubclass(klass, PurePath):
