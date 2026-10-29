@@ -615,6 +615,19 @@ class NoSubclasses(ABC):
     def run(self) -> None: ...
 
 
+class Node:
+    def sql(self) -> str:
+        raise NotImplementedError
+
+
+class Literal(Node):
+    def __init__(self, value: int):
+        self.value = value
+
+    def sql(self) -> str:
+        return str(self.value)
+
+
 def test_generate_true_constructed_from_init():
     values = take(10, generate_true(is_instance_p(Point)))
     assert len(values) == 10
@@ -633,6 +646,11 @@ def test_generate_true_constructed_dataclass_with_class_fields():
 def test_generate_true_constructed_abstract_class_uses_subclass():
     values = take(5, generate_true(is_instance_p(Shape)))
     assert all(isinstance(value, Square) for value in values)
+
+
+def test_generate_true_constructed_informal_abstract_class_uses_subclass():
+    values = take(5, generate_true(is_instance_p(Node)))
+    assert all(isinstance(value, Literal) for value in values)
 
 
 def test_generate_true_constructed_abstract_subclasses_keep_raising():

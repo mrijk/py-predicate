@@ -706,9 +706,10 @@ def _constructed_instances(klass: Any) -> Iterator:
 
 
 def _constructible_classes(klass: Any) -> list[Any]:
-    # An abstract class can't be built itself, but its concrete subclasses may be (#354); protocols are left out
-    if isinstance(klass, type) and inspect.isabstract(klass) and not getattr(klass, "_is_protocol", False):
-        return _all_subclasses(klass)
+    # An abstract class can't be built itself, but its concrete subclasses may be (#354); protocols are left out.
+    # A base class with subclasses is often abstract in all but name (e.g. sqlglot's Expr), so it's skipped too (#358)
+    if isinstance(klass, type) and not getattr(klass, "_is_protocol", False):
+        return _all_subclasses(klass) or [klass]
     return [klass]
 
 
