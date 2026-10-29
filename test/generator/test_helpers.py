@@ -7,6 +7,7 @@ from more_itertools import first, take
 
 from predicate import (
     all_p,
+    eq_p,
     ge_le_p,
     ge_p,
     has_length_p,
@@ -42,11 +43,14 @@ from predicate.generator.helpers import (
     random_containers,
     random_datetimes,
     random_dicts,
+    random_first_from_iterables,
     random_floats,
     random_frozensets,
     random_functions,
     random_hashables,
     random_ints,
+    random_iterables,
+    random_lengths,
     random_lists,
     random_sets,
     random_strings,
@@ -367,3 +371,38 @@ def test_random_values_of_type_any():
 def test_random_values_of_type_unknown():
     with pytest.raises(ValueError, match="No generator found for <class 'complex'"):
         take(10, random_values_of_type(complex))
+
+
+def test_random_lengths_empty_once_and_first():
+    # #356: exercise with a small n only sees the start of the stream
+    lengths = take(50, random_lengths(ge_le_p(lower=0, upper=10)))
+
+    assert lengths[0] == 0
+    assert all(0 < length <= 10 for length in lengths[1:])
+
+
+def test_random_lengths_without_zero():
+    assert all(length >= 3 for length in take(20, random_lengths(ge_le_p(lower=3, upper=5))))
+
+
+def test_random_lengths_only_zero():
+    assert take(5, random_lengths(eq_p(0))) == [0, 0, 0, 0, 0]
+
+
+@pytest.mark.parametrize("generator", [random_lists, random_sets, random_tuples, random_dicts, random_iterables])
+def test_random_collections_empty_once_and_first(generator):
+    values = take(20, generator())
+
+    assert len(values[0]) == 0
+    assert all(values[1:])
+
+
+def test_random_iterables_doesnt_run_out():
+    # Used to yield [], {}, (), "" and stop whenever length 0 was allowed
+    assert len(take(20, random_iterables())) == 20
+
+
+def test_random_first_from_iterables_drops_exhausted():
+    values = take(10, random_first_from_iterables(iter([1, 2]), iter([3])))
+
+    assert sorted(values) == [1, 2, 3]

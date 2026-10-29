@@ -552,6 +552,23 @@ def test_generate_true_is_instance_predicate_subclass(predicate_class):
     assert all(isinstance(value, predicate_class) for value in values)
 
 
+@pytest.mark.parametrize(
+    "predicate",
+    [is_list_of_p(is_int_p), is_set_of_p(is_int_p), all_p(is_int_p)],
+)
+def test_generate_true_collections_empty_once_and_first(predicate):
+    # #356: one empty value, first, so exercise with a small n still sees non-empty values
+    values = take(20, generate_true(predicate))
+
+    assert len(values[0]) == 0
+    assert all(values[1:])
+
+
+def test_generate_true_and_where_one_side_rarely_matches():
+    # Random tuples are only rarely empty: generate_and used to wait forever for the next one
+    assert take(10, generate_true(is_tuple_p & is_empty_p)) == [()] * 10
+
+
 def test_generate_true_all_of_tuples_with_unhashable_items():
     # A tuple of predicates is Hashable by type, but hashing it fails
     values = take(20, generate_true(all_p(is_tuple_of_p(is_predicate_p, is_predicate_p))))
