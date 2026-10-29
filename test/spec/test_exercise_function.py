@@ -5,15 +5,29 @@ import logging
 import re
 import time
 import types
+from collections.abc import AsyncGenerator, AsyncIterable, Awaitable
 from functools import partial
 from typing import Any, ForwardRef, TypeVar
 
 import pytest
+from more_itertools import first, take
 
-from predicate import all_p, ge_p, is_dict_of_p, is_dict_p, is_empty_p, is_float_p, is_int_p, is_str_p, pos_p
+from predicate import (
+    all_p,
+    ge_p,
+    generate_true,
+    is_dict_of_p,
+    is_dict_p,
+    is_empty_p,
+    is_float_p,
+    is_int_p,
+    is_str_p,
+    pos_p,
+)
 from predicate.list_of_predicate import is_list_of_p
 from predicate.spec.exercise import Spec, exercise
 from predicate.spec.exercise_function import get_spec_from_function_annotation
+from predicate.spec.exercise_helpers import annotation_to_predicate
 from predicate.spec.spec import InvalidSpecError, SpecViolationError
 
 
@@ -256,6 +270,44 @@ async def test_exercise_async_happy():
 
     result = [r async for r in exercise(adder)]
     assert result
+
+
+@pytest.mark.asyncio
+async def test_exercise_async_iterable_argument():
+    # #315: no generator for AsyncIterable[T] / Awaitable[T]
+    async def collect(xs: AsyncIterable[int]) -> list[int]:
+        return [x async for x in xs]
+
+    results = [result async for _, result in exercise(collect, n=5)]
+
+    assert len(results) == 5
+    assert all(isinstance(x, int) for result in results for x in result)
+
+
+@pytest.mark.asyncio
+async def test_exercise_awaitable_argument():
+    async def wait(x: Awaitable[int]) -> int:
+        return await x
+
+    results = [result async for _, result in exercise(wait, n=5)]
+
+    assert len(results) == 5
+
+
+@pytest.mark.asyncio
+async def test_generated_awaitable_can_be_awaited_twice():
+    awaitable = first(generate_true(annotation_to_predicate(Awaitable[str])))
+
+    assert await awaitable == await awaitable
+
+
+@pytest.mark.asyncio
+async def test_generated_async_generator_items():
+    values = take(5, generate_true(annotation_to_predicate(AsyncGenerator[str, None])))
+
+    items = [[item async for item in value] for value in values]
+
+    assert all(isinstance(item, str) for value in items for item in value)
 
 
 @pytest.mark.asyncio
