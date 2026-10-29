@@ -4,7 +4,7 @@ import io
 import sys
 import types
 import warnings
-from functools import reduce
+from functools import partial, reduce
 from inspect import Parameter, Signature, isroutine, signature
 from itertools import islice, repeat, takewhile
 from typing import (
@@ -164,6 +164,13 @@ def _empty() -> None: ...
 
 
 _empty_code = _empty.__code__
+
+
+def callable_name(f: Callable) -> str:
+    """Return a name for any callable, e.g. for a partial or an instance of a class with __call__ (#362)."""
+    if isinstance(f, partial):
+        return callable_name(f.func)
+    return getattr(f, "__name__", type(f).__name__)
 
 
 def resolved_signature(f: Callable) -> Signature:
