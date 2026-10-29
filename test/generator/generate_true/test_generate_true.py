@@ -88,6 +88,7 @@ from predicate import (
     zero_p,
 )
 from predicate.and_predicate import AndPredicate
+from predicate.dict_of_predicate import DictOfPredicate
 from predicate.in_predicate import InPredicate
 from predicate.not_predicate import NotPredicate
 from predicate.predicate import Predicate
@@ -551,9 +552,16 @@ def test_generate_true_is_instance_predicate_subclass(predicate_class):
     assert all(isinstance(value, predicate_class) for value in values)
 
 
+def test_generate_true_is_instance_predicate_subclass_constructed():
+    values = take(5, generate_true(is_instance_p(TeePredicate)))
+    assert all(isinstance(value, TeePredicate) for value in values)
+
+
 def test_generate_true_is_instance_predicate_subclass_unknown():
-    with pytest.raises(ValueError, match="No generator found for <class 'predicate.tee_predicate.TeePredicate'>"):
-        take(5, generate_true(is_instance_p(TeePredicate)))
+    with pytest.raises(
+        ValueError, match="No generator found for <class 'predicate.dict_of_predicate.DictOfPredicate'>"
+    ):
+        take(5, generate_true(is_instance_p(DictOfPredicate)))
 
 
 class Point:
