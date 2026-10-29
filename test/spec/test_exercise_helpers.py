@@ -28,7 +28,16 @@ import pytest
 import typing_extensions
 from more_itertools import take
 
-from predicate import exercise, generate_false, generate_true, is_instance_p, is_int_p, is_struct_p
+from predicate import (
+    always_true_p,
+    exercise,
+    generate_false,
+    generate_true,
+    is_instance_p,
+    is_int_p,
+    is_str_p,
+    is_struct_p,
+)
 from predicate.spec.exercise_helpers import annotation_to_predicate
 from predicate.spec.instrument import instrument, instrument_function
 from predicate.spec.spec import SpecViolationError
@@ -335,6 +344,42 @@ def test_exercise_io():
         return stream
 
     assert len(list(exercise(read_all, n=5))) == 5
+
+
+def _item_types(value):
+    return {type(item) for item in (value.values() if isinstance(value, dict) else value)}
+
+
+@pytest.mark.parametrize(
+    "annotation",
+    [list[T], collections.abc.Iterable[T], set[T], dict[str, T], list[ConstrainedT], list[BoundT]],  # type: ignore[valid-type]
+)
+def test_generate_type_var_collection_items_share_one_type(annotation):
+    # #375: a type variable is one type per call, and a mixed list can't be sorted
+    values = take(100, generate_true(annotation_to_predicate(annotation)))
+
+    assert all(len(_item_types(value)) <= 1 for value in values)
+
+
+def test_generate_constrained_type_var_uses_each_constraint():
+    values = take(100, generate_true(annotation_to_predicate(list[ConstrainedT])))
+
+    assert set().union(*(_item_types(value) for value in values)) == {int, str}
+
+
+def test_type_var_predicates_equal_the_checking_predicates():
+    # Only generation differs: checking, repr and equality stay as they were
+    assert annotation_to_predicate(T) == always_true_p
+    assert repr(annotation_to_predicate(T)) == "always_true_p"
+    assert annotation_to_predicate(ConstrainedT) == is_int_p | is_str_p
+    assert repr(annotation_to_predicate(ConstrainedT)) == "is_int_p | is_str_p"
+
+
+def test_exercise_sort_of_type_var():
+    def smallest(values: collections.abc.Iterable[T]) -> list[T]:
+        return sorted(values)[:1]  # type: ignore[type-var]  # a free T, as in natsort's natsorted
+
+    assert len(take(10, exercise(smallest, n=10))) == 10
 
 
 CallableT = TypeVar("CallableT", bound=Callable[..., Any])

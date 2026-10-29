@@ -206,6 +206,7 @@ from predicate.star_predicate import StarPredicate
 from predicate.struct_predicate import StructPredicate
 from predicate.tee_predicate import TeePredicate
 from predicate.tuple_of_predicate import TupleOfPredicate
+from predicate.type_var_predicate import ConstrainedTypeVarPredicate, FreeTypeVarPredicate
 from predicate.xor_predicate import XorPredicate
 
 
@@ -268,6 +269,20 @@ def generate_any_p(any_predicate: AnyPredicate, *, length_p: Predicate = default
 
         yield random_permutation(combined_values)
         yield from set_from_list(combined_values)
+
+
+@generate_true.register
+def generate_free_type_var(_predicate: FreeTypeVarPredicate, **_kwargs: Any) -> Iterator:
+    # One kind of value per stream, and each generated collection draws from a fresh stream:
+    # list[T] is never a mix of e.g. datetimes and floats, which a sort function can't compare (#375)
+    yield from random.choice((random_bools, random_ints, random_strings, random_floats, random_datetimes))()
+
+
+@generate_true.register
+def generate_constrained_type_var(predicate: ConstrainedTypeVarPredicate, **_kwargs: Any) -> Iterator:
+    # T is exactly one of its constraints per call, so a list[T] is all ints or all strs, not both (#375)
+    # ponytail: with 3+ constraints the nested choice favours the last one, uniform would need the full list
+    yield from generate_true(random.choice((predicate.left, predicate.right)))
 
 
 @generate_true.register
