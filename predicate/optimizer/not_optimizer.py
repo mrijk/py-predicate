@@ -19,10 +19,9 @@ def optimize_not_predicate[T](predicate: NotPredicate[T]) -> MaybeOptimized[T]: 
     optimized = optimize(predicate.predicate)
 
     match optimized:
-        case AllPredicate(all_predicate):
-            match negate(all_predicate):
-                case _ as inverted:
-                    return Optimized(AnyPredicate(predicate=inverted))
+        # ~all_p(p) == any_p(~p), only when ~p simplifies: optimize_any_predicate turns any_p(~p) back into ~all_p(p)
+        case AllPredicate(all_predicate) if negate(all_predicate) != NotPredicate(all_predicate):
+            return Optimized(AnyPredicate(predicate=negate(all_predicate)))
 
         case AndPredicate(left, right):
             match left, right:
@@ -33,10 +32,9 @@ def optimize_not_predicate[T](predicate: NotPredicate[T]) -> MaybeOptimized[T]: 
                 case _:
                     return Optimized(negate(optimized)) if optimized != predicate.predicate else NotOptimized()
 
-        case AnyPredicate(any_predicate):
-            match negate(any_predicate):
-                case _ as inverted:
-                    return Optimized(AllPredicate(predicate=inverted))
+        # ~any_p(p) == all_p(~p), only when ~p simplifies: optimize_all_predicate turns all_p(~p) back into ~any_p(p)
+        case AnyPredicate(any_predicate) if negate(any_predicate) != NotPredicate(any_predicate):
+            return Optimized(AllPredicate(predicate=negate(any_predicate)))
         case OrPredicate(left, right):
             match left, right:
                 case _, NotPredicate(not_predicate):

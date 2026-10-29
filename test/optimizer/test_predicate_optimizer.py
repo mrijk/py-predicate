@@ -1,11 +1,20 @@
+import pytest
 from helpers import (
     is_and_p,
 )
 
 from predicate import (
+    all_p,
     always_false_p,
     always_true_p,
+    any_p,
     can_optimize,
+    eq_p,
+    ge_p,
+    gt_p,
+    le_p,
+    lt_p,
+    ne_p,
     optimize,
 )
 
@@ -245,3 +254,29 @@ def test_optimize_xor_or_right_right(p, q):
     optimized = optimize(predicate)
 
     assert optimized == q & ~p
+
+
+_numbers = [-100, -1, 0, 1, 2, 5, 100]
+_lists = [[], [0], [1], [-1, 0], [0, 5], [-5, -1]]
+
+
+@pytest.mark.parametrize(
+    "predicate, values",
+    [
+        # any_p(ne_p(v)) and ~all_p(eq_p(v)) rewrote into each other
+        (all_p(eq_p(0)) | ((all_p(eq_p(1)) & any_p(ne_p(0))) | all_p(eq_p(2))), _lists),
+        # ~any_p(p) and all_p(~p) rewrote into each other when ~p doesn't simplify
+        (all_p(ge_p(0)) ^ (~any_p(ne_p(0) | le_p(0)) ^ all_p(ge_p(0))), _lists),
+        (~all_p(eq_p(0) ^ le_p(0)) & (any_p(eq_p(3)) & ~all_p(gt_p(0))), _lists),
+        # (p | q) & (r ^ s): the and-optimizer swapped the two sides back and forth
+        ((le_p(0) | eq_p(5)) & (gt_p(0) ^ lt_p(0)), _numbers),
+        ((gt_p(0) ^ lt_p(0)) & (le_p(0) | eq_p(5)), _numbers),
+        # (p ^ q) & (r ^ s): the same swap with an Xor on both sides
+        ((eq_p(1) ^ eq_p(2)) & (eq_p(3) ^ eq_p(4)), _numbers),
+    ],
+)
+def test_optimize_terminates(predicate, values):
+    # Used to raise RecursionError; the result must still give the same answers
+    optimized = optimize(predicate)
+
+    assert [optimized(v) for v in values] == [predicate(v) for v in values]
