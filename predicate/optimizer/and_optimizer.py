@@ -106,7 +106,9 @@ def optimize_and_predicate[T](predicate: AndPredicate[T]) -> MaybeOptimized[T]: 
             return Optimized(optimize(right & ~xor_right))  # (p ^ q) & p == p & ~q
         case XorPredicate(xor_left, xor_right), _ if xor_right == right:
             return Optimized(optimize(~xor_left & right))  # (p ^ q) & q == ~p & q
-        case _, XorPredicate():
+        case _, XorPredicate() if not isinstance(left, XorPredicate | OrPredicate):
+            # Only swap when it ends the matching: with an Xor on the left the swap repeats forever, and with an
+            # Or on the left the `_, OrPredicate()` case below swaps it straight back
             return optimize_and_predicate(AndPredicate(left=right, right=left))
 
         case OrPredicate(or_left, or_right), _:

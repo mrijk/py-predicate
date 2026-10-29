@@ -1,17 +1,19 @@
-from predicate import all_p, always_false_p, always_true_p, any_p, can_optimize, eq_p, ge_p, optimize
+from predicate import all_p, always_false_p, always_true_p, any_p, can_optimize, eq_p, ge_p, ne_p, optimize
 
 
 def test_optimize_any_ne():
-    # Any(~p) => ~All(p)
-    eq_2 = eq_p(2)
-
-    predicate = any_p(~eq_2)
+    # any_p(~eq_p(2)) => any_p(ne_p(2)): ~eq_p(2) simplifies, so any_p stays (rewriting it to ~all_p would cycle)
+    predicate = any_p(~eq_p(2))
 
     assert can_optimize(predicate)
 
     optimized = optimize(predicate)
 
-    assert optimized == ~all_p(eq_2)
+    assert optimized == any_p(ne_p(2))
+
+
+def test_optimize_any_ne_is_stable():
+    assert not can_optimize(any_p(ne_p(2)))
 
 
 def test_optimize_any_always_false():
