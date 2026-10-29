@@ -87,10 +87,10 @@ def to_dot(predicate: Predicate, predicate_string: str | None = None, show_optim
 
     node_nr = count()
 
-    render_original(dot, predicate, node_nr)
+    _render_original(dot, predicate, node_nr)
 
     if show_optimized:
-        render_optimized(dot, predicate, node_nr)
+        _render_optimized(dot, predicate, node_nr)
 
     return dot
 
@@ -286,10 +286,10 @@ def render(dot: Digraph, predicate: Predicate, node_nr: count) -> None:  # noqa:
 
     to_value(predicate)
 
-    render_lazy_references(dot, node_predicate_mapping)
+    _render_lazy_references(dot, node_predicate_mapping)
 
 
-def render_lazy_references(dot: Digraph, node_predicate_mapping: dict[str, Predicate]) -> None:
+def _render_lazy_references(dot: Digraph, node_predicate_mapping: dict[str, Predicate]) -> None:
     def find_in_mapping(lookup: Predicate) -> str:
         return first(node for node, predicate in node_predicate_mapping.items() if predicate == lookup)
 
@@ -309,14 +309,14 @@ def render_lazy_references(dot: Digraph, node_predicate_mapping: dict[str, Predi
                 add_dashed_line(node, this)
 
 
-def render_original(dot: Digraph, predicate: Predicate, node_nr: count) -> None:
+def _render_original(dot: Digraph, predicate: Predicate, node_nr: count) -> None:
     with dot.subgraph(name="cluster_original") as original:
         original.attr(style="filled", color="lightgrey")
         original.attr(label="Original predicate")
         render(original, predicate, node_nr)
 
 
-def render_optimized(dot: Digraph, predicate: Predicate, node_nr: count) -> None:
+def _render_optimized(dot: Digraph, predicate: Predicate, node_nr: count) -> None:
     optimized_predicate = optimize(predicate)
 
     with dot.subgraph(name="cluster_optimized") as optimized:

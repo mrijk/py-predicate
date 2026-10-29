@@ -17,7 +17,7 @@ from predicate.spec.exercise_helpers import (
 from predicate.spec.spec import Spec
 
 
-def get_spec_from_class_annotation(f: Callable) -> Spec:
+def _get_spec_from_class_annotation(f: Callable) -> Spec:
     sig = resolved_signature(f.__call__)  # type: ignore
     name = type(f).__name__
 
@@ -53,7 +53,7 @@ def get_spec_from_class_annotation(f: Callable) -> Spec:
 
 def _resolve_class_spec(f: Callable, spec: Spec | None) -> Spec:
     if not spec:
-        return get_spec_from_class_annotation(f)
+        return _get_spec_from_class_annotation(f)
     return check_signature_against_spec(f, spec)
 
 
