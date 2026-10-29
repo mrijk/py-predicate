@@ -10,6 +10,7 @@ from collections.abc import Sized
 from datetime import date, datetime, time, timedelta, timezone, tzinfo
 from decimal import Decimal
 from fractions import Fraction
+from inspect import Parameter
 from pathlib import Path, PurePath, PureWindowsPath
 from typing import (
     ForwardRef,
@@ -72,6 +73,9 @@ from predicate import generate_true, is_instance_p
         Fraction,
         ipaddress.IPv4Address,
         ipaddress.IPv6Address,
+        ipaddress.IPv4Network,
+        ipaddress.IPv6Network,
+        Parameter,
     ],
 )
 def test_generate_stdlib_type(klass):
