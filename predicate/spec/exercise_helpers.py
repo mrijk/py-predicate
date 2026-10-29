@@ -207,7 +207,7 @@ def _type_arg_class(arg: Any, module_name: str, owner: str) -> Any:
     return get_origin(arg) or arg  # Function[Any] -> Function
 
 
-def type_arg_classes(arg: Any) -> tuple[Any, ...]:
+def _type_arg_classes(arg: Any) -> tuple[Any, ...]:
     """Return the classes type[arg] stands for: a TypeVar's constraints or bound (else object), or arg itself."""
     if isinstance(arg, TypeVar):
         classes = arg.__constraints__ or (arg.__bound__ or object,)
@@ -216,7 +216,7 @@ def type_arg_classes(arg: Any) -> tuple[Any, ...]:
     return tuple(_type_arg_class(klass, "", "a type[...] annotation") for klass in _flatten_unions((arg,)))
 
 
-def type_var_annotation(type_var: TypeVar) -> Any:
+def _type_var_annotation(type_var: TypeVar) -> Any:
     """Return what a plain TypeVar stands for: the union of its constraints, its bound, or Any."""
     classes = type_var.__constraints__ or (type_var.__bound__ or Any,)
     resolved = [
@@ -250,7 +250,7 @@ def _is_typing_special(klass: Any, name: str) -> bool:
 
 def type_arg_predicate(arg: Any) -> Predicate:
     """Return the predicate for the classes type[arg] stands for (without checking that the value is a class)."""
-    match type_arg_classes(arg):
+    match _type_arg_classes(arg):
         case (klass,) if _is_typing_special(klass, "NamedTuple"):
             return _named_tuple_class_p
         case (klass,) if _is_typing_special(klass, "TypedDict"):
@@ -365,7 +365,7 @@ def annotation_to_predicate(annotation: Any) -> Predicate:  # noqa: C901
         return always_true_p  # every value is an object
     if type(annotation) is TypeVar:
         # A value within T's bound or constraints (binding T to other arguments is #258)
-        return annotation_to_predicate(type_var_annotation(annotation))
+        return annotation_to_predicate(_type_var_annotation(annotation))
     if annotation in (Never, NoReturn):
         return always_false_p  # no value inhabits Never
     if annotation is LiteralString:
@@ -436,7 +436,7 @@ def check_ret_name(sig: Signature, spec: Spec) -> None:
         raise InvalidSpecError(f"Parameter '{name}' clashes with the fn return value name, set 'ret_name' in the spec")
 
 
-def validate_args(f: Callable, spec: Spec) -> dict[str, Predicate]:
+def _validate_args(f: Callable, spec: Spec) -> dict[str, Predicate]:
     # Copy, so filling in annotation predicates doesn't change the caller's spec
     parameters = dict(spec["args"])
     sig = resolved_signature(f)
@@ -462,7 +462,7 @@ def check_signature_against_spec(f: Callable, spec: Spec) -> Spec:
 
     sig = resolved_signature(f)
 
-    parameters = validate_args(f, spec)
+    parameters = _validate_args(f, spec)
 
     spec = get_return_spec(f, spec) | {"args": parameters}
 

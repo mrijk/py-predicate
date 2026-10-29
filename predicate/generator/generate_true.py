@@ -423,17 +423,17 @@ def generate_has_length(predicate: HasLengthPredicate, *, value_p: Predicate = i
     yield from random_iterables(length_p=predicate.length_p, value_p=value_p)
 
 
-def create_value_predicate(path: list[Predicate]) -> Predicate:
+def _create_value_predicate(path: list[Predicate]) -> Predicate:
     match path:
         case [head]:
             return head
         case [root, *rest] if root == is_list_p:
-            valid_value = create_value_predicate(rest)
+            valid_value = _create_value_predicate(rest)
             return is_list_of_p(valid_value)
         case [root, *rest]:
             valid_keys = generate_true(root)
             valid_key = next(valid_keys)
-            valid_value = create_value_predicate(rest)
+            valid_value = _create_value_predicate(rest)
             return is_dict_of_p((valid_key, valid_value))
         case []:
             return always_true_p
@@ -449,7 +449,7 @@ def generate_has_path(predicate: HasPathPredicate) -> Iterator:
 
     while True:
         valid_key = next(valid_keys)
-        valid_value = create_value_predicate(rest)
+        valid_value = _create_value_predicate(rest)
         dict_of = is_dict_of_p((valid_key, valid_value))
         yield from generate_true(dict_of, length_p=ge_p(1))
 

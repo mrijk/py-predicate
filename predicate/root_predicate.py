@@ -24,14 +24,14 @@ class RootPredicate[T](Predicate[T]):
 
 
 def find_root_predicate(start_frame, predicate: Predicate) -> Predicate:
-    for frame in get_frames(start_frame):
+    for frame in _get_frames(start_frame):
         locals = reversed(frame.f_locals.items())
         if found := find_in_locals(locals, predicate):  # type: ignore
             return found
     raise ValueError("Could not find 'root' predicate")
 
 
-def get_frames(frame) -> Iterator:
+def _get_frames(frame) -> Iterator:
     if frame:
         yield frame
-        yield from get_frames(frame.f_back)
+        yield from _get_frames(frame.f_back)

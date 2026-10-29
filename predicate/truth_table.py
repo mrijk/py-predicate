@@ -24,7 +24,7 @@ def truth_table(predicate: Predicate) -> Iterable[tuple]:
 
     for combination in combinations:
         values = dict(zip(named_predicates, combination, strict=False))
-        yield combination, execute_predicate(predicate, values=values)
+        yield combination, _execute_predicate(predicate, values=values)
 
 
 def get_named_predicates(predicate: Predicate) -> list[str]:
@@ -49,7 +49,7 @@ def get_named_predicates(predicate: Predicate) -> list[str]:
     return sorted(set(get_names()))
 
 
-def execute_predicate(predicate: Predicate, values: dict) -> bool:
+def _execute_predicate(predicate: Predicate, values: dict) -> bool:
     set_named_values(predicate, values)
 
     dummy = False

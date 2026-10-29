@@ -121,7 +121,7 @@ def generate_all_p(all_predicate: AllPredicate, *, length_p: Predicate = default
     predicate = all_predicate.predicate
 
     while True:
-        yield generate_at_least_one_false(predicate, length_p=length_p)
+        yield _generate_at_least_one_false(predicate, length_p=length_p)
 
 
 @generate_false.register
@@ -570,7 +570,7 @@ def generate_list_of_p(
     predicate = list_of_predicate.predicate
 
     while True:
-        yield list(generate_at_least_one_false(predicate, length_p=length_p))
+        yield list(_generate_at_least_one_false(predicate, length_p=length_p))
 
 
 def bool_array_from_int(n: int) -> Iterable[bool]:
@@ -604,7 +604,7 @@ def generate_set_of_p(
     predicate = set_of_predicate.predicate
 
     while True:
-        result = set(generate_at_least_one_false(predicate, length_p=length_p))
+        result = set(_generate_at_least_one_false(predicate, length_p=length_p))
         # This check is needed because {False, 0} and {True, 1} result in {False} and {True}
         if not set_of_predicate(result):
             yield result
@@ -634,7 +634,7 @@ def generate_xor(predicate: XorPredicate) -> Iterator:
         yield from random_first_from_iterables(left_and_right, not_right_and_not_left)
 
 
-def generate_at_least_one_false(predicate: Predicate, *, length_p: Predicate = default_at_least_one_length_p) -> tuple:
+def _generate_at_least_one_false(predicate: Predicate, *, length_p: Predicate = default_at_least_one_length_p) -> tuple:
     from predicate import generate_true
 
     length = max(first(generate_true(length_p)), 1)
