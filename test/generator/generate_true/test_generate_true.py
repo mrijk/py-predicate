@@ -552,16 +552,20 @@ def test_generate_true_is_instance_predicate_subclass(predicate_class):
     assert all(isinstance(value, predicate_class) for value in values)
 
 
+def test_generate_true_all_of_tuples_with_unhashable_items():
+    # A tuple of predicates is Hashable by type, but hashing it fails
+    values = take(20, generate_true(all_p(is_tuple_of_p(is_predicate_p, is_predicate_p))))
+    assert len(values) == 20
+
+
+def test_generate_true_is_instance_dict_of_predicate():
+    values = take(5, generate_true(is_instance_p(DictOfPredicate)))
+    assert all(isinstance(value, DictOfPredicate) for value in values)
+
+
 def test_generate_true_is_instance_predicate_subclass_constructed():
     values = take(5, generate_true(is_instance_p(TeePredicate)))
     assert all(isinstance(value, TeePredicate) for value in values)
-
-
-def test_generate_true_is_instance_predicate_subclass_unknown():
-    with pytest.raises(
-        ValueError, match="No generator found for <class 'predicate.dict_of_predicate.DictOfPredicate'>"
-    ):
-        take(5, generate_true(is_instance_p(DictOfPredicate)))
 
 
 class Point:
