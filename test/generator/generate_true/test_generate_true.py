@@ -346,6 +346,38 @@ def test_generate_gt_lt(lower, upper):
 
 
 @pytest.mark.parametrize(
+    "predicate",
+    [
+        ge_lt_p(0, 0),
+        gt_le_p(0, 0),
+        gt_lt_p(0, 0),
+        gt_lt_p(0, 1),
+        ge_le_p(1, 0),
+        ge_lt_p(0.0, 0.0),
+        gt_lt_p(0.0, 0.0),
+        ge_le_p(1.0, 0.0),
+        ge_lt_p(datetime(2024, 1, 1), datetime(2024, 1, 1)),
+        gt_lt_p(datetime(2024, 1, 1), datetime(2024, 1, 1)),
+        any_p(ge_lt_p(0, 0)),
+        any_p(always_false_p),
+    ],
+)
+def test_generate_true_empty_range(predicate):
+    # No value fits: the generator yields nothing, instead of looping forever (ints, floats) or raising (datetimes)
+    assert take(5, generate_true(predicate)) == []
+
+
+def test_generate_true_single_value_datetime_range():
+    assert take(3, generate_true(ge_le_p(datetime(2024, 1, 1), datetime(2024, 1, 1)))) == [datetime(2024, 1, 1)] * 3
+
+
+@pytest.mark.parametrize("predicate", [all_p(ge_lt_p(0, 0)), all_p(always_false_p)])
+def test_generate_true_all_of_nothing(predicate):
+    # Only an empty collection has no items to fail the predicate
+    assert take(5, generate_true(predicate)) == [[]] * 5
+
+
+@pytest.mark.parametrize(
     "key_value_predicates",
     [
         ([(is_str_p, is_int_p)]),

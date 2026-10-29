@@ -228,6 +228,10 @@ def generate_all_p(all_predicate: AllPredicate, *, length_p: Predicate = default
 
 def _all_p_values(predicate: Predicate, max_length: int) -> Iterator:
     values = take(max_length, generate_true(predicate))
+    if not values:
+        # The item predicate has no values (e.g. ge_lt_p(0, 0)): only an empty collection satisfies all_p
+        yield []
+        return
     yield random_combination_with_replacement(values, max_length)
 
     values = take(max_length, generate_true(predicate))
@@ -264,6 +268,8 @@ def generate_any_p(any_predicate: AnyPredicate, *, length_p: Predicate = default
 
         false_values = take(nr_false_values, generate_false(predicate))
         true_values = take(nr_true_values, generate_true(predicate))
+        if not true_values:
+            return  # the item predicate has no values (e.g. ge_lt_p(0, 0)), so no iterable satisfies any_p
 
         combined_values = false_values + true_values
 

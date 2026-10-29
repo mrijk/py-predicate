@@ -181,6 +181,8 @@ if sys.version_info >= (3, 14):
 def random_datetimes(lower: datetime | None = None, upper: datetime | None = None) -> Iterator[datetime]:
     start = lower if lower else datetime(year=1980, month=1, day=1)
     end = upper if upper else datetime(year=2050, month=1, day=1)
+    if start > end:
+        return  # an empty range, e.g. ge_lt_p(d, d): no value fits
 
     now = datetime.now()
 
@@ -190,7 +192,7 @@ def random_datetimes(lower: datetime | None = None, upper: datetime | None = Non
     while True:
         delta = end - start
         int_delta = (delta.days * 24 * 60 * 60) + delta.seconds
-        random_second = random.randrange(int_delta)
+        random_second = random.randint(0, int_delta)  # inclusive, so ge_le_p(d, d) yields d
         yield start + timedelta(seconds=random_second)
 
 
@@ -245,6 +247,9 @@ def random_strings(min_size: int = 0, max_size: int = 10) -> Iterator[str]:
 
 
 def random_floats(lower: float = -1e-6, upper: float = 1e6) -> Iterator[float]:
+    if lower > upper:
+        return  # an empty range, e.g. ge_lt_p(0.0, 0.0): no value fits, and the loop below would never yield
+
     def between(limit: float) -> Iterator[float]:
         low = max(-limit, lower)
         high = min(limit, upper)
@@ -258,6 +263,9 @@ def random_floats(lower: float = -1e-6, upper: float = 1e6) -> Iterator[float]:
 
 
 def random_ints(lower: int = -sys.maxsize, upper: int = sys.maxsize, **_kwargs: Any) -> Iterator[int]:
+    if lower > upper:
+        return  # an empty range, e.g. ge_lt_p(0, 0): no value fits, and the loop below would never yield
+
     def between(limit: int) -> Iterator[int]:
         low = max(-limit, lower)
         high = min(limit, upper)
