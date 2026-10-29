@@ -1,5 +1,6 @@
 import ast
 import asyncio
+import gc
 import inspect
 import io
 import ipaddress
@@ -741,10 +742,32 @@ def _returning(values: Iterator) -> Callable:
     return function
 
 
+def _random_classes_with_metaclass(metaclass: type) -> Iterator[type]:
+    """Return existing classes whose metaclass is metaclass, e.g. polars' data types for DataTypeClass (#357).
+
+    A metaclass annotation means an existing class with that metaclass: calling the metaclass would create a new class.
+    """
+    # ponytail: only classes that already exist, found through gc, like the subclass walk for abstract classes (#355)
+    classes = [obj for obj in gc.get_objects() if isinstance(obj, type) and isinstance(obj, metaclass)]
+    # Base classes are often abstract in all but name (polars' DataType, NumericType), so prefer the leaves
+    leaves = [
+        klass
+        for klass in classes
+        if not inspect.isabstract(klass) and not any(isinstance(sub, metaclass) for sub in _all_subclasses(klass))
+    ]
+    candidates = leaves or classes
+    if not candidates:
+        raise ValueError(f"No generator found for {metaclass}: no class with this metaclass exists")
+    while True:
+        yield random.choice(candidates)
+
+
 def _family_generator(klass: Any, annotation: Any) -> Iterator | None:
     """Return a generator for a whole family of types (enums, paths, Supports* protocols, patterns, ...), or None."""
     if klass is Callable and (args := get_args(annotation)) and args[-1] is not Any:
         return _random_returning_callables(args[-1])
+    if isinstance(klass, type) and issubclass(klass, type) and klass is not type:
+        return _random_classes_with_metaclass(klass)
     if isinstance(klass, type) and issubclass(klass, Enum):
         return random_enum_members(klass)
     if isinstance(klass, type) and issubclass(klass, PurePath):
