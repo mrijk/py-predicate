@@ -622,6 +622,46 @@ def test_generate_true_is_instance_predicate_subclass_constructed():
     assert all(isinstance(value, TeePredicate) for value in values)
 
 
+class DataTypeClass(type):
+    pass
+
+
+class DataType(metaclass=DataTypeClass):
+    pass
+
+
+class NumericType(DataType):
+    pass
+
+
+class Int64(NumericType):
+    pass
+
+
+class String(DataType):
+    pass
+
+
+class Lonely(type):
+    pass
+
+
+def test_generate_true_metaclass_gives_existing_leaf_classes():
+    # #357: a metaclass annotation means an existing class with that metaclass, e.g. polars' data types
+    values = set(take(100, generate_true(is_instance_p(DataTypeClass))))
+
+    assert values == {Int64, String}
+
+
+def test_generate_true_metaclass_without_classes():
+    with pytest.raises(ValueError, match="no class with this metaclass exists"):
+        take(1, generate_true(is_instance_p(Lonely)))
+
+
+def test_generate_true_type_is_unchanged():
+    assert all(isinstance(value, type) for value in take(10, generate_true(is_instance_p(type))))
+
+
 class Point:
     def __init__(self, x: int, y: int = 0, *, label: str | None = None):
         self.x, self.y, self.label = x, y, label
