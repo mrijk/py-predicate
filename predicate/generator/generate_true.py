@@ -20,6 +20,7 @@ from collections.abc import (
     MutableMapping,
     MutableSequence,
     MutableSet,
+    Reversible,
     Sequence,
     Set,
     Sized,
@@ -30,7 +31,7 @@ from enum import Enum
 from fractions import Fraction
 from functools import singledispatch
 from inspect import Parameter, Signature, getmembers, isfunction, signature
-from itertools import cycle, repeat
+from itertools import chain, cycle, repeat
 from pathlib import PurePath
 from time import struct_time
 from types import CodeType, ModuleType, UnionType
@@ -655,6 +656,7 @@ _abc_builtins: Final[dict[Any, Any]] = {
     Collection: list,
     Sequence: list,
     MutableSequence: list,
+    Reversible: list,
     Set: set,
     MutableSet: set,
     Mapping: dict,
@@ -697,9 +699,23 @@ _construct_depth = 0
 
 def _constructed_instances(klass: Any) -> Iterator:
     """Return instances of a class built from its fully annotated __init__ (#305); the last resort for a class."""
-    if (params := _init_params(klass)) is None:
+    candidates = [(c, params) for c in _constructible_classes(klass) if (params := _init_params(c)) is not None]
+    if not candidates:
         raise ValueError(f"No generator found for {klass}")
-    return _random_constructed(klass, params)
+    return _random_constructed(klass, candidates)
+
+
+def _constructible_classes(klass: Any) -> list[Any]:
+    # An abstract class can't be built itself, but its concrete subclasses may be (#354); protocols are left out
+    if isinstance(klass, type) and inspect.isabstract(klass) and not getattr(klass, "_is_protocol", False):
+        return _all_subclasses(klass)
+    return [klass]
+
+
+def _all_subclasses(klass: type) -> list[type]:
+    # ponytail: only subclasses that are already imported, like random_modules
+    direct: list[type] = klass.__subclasses__()
+    return list(dict.fromkeys(chain(direct, *(_all_subclasses(subclass) for subclass in direct))))
 
 
 def _init_params(klass: Any) -> list[Parameter] | None:
@@ -723,17 +739,18 @@ def _init_params(klass: Any) -> list[Parameter] | None:
     return None if any(param.annotation is Parameter.empty for param in params) else params
 
 
-def _random_constructed(klass: type, params: list[Parameter]) -> Iterator:
+def _random_constructed(klass: type, candidates: list[tuple[type, list[Parameter]]]) -> Iterator:
     errors: list[str] = []
     while len(errors) < _MAX_CONSTRUCT_ATTEMPTS:
-        value, error = _try_construct(klass, params)
+        value, error = _try_construct(*random.choice(candidates))
         if error:
             errors.append(error)
         else:
             errors.clear()
             yield value
     most_common = max(set(errors), key=errors.count)
-    raise ValueError(f"No generator found for {klass}: its constructor keeps raising ({most_common})")
+    what = "its constructor keeps" if [c for c, _ in candidates] == [klass] else "its subclasses keep"
+    raise ValueError(f"No generator found for {klass}: {what} raising ({most_common})")
 
 
 def _try_construct(klass: type, params: list[Parameter]) -> tuple[Any, str | None]:
@@ -787,6 +804,7 @@ def generate_is_instance_p(predicate: IsInstancePredicate, **kwargs: Any) -> Ite
         # Abstract collections map to the builtin that implements them
         Collection: random_iterables,
         Sequence: random_lists,
+        Reversible: random_lists,
         MutableSequence: random_lists,
         Set: random_sets,
         MutableSet: random_sets,

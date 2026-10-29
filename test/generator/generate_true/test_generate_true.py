@@ -589,6 +589,32 @@ class Shape(ABC):
     def area(self) -> float: ...
 
 
+class Shape2D(Shape, ABC):
+    pass
+
+
+class Square(Shape2D):
+    def area(self) -> float:
+        return self.size**2
+
+
+class Broken(ABC):
+    @abstractmethod
+    def run(self) -> None: ...
+
+
+class AlwaysBroken(Broken):
+    def __init__(self, x: int):
+        raise ValueError("broken")
+
+    def run(self) -> None: ...
+
+
+class NoSubclasses(ABC):
+    @abstractmethod
+    def run(self) -> None: ...
+
+
 def test_generate_true_constructed_from_init():
     values = take(10, generate_true(is_instance_p(Point)))
     assert len(values) == 10
@@ -604,7 +630,17 @@ def test_generate_true_constructed_dataclass_with_class_fields():
     assert all(isinstance(value.start, Point) and isinstance(value.end, Point) for value in values)
 
 
-@pytest.mark.parametrize("klass", [Unannotated, Shape])
+def test_generate_true_constructed_abstract_class_uses_subclass():
+    values = take(5, generate_true(is_instance_p(Shape)))
+    assert all(isinstance(value, Square) for value in values)
+
+
+def test_generate_true_constructed_abstract_subclasses_keep_raising():
+    with pytest.raises(ValueError, match=r"its subclasses keep raising \(ValueError: broken\)"):
+        take(1, generate_true(is_instance_p(Broken)))
+
+
+@pytest.mark.parametrize("klass", [Unannotated, NoSubclasses])
 def test_generate_true_constructed_not_possible(klass):
     with pytest.raises(ValueError, match="No generator found"):
         take(1, generate_true(is_instance_p(klass)))

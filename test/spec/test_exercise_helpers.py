@@ -178,6 +178,9 @@ def test_annotation_to_predicate_tuple_generators(annotation):
         (collections.abc.Mapping[str, int], [("a", 1)], False),
         (collections.abc.MutableMapping[str, int], {"a": 1}, True),
         (collections.abc.Sequence, ["x"], True),
+        (collections.abc.Reversible[int], [1, 2], True),
+        (collections.abc.Reversible[int], [1, "x"], False),
+        (collections.abc.Reversible[int], {1, 2}, False),
     ],
 )
 def test_annotation_to_predicate_abc_generics(annotation, value, expected):
@@ -196,6 +199,7 @@ def test_annotation_to_predicate_abc_generics(annotation, value, expected):
         collections.abc.Mapping[int, str],
         collections.abc.MutableMapping[str, int],
         collections.abc.Sequence[collections.abc.Sequence[int]],
+        collections.abc.Reversible[int],
     ],
 )
 def test_annotation_to_predicate_abc_generators(annotation):
@@ -210,6 +214,13 @@ def test_exercise_variadic_tuple():
         return sum(values)
 
     assert take(5, exercise(total))
+
+
+def test_exercise_reversible():
+    def last(values: collections.abc.Reversible[int]) -> int | None:
+        return next(reversed(values), None)  # type: ignore[call-overload]
+
+    assert take(5, exercise(last))
 
 
 def test_exercise_abc_generics():

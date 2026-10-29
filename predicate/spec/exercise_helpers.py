@@ -78,6 +78,7 @@ _item_collection_origins: set = {
     collections.abc.Collection,
     collections.abc.MutableSequence,
     collections.abc.MutableSet,
+    collections.abc.Reversible,
     collections.abc.Sequence,
     collections.abc.Set,
 }
