@@ -53,6 +53,11 @@ def _(_predicate: AlwaysTruePredicate, other: Predicate) -> bool:
 
 @implies.register
 def _(predicate: AndPredicate, other: Predicate) -> bool:
+    if predicate == other:
+        return True
+    if isinstance(other, AndPredicate):
+        # p => (q & r) when p => q and p => r, e.g. a spec that narrows one part of an annotation (#306)
+        return implies(predicate, other.left) and implies(predicate, other.right)
     return implies(predicate.left, other) or implies(predicate.right, other)
 
 
