@@ -18,7 +18,7 @@ from enum import Enum, Flag
 from fractions import Fraction
 from functools import cache, reduce, wraps
 from inspect import Parameter, Signature, signature
-from itertools import count, cycle
+from itertools import chain, count, cycle
 from operator import or_
 from pathlib import PurePath
 from random import choices
@@ -37,20 +37,21 @@ from predicate.standard_predicates import is_int_p, is_str_p
 
 
 def random_first_from_iterables(*iterables: Iterable) -> Iterator[Any]:
-    non_empty_iterables = [it for it in iterables if it]
+    remaining = [it for it in iterables if it]
 
-    while True:
-        chosen_iterable = random.choice(non_empty_iterables)
+    # An iterable that runs out is dropped, instead of being picked (and failing) forever
+    while remaining:
+        chosen_iterable = random.choice(remaining)
         try:
             yield next(iter(chosen_iterable))
         except StopIteration:
-            pass
+            remaining.remove(chosen_iterable)
 
 
 def set_from_list(value: list[Any], order: bool = False) -> Iterator[set[Any]]:
     length = len(value)
     try:
-        if length and len(result := set(value)) == length:
+        if len(result := set(value)) == length:
             yield result if order else set(random_permutation(result))
     except TypeError:
         pass
@@ -128,17 +129,30 @@ def random_callable_objects(nr_of_parameters_p: Predicate = default_size_p) -> I
     yield from (callable_object_with_signature(sig) for sig in random_signatures(nr_of_parameters_p))
 
 
+def random_lengths(length_p: Predicate) -> Iterator[int]:
+    """Return collection lengths: 0 (the empty collection) at most once and first, then only positive lengths (#356).
+
+    The empty collection is a valuable edge case, but exercise with a small n only sees the start of the stream.
+    """
+    from predicate import generate_true
+
+    if length_p(0):
+        yield 0
+    lengths = generate_true(length_p)
+    # ponytail: a length_p without a positive length in 100 draws (e.g. eq_p(0)) is taken to allow only 0
+    head = take(100, lengths)
+    positive = any(n > 0 for n in head)
+    yield from (n for n in chain(head, lengths) if (n > 0 if positive else n >= 0))
+
+
 def random_dicts(
     key_p: Predicate = is_str_p, value_p: Predicate = is_int_p, size_p: Predicate = default_size_p
 ) -> Iterator[dict[Any, Any]]:
     from predicate import generate_true
 
-    if size_p(0):
-        yield {}
-
     valid_keys = generate_true(key_p)
     valid_values = generate_true(value_p)
-    valid_sizes = (s for s in generate_true(size_p) if s >= 0)
+    valid_sizes = random_lengths(size_p)
 
     yield from (dict(zip(take(s, unique_everseen(valid_keys)), valid_values, strict=False)) for s in valid_sizes)
 
@@ -194,11 +208,7 @@ default_length_p: Final = ge_le_p(lower=0, upper=10)
 def random_sets(length_p: Predicate = default_length_p, value_p: Predicate = is_int_p) -> Iterator[set[Any]]:
     from predicate import generate_true
 
-    if length_p(0):
-        yield set()
-    valid_lengths = (n for n in generate_true(length_p) if n > 0)
-
-    for length in valid_lengths:
+    for length in random_lengths(length_p):
         values = take(length, generate_true(value_p))
         if len(result := set(values)) == length:
             yield result
@@ -264,24 +274,14 @@ def random_ints(lower: int = -sys.maxsize, upper: int = sys.maxsize, **_kwargs: 
 
 
 def random_iterables(length_p: Predicate = default_length_p, value_p: Predicate = is_int_p) -> Iterator[Iterable]:
-    if length_p(0):
-        yield from ([], {}, (), "")
-    else:
-        iterable_1 = random_sets(length_p=length_p, value_p=value_p)
-        iterable_2 = random_lists(length_p=length_p, value_p=value_p)
-        iterable_3 = random_tuples(length_p=length_p, value_p=value_p)
-        yield from random_first_from_iterables(iterable_1, iterable_2, iterable_3)
+    # A list or a tuple of each length, so the empty one comes once instead of once per kind
+    yield from (random.choice((list, tuple))(values) for values in random_lists(length_p=length_p, value_p=value_p))
 
 
 def random_lists(length_p: Predicate = default_length_p, value_p: Predicate = is_int_p) -> Iterator[list[Any]]:
     from predicate import generate_true
 
-    if length_p(0):
-        yield []
-
-    valid_lengths = (n for n in generate_true(length_p) if n >= 0)
-
-    yield from (take(n, generate_true(value_p)) for n in valid_lengths)
+    yield from (take(n, generate_true(value_p)) for n in random_lengths(length_p))
 
 
 def random_tuples(length_p: Predicate = default_length_p, value_p: Predicate = is_int_p) -> Iterator[tuple[Any, ...]]:

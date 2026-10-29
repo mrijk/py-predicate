@@ -31,7 +31,7 @@ from enum import Enum
 from fractions import Fraction
 from functools import singledispatch
 from inspect import Parameter, Signature, getmembers, isfunction, signature
-from itertools import chain, cycle, repeat
+from itertools import chain, cycle, islice, repeat
 from pathlib import PurePath
 from time import struct_time
 from types import CodeType, ModuleType, UnionType
@@ -121,6 +121,7 @@ from predicate.generator.helpers import (
     random_ipv6_networks,
     random_iterables,
     random_lambdas,
+    random_lengths,
     random_lists,
     random_log_records,
     random_loggers,
@@ -217,26 +218,24 @@ def generate_true[T](predicate: Predicate[T], **_kwargs: Any) -> Iterator[T]:
 
 @generate_true.register
 def generate_all_p(all_predicate: AllPredicate, *, length_p: Predicate = default_length_p) -> Iterator:
-    if length_p(0):
-        yield []
-
     predicate = all_predicate.predicate
 
-    valid_max_lengths = generate_true(length_p)
+    for max_length in random_lengths(length_p):
+        # One empty value, not an empty tuple, set and list in a row
+        yield from _all_p_values(predicate, max_length) if max_length else [[]]
 
-    while True:
-        max_length = next(valid_max_lengths)
 
-        values = take(max_length, generate_true(predicate))
-        yield random_combination_with_replacement(values, max_length)
+def _all_p_values(predicate: Predicate, max_length: int) -> Iterator:
+    values = take(max_length, generate_true(predicate))
+    yield random_combination_with_replacement(values, max_length)
 
-        values = take(max_length, generate_true(predicate))
-        # isinstance(value, Hashable) isn't enough: a tuple is Hashable even when its items aren't
-        if all(_is_hashable(value) for value in values):
-            yield set(random_combination_with_replacement(values, max_length))
+    values = take(max_length, generate_true(predicate))
+    # isinstance(value, Hashable) isn't enough: a tuple is Hashable even when its items aren't
+    if all(_is_hashable(value) for value in values):
+        yield set(random_combination_with_replacement(values, max_length))
 
-        values = take(max_length, generate_true(predicate))
-        yield list(random_combination_with_replacement(values, max_length))
+    values = take(max_length, generate_true(predicate))
+    yield list(random_combination_with_replacement(values, max_length))
 
 
 def _is_hashable(value: Any) -> bool:
@@ -281,6 +280,22 @@ def generate_exception(_predicate: ExceptionPredicate) -> Iterator:
     yield from []
 
 
+def _satisfying(values: Iterator, predicate: Predicate, attempts: int) -> Iterator:
+    """Return the values that satisfy the predicate; stops after attempts misses in a row, so it can't hang.
+
+    E.g. is_tuple_p & is_empty_p: random tuples are only rarely empty.
+    """
+    misses = 0
+    for value in values:
+        if predicate(value):
+            misses = 0
+            yield value
+        else:
+            misses += 1
+            if misses == attempts:
+                return
+
+
 @generate_true.register
 def generate_and(predicate: AndPredicate) -> Iterator:
     if optimize(predicate) == always_false_p:
@@ -289,18 +304,18 @@ def generate_and(predicate: AndPredicate) -> Iterator:
         attempts = 100
         _sentinel = object()
 
-        first_left = next(
-            (item for item in take(attempts, generate_true(predicate.left)) if predicate.right(item)), _sentinel
-        )
-        first_right = next(
-            (item for item in take(attempts, generate_true(predicate.right)) if predicate.left(item)), _sentinel
-        )
+        left_values = generate_true(predicate.left)
+        right_values = generate_true(predicate.right)
+        first_left = next((item for item in islice(left_values, attempts) if predicate.right(item)), _sentinel)
+        first_right = next((item for item in islice(right_values, attempts) if predicate.left(item)), _sentinel)
 
         iterables = []
         if first_left is not _sentinel:
-            iterables.append(item for item in generate_true(predicate.left) if predicate.right(item))
+            iterables.append(chain([first_left], _satisfying(left_values, predicate.right, attempts)))
         if first_right is not _sentinel:
-            iterables.append(item for item in generate_true(predicate.right) if predicate.left(item))
+            # Both sides often start with the same edge case, e.g. []: yield it once (#356)
+            head = [] if first_right == first_left else [first_right]
+            iterables.append(chain(head, _satisfying(right_values, predicate.left, attempts)))
 
         if not iterables:
             raise ValueError(f"Couldn't generate values that satisfy {predicate}")
@@ -963,14 +978,7 @@ def generate_frozendict_of_p(frozendict_of_predicate: FrozenDictOfPredicate, **k
 def generate_list_of_p(list_of_predicate: ListOfPredicate, *, length_p: Predicate = default_length_p) -> Iterator:
     predicate = list_of_predicate.predicate
 
-    if length_p(0):
-        yield []
-
-    valid_lengths = generate_true(length_p)
-
-    while True:
-        length = next(valid_lengths)
-        yield take(length, generate_true(predicate))
+    yield from (take(length, generate_true(predicate)) for length in random_lengths(length_p))
 
 
 @generate_true.register
@@ -999,10 +1007,7 @@ def generate_set_of_p(
 ) -> Iterator:
     predicate = set_of_predicate.predicate
 
-    valid_lengths = generate_true(length_p)
-
-    while True:
-        length = next(valid_lengths)
+    for length in random_lengths(length_p):
         values = take(length, generate_true(predicate))
 
         yield from set_from_list(values, order)
