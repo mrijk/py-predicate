@@ -4,6 +4,7 @@ from typing import AsyncIterator, Callable, Iterator
 
 from predicate.spec.exercise_helpers import (
     call_args,
+    callable_name,
     check_exception,
     check_signature_against_spec,
     generate_values,
@@ -25,13 +26,13 @@ def get_spec_from_function_annotation(f: Callable) -> Spec:
     sig = resolved_signature(f)
 
     if sig.return_annotation == sig.empty:
-        raise no_spec_error(f.__name__, "missing return annotation")
+        raise no_spec_error(callable_name(f), "missing return annotation")
 
     spec: Spec = {"args": {}, "ret": get_return_predicate(sig)}
 
     for key, parameter in _annotatable_parameters(sig.parameters):
         if parameter.annotation == parameter.empty:
-            raise no_spec_error(f.__name__, f"parameter '{key}' has no annotation")
+            raise no_spec_error(callable_name(f), f"parameter '{key}' has no annotation")
         spec["args"][key] = param_predicate(parameter)
 
     return spec

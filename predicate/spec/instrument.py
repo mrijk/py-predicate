@@ -12,6 +12,7 @@ from predicate.explain import explain
 from predicate.is_async_predicate import is_async_p
 from predicate.predicate import Predicate
 from predicate.spec.exercise_helpers import (
+    callable_name,
     check_ret_name,
     get_return_predicate,
     param_predicate,
@@ -130,9 +131,11 @@ def _check_constraints(spec: Spec, func_name: str, arguments: dict, result: Any)
 
 
 def _replace_in_module(func: Callable, wrapped: Callable) -> None:
-    module = sys.modules.get(func.__module__)
-    if module and hasattr(module, func.__name__):
-        setattr(module, func.__name__, wrapped)
+    # A partial or a callable instance has no __name__: it isn't a module-level function to replace (#362)
+    name = getattr(func, "__name__", None)
+    module = sys.modules.get(getattr(func, "__module__", None) or "")
+    if name and module and hasattr(module, name):
+        setattr(module, name, wrapped)
 
 
 def _report(on_error: OnError, error: str | None) -> None:
@@ -181,7 +184,7 @@ def instrument_function(func: Callable, spec: Spec, on_error: OnError = _default
     if is_instrumented(func):
         return func
     func = unwrap(func)
-    func_name = func.__name__
+    func_name = callable_name(func)
     # resolved once, on first call, so forward references (e.g. the enclosing class) exist by then
     resolved_signature = cache(lambda: signature(func))
     resolved_spec = cache(lambda: enrich_spec(func, spec))

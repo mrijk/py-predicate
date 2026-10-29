@@ -5,6 +5,7 @@ import logging
 import re
 import time
 import types
+from functools import partial
 from typing import ForwardRef, TypeVar
 
 import pytest
@@ -44,6 +45,15 @@ def test_exercise_lambda():
     result = list(exercise(a_lambda, spec=spec))
 
     assert result
+
+
+def test_exercise_partial_uses_wrapped_annotations():
+    def add(x: int, y: int) -> int:
+        return x + y
+
+    result = list(exercise(partial(add, 1), n=3))
+
+    assert len(result) == 3
 
 
 def test_exercise_with_fn_happy():

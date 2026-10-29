@@ -1,5 +1,6 @@
 import asyncio
 import sys
+from functools import partial
 from typing import Any
 
 import pytest
@@ -699,3 +700,45 @@ def test_instrumentation_switch_is_checked_at_call_time():
 )
 def test_instrumentation_environment_variable(value, expected):
     assert _enabled_from_environment(value) is expected
+
+
+def _add(x: int, y: int) -> int:
+    return x + y
+
+
+class _Adder:
+    def __call__(self, x: int) -> int:
+        return x + 1
+
+
+@pytest.mark.parametrize("f", [partial(_add, 1), _Adder()])
+def test_instrument_callable_without_name(f):
+    errors = []
+    instrumented = instrument(on_error=errors.append)(f)
+
+    assert instrumented(2) == 3
+    assert not errors
+
+
+@pytest.mark.parametrize(
+    "f, param, name",
+    [
+        (partial(_add, 1), "y", "_add"),
+        (_Adder(), "x", "_Adder"),
+    ],
+)
+def test_instrument_function_callable_without_name_reports_name(f, param, name):
+    errors = []
+    instrumented = instrument_function(f, {"args": {param: ge_p(0)}}, on_error=errors.append)
+
+    instrumented(-5)
+
+    assert errors == [
+        f"Parameter predicate for parameter '{param}' of function {name} failed. Reason: -5 is not greater or equal to 0"
+    ]
+
+
+def test_instrument_partial_leaves_module_function():
+    instrument(partial(_add, 1))
+
+    assert sys.modules[__name__]._add is _add
