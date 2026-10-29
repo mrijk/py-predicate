@@ -7,6 +7,7 @@ import warnings
 from functools import partial, reduce
 from inspect import Parameter, Signature, isroutine, signature
 from itertools import islice, repeat, takewhile
+from operator import and_
 from typing import (
     IO,
     Annotated,
@@ -56,6 +57,7 @@ from predicate.list_of_predicate import is_list_of_p
 from predicate.or_predicate import or_p
 from predicate.predicate import Predicate
 from predicate.set_of_predicate import is_set_of_p
+from predicate.spec.annotated_constraints import constraint_predicates
 from predicate.spec.spec import InvalidSpecError, Spec, SpecViolationError, UnresolvedAnnotationWarning
 from predicate.spec.type_checking import (
     imported_namespace,
@@ -108,12 +110,13 @@ def _type_hints(owner: Callable, localns: dict[str, Any]) -> dict[str, Any]:
     if sys.version_info >= (3, 14):  # pragma: no cover
         from annotationlib import Format
 
-        hints = get_type_hints(owner, localns=localns, format=Format.FORWARDREF)
+        # include_extras keeps Annotated[T, ...]: its annotated-types constraints are checked too (#384)
+        hints = get_type_hints(owner, localns=localns, format=Format.FORWARDREF, include_extras=True)
         # Names that are still unresolved raise NameError here; resolved_signature then falls back per annotation
         for ref in (ref for hint in hints.values() for ref in _forward_refs(hint)):
             ref.evaluate(locals=localns)
         return hints
-    return get_type_hints(owner, localns=localns)  # pragma: no cover
+    return get_type_hints(owner, localns=localns, include_extras=True)  # pragma: no cover
 
 
 def _hints_or_any(owner: Callable, localns: dict[str, Any]) -> dict[str, Any]:
@@ -356,16 +359,15 @@ def _typed_dict_predicate(klass: type) -> Predicate:
 
 
 def _unwrap_alias(annotation: Any) -> Any:
-    """Return the type behind NewType, Annotated and PEP 695 `type` aliases, which isinstance() can't check."""
+    """Return the type behind NewType and PEP 695 `type` aliases, which isinstance() can't check.
+
+    Annotated is left as it is: annotation_to_predicate reads its metadata.
+    """
     match annotation:
         case NewType():
             return _unwrap_alias(annotation.__supertype__)
         case TypeAliasType():
             return _unwrap_alias(annotation.__value__)
-        case _ if get_origin(annotation) is Annotated:
-            return _unwrap_alias(
-                annotation.__origin__
-            )  # ponytail: the metadata (e.g. annotated-types bounds) is ignored
         case _ if isinstance(get_origin(annotation), TypeAliasType):
             # A generic alias such as G[int] with `type G[T] = list[T]`
             alias = get_origin(annotation)
@@ -376,6 +378,10 @@ def _unwrap_alias(annotation: Any) -> Any:
 
 def annotation_to_predicate(annotation: Any) -> Predicate:  # noqa: C901
     annotation = _unwrap_alias(annotation)
+    if get_origin(annotation) is Annotated:
+        # The type plus its annotated-types constraints, e.g. Annotated[int, Gt(0)] -> is_int_p & gt_p(0) (#384)
+        constraints = [predicate for item in annotation.__metadata__ for predicate in constraint_predicates(item)]
+        return reduce(and_, constraints, annotation_to_predicate(annotation.__origin__))
     if annotation is None or annotation is types.NoneType:
         return is_none_p
     if is_typed_dict_class(annotation):
