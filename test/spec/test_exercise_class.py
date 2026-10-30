@@ -1,3 +1,4 @@
+from collections.abc import Iterator
 from typing import TypeGuard, TypeVar
 
 import pytest
@@ -22,6 +23,15 @@ def test_exercise_pos_p():
     result = list(exercise(pos_p, spec=spec))
 
     assert result
+
+
+def test_exercise_class_with_generator_call():
+    # #380: a callable object whose __call__ is a generator function is consumed too
+    class Repeat:
+        def __call__(self, n: int) -> Iterator[str]:
+            yield from ["x"] * max(n, 0)
+
+    assert all(result == ["x"] * max(args[0], 0) for args, result in exercise(Repeat(), n=5))
 
 
 def test_exercise_class_with_call():

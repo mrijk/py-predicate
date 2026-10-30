@@ -1,11 +1,12 @@
 import ast
 import asyncio
 import datetime
+import itertools
 import logging
 import re
 import time
 import types
-from collections.abc import AsyncGenerator, AsyncIterable, Awaitable
+from collections.abc import AsyncGenerator, AsyncIterable, AsyncIterator, Awaitable, Generator, Iterator
 from functools import partial
 from typing import Any, ForwardRef, TypeVar
 
@@ -27,7 +28,7 @@ from predicate import (
 from predicate.list_of_predicate import is_list_of_p
 from predicate.spec.exercise import Spec, exercise
 from predicate.spec.exercise_function import get_spec_from_function_annotation
-from predicate.spec.exercise_helpers import annotation_to_predicate
+from predicate.spec.exercise_helpers import GENERATOR_ITEMS, annotation_to_predicate
 from predicate.spec.spec import InvalidSpecError, SpecViolationError
 
 
@@ -308,6 +309,80 @@ async def test_generated_async_generator_items():
     items = [[item async for item in value] for value in values]
 
     assert all(isinstance(item, str) for value in items for item in value)
+
+
+def test_exercise_generator_function_items():
+    # #380: a generator function's body used to never run, since its result wasn't iterated
+    def countdown(n: int) -> Iterator[int]:
+        while n > 0:
+            yield n
+            n -= 1
+
+    calls = list(exercise(countdown, n=5))
+
+    assert all(result == list(range(args[0], 0, -1)) for args, result in calls)
+
+
+def test_exercise_generator_function_wrong_items():
+    def wrong(n: int) -> Iterator[int]:
+        yield "not an int"  # type: ignore[misc]  # the wrong item type is the point
+
+    with pytest.raises(SpecViolationError, match="yielded"):
+        list(exercise(wrong, n=3))
+
+
+def test_exercise_generator_function_raises_while_iterating():
+    def broken(n: int) -> Iterator[int]:
+        yield 1
+        raise ValueError("fails while iterating")
+
+    with pytest.raises(ValueError, match="fails while iterating"):
+        list(exercise(broken, n=3))
+
+
+def test_exercise_generator_function_expected_exception():
+    def broken(n: int) -> Iterator[int]:
+        yield 1
+        raise ValueError("fails while iterating")
+
+    spec: Spec = {"args": {"n": is_int_p}, "ret": all_p(is_int_p), "raises": ValueError}
+
+    assert all(isinstance(result, ValueError) for _, result in exercise(broken, spec=spec, n=3))
+
+
+def test_exercise_generator_function_infinite():
+    def endless(start: int) -> Iterator[int]:
+        yield from itertools.count(start)
+
+    assert all(len(result) == GENERATOR_ITEMS for _, result in exercise(endless, n=3))
+
+
+def test_exercise_generator_with_send_and_return_types():
+    def echo() -> Generator[int, str, bool]:
+        received = yield 1
+        return received == "stop"
+
+    assert [result for _, result in exercise(echo, n=2)] == [[1], [1]]
+
+
+@pytest.mark.asyncio
+async def test_exercise_async_generator_function_items():
+    async def count(n: int) -> AsyncIterator[int]:
+        for i in range(min(n, 3)):
+            yield i
+
+    results = [result async for _, result in exercise(count, n=5)]
+
+    assert all(isinstance(result, list) for result in results)
+
+
+@pytest.mark.asyncio
+async def test_exercise_async_generator_function_wrong_items():
+    async def wrong(n: int) -> AsyncIterator[int]:
+        yield "wrong"  # type: ignore[misc]  # the wrong item type is the point
+
+    with pytest.raises(SpecViolationError, match="yielded"):
+        [result async for _, result in exercise(wrong, n=3)]
 
 
 @pytest.mark.asyncio
