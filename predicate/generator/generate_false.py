@@ -41,6 +41,7 @@ from predicate.generator.helpers import (
     random_ints,
     random_iterables,
     random_lambdas,
+    random_lengths,
     random_non_hashables,
     random_sets,
     random_strings,
@@ -127,13 +128,9 @@ def generate_all_p(all_predicate: AllPredicate, *, length_p: Predicate = default
 @generate_false.register
 def generate_any_p(any_predicate: AnyPredicate, length_p: Predicate = default_size_p) -> Iterator:
     predicate = any_predicate.predicate
-    from predicate import generate_true
 
-    valid_lengths = generate_true(length_p)
-
-    while True:
-        length = next(valid_lengths)
-
+    # Lengths >= 0 only, e.g. for length_p=le_p(0), with the empty iterable once and first (#388)
+    for length in random_lengths(length_p):
         false_values = take(length, generate_false(predicate))
 
         yield random_permutation(false_values)
