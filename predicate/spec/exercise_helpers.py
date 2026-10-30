@@ -590,6 +590,39 @@ def verify_result(spec: Spec, return_p: Predicate, value: dict, result: Any) -> 
             raise SpecViolationError(f"Not conform spec: {explain(fn_p_result, result)}")
 
 
+# ponytail: an item limit only. A generator that never yields hangs, like any exercised function that never returns
+GENERATOR_ITEMS: Final = 100
+"""How many items exercise takes from a (async) generator function's result: enough to run its body (#380)."""
+
+
+def yield_predicate(f: Callable) -> Predicate | None:
+    """Return the predicate for the items a (async) generator function yields, or None for any other function.
+
+    T from Iterator[T], Iterable[T], Generator[T, S, R], AsyncIterator[T], ...; without a T, any item is fine.
+    """
+    if not (inspect.isgeneratorfunction(f) or inspect.isasyncgenfunction(f)):
+        return None
+    args = get_args(resolved_signature(f).return_annotation)
+    return annotation_to_predicate(args[0]) if args else always_true_p
+
+
+async def take_async(values: Any, n: int) -> list:
+    """Return the first n items of an async iterator, like take()."""
+    items: list = []
+    async for item in values:
+        items.append(item)
+        if len(items) == n:
+            break
+    return items
+
+
+def verify_items(item_p: Predicate, value: dict, items: list) -> None:
+    """Check the items a generator function yielded for the inputs in value."""
+    items_p = all_p(item_p)
+    if not items_p(items):
+        raise SpecViolationError(f"Not conform spec: yielded {explain(items_p, items)} for inputs {value}")
+
+
 def check_exception(spec: Spec, value: dict, exc: Exception) -> Exception:
     expected = spec.get("raises")
     if not expected:

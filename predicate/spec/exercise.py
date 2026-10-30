@@ -1,3 +1,4 @@
+import inspect
 from functools import partial
 from types import FunctionType
 from typing import AsyncIterator, Callable, Iterator
@@ -11,7 +12,9 @@ from predicate.spec.spec import Spec
 def exercise(f: Callable, spec: Spec | None = None, n: int = 10) -> Iterator[tuple] | AsyncIterator[tuple]:
     # A partial carries the signature of the function it wraps, so it's exercised like one (#362)
     is_func = isinstance(f, FunctionType | partial)
-    is_async = is_async_p(f) if is_func else is_async_p(f.__call__)  # type: ignore[operator]
+    target = f if is_func else f.__call__  # type: ignore[operator]
+    # An async generator function takes the async path too: its items are taken with async for (#380)
+    is_async = is_async_p(target) or inspect.isasyncgenfunction(target)
     if is_async:
         return async_exercise_function(f, spec, n) if is_func else async_exercise_class(f, spec, n)
     return exercise_function(f, spec, n) if is_func else exercise_class(f, spec, n)
