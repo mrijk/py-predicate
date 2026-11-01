@@ -5,7 +5,7 @@ from decimal import Decimal
 from fractions import Fraction
 from functools import partial
 from ipaddress import IPv4Address, IPv6Address
-from typing import Any, Callable, ClassVar, Iterable, Iterator, final
+from typing import Any, Callable, ClassVar, Iterable, Iterator, final, overload
 from uuid import UUID
 
 from more_itertools import spy
@@ -22,17 +22,89 @@ class Predicate[T]:
     def __call__(self, *args, **kwargs) -> bool:
         raise NotImplementedError
 
-    def __and__(self, predicate: "Predicate") -> "Predicate":
+    @overload
+    def __and__(self, other: "Predicate") -> "Predicate": ...
+
+    @overload
+    def __and__(self, other: Callable[[T], bool]) -> "Predicate": ...
+
+    def __and__(self, other: Any) -> "Predicate":
         """Return the 'and' predicate."""
         from predicate.and_predicate import AndPredicate
 
-        return AndPredicate(left=resolve_predicate(self), right=resolve_predicate(predicate))
+        left = resolve_predicate(self)
 
-    def __or__(self, predicate: "Predicate") -> "Predicate":
+        match other:
+            case Predicate():
+                right = resolve_predicate(other)
+            case _ if callable(other):
+                from predicate.function_predicate import fn_p
+
+                right = fn_p(other)
+            case _:
+                return NotImplemented
+
+        return AndPredicate(left=left, right=right)
+
+    def __rand__(self, other) -> "Predicate":
+        """Return the 'rand' predicate."""
+        from predicate.and_predicate import AndPredicate
+
+        right = resolve_predicate(self)
+
+        match other:
+            case Predicate():
+                left = resolve_predicate(other)
+            case _ if callable(other):
+                from predicate.function_predicate import fn_p
+
+                left = fn_p(other)
+            case _:
+                return NotImplemented
+
+        return AndPredicate(left=left, right=right)
+
+    @overload
+    def __or__(self, other: "Predicate") -> "Predicate": ...
+
+    @overload
+    def __or__(self, other: Callable[[T], bool]) -> "Predicate": ...
+
+    def __or__(self, other: Any) -> "Predicate":
         """Return the 'or' predicate."""
         from predicate.or_predicate import OrPredicate
 
-        return OrPredicate(left=resolve_predicate(self), right=resolve_predicate(predicate))
+        left = resolve_predicate(self)
+
+        match other:
+            case Predicate():
+                right = resolve_predicate(other)
+            case _ if callable(other):
+                from predicate.function_predicate import fn_p
+
+                right = fn_p(other)
+            case _:
+                return NotImplemented
+
+        return OrPredicate(left=left, right=right)
+
+    def __ror__(self, other) -> "Predicate":
+        """Return the 'ror' predicate."""
+        from predicate.or_predicate import OrPredicate
+
+        right = resolve_predicate(self)
+
+        match other:
+            case Predicate():
+                left = resolve_predicate(other)
+            case _ if callable(other):
+                from predicate.function_predicate import fn_p
+
+                left = fn_p(other)
+            case _:
+                return NotImplemented
+
+        return OrPredicate(left=left, right=right)
 
     def __xor__(self, predicate: "Predicate") -> "Predicate":
         """Return the 'xor' predicate."""

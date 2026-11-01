@@ -4,9 +4,11 @@ from predicate import exercise, is_instance_p
 from predicate.and_predicate import AndPredicate
 from predicate.eq_predicate import EqPredicate
 from predicate.not_predicate import NotPredicate
+from predicate.or_predicate import OrPredicate
 
 is_and_p = is_instance_p(AndPredicate)
 is_not_p = is_instance_p(NotPredicate)
+is_or_p = is_instance_p(OrPredicate)
 is_eq_p = is_instance_p(EqPredicate)
 
 

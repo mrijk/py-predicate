@@ -22,9 +22,9 @@ from predicate.dict_of_predicate import DictOfPredicate
 from predicate.eq_predicate import EqPredicate
 from predicate.exactly_predicate import ExactlyPredicate
 from predicate.exception_predicate import ExceptionPredicate
-from predicate.fn_predicate import FnPredicate
 from predicate.frozendict_of_predicate import FrozenDictOfPredicate
 from predicate.frozenset_of_predicate import FrozenSetOfPredicate
+from predicate.function_predicate import FnPredicate
 from predicate.ge_predicate import GePredicate
 from predicate.generator.helpers import (
     default_size_p,

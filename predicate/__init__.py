@@ -15,6 +15,7 @@ from predicate.exactly_predicate import exactly_n
 from predicate.exception_predicate import exception_p
 from predicate.compile_predicate import compile_predicate, try_compile_predicate
 from predicate.explain import explain
+from predicate.function_predicate import as_predicate
 from predicate.fn_predicate import (
     fn_p,
     is_even_p,
@@ -24,7 +25,6 @@ from predicate.fn_predicate import (
     is_normal_p,
     is_odd_p,
     is_subnormal_p,
-    as_predicate,
 )
 from predicate.formatter import to_dot, to_json, to_latex, to_yaml
 from predicate.ge_predicate import ge_p

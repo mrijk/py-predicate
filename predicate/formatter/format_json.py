@@ -12,10 +12,10 @@ from predicate.count_predicate import CountPredicate
 from predicate.dict_of_predicate import DictOfPredicate
 from predicate.eq_predicate import EqPredicate
 from predicate.exactly_predicate import ExactlyPredicate
-from predicate.fn_predicate import FnPredicate
 from predicate.formatter.fn_source import get_fn_source
 from predicate.frozendict_of_predicate import FrozenDictOfPredicate
 from predicate.frozenset_of_predicate import FrozenSetOfPredicate
+from predicate.function_predicate import FnPredicate
 from predicate.ge_predicate import GePredicate
 from predicate.gt_predicate import GtPredicate
 from predicate.has_key_predicate import HasKeyPredicate
