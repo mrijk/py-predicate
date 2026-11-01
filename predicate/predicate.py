@@ -33,36 +33,13 @@ class Predicate[T]:
         from predicate.and_predicate import AndPredicate
 
         left = resolve_predicate(self)
-
-        match other:
-            case Predicate():
-                right = resolve_predicate(other)
-            case _ if callable(other):
-                from predicate.function_predicate import fn_p
-
-                right = fn_p(other)
-            case _:
-                return NotImplemented
+        right = _as_predicate(other)
 
         return AndPredicate(left=left, right=right)
 
     def __rand__(self, other) -> "Predicate":
         """Return the 'rand' predicate."""
-        from predicate.and_predicate import AndPredicate
-
-        right = resolve_predicate(self)
-
-        match other:
-            case Predicate():
-                left = resolve_predicate(other)
-            case _ if callable(other):
-                from predicate.function_predicate import fn_p
-
-                left = fn_p(other)
-            case _:
-                return NotImplemented
-
-        return AndPredicate(left=left, right=right)
+        return self & other
 
     @overload
     def __or__(self, other: "Predicate") -> "Predicate": ...
@@ -75,42 +52,37 @@ class Predicate[T]:
         from predicate.or_predicate import OrPredicate
 
         left = resolve_predicate(self)
-
-        match other:
-            case Predicate():
-                right = resolve_predicate(other)
-            case _ if callable(other):
-                from predicate.function_predicate import fn_p
-
-                right = fn_p(other)
-            case _:
-                return NotImplemented
+        right = _as_predicate(other)
 
         return OrPredicate(left=left, right=right)
 
-    def __ror__(self, other) -> "Predicate":
+    def __ror__(self, other: Any) -> "Predicate":
         """Return the 'ror' predicate."""
         from predicate.or_predicate import OrPredicate
 
+        left = _as_predicate(other)
         right = resolve_predicate(self)
-
-        match other:
-            case Predicate():
-                left = resolve_predicate(other)
-            case _ if callable(other):
-                from predicate.function_predicate import fn_p
-
-                left = fn_p(other)
-            case _:
-                return NotImplemented
 
         return OrPredicate(left=left, right=right)
 
-    def __xor__(self, predicate: "Predicate") -> "Predicate":
+    @overload
+    def __xor__(self, other: "Predicate") -> "Predicate": ...
+
+    @overload
+    def __xor__(self, other: Callable[[T], bool]) -> "Predicate": ...
+
+    def __xor__(self, other: Any) -> "Predicate":
         """Return the 'xor' predicate."""
         from predicate.xor_predicate import XorPredicate
 
-        return XorPredicate(left=resolve_predicate(self), right=resolve_predicate(predicate))
+        left = resolve_predicate(self)
+        right = _as_predicate(other)
+
+        return XorPredicate(left=left, right=right)
+
+    def __rxor__(self, other) -> "Predicate":
+        """Return the 'rxor' predicate."""
+        return self ^ other
 
     def __invert__(self) -> "Predicate":
         """Return the 'negated' predicate."""
@@ -149,6 +121,18 @@ class Predicate[T]:
         """
         [item], _ = spy(iterable)
         yield 1 if self(item) else 0
+
+
+def _as_predicate(candidate: Any) -> Predicate:
+    match candidate:
+        case Predicate():
+            return resolve_predicate(candidate)
+        case _ if callable(candidate):
+            from predicate.function_predicate import fn_p
+
+            return fn_p(candidate)
+        case _:
+            return NotImplemented
 
 
 def repr_operand(predicate: Predicate, precedence: int) -> str:
