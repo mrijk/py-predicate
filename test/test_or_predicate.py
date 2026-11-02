@@ -1,5 +1,12 @@
-from predicate import ge_p, gt_p, is_none_p, is_not_none_p, le_p, lt_p
+from functools import partial
+from operator import le
+from typing import cast
+
+from helpers import is_or_p
+
+from predicate import ge_p, gt_p, is_none_p, is_not_none_p, is_predicate_p, le_p, lt_p
 from predicate.explain import explain
+from predicate.or_predicate import OrPredicate
 
 
 def test_or():
@@ -11,6 +18,28 @@ def test_or():
     assert not le_2_or_ge_4(3)
     assert le_2_or_ge_4(2)
     assert le_2_or_ge_4(4)
+
+
+def test_or_callable_right():
+    def ge_4(x):
+        return x >= 4
+
+    le_2 = le_p(2)
+
+    le_2_or_ge_4 = le_2 | ge_4
+
+    assert is_or_p(le_2_or_ge_4)
+    assert is_predicate_p(cast(OrPredicate, le_2_or_ge_4).right)
+
+
+def test_or_callable_left():
+    ge_4 = ge_p(4)
+    le_2 = partial(le, 2)
+
+    le_2_or_ge_4 = le_2 | ge_4
+
+    assert is_or_p(le_2_or_ge_4)
+    assert is_predicate_p(cast(OrPredicate, le_2_or_ge_4).left)
 
 
 def test_or_commutative():

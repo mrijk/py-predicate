@@ -5,7 +5,7 @@ from predicate.always_false_predicate import AlwaysFalsePredicate, always_false_
 from predicate.always_true_predicate import AlwaysTruePredicate, always_true_p
 from predicate.and_predicate import AndPredicate
 from predicate.eq_predicate import EqPredicate
-from predicate.fn_predicate import FnPredicate
+from predicate.function_predicate import FnPredicate
 from predicate.ge_predicate import GePredicate
 from predicate.gt_predicate import GtPredicate
 from predicate.implies import implies

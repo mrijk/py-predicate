@@ -1,6 +1,11 @@
+from functools import partial
+from operator import ge
+from typing import cast
+
 from helpers import is_and_p
 
-from predicate import ge_p, gt_p, le_p, lt_p
+from predicate import ge_p, gt_p, is_predicate_p, le_p, lt_p
+from predicate.and_predicate import AndPredicate
 from predicate.explain import explain
 
 
@@ -16,6 +21,28 @@ def test_and():
     assert not between_2_and_3(4)
     assert between_2_and_3(2)
     assert between_2_and_3(3)
+
+
+def test_and_callable_left():
+    def ge_2(x):
+        return x >= 2
+
+    le_3 = le_p(3)
+
+    between_2_and_3 = ge_2 & le_3
+
+    assert is_and_p(between_2_and_3)
+    assert is_predicate_p(cast(AndPredicate, between_2_and_3).left)
+
+
+def test_and_callable_right():
+    ge_2 = ge_p(2)
+    le_3 = partial(ge, 3)
+
+    between_2_and_3 = ge_2 & le_3
+
+    assert is_and_p(between_2_and_3)
+    assert is_predicate_p(cast(AndPredicate, between_2_and_3).right)
 
 
 def test_and_commutative():

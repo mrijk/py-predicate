@@ -15,7 +15,8 @@ from predicate import (
     is_subnormal_p,
     or_p,
 )
-from predicate.fn_predicate import _undefined, as_predicate, generate_inf
+from predicate.fn_predicate import generate_inf
+from predicate.function_predicate import _undefined, as_predicate
 from predicate.match_predicate import match_p
 from predicate.predicate import predicate_partial
 
