@@ -15,5 +15,5 @@ def test_regex_predicate():
 def test_regex_p_explain():
     predicate = regex_p("^foo.*bar$")
 
-    expected = {"result": False, "reason": "String foo didn't match patter ^foo.*bar$"}
+    expected = {"result": False, "reason": "String foo didn't match pattern ^foo.*bar$"}
     assert explain(predicate, "foo") == expected

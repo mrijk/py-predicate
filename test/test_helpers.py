@@ -1,6 +1,6 @@
 import pytest
 
-from predicate import is_int_p
+from predicate import exercise, is_int_p
 from predicate.helpers import first_false, join_with_or
 
 
@@ -24,3 +24,8 @@ def test_first_false():
 def test_first_false_none_false():
     assert first_false([1, 2], is_int_p) is None
     assert first_false([], is_int_p) is None
+
+
+@pytest.mark.xfail(reason="exercise generates iterable and predicate independently, so T isn't shared", strict=False)
+def test_exercise_first_false():
+    list(exercise(first_false))

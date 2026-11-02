@@ -7,6 +7,8 @@ from predicate import regex_p
 @pytest.mark.parametrize(
     "pattern",
     [
+        r"",
+        r".*",
         r"\d+",
         r"[a-z]+",
         r"foo|bar",

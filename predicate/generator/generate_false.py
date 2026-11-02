@@ -5,7 +5,7 @@ from collections.abc import Iterable, Iterator
 from datetime import datetime, timedelta
 from functools import singledispatch
 from inspect import Parameter, getmembers, isfunction, signature
-from itertools import chain, cycle, repeat
+from itertools import chain, cycle, islice, repeat
 from types import UnionType
 from typing import Any, Final, Hashable, get_args
 from uuid import UUID
@@ -75,9 +75,7 @@ from predicate.juxt_predicate import JuxtPredicate
 from predicate.le_predicate import LePredicate
 from predicate.list_of_predicate import ListOfPredicate, is_list_of_p
 from predicate.lt_predicate import LtPredicate
-from predicate.match_predicate import (
-    MatchPredicate,
-)
+from predicate.match_predicate import MatchPredicate
 from predicate.ne_predicate import NePredicate, ne_p
 from predicate.not_in_predicate import NotInPredicate
 from predicate.not_predicate import NotPredicate
@@ -783,7 +781,10 @@ def generate_reduce_p(predicate: ReducePredicate) -> Iterator:
 
 @generate_false.register
 def generate_regex(predicate: RegexPredicate) -> Iterator:
-    yield from (s for s in random_strings() if not predicate(s))
+    candidates = (s for s in islice(random_strings(), 100) if not predicate(s))
+    yield from candidates
+
+    yield from (s for s in random_anys() if not predicate(s))
 
 
 @generate_false.register
