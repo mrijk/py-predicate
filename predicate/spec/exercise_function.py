@@ -65,7 +65,7 @@ def exercise_function(f: Callable, spec: Spec | None, n: int) -> Iterator[tuple]
         except Exception as exc:
             yield tuple(value.values()), check_exception(spec, value, exc)
             continue
-        verify_result(spec, return_p, value, result)
+        verify_result(spec, return_p, value, result, sig)
         if item_p is not None and items is not None:
             verify_items(item_p, value, items)
             result = items
@@ -91,7 +91,7 @@ async def async_exercise_function(f: Callable, spec: Spec | None, n: int) -> Asy
         except Exception as exc:
             yield tuple(value.values()), check_exception(spec, value, exc)
             continue
-        verify_result(spec, return_p, value, result)
+        verify_result(spec, return_p, value, result, sig)
         if item_p is not None and items is not None:
             verify_items(item_p, value, items)
             result = items

@@ -576,9 +576,71 @@ def generate_values(spec: Spec, n: int) -> tuple:
     return return_p, values
 
 
-def verify_result(spec: Spec, return_p: Predicate, value: dict, result: Any) -> None:
+def _has_type_var(annotation: Any) -> bool:
+    return isinstance(annotation, TypeVar) or any(_has_type_var(arg) for arg in get_args(annotation))
+
+
+def _bound_types(annotation: Any, value: Any) -> Iterator[tuple[TypeVar, type]]:
+    """Yield (T, type) for each place a type variable occurs in an argument: T, list[T], dict[K, V], tuple[T, ...]."""
+    origin = get_origin(annotation)
+    args = get_args(annotation)
+    if isinstance(annotation, TypeVar):
+        yield annotation, type(value)
+    elif origin in (list, set, frozenset) and isinstance(value, origin) and args:
+        yield from (bound for item in value for bound in _bound_types(args[0], item))
+    elif origin is dict and isinstance(value, dict) and len(args) == 2:
+        yield from (bound for k, v in value.items() for bound in (*_bound_types(args[0], k), *_bound_types(args[1], v)))
+    elif origin is tuple and isinstance(value, tuple) and args:
+        item_types = [args[0]] * len(value) if args[-1] is Ellipsis else args
+        yield from (bound for t, item in zip(item_types, value, strict=False) for bound in _bound_types(t, item))
+
+
+def _conforms(annotation: Any, value: Any, bindings: dict[TypeVar, tuple[type, ...]]) -> bool:
+    """Check value against a return annotation, where a bound type variable means an instance of its bound types."""
+    origin = get_origin(annotation)
+    args = get_args(annotation)
+    if isinstance(annotation, TypeVar):
+        return annotation not in bindings or isinstance(value, bindings[annotation])
+    if not _has_type_var(annotation):
+        return annotation_to_predicate(annotation)(value)
+    if origin in _union_origins:
+        return any(_conforms(arg, value, bindings) for arg in args)
+    if origin in (list, set, frozenset) and isinstance(value, origin):
+        return all(_conforms(args[0], item, bindings) for item in value)
+    if origin is dict and isinstance(value, dict) and len(args) == 2:
+        return all(_conforms(args[0], k, bindings) and _conforms(args[1], v, bindings) for k, v in value.items())
+    if origin is tuple and isinstance(value, tuple) and args:
+        item_types = [args[0]] * len(value) if args[-1] is Ellipsis else args
+        return all(_conforms(t, item, bindings) for t, item in zip(item_types, value, strict=False))
+    return True  # ponytail: other generics (Callable[[T], U], Iterator[T], ...) can't be bound at runtime
+
+
+def type_var_failure(sig: Signature, arguments: dict, result: Any) -> str | None:
+    """Return why result isn't an instance of the types the arguments bind the return's type variables to (#258).
+
+    No evidence (an empty container, T only in the return) means no check. Arguments needn't share one type.
+    """
+    if sig.return_annotation is sig.empty or not _has_type_var(sig.return_annotation):
+        return None
+    bound: dict[TypeVar, set[type]] = {}
+    for name, param in sig.parameters.items():
+        if name in arguments:
+            values = arguments[name] if param.kind == Parameter.VAR_POSITIONAL else [arguments[name]]
+            for type_var, klass in (bound for v in values for bound in _bound_types(param.annotation, v)):
+                bound.setdefault(type_var, set()).add(klass)
+    bindings = {type_var: tuple(classes) for type_var, classes in bound.items()}
+    if _conforms(sig.return_annotation, result, bindings):
+        return None
+    names = ", ".join(f"{tv.__name__}={'|'.join(c.__name__ for c in cs)}" for tv, cs in bindings.items())
+    return f"{result!r} doesn't match the type variables bound by the arguments ({names})"
+
+
+def verify_result(spec: Spec, return_p: Predicate, value: dict, result: Any, sig: Signature | None = None) -> None:
     if not return_p(result):
         raise SpecViolationError(f"Not conform spec: {explain(return_p, result)}")
+
+    if sig is not None and (reason := type_var_failure(sig, value, result)):
+        raise SpecViolationError(f"Not conform spec: {reason}")
 
     if fn := spec.get("fn"):
         if not fn(**value, **{ret_name(spec): result}):

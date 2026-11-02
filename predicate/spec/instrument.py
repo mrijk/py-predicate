@@ -2,7 +2,7 @@ import os
 import sys
 from fnmatch import fnmatch
 from functools import cache, wraps
-from inspect import getmembers, isclass, isfunction, signature, unwrap
+from inspect import Signature, getmembers, isclass, isfunction, signature, unwrap
 from types import ModuleType
 from typing import Any, Callable, TypeAlias
 
@@ -16,8 +16,11 @@ from predicate.spec.exercise_helpers import (
     check_ret_name,
     get_return_predicate,
     param_predicate,
-    resolved_signature,
     ret_name,
+    type_var_failure,
+)
+from predicate.spec.exercise_helpers import (
+    resolved_signature as resolve_signature,
 )
 from predicate.spec.spec import InvalidSpecError, Spec, SpecViolationError
 
@@ -42,7 +45,7 @@ def is_instrumentation_enabled() -> bool:
 
 
 def enrich_spec(func: Callable, spec: Spec) -> Spec:
-    sig = resolved_signature(func)  # unresolvable annotations become Any, with an UnresolvedAnnotationWarning
+    sig = resolve_signature(func)  # unresolvable annotations become Any, with an UnresolvedAnnotationWarning
 
     snapshot = spec.get("snapshot", {})
     if unknown := first(snapshot.keys() - sig.parameters.keys(), False):
@@ -106,6 +109,12 @@ def _check_return_value(spec: Spec, func_name: str, result: Any) -> str | None:
     if return_p := spec.get("ret"):
         if reason := _get_reason(return_p, value=result):
             return f"Return predicate for function {func_name} failed. Reason: {reason}"
+    return None
+
+
+def _check_type_vars(sig: Signature, func_name: str, arguments: dict, result: Any) -> str | None:
+    if reason := type_var_failure(sig, arguments, result):
+        return f"Type variable binding for function {func_name} failed. Reason: {reason}"
     return None
 
 
@@ -206,6 +215,7 @@ def instrument_function(func: Callable, spec: Spec, on_error: OnError = _default
     # resolved once, on first call, so forward references (e.g. the enclosing class) exist by then
     resolved_signature = cache(lambda: signature(func))
     resolved_spec = cache(lambda: enrich_spec(func, spec))
+    typed_signature = cache(lambda: resolve_signature(func))
 
     def _before(args: tuple, kwargs: dict) -> tuple[dict, dict]:
         bound = resolved_signature().bind(*args, **kwargs)
@@ -226,6 +236,7 @@ def instrument_function(func: Callable, spec: Spec, on_error: OnError = _default
         arguments, old = context
 
         _report(on_error, _check_return_value(resolved_spec(), func_name, result))
+        _report(on_error, _check_type_vars(typed_signature(), func_name, arguments, result))
         _report(on_error, _check_constraints(resolved_spec(), func_name, arguments, result, old))
         return result
 
