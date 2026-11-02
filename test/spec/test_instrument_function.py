@@ -742,3 +742,22 @@ def test_instrument_partial_leaves_module_function():
     instrument(partial(_add, 1))
 
     assert sys.modules[__name__]._add is _add
+
+
+def test_postcondition_receives_snapshot_of_original_argument():
+    @instrument(
+        {
+            "args": {},
+            "snapshot": {"items": list},
+            "fn": lambda items, ret, old: len(items) == len(old["items"]) + 1,
+        }
+    )
+    def append_item(items: list[int]) -> None:
+        items.append(42)
+
+    items = [1, 2]
+
+    result = append_item(items)
+
+    assert result is None
+    assert items == [1, 2, 42]
