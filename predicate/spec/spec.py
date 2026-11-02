@@ -1,4 +1,4 @@
-from typing import Callable, NotRequired, TypedDict
+from typing import Any, Callable, NotRequired, TypedDict
 
 from predicate.predicate import Predicate
 
@@ -25,5 +25,6 @@ Spec = TypedDict(
         "fn": NotRequired[Callable[..., bool]],
         "fn_p": NotRequired[Callable[..., Predicate]],
         "raises": NotRequired[type[Exception] | tuple[type[Exception], ...]],
+        "snapshot": NotRequired[dict[str, Callable[[Any], Any]]],
     },
 )

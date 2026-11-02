@@ -4,9 +4,9 @@ from fnmatch import fnmatch
 from functools import cache, wraps
 from inspect import getmembers, isclass, isfunction, signature, unwrap
 from types import ModuleType
-from typing import Any, Callable
+from typing import Any, Callable, TypeAlias
 
-from more_itertools import consume, first_true, side_effect
+from more_itertools import consume, first, first_true, side_effect
 
 from predicate.explain import explain
 from predicate.is_async_predicate import is_async_p
@@ -19,7 +19,9 @@ from predicate.spec.exercise_helpers import (
     resolved_signature,
     ret_name,
 )
-from predicate.spec.spec import Spec, SpecViolationError
+from predicate.spec.spec import InvalidSpecError, Spec, SpecViolationError
+
+BeforeContext: TypeAlias = tuple[dict[str, Any], dict[str, Any]]
 
 
 def _enabled_from_environment(value: str | None) -> bool:
@@ -41,6 +43,13 @@ def is_instrumentation_enabled() -> bool:
 
 def enrich_spec(func: Callable, spec: Spec) -> Spec:
     sig = resolved_signature(func)  # unresolvable annotations become Any, with an UnresolvedAnnotationWarning
+
+    snapshot = spec.get("snapshot", {})
+    if unknown := first(snapshot.keys() - sig.parameters.keys(), False):
+        raise InvalidSpecError(f"Snapshot parameter '{unknown}' not in function signature")
+
+    if snapshot and "old" in sig.parameters:
+        raise InvalidSpecError("Parameter 'old' is reserved when snapshots are configured")
 
     check_ret_name(sig, spec)
 
@@ -115,15 +124,24 @@ def _check_exception(spec: Spec, func_name: str, exc: Exception) -> str | None:
     return None
 
 
-def _check_constraints(spec: Spec, func_name: str, arguments: dict, result: Any) -> str | None:
+def _check_constraints(spec: Spec, func_name: str, arguments: dict, result: Any, old: dict) -> str | None:
     if fn := spec.get("fn"):
-        name = ret_name(spec)
-        if not fn(**arguments, **{name: result}):
+        kwargs = {**arguments, ret_name(spec): result}
+
+        if spec.get("snapshot"):
+            kwargs["old"] = old
+
+        if not fn(**kwargs):
             args_str = ", ".join(f"{k}={v!r}" for k, v in arguments.items())
-            return f"fn constraint for function {func_name} failed. Arguments: {args_str}, {name}={result!r}"
+            return f"fn constraint for function {func_name} failed. Arguments: {args_str}, {ret_name(spec)}={result!r}"
 
     if fn_p := spec.get("fn_p"):
-        p = fn_p(**arguments)
+        kwargs = dict(arguments)
+
+        if spec.get("snapshot"):
+            kwargs["old"] = old
+
+        p = fn_p(**kwargs)
         if reason := _get_reason(p, value=result):
             return f"fn_p constraint for function {func_name} failed. Reason: {reason}"
 
@@ -145,9 +163,9 @@ def _report(on_error: OnError, error: str | None) -> None:
 
 def _make_wrapper(
     func: Callable,
-    before: Callable[[tuple, dict], dict],
+    before: Callable[..., BeforeContext],
     on_exception: Callable[[Exception], None],
-    after: Callable[[dict, Any], Any],
+    after: Callable[[BeforeContext, Any], Any],
 ) -> Callable:
     if is_async_p(func):
 
@@ -189,18 +207,26 @@ def instrument_function(func: Callable, spec: Spec, on_error: OnError = _default
     resolved_signature = cache(lambda: signature(func))
     resolved_spec = cache(lambda: enrich_spec(func, spec))
 
-    def _before(args: tuple, kwargs: dict) -> dict:
+    def _before(args: tuple, kwargs: dict) -> tuple[dict, dict]:
         bound = resolved_signature().bind(*args, **kwargs)
         bound.apply_defaults()
-        _report(on_error, _check_args(resolved_spec(), func_name, bound.arguments))
-        return bound.arguments
+
+        arguments = bound.arguments
+
+        _report(on_error, _check_args(resolved_spec(), func_name, arguments))
+
+        old = {name: capture(arguments[name]) for name, capture in resolved_spec().get("snapshot", {}).items()}
+
+        return arguments, old
 
     def _on_exception(exc: Exception) -> None:
         _report(on_error, _check_exception(resolved_spec(), func_name, exc))
 
-    def _after(arguments: dict, result: Any) -> Any:
+    def _after(context: tuple[dict, dict], result: Any) -> Any:
+        arguments, old = context
+
         _report(on_error, _check_return_value(resolved_spec(), func_name, result))
-        _report(on_error, _check_constraints(resolved_spec(), func_name, arguments, result))
+        _report(on_error, _check_constraints(resolved_spec(), func_name, arguments, result, old))
         return result
 
     wrapped = _make_wrapper(func, _before, _on_exception, _after)
