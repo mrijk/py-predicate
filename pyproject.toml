@@ -93,6 +93,10 @@ target-version = "py312"
 [tool.ruff.lint.mccabe]
 max-complexity = 10
 
+[tool.complexipy]
+max-complexity-allowed = 20
+exclude = ["tests/**", "benchmarks/**"]
+
 [tool.ruff.lint.flake8-tidy-imports]
 ban-relative-imports = "all"
 

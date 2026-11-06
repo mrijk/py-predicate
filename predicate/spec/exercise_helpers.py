@@ -376,7 +376,7 @@ def _unwrap_alias(annotation: Any) -> Any:
             return annotation
 
 
-def annotation_to_predicate(annotation: Any) -> Predicate:  # noqa: C901
+def annotation_to_predicate(annotation: Any) -> Predicate:  # noqa: C901 # complexipy: ignore
     annotation = _unwrap_alias(annotation)
     if get_origin(annotation) is Annotated:
         # The type plus its annotated-types constraints, e.g. Annotated[int, Gt(0)] -> is_int_p & gt_p(0) (#384)
@@ -595,7 +595,7 @@ def _bound_types(annotation: Any, value: Any) -> Iterator[tuple[TypeVar, type]]:
         yield from (bound for t, item in zip(item_types, value, strict=False) for bound in _bound_types(t, item))
 
 
-def _conforms(annotation: Any, value: Any, bindings: dict[TypeVar, tuple[type, ...]]) -> bool:
+def _conforms(annotation: Any, value: Any, bindings: dict[TypeVar, tuple[type, ...]]) -> bool:  # complexipy: ignore
     """Check value against a return annotation, where a bound type variable means an instance of its bound types."""
     origin = get_origin(annotation)
     args = get_args(annotation)
