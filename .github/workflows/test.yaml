@@ -34,7 +34,7 @@ jobs:
       - name: Mypy
         run: mypy .
       - name: Complexipy (Cognitive Complexity)
-        run: complexipy .
+        run: complexipy . --failed
       - name: Test with pytest
         run: pytest --cov-branch --cov=predicate --cov-report=xml --ignore=tests --ignore=benchmarks
       - name: Upload coverage to Codecov
