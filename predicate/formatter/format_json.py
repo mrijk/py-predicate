@@ -70,131 +70,131 @@ def list_to_json(predicates: list[Predicate]) -> list[dict[str, Any]]:
 
 def to_json(predicate: Predicate) -> dict[str, Any]:  # noqa: C901
     """Format predicate as json."""
+    return dict([_to_value(predicate)])
 
-    def to_value(predicate) -> tuple[str, Any]:  # noqa: C901
-        match predicate:
-            case CompiledPredicate(predicate=inner):
-                return to_value(inner)
-            case AllPredicate(all_predicate):
-                return "all", {"predicate": to_json(all_predicate)}
-            case AlwaysFalsePredicate():
-                return "false", False
-            case AlwaysTruePredicate():
-                return "true", True
-            case AndPredicate(left, right):
-                return "and", {"left": to_json(left), "right": to_json(right)}
-            case AnyPredicate(any_predicate):
-                return "any", {"predicate": to_json(any_predicate)}
-            case CountPredicate(predicate, length_p):
-                return "count", {"predicate": to_json(predicate), "length_p": to_json(length_p)}
-            case DictOfPredicate(key_value_predicates):
-                return "dict_of", {"kv": [[to_json(k), to_json(v)] for k, v in key_value_predicates]}
-            case FrozenDictOfPredicate(key_value_predicates):
-                return "frozendict_of", {"kv": [[to_json(k), to_json(v)] for k, v in key_value_predicates]}
-            case EqPredicate(v):
-                return "eq", {"v": v}
-            case ExactlyPredicate(n, predicate):
-                return "exactly", {"n": n, "predicate": to_json(predicate)}
-            case ReducePredicate(fn, initial):
-                name = getattr(fn, "__name__", str(fn))
-                return "reduce", {"fn": name, "initial": initial}
-            case FnPredicate(predicate_fn):
-                name = getattr(predicate_fn, "__name__", str(predicate_fn))
-                fn_info: dict[str, Any] = {"name": name}
-                fn_info.update(get_fn_source(predicate_fn))
-                return "fn", fn_info
-            case HasKeyPredicate(key_p):
-                return "has_key", {"key_p": to_json(key_p)}
-            case HasLengthPredicate(length_p):
-                return "has_length", {"length_p": to_json(length_p)}
-            case HasPathPredicate(path):
-                return "has_path", {"path": [to_json(p) for p in path]}
-            case ImpliesPredicate(predicate):
-                return "implies", {"predicate": to_json(predicate)}
-            case InPredicate(v):
-                return "in", {"v": list(cast(Iterable, v))}
-            case IntersectsPredicate(v):
-                return "intersects", {"v": list(v)}
-            case IsClosePredicate(target, rel_tol, abs_tol):
-                return "is_close", {"target": target, "rel_tol": rel_tol, "abs_tol": abs_tol}
-            case IsFalsyPredicate():
-                return "is_falsy", None
-            case IsInstancePredicate(instance_klass):
-                return "is_instance", {"klass": [k.__name__ for k in instance_klass]}
-            case IsNonePredicate():
-                return "is_none", None
-            case IsNotNonePredicate():
-                return "is_not_none", None
-            case IsRealSubsetPredicate(v):
-                return "is_real_subset", {"v": list(v)}
-            case IsRealSupersetPredicate(v):
-                return "is_real_superset", {"v": list(v)}
-            case IsSamePredicate(predicate):
-                return "is_same", {"predicate": to_json(predicate)}
-            case IsSubclassPredicate(class_or_tuple):
-                match class_or_tuple:
-                    case tuple(klasses):
-                        names = [k.__name__ for k in klasses]
-                    case UnionType() as union_type:
-                        names = [k.__name__ for k in get_args(union_type)]
-                    case klass:
-                        names = [klass.__name__]
-                return "is_subclass", {"klass": names}
-            case IsSubsetPredicate(v):
-                return "is_subset", {"v": list(v)}
-            case IsSupersetPredicate(v):
-                return "is_superset", {"v": list(v)}
-            case IsTruthyPredicate():
-                return "is_truthy", None
-            case JuxtPredicate(predicates=predicates, evaluate=evaluate):
-                return "juxt", {"predicates": list_to_json(predicates), "evaluate": to_json(evaluate)}
-            case GeLePredicate(lower, upper):
-                return "ge_le", {"lower": lower, "upper": upper}
-            case GeLtPredicate(lower, upper):
-                return "ge_lt", {"lower": lower, "upper": upper}
-            case GePredicate(v):
-                return "ge", {"v": v}
-            case GtLePredicate(lower, upper):
-                return "gt_le", {"lower": lower, "upper": upper}
-            case GtLtPredicate(lower, upper):
-                return "gt_lt", {"lower": lower, "upper": upper}
-            case GtPredicate(v):
-                return "gt", {"v": v}
-            case LePredicate(v):
-                return "le", {"v": v}
-            case ListOfPredicate(predicate):
-                return "list_of", {"predicate": to_json(predicate)}
-            case LtPredicate(v):
-                return "lt", {"v": v}
-            case MatchPredicate(predicates, full_match):
-                return "match", {"predicates": list_to_json(predicates), "full_match": full_match}
-            case NamedPredicate(name):
-                return "variable", name
-            case NePredicate(v):
-                return "ne", {"v": v}
-            case NotInPredicate(v):
-                return "not_in", {"v": list(cast(Iterable, v))}
-            case NotPredicate(not_predicate):
-                return "not", {"predicate": to_json(not_predicate)}
-            case OptionalPredicate(predicate):
-                return "optional", {"predicate": to_json(predicate)}
-            case OrPredicate(left, right):
-                return "or", {"left": to_json(left), "right": to_json(right)}
-            case RegexPredicate() as r:
-                return "regex", {"pattern": r.pattern}
-            case SetOfPredicate(predicate):
-                return "set_of", {"predicate": to_json(predicate)}
-            case FrozenSetOfPredicate(predicate):
-                return "frozenset_of", {"predicate": to_json(predicate)}
-            case StructPredicate(required, optional):
-                return "struct_p", {"required": dict_to_json(required), "optional": dict_to_json(optional)}
-            case TeePredicate():
-                return "tee", None
-            case TupleOfPredicate(predicates):
-                return "tuple_of", {"predicates": list_to_json(predicates)}
-            case XorPredicate(left, right):
-                return "xor", {"left": to_json(left), "right": to_json(right)}
-            case _:
-                return "unknown", {}
 
-    return dict([to_value(predicate)])
+def _to_value(predicate) -> tuple[str, Any]:  # noqa: C901
+    match predicate:
+        case CompiledPredicate(predicate=inner):
+            return _to_value(inner)
+        case AllPredicate(all_predicate):
+            return "all", {"predicate": to_json(all_predicate)}
+        case AlwaysFalsePredicate():
+            return "false", False
+        case AlwaysTruePredicate():
+            return "true", True
+        case AndPredicate(left, right):
+            return "and", {"left": to_json(left), "right": to_json(right)}
+        case AnyPredicate(any_predicate):
+            return "any", {"predicate": to_json(any_predicate)}
+        case CountPredicate(predicate, length_p):
+            return "count", {"predicate": to_json(predicate), "length_p": to_json(length_p)}
+        case DictOfPredicate(key_value_predicates):
+            return "dict_of", {"kv": [[to_json(k), to_json(v)] for k, v in key_value_predicates]}
+        case FrozenDictOfPredicate(key_value_predicates):
+            return "frozendict_of", {"kv": [[to_json(k), to_json(v)] for k, v in key_value_predicates]}
+        case EqPredicate(v):
+            return "eq", {"v": v}
+        case ExactlyPredicate(n, predicate):
+            return "exactly", {"n": n, "predicate": to_json(predicate)}
+        case ReducePredicate(fn, initial):
+            name = getattr(fn, "__name__", str(fn))
+            return "reduce", {"fn": name, "initial": initial}
+        case FnPredicate(predicate_fn):
+            name = getattr(predicate_fn, "__name__", str(predicate_fn))
+            fn_info: dict[str, Any] = {"name": name}
+            fn_info.update(get_fn_source(predicate_fn))
+            return "fn", fn_info
+        case HasKeyPredicate(key_p):
+            return "has_key", {"key_p": to_json(key_p)}
+        case HasLengthPredicate(length_p):
+            return "has_length", {"length_p": to_json(length_p)}
+        case HasPathPredicate(path):
+            return "has_path", {"path": [to_json(p) for p in path]}
+        case ImpliesPredicate(predicate):
+            return "implies", {"predicate": to_json(predicate)}
+        case InPredicate(v):
+            return "in", {"v": list(cast(Iterable, v))}
+        case IntersectsPredicate(v):
+            return "intersects", {"v": list(v)}
+        case IsClosePredicate(target, rel_tol, abs_tol):
+            return "is_close", {"target": target, "rel_tol": rel_tol, "abs_tol": abs_tol}
+        case IsFalsyPredicate():
+            return "is_falsy", None
+        case IsInstancePredicate(instance_klass):
+            return "is_instance", {"klass": [k.__name__ for k in instance_klass]}
+        case IsNonePredicate():
+            return "is_none", None
+        case IsNotNonePredicate():
+            return "is_not_none", None
+        case IsRealSubsetPredicate(v):
+            return "is_real_subset", {"v": list(v)}
+        case IsRealSupersetPredicate(v):
+            return "is_real_superset", {"v": list(v)}
+        case IsSamePredicate(predicate):
+            return "is_same", {"predicate": to_json(predicate)}
+        case IsSubclassPredicate(class_or_tuple):
+            match class_or_tuple:
+                case tuple(klasses):
+                    names = [k.__name__ for k in klasses]
+                case UnionType() as union_type:
+                    names = [k.__name__ for k in get_args(union_type)]
+                case klass:
+                    names = [klass.__name__]
+            return "is_subclass", {"klass": names}
+        case IsSubsetPredicate(v):
+            return "is_subset", {"v": list(v)}
+        case IsSupersetPredicate(v):
+            return "is_superset", {"v": list(v)}
+        case IsTruthyPredicate():
+            return "is_truthy", None
+        case JuxtPredicate(predicates=predicates, evaluate=evaluate):
+            return "juxt", {"predicates": list_to_json(predicates), "evaluate": to_json(evaluate)}
+        case GeLePredicate(lower, upper):
+            return "ge_le", {"lower": lower, "upper": upper}
+        case GeLtPredicate(lower, upper):
+            return "ge_lt", {"lower": lower, "upper": upper}
+        case GePredicate(v):
+            return "ge", {"v": v}
+        case GtLePredicate(lower, upper):
+            return "gt_le", {"lower": lower, "upper": upper}
+        case GtLtPredicate(lower, upper):
+            return "gt_lt", {"lower": lower, "upper": upper}
+        case GtPredicate(v):
+            return "gt", {"v": v}
+        case LePredicate(v):
+            return "le", {"v": v}
+        case ListOfPredicate(predicate):
+            return "list_of", {"predicate": to_json(predicate)}
+        case LtPredicate(v):
+            return "lt", {"v": v}
+        case MatchPredicate(predicates, full_match):
+            return "match", {"predicates": list_to_json(predicates), "full_match": full_match}
+        case NamedPredicate(name):
+            return "variable", name
+        case NePredicate(v):
+            return "ne", {"v": v}
+        case NotInPredicate(v):
+            return "not_in", {"v": list(cast(Iterable, v))}
+        case NotPredicate(not_predicate):
+            return "not", {"predicate": to_json(not_predicate)}
+        case OptionalPredicate(predicate):
+            return "optional", {"predicate": to_json(predicate)}
+        case OrPredicate(left, right):
+            return "or", {"left": to_json(left), "right": to_json(right)}
+        case RegexPredicate() as r:
+            return "regex", {"pattern": r.pattern}
+        case SetOfPredicate(predicate):
+            return "set_of", {"predicate": to_json(predicate)}
+        case FrozenSetOfPredicate(predicate):
+            return "frozenset_of", {"predicate": to_json(predicate)}
+        case StructPredicate(required, optional):
+            return "struct_p", {"required": dict_to_json(required), "optional": dict_to_json(optional)}
+        case TeePredicate():
+            return "tee", None
+        case TupleOfPredicate(predicates):
+            return "tuple_of", {"predicates": list_to_json(predicates)}
+        case XorPredicate(left, right):
+            return "xor", {"left": to_json(left), "right": to_json(right)}
+        case _:
+            return "unknown", {}

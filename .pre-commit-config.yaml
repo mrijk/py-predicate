@@ -4,13 +4,12 @@ repos:
     hooks:
       - id: trailing-whitespace
       - id: end-of-file-fixer
-#      - id: check-docstring-first
       - id: check-json
       - id: check-yaml
       - id: debug-statements
       - id: detect-private-key
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.17.1
+    rev: v0.17.3
     hooks:
       - id: ruff-format
       - id: ruff
@@ -22,3 +21,8 @@ repos:
       - id: python-use-type-annotations
       - id: python-check-mock-methods
       - id: rst-backticks
+  - repo: https://github.com/rohaquinlop/complexipy-pre-commit
+    rev: v8.3.0
+    hooks:
+      - id: complexipy
+        exclude: ^test/

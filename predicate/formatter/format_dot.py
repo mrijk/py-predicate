@@ -95,7 +95,7 @@ def to_dot(predicate: Predicate, predicate_string: str | None = None, show_optim
     return dot
 
 
-def render(dot: Digraph, predicate: Predicate, node_nr: count) -> None:  # noqa: C901
+def render(dot: Digraph, predicate: Predicate, node_nr: count) -> None:  # noqa: C901 # complexipy: ignore
     node_predicate_mapping: dict[str, Predicate] = {}
 
     def _add_node(name: str, *, label: str, predicate: Predicate | None) -> str:
