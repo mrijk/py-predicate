@@ -25,4 +25,3 @@ repos:
     rev: v8.3.0
     hooks:
       - id: complexipy
-        exclude: ^test/
