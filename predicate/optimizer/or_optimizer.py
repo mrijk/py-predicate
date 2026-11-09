@@ -22,7 +22,7 @@ from predicate.set_predicates import IntersectsPredicate
 
 def optimize_or_predicate[T](predicate: OrPredicate[T]) -> MaybeOptimized[T]:  # noqa: C901
     from predicate.negate import negate
-    from predicate.optimizer.predicate_optimizer import optimizations, optimize
+    from predicate.optimizer.predicate_optimizer import optimize
 
     match left := optimize(predicate.left), right := optimize(predicate.right):
         case _, AlwaysTruePredicate():
@@ -88,15 +88,7 @@ def optimize_or_predicate[T](predicate: OrPredicate[T]) -> MaybeOptimized[T]:  #
 
         # recursive & optimizations
         case OrPredicate(or_left, or_right), _:
-            match optimizations(or_left | right):
-                case Optimized(optimized):
-                    return Optimized(predicate=optimize(optimized | or_right))
-                case _:
-                    match optimizations(or_right | right):
-                        case Optimized(optimized):
-                            return Optimized(optimize(optimized | or_left))
-                        case _:
-                            return NotOptimized()
+            return _match_recursive_or(or_left=or_left, or_right=or_right, right=right)
         case _, OrPredicate():
             return optimize_or_predicate(OrPredicate(right, left))
 
@@ -136,3 +128,19 @@ def optimize_or_predicate[T](predicate: OrPredicate[T]) -> MaybeOptimized[T]:  #
             return Optimized(left)
 
     return Optimized(left | right) if (left != predicate.left or right != predicate.right) else NotOptimized()
+
+
+def _match_recursive_or[T](or_left: Predicate[T], or_right: Predicate[T], right: Predicate[T]) -> MaybeOptimized[T]:
+    from predicate.optimizer.predicate_optimizer import optimizations, optimize
+
+    match optimizations(or_left | right):
+        case Optimized(optimized):
+            from predicate import optimize
+
+            return Optimized(predicate=optimize(optimized | or_right))
+        case _:
+            match optimizations(or_right | right):
+                case Optimized(optimized):
+                    return Optimized(optimize(optimized | or_left))
+                case _:
+                    return NotOptimized()

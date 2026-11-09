@@ -1,6 +1,6 @@
 from collections.abc import Mapping
 from dataclasses import dataclass
-from inspect import Parameter, signature
+from inspect import Parameter, Signature, signature
 from types import NoneType, UnionType
 from typing import Any, Callable, Union, get_args, get_origin, override
 
@@ -47,6 +47,45 @@ def ordered(parameters: Mapping[str, Parameter]) -> list[tuple[str, Parameter]]:
     )
 
 
+def _compare_signatures(f_sig: Signature, g_sig: Signature) -> str | None:
+    # Check return type is covariant
+    f_return = f_sig.return_annotation
+    g_return = g_sig.return_annotation
+    if not is_subtype(g_return, f_return):
+        return f"Return type {g_return} is not a subtype of {f_return}"
+
+    # Check parameters
+    f_parameters = f_sig.parameters
+    g_parameters = remove_default_args(f_parameters, g_sig.parameters)
+
+    # Leave out default parameters in g if they are not part of f
+
+    if len(f_parameters) != len(g_parameters):
+        return f"Expected {len(f_parameters)} parameter(s), got {len(g_parameters)}"
+
+    for f_param, g_param in zip(ordered(f_parameters), ordered(g_parameters), strict=False):
+        f_param_name, f_param_annotation = f_param
+        g_param_name, g_param_annotation = g_param
+        # Callers of f can't pass a positional-only parameter by name, so its name doesn't matter
+        if f_param_annotation.kind != Parameter.POSITIONAL_ONLY and f_param_name != g_param_name:
+            return f"Expected parameter '{f_param_name}', got '{g_param_name}'"
+        # Callers of f may pass this parameter by position or by name, so g must accept both
+        f_kind, g_kind = f_param_annotation.kind, g_param_annotation.kind
+        if f_kind == Parameter.POSITIONAL_OR_KEYWORD and g_kind != Parameter.POSITIONAL_OR_KEYWORD:
+            return f"Parameter '{g_param_name}' is {g_kind.description}, expected {f_kind.description}"
+        # Callers of f may leave out a parameter with a default, so g needs a default too
+        if f_param_annotation.default is not Parameter.empty and g_param_annotation.default is Parameter.empty:
+            return f"Parameter '{g_param_name}' has no default value"
+        # Parameter types are contravariant
+        if not is_subtype(f_param_annotation.annotation, g_param_annotation.annotation):
+            return (
+                f"Parameter '{g_param_name}' has type {g_param_annotation.annotation}, "
+                f"expected {f_param_annotation.annotation}"
+            )
+
+    return None
+
+
 @dataclass
 class SameSignaturePredicate[T](Predicate[T]):
     """A predicate class that models the 'same signature as predicate."""
@@ -68,42 +107,7 @@ class SameSignaturePredicate[T](Predicate[T]):
             # Some builtins, like max, have no signature that can be inspected
             return f"{function} has no signature"
 
-        # Check return type is covariant
-        f_return = f_sig.return_annotation
-        g_return = g_sig.return_annotation
-        if not is_subtype(g_return, f_return):
-            return f"Return type {g_return} is not a subtype of {f_return}"
-
-        # Check parameters
-        f_parameters = f_sig.parameters
-        g_parameters = remove_default_args(f_parameters, g_sig.parameters)
-
-        # Leave out default parameters in g if they are not part of f
-
-        if len(f_parameters) != len(g_parameters):
-            return f"Expected {len(f_parameters)} parameter(s), got {len(g_parameters)}"
-
-        for f_param, g_param in zip(ordered(f_parameters), ordered(g_parameters), strict=False):
-            f_param_name, f_param_annotation = f_param
-            g_param_name, g_param_annotation = g_param
-            # Callers of f can't pass a positional-only parameter by name, so its name doesn't matter
-            if f_param_annotation.kind != Parameter.POSITIONAL_ONLY and f_param_name != g_param_name:
-                return f"Expected parameter '{f_param_name}', got '{g_param_name}'"
-            # Callers of f may pass this parameter by position or by name, so g must accept both
-            f_kind, g_kind = f_param_annotation.kind, g_param_annotation.kind
-            if f_kind == Parameter.POSITIONAL_OR_KEYWORD and g_kind != Parameter.POSITIONAL_OR_KEYWORD:
-                return f"Parameter '{g_param_name}' is {g_kind.description}, expected {f_kind.description}"
-            # Callers of f may leave out a parameter with a default, so g needs a default too
-            if f_param_annotation.default is not Parameter.empty and g_param_annotation.default is Parameter.empty:
-                return f"Parameter '{g_param_name}' has no default value"
-            # Parameter types are contravariant
-            if not is_subtype(f_param_annotation.annotation, g_param_annotation.annotation):
-                return (
-                    f"Parameter '{g_param_name}' has type {g_param_annotation.annotation}, "
-                    f"expected {f_param_annotation.annotation}"
-                )
-
-        return None
+        return _compare_signatures(f_sig, g_sig)
 
     def __repr__(self) -> str:
         return f"same_signature_p({self.function.__name__})"
