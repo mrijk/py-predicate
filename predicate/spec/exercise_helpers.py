@@ -625,17 +625,24 @@ def type_var_failure(sig: Signature, arguments: dict, result: Any) -> str | None
     """
     if sig.return_annotation is sig.empty or not _has_type_var(sig.return_annotation):
         return None
+
+    bound = _get_bound_arguments(sig, arguments)
+
+    bindings = {type_var: tuple(classes) for type_var, classes in bound.items()}
+    if _conforms(sig.return_annotation, result, bindings):
+        return None
+    names = ", ".join(f"{tv.__name__}={'|'.join(c.__name__ for c in cs)}" for tv, cs in bindings.items())
+    return f"{result!r} doesn't match the type variables bound by the arguments ({names})"
+
+
+def _get_bound_arguments(sig: Signature, arguments: dict) -> dict[TypeVar, set[type]]:
     bound: dict[TypeVar, set[type]] = {}
     for name, param in sig.parameters.items():
         if name in arguments:
             values = arguments[name] if param.kind == Parameter.VAR_POSITIONAL else [arguments[name]]
             for type_var, klass in (bound for v in values for bound in _bound_types(param.annotation, v)):
                 bound.setdefault(type_var, set()).add(klass)
-    bindings = {type_var: tuple(classes) for type_var, classes in bound.items()}
-    if _conforms(sig.return_annotation, result, bindings):
-        return None
-    names = ", ".join(f"{tv.__name__}={'|'.join(c.__name__ for c in cs)}" for tv, cs in bindings.items())
-    return f"{result!r} doesn't match the type variables bound by the arguments ({names})"
+    return bound
 
 
 def verify_result(spec: Spec, return_p: Predicate, value: dict, result: Any, sig: Signature | None = None) -> None:
