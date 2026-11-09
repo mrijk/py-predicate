@@ -484,7 +484,6 @@ def get_return_spec(f: Callable, spec: Spec) -> Spec:
 
 
 def check_signature_against_spec(f: Callable, spec: Spec) -> Spec:
-
     sig = resolved_signature(f)
 
     parameters = _validate_args(f, spec)
@@ -493,21 +492,25 @@ def check_signature_against_spec(f: Callable, spec: Spec) -> Spec:
 
     for key in sig.parameters:
         parameter = sig.parameters[key]
-        annotation = parameter.annotation
-        if annotation == parameter.empty:
-            if key not in parameters:
-                raise InvalidSpecError(f"Unannotated parameter '{key}' not in spec")
-        elif type(annotation) is TypeVar:
-            if key not in parameters:
-                raise InvalidSpecError(f"Unannotated parameter '{key}' not in spec")
-        else:
-            if key not in parameters:
-                parameters[key] = exercise_param_predicate(parameter)
-            else:
-                if not implies(parameters[key], param_predicate(parameter)):
-                    raise InvalidSpecError("Spec predicate is not a constrained annotation")
+        _check_parameter(key, parameter, parameters)
 
     return spec
+
+
+def _check_parameter(key: str, parameter: Parameter, parameters: dict[str, Predicate]) -> None:
+    annotation = parameter.annotation
+    if annotation == parameter.empty:
+        if key not in parameters:
+            raise InvalidSpecError(f"Unannotated parameter '{key}' not in spec")
+    elif type(annotation) is TypeVar:
+        if key not in parameters:
+            raise InvalidSpecError(f"Unannotated parameter '{key}' not in spec")
+    else:
+        if key not in parameters:
+            parameters[key] = exercise_param_predicate(parameter)
+        else:
+            if not implies(parameters[key], param_predicate(parameter)):
+                raise InvalidSpecError("Spec predicate is not a constrained annotation")
 
 
 def exercise_param_predicate(param: Parameter) -> Predicate:

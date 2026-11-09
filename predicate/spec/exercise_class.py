@@ -1,3 +1,4 @@
+from inspect import Parameter
 from typing import AsyncIterator, Callable, Iterator, TypeVar, get_origin
 
 from more_itertools import take
@@ -38,23 +39,28 @@ def _get_spec_from_class_annotation(f: Callable) -> Spec:
 
     for key in parameters:
         parameter = parameters[key]
-        annotation = parameter.annotation
-
-        if annotation == parameter.empty:
-            raise no_spec_error(name, f"parameter '{key}' has no annotation")
-
-        if isinstance(f, Predicate):
-            try:
-                spec["args"][key] = is_instance_p(f.klass)
-            except NotImplementedError:
-                origin = get_origin(annotation)
-                spec["args"][key] = is_instance_p(origin) if origin is not None else always_true_p
-        elif type(annotation) is TypeVar:
-            spec["args"][key] = always_true_p
-        else:
-            spec["args"][key] = exercise_param_predicate(parameter)
+        spec["args"][key] = _get_param_predicate(f, key, parameter)
 
     return spec
+
+
+def _get_param_predicate(f: Callable, key: str, parameter: Parameter) -> Predicate:
+    annotation = parameter.annotation
+    name = type(f).__name__
+
+    if annotation == parameter.empty:
+        raise no_spec_error(name, f"parameter '{key}' has no annotation")
+
+    if isinstance(f, Predicate):
+        try:
+            return is_instance_p(f.klass)
+        except NotImplementedError:
+            origin = get_origin(annotation)
+            return is_instance_p(origin) if origin is not None else always_true_p
+    elif type(annotation) is TypeVar:
+        return always_true_p
+    else:
+        return exercise_param_predicate(parameter)
 
 
 def _resolve_class_spec(f: Callable, spec: Spec | None) -> Spec:
