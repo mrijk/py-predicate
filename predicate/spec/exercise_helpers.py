@@ -484,7 +484,6 @@ def get_return_spec(f: Callable, spec: Spec) -> Spec:
 
 
 def check_signature_against_spec(f: Callable, spec: Spec) -> Spec:
-
     sig = resolved_signature(f)
 
     parameters = _validate_args(f, spec)
@@ -493,21 +492,25 @@ def check_signature_against_spec(f: Callable, spec: Spec) -> Spec:
 
     for key in sig.parameters:
         parameter = sig.parameters[key]
-        annotation = parameter.annotation
-        if annotation == parameter.empty:
-            if key not in parameters:
-                raise InvalidSpecError(f"Unannotated parameter '{key}' not in spec")
-        elif type(annotation) is TypeVar:
-            if key not in parameters:
-                raise InvalidSpecError(f"Unannotated parameter '{key}' not in spec")
-        else:
-            if key not in parameters:
-                parameters[key] = exercise_param_predicate(parameter)
-            else:
-                if not implies(parameters[key], param_predicate(parameter)):
-                    raise InvalidSpecError("Spec predicate is not a constrained annotation")
+        _check_parameter(key, parameter, parameters)
 
     return spec
+
+
+def _check_parameter(key: str, parameter: Parameter, parameters: dict[str, Predicate]) -> None:
+    annotation = parameter.annotation
+    if annotation == parameter.empty:
+        if key not in parameters:
+            raise InvalidSpecError(f"Unannotated parameter '{key}' not in spec")
+    elif type(annotation) is TypeVar:
+        if key not in parameters:
+            raise InvalidSpecError(f"Unannotated parameter '{key}' not in spec")
+    else:
+        if key not in parameters:
+            parameters[key] = exercise_param_predicate(parameter)
+        else:
+            if not implies(parameters[key], param_predicate(parameter)):
+                raise InvalidSpecError("Spec predicate is not a constrained annotation")
 
 
 def exercise_param_predicate(param: Parameter) -> Predicate:
@@ -622,17 +625,24 @@ def type_var_failure(sig: Signature, arguments: dict, result: Any) -> str | None
     """
     if sig.return_annotation is sig.empty or not _has_type_var(sig.return_annotation):
         return None
+
+    bound = _get_bound_arguments(sig, arguments)
+
+    bindings = {type_var: tuple(classes) for type_var, classes in bound.items()}
+    if _conforms(sig.return_annotation, result, bindings):
+        return None
+    names = ", ".join(f"{tv.__name__}={'|'.join(c.__name__ for c in cs)}" for tv, cs in bindings.items())
+    return f"{result!r} doesn't match the type variables bound by the arguments ({names})"
+
+
+def _get_bound_arguments(sig: Signature, arguments: dict) -> dict[TypeVar, set[type]]:
     bound: dict[TypeVar, set[type]] = {}
     for name, param in sig.parameters.items():
         if name in arguments:
             values = arguments[name] if param.kind == Parameter.VAR_POSITIONAL else [arguments[name]]
             for type_var, klass in (bound for v in values for bound in _bound_types(param.annotation, v)):
                 bound.setdefault(type_var, set()).add(klass)
-    bindings = {type_var: tuple(classes) for type_var, classes in bound.items()}
-    if _conforms(sig.return_annotation, result, bindings):
-        return None
-    names = ", ".join(f"{tv.__name__}={'|'.join(c.__name__ for c in cs)}" for tv, cs in bindings.items())
-    return f"{result!r} doesn't match the type variables bound by the arguments ({names})"
+    return bound
 
 
 def verify_result(spec: Spec, return_p: Predicate, value: dict, result: Any, sig: Signature | None = None) -> None:

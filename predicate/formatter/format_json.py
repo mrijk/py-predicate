@@ -134,14 +134,7 @@ def _to_value(predicate) -> tuple[str, Any]:  # noqa: C901
         case IsSamePredicate(predicate):
             return "is_same", {"predicate": to_json(predicate)}
         case IsSubclassPredicate(class_or_tuple):
-            match class_or_tuple:
-                case tuple(klasses):
-                    names = [k.__name__ for k in klasses]
-                case UnionType() as union_type:
-                    names = [k.__name__ for k in get_args(union_type)]
-                case klass:
-                    names = [klass.__name__]
-            return "is_subclass", {"klass": names}
+            return _to_subclass(class_or_tuple)
         case IsSubsetPredicate(v):
             return "is_subset", {"v": list(v)}
         case IsSupersetPredicate(v):
@@ -198,3 +191,14 @@ def _to_value(predicate) -> tuple[str, Any]:  # noqa: C901
             return "xor", {"left": to_json(left), "right": to_json(right)}
         case _:
             return "unknown", {}
+
+
+def _to_subclass(class_or_tuple: type | UnionType | tuple[Any, ...]) -> tuple[str, Any]:
+    match class_or_tuple:
+        case tuple(klasses):
+            names = [k.__name__ for k in klasses]
+        case UnionType() as union_type:
+            names = [k.__name__ for k in get_args(union_type)]
+        case klass:
+            names = [klass.__name__]
+    return "is_subclass", {"klass": names}

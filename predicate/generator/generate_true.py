@@ -326,27 +326,28 @@ def _satisfying(values: Iterator, predicate: Predicate, attempts: int) -> Iterat
 def generate_and(predicate: AndPredicate) -> Iterator:
     if optimize(predicate) == always_false_p:
         yield from []
-    else:
-        attempts = 100
-        _sentinel = object()
+        return
 
-        left_values = generate_true(predicate.left)
-        right_values = generate_true(predicate.right)
-        first_left = next((item for item in islice(left_values, attempts) if predicate.right(item)), _sentinel)
-        first_right = next((item for item in islice(right_values, attempts) if predicate.left(item)), _sentinel)
+    attempts = 100
+    _sentinel = object()
 
-        iterables = []
-        if first_left is not _sentinel:
-            iterables.append(chain([first_left], _satisfying(left_values, predicate.right, attempts)))
-        if first_right is not _sentinel:
-            # Both sides often start with the same edge case, e.g. []: yield it once (#356)
-            head = [] if first_right == first_left else [first_right]
-            iterables.append(chain(head, _satisfying(right_values, predicate.left, attempts)))
+    left_values = generate_true(predicate.left)
+    right_values = generate_true(predicate.right)
+    first_left = next((item for item in islice(left_values, attempts) if predicate.right(item)), _sentinel)
+    first_right = next((item for item in islice(right_values, attempts) if predicate.left(item)), _sentinel)
 
-        if not iterables:
-            raise ValueError(f"Couldn't generate values that satisfy {predicate}")
+    iterables = []
+    if first_left is not _sentinel:
+        iterables.append(chain([first_left], _satisfying(left_values, predicate.right, attempts)))
+    if first_right is not _sentinel:
+        # Both sides often start with the same edge case, e.g. []: yield it once (#356)
+        head = [] if first_right == first_left else [first_right]
+        iterables.append(chain(head, _satisfying(right_values, predicate.left, attempts)))
 
-        yield from random_first_from_iterables(*iterables)
+    if not iterables:
+        raise ValueError(f"Couldn't generate values that satisfy {predicate}")
+
+    yield from random_first_from_iterables(*iterables)
 
 
 @generate_true.register

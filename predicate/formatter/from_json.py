@@ -121,8 +121,7 @@ def from_json(data: dict[str, Any]) -> Predicate:  # noqa: C901
         case "is_truthy":
             return is_truthy_p
         case "juxt":
-            predicates = [from_json(p) for p in value["predicates"]]
-            return juxt_p(*predicates, evaluate=from_json(value["evaluate"]))
+            return _juxt_p_from_json(value)
         case "le":
             return le_p(value["v"])
         case "list_of":
@@ -151,9 +150,7 @@ def from_json(data: dict[str, Any]) -> Predicate:  # noqa: C901
         case "frozenset_of":
             return is_frozenset_of_p(from_json(value["predicate"]))
         case "struct_p":
-            required = {k: from_json(v) for k, v in value["required"].items()}
-            optional_fields = {k: from_json(v) for k, v in value["optional"].items()}
-            return is_struct_p(required=required, optional=optional_fields)
+            return _struct_p_from_json(value)
         case "tuple_of":
             return is_tuple_of_p(*[from_json(p) for p in value["predicates"]])
         case "variable":
@@ -162,6 +159,17 @@ def from_json(data: dict[str, Any]) -> Predicate:  # noqa: C901
             return from_json(value["left"]) ^ from_json(value["right"])
         case _:
             raise ValueError(f"Unknown predicate type: {key!r}")
+
+
+def _juxt_p_from_json(value: dict) -> Predicate:
+    predicates = [from_json(p) for p in value["predicates"]]
+    return juxt_p(*predicates, evaluate=from_json(value["evaluate"]))
+
+
+def _struct_p_from_json(value: dict) -> Predicate:
+    required = {k: from_json(v) for k, v in value["required"].items()}
+    optional_fields = {k: from_json(v) for k, v in value["optional"].items()}
+    return is_struct_p(required=required, optional=optional_fields)
 
 
 _CLASS_REGISTRY: dict[str, type] = {
