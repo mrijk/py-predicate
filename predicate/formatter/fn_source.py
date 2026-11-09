@@ -20,6 +20,10 @@ def get_fn_source(fn: Callable) -> dict[str, str]:
         except OSError:
             return _builtin_info(fn)
 
+    return _get_lambda_source(source_file, fn)
+
+
+def _get_lambda_source(source_file: str, fn: Callable) -> dict[str, str]:
     # Lambda: parse full file, find Lambda node on the right line
     try:
         with open(source_file) as f:

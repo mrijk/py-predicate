@@ -112,8 +112,7 @@ def from_json(data: dict[str, Any]) -> Predicate:  # noqa: C901
         case "is_same":
             return is_same_p(from_json(value["predicate"]))
         case "is_subclass":
-            klasses = [_resolve_class(name) for name in value["klass"]]
-            return is_subclass_p(tuple(klasses) if len(klasses) > 1 else klasses[0])
+            return _is_subclass_from_json(value)
         case "is_subset":
             return is_subset_p(set(value["v"]))
         case "is_superset":
@@ -159,6 +158,11 @@ def from_json(data: dict[str, Any]) -> Predicate:  # noqa: C901
             return from_json(value["left"]) ^ from_json(value["right"])
         case _:
             raise ValueError(f"Unknown predicate type: {key!r}")
+
+
+def _is_subclass_from_json(value: dict) -> Predicate:
+    klasses = [_resolve_class(name) for name in value["klass"]]
+    return is_subclass_p(tuple(klasses) if len(klasses) > 1 else klasses[0])
 
 
 def _juxt_p_from_json(value: dict) -> Predicate:

@@ -408,12 +408,11 @@ def generate_anys(predicate: Predicate) -> Iterator[Any]:
 
 
 def generate_even_numbers() -> Iterator[int]:
-    yield 0
-    yield from (value for value in random_ints() if value % 2 == 0)
+    yield from (value * 2 for value in random_ints())
 
 
 def generate_odd_numbers() -> Iterator[int]:
-    yield from (value for value in random_ints() if value % 2 != 0)
+    yield from (value + 1 for value in generate_even_numbers())
 
 
 def function_with_signature(sig: Signature) -> Callable:

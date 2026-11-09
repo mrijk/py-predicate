@@ -4,6 +4,7 @@ from predicate.any_predicate import AnyPredicate
 from predicate.not_predicate import NotPredicate
 from predicate.optimizer.helpers import MaybeOptimized, NotOptimized, Optimized
 from predicate.or_predicate import OrPredicate
+from predicate.predicate import Predicate
 from predicate.xor_predicate import XorPredicate
 
 
@@ -45,12 +46,16 @@ def optimize_not_predicate[T](predicate: NotPredicate[T]) -> MaybeOptimized[T]: 
                     return Optimized(negate(optimized)) if optimized != predicate.predicate else NotOptimized()
 
         case XorPredicate(left, right):
-            match left, right:
-                case NotPredicate(not_predicate), _:  # ~(~p ^ q) == p ^ q
-                    return Optimized(XorPredicate(left=not_predicate, right=right))
-                case _, NotPredicate(not_predicate):  # ~(p ^ ~q) == p ^ q
-                    return Optimized(XorPredicate(left=left, right=not_predicate))
-                case _:  # ~(p ^ q) == ~p ^ q
-                    return Optimized(XorPredicate(left=NotPredicate(predicate=left), right=right))
+            return _match_xor(left=left, right=right)
 
     return Optimized(negate(optimized))
+
+
+def _match_xor[T](left: Predicate[T], right: Predicate[T]) -> MaybeOptimized[T]:
+    match left, right:
+        case NotPredicate(not_predicate), _:  # ~(~p ^ q) == p ^ q
+            return Optimized(XorPredicate(left=not_predicate, right=right))
+        case _, NotPredicate(not_predicate):  # ~(p ^ ~q) == p ^ q
+            return Optimized(XorPredicate(left=left, right=not_predicate))
+        case _:  # ~(p ^ q) == ~p ^ q
+            return Optimized(XorPredicate(left=NotPredicate(predicate=left), right=right))
