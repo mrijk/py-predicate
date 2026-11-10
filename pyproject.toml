@@ -94,7 +94,7 @@ target-version = "py312"
 max-complexity = 10
 
 [tool.complexipy]
-max-complexity-allowed = 15
+max-complexity-allowed = 10
 exclude = ["tests/**", "benchmarks/**"]
 
 [tool.ruff.lint.flake8-tidy-imports]

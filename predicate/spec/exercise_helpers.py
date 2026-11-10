@@ -637,13 +637,20 @@ def type_var_failure(sig: Signature, arguments: dict, result: Any) -> str | None
     return f"{result!r} doesn't match the type variables bound by the arguments ({names})"
 
 
+def _get_values(argument: Any, param: Parameter) -> list:
+    return argument if param.kind == Parameter.VAR_POSITIONAL else [argument]
+
+
 def _get_bound_arguments(sig: Signature, arguments: dict) -> dict[TypeVar, set[type]]:
     bound: dict[TypeVar, set[type]] = {}
-    for name, param in sig.parameters.items():
-        if name in arguments:
-            values = arguments[name] if param.kind == Parameter.VAR_POSITIONAL else [arguments[name]]
-            for type_var, klass in (bound for v in values for bound in _bound_types(param.annotation, v)):
-                bound.setdefault(type_var, set()).add(klass)
+    bound_arguments = (
+        (param, _get_values(arguments[name], param)) for name, param in sig.parameters.items() if name in arguments
+    )
+
+    for param, values in bound_arguments:
+        for type_var, klass in (bound for v in values for bound in _bound_types(param.annotation, v)):
+            bound.setdefault(type_var, set()).add(klass)
+
     return bound
 
 
