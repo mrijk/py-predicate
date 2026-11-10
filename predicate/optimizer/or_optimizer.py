@@ -94,28 +94,9 @@ def optimize_or_predicate[T](predicate: OrPredicate[T]) -> MaybeOptimized[T]:  #
 
         #
         case AndPredicate(and_left_left, and_left_right), AndPredicate(and_right_left, and_right_right):
-            match and_left_left, and_left_right, and_right_left, and_right_right:
-                case (
-                    NotPredicate(left_not),
-                    Predicate() as q,
-                    Predicate() as p,
-                    NotPredicate(right_not),
-                ) if left_not == p and right_not == q:
-                    return Optimized(p ^ q)  # (~p & q) | (p & ~q) == p ^ q
-                case (
-                    Predicate() as p,
-                    NotPredicate(left_not),
-                    NotPredicate(right_not),
-                    Predicate() as q,
-                ) if left_not == q and right_not == p:
-                    return Optimized(p ^ q)  # (p & ~q) | (~p & q) == p ^ q
-                case _:
-                    return (
-                        Optimized(OrPredicate(left=left, right=right))
-                        if (left != predicate.left or right != predicate.right)
-                        else NotOptimized()
-                    )
-
+            return _match_recursive_and(
+                predicate, and_left_left, and_left_right, and_right_left, and_right_right, left, right
+            )
         case _, AndPredicate(and_left, and_right):
             match and_left:
                 case NotPredicate(not_predicate) if not_predicate == left:  # p | (~p & q) == p | q
@@ -128,6 +109,38 @@ def optimize_or_predicate[T](predicate: OrPredicate[T]) -> MaybeOptimized[T]:  #
             return Optimized(left)
 
     return Optimized(left | right) if (left != predicate.left or right != predicate.right) else NotOptimized()
+
+
+def _match_recursive_and[T](
+    predicate: OrPredicate[T],
+    and_left_left: Predicate[T],
+    and_left_right: Predicate[T],
+    and_right_left: Predicate[T],
+    and_right_right: Predicate[T],
+    left: Predicate[T],
+    right: Predicate[T],
+) -> MaybeOptimized[T]:
+    match and_left_left, and_left_right, and_right_left, and_right_right:
+        case (
+            NotPredicate(left_not),
+            Predicate() as q,
+            Predicate() as p,
+            NotPredicate(right_not),
+        ) if left_not == p and right_not == q:
+            return Optimized(p ^ q)  # (~p & q) | (p & ~q) == p ^ q
+        case (
+            Predicate() as p,
+            NotPredicate(left_not),
+            NotPredicate(right_not),
+            Predicate() as q,
+        ) if left_not == q and right_not == p:
+            return Optimized(p ^ q)  # (p & ~q) | (~p & q) == p ^ q
+        case _:
+            return (
+                Optimized(OrPredicate(left=left, right=right))
+                if (left != predicate.left or right != predicate.right)
+                else NotOptimized()
+            )
 
 
 def _match_recursive_or[T](or_left: Predicate[T], or_right: Predicate[T], right: Predicate[T]) -> MaybeOptimized[T]:

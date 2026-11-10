@@ -77,9 +77,7 @@ def optimize_and_predicate[T](predicate: AndPredicate[T]) -> MaybeOptimized[T]: 
 
         # set optimizations
         case InPredicate(v1), InPredicate(v2) if isinstance(v1, Iterable) and isinstance(v2, Iterable):
-            if v := set(v1) & set(v2):
-                return Optimized(optimize(InPredicate(v=v)))
-            return Optimized(always_false_p)
+            return _match_in_in(v1=v1, v2=v2)
         case InPredicate(v1), NotInPredicate(v2) if isinstance(v1, Iterable) and isinstance(v2, Iterable):
             if v := set(v1) - set(v2):
                 return Optimized(optimize(InPredicate(v=v)))
@@ -118,6 +116,14 @@ def optimize_and_predicate[T](predicate: AndPredicate[T]) -> MaybeOptimized[T]: 
             return Optimized(always_false_p)
 
     return Optimized(left & right) if (left != predicate.left or right != predicate.right) else NotOptimized()
+
+
+def _match_in_in[T](v1: Iterable[T], v2: Iterable[T]) -> MaybeOptimized[T]:
+    if v := set(v1) & set(v2):
+        from predicate import optimize
+
+        return Optimized(optimize(InPredicate(v=v)))
+    return Optimized(always_false_p)
 
 
 def _match_recursive_and[T](and_left: Predicate[T], and_right: Predicate[T], right: Predicate[T]) -> MaybeOptimized[T]:

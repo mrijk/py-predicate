@@ -9,12 +9,13 @@ from predicate.in_predicate import InPredicate
 from predicate.not_predicate import NotPredicate
 from predicate.optimizer.helpers import MaybeOptimized, NotOptimized, Optimized
 from predicate.or_predicate import OrPredicate
+from predicate.predicate import Predicate
 from predicate.xor_predicate import XorPredicate
 
 
 def optimize_xor_predicate[T](predicate: XorPredicate[T]) -> MaybeOptimized[T]:  # noqa: C901
     from predicate.negate import negate
-    from predicate.optimizer.predicate_optimizer import optimizations, optimize
+    from predicate.optimizer.predicate_optimizer import optimize
 
     match left := optimize(predicate.left), right := optimize(predicate.right):
         case _, AlwaysFalsePredicate():  # p ^ False = p
@@ -35,15 +36,7 @@ def optimize_xor_predicate[T](predicate: XorPredicate[T]) -> MaybeOptimized[T]: 
 
         # recursive & optimizations
         case XorPredicate(xor_left, xor_right), _:
-            match optimizations(xor_left ^ right):
-                case Optimized(optimized):
-                    return Optimized(predicate=optimize(optimized ^ xor_right))
-                case _:
-                    match optimizations(xor_right ^ right):
-                        case Optimized(optimized):
-                            return Optimized(optimize(optimized ^ xor_left))
-                        case _:
-                            return NotOptimized()
+            return _match_recursive_xor(xor_left=xor_left, xor_right=xor_right, right=right)
         case _, XorPredicate():
             return optimize_xor_predicate(XorPredicate(right, left))
 
@@ -82,3 +75,17 @@ def optimize_xor_predicate[T](predicate: XorPredicate[T]) -> MaybeOptimized[T]: 
             return Optimized(optimize(left & ~right))
         case _:
             return Optimized(left ^ right) if (left != predicate.left or right != predicate.right) else NotOptimized()
+
+
+def _match_recursive_xor[T](xor_left: Predicate[T], xor_right: Predicate[T], right: Predicate[T]) -> MaybeOptimized[T]:
+    from predicate.optimizer.predicate_optimizer import optimizations, optimize
+
+    match optimizations(xor_left ^ right):
+        case Optimized(optimized):
+            return Optimized(predicate=optimize(optimized ^ xor_right))
+        case _:
+            match optimizations(xor_right ^ right):
+                case Optimized(optimized):
+                    return Optimized(optimize(optimized ^ xor_left))
+                case _:
+                    return NotOptimized()

@@ -2,7 +2,7 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from typing import Any, override
 
-from more_itertools import first
+from more_itertools import first_true
 
 from predicate.predicate import Predicate
 
@@ -42,11 +42,8 @@ class IsCallablePredicate[T](Predicate[T]):
                 params = [param for key, param in annotations.items() if key != "return"]
                 if len(params) != len(self.params):
                     return {"reason": f"Got {len(params)} parameters, expected {len(self.params)}"}
-                combined = zip(self.params, params, strict=False)
-                different = first(
-                    (expected_param, param) for expected_param, param in combined if expected_param != param
-                )
-                expected, actual = different
+                combined = zip(self.params, params, strict=True)
+                expected, actual = first_true(combined, pred=lambda pair: pair[0] != pair[1])  # type: ignore[misc]
 
                 return {"reason": f"Got type {actual.__name__}, expected {expected.__name__}"}
             case _:

@@ -2,7 +2,7 @@ from typing import TypeVar
 
 import pytest
 
-from predicate.spec.instrument import instrument_function
+from predicate import instrument_function
 from predicate.spec.spec import SpecViolationError
 
 T = TypeVar("T")

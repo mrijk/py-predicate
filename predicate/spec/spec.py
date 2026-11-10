@@ -28,3 +28,6 @@ Spec = TypedDict(
         "snapshot": NotRequired[dict[str, Callable[[Any], Any]]],
     },
 )
+
+
+EMPTY_SPEC: Spec = {"args": {}}

@@ -34,7 +34,7 @@ from datetime import date, datetime, time, timedelta, timezone, tzinfo
 from decimal import Decimal
 from enum import Enum
 from fractions import Fraction
-from functools import singledispatch
+from functools import cache, singledispatch
 from inspect import Parameter, Signature, getmembers, isfunction, signature
 from itertools import chain, cycle, islice, repeat
 from pathlib import PurePath
@@ -740,7 +740,7 @@ def _random_async_iterators(annotation: Any) -> Iterator[AsyncIterator]:
     yield from (_async_iterator(items) for items in lists)
 
 
-async def _async_iterator(items: list) -> AsyncIterator:
+async def _async_iterator[T](items: list[T]) -> AsyncIterator[T]:
     for item in items:
         yield item
 
@@ -943,12 +943,8 @@ def _type_arg_predicate(arg: Any) -> Predicate:
     return type_arg_predicate(arg)
 
 
-@generate_true.register
-def generate_is_instance_p(predicate: IsInstancePredicate, **kwargs: Any) -> Iterator:
-    annotation = predicate.instance_klass[0]  # type: ignore
-    # Generic aliases such as Predicate[int], typing.Callable and Iterable[int] map to their origin class
-    klass = get_origin(annotation) or annotation
-
+@cache
+def _get_type_registry() -> dict[Any, Callable[[], Iterator]]:
     type_registry: dict[Any, Callable[[], Iterator]] = {
         Callable: random_callables,
         Container: random_containers,
@@ -1022,27 +1018,51 @@ def generate_is_instance_p(predicate: IsInstancePredicate, **kwargs: Any) -> Ite
 
         type_registry[Template] = random_templates
 
+    return type_registry
+
+
+@generate_true.register
+def generate_is_instance_p(predicate: IsInstancePredicate, **kwargs: Any) -> Iterator:
+    annotation = predicate.instance_klass[0]  # type: ignore
+    # Generic aliases such as Predicate[int], typing.Callable and Iterable[int] map to their origin class
+    klass = get_origin(annotation) or annotation
+
+    type_registry = _get_type_registry()
+
     if klass in (Iterator, Generator):
         yield from _random_iterators(annotation)
-    elif (builtin := _abc_builtins.get(klass)) and (args := get_args(annotation)):
+        return
+
+    if (builtin := _abc_builtins.get(klass)) and (args := get_args(annotation)):
         from predicate.spec.exercise_helpers import annotation_to_predicate
 
         # Sequence[int] -> list[int] etc., so the generated items have the requested types
         yield from generate_true(annotation_to_predicate(builtin[args]))
-    elif (family_values := _family_generator(klass, annotation)) is not None:
+        return
+
+    if (family_values := _family_generator(klass, annotation)) is not None:
         yield from family_values
-    elif generator := type_registry.get(klass):
+        return
+
+    if generator := type_registry.get(klass):
         yield from generator(**accepted_kwargs(generator, kwargs))
-    elif klass is type:
+        return
+
+    if klass is type:
         # For type[X] yield X and its subclasses, for plain type any class
         yield from generate_true(_type_arg_predicate(first(get_args(annotation), object)))
-    elif klass == ConstrainedT:
+        return
+
+    if klass == ConstrainedT:
         iterables = [random_ints()]
         yield from random_first_from_iterables(*iterables)
-    elif isinstance(klass, type) and issubclass(klass, Predicate):
+        return
+
+    if isinstance(klass, type) and issubclass(klass, Predicate):
         yield from _random_predicates_of_type(klass, kwargs)
-    else:
-        yield from _constructed_instances(klass)
+        return
+
+    yield from _constructed_instances(klass)
 
 
 @generate_true.register

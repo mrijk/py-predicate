@@ -62,20 +62,26 @@ def match(iterable: Iterable, *, predicates: list[Predicate], full_match: bool) 
         case OptionalPredicate() | PlusPredicate() | StarPredicate() | ExactlyPredicate() | RepeatPredicate():
             return predicate(iterable, predicates=rest_predicates, full_match=full_match)
         case Predicate():
-            consumed = list(consumes(predicate, iterable))
-
-            end = consumed[-1]
-
-            if end >= 1 and rest_predicates:
-                it1, it2 = tee(iterable)
-                rest = list(islice(it2, end, None))
-                return match(rest, predicates=rest_predicates, full_match=full_match)
-            if end >= 1:
-                if full_match:
-                    it1, it2 = tee(iterable)
-                    rest = list(islice(it2, end, None))
-                    return not rest
-                return True
-            return False
+            return _match_recur(iterable, predicate=predicate, rest_predicates=rest_predicates, full_match=full_match)
         case _:
             raise NotImplementedError
+
+
+def _match_recur(
+    iterable: Iterable, *, predicate: Predicate, rest_predicates: list[Predicate], full_match: bool
+) -> bool:
+    consumed = list(consumes(predicate, iterable))
+
+    end = consumed[-1]
+
+    if end >= 1 and rest_predicates:
+        it1, it2 = tee(iterable)
+        rest = list(islice(it2, end, None))
+        return match(rest, predicates=rest_predicates, full_match=full_match)
+    if end >= 1:
+        if full_match:
+            it1, it2 = tee(iterable)
+            rest = list(islice(it2, end, None))
+            return not rest
+        return True
+    return False

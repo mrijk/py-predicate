@@ -93,6 +93,7 @@ from predicate.optional_predicate import optional
 from predicate.plus_predicate import plus
 from predicate.and_predicate import and_p
 from predicate.or_predicate import or_p
+from predicate.predicate import Predicate
 from predicate.xor_predicate import xor_p
 from predicate.raises_predicate import raises_exception_p, raises_p
 from predicate.range_predicate import ge_le_p, ge_lt_p, gt_le_p, gt_lt_p
@@ -114,12 +115,14 @@ from predicate.set_predicates import (
 from predicate.spec.exercise import exercise
 from predicate.spec.instrument import (
     instrument,
-    instrument_class,
-    instrument_function,
     instrument_module,
-    is_instrumentation_enabled,
+)
+from predicate.spec.instrument_class import instrument_class
+from predicate.spec.instrument_function import (
     is_instrumented,
+    instrument_function,
     set_instrumentation,
+    is_instrumentation_enabled,
 )
 from predicate.spec.is_valid_spec_predicate import is_valid_spec_p
 from predicate.spec.spec import InvalidSpecError, Spec, SpecViolationError
@@ -313,6 +316,7 @@ __all__ = [
     "to_yaml",
     "xor_p",
     "zero_p",
+    "Predicate",
 ]
 
 from predicate.str_predicates import (

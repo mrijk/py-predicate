@@ -3,7 +3,7 @@ import inspect
 import textwrap
 from typing import Callable
 
-from more_itertools import first, one
+from more_itertools import first
 
 
 def get_fn_source(fn: Callable) -> dict[str, str]:
@@ -20,6 +20,10 @@ def get_fn_source(fn: Callable) -> dict[str, str]:
         except OSError:
             return _builtin_info(fn)
 
+    return _get_lambda_source(source_file, fn)
+
+
+def _get_lambda_source(source_file: str, fn: Callable) -> dict[str, str]:
     # Lambda: parse full file, find Lambda node on the right line
     try:
         with open(source_file) as f:
@@ -30,14 +34,15 @@ def get_fn_source(fn: Callable) -> dict[str, str]:
     target_line = fn.__code__.co_firstlineno
     candidates = [n for n in ast.walk(tree) if isinstance(n, ast.Lambda) and n.lineno == target_line]
 
-    if not candidates:
-        return {}
-    if len(candidates) == 1:
-        chosen = one(candidates)
-    else:
-        body_col = _get_body_col(fn)
-        exact = [n for n in candidates if body_col is not None and n.body.col_offset == body_col]
-        chosen = first(exact, default=first(candidates))
+    match candidates:
+        case []:
+            return {}
+        case [chosen]:
+            pass
+        case _:
+            body_col = _get_body_col(fn)
+            exact = [n for n in candidates if body_col is not None and n.body.col_offset == body_col]
+            chosen = first(exact, default=first(candidates))
 
     return {"source": ast.unparse(chosen)}
 
