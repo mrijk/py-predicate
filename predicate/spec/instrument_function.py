@@ -68,7 +68,7 @@ def enrich_spec(func: Callable, spec: Spec) -> Spec:
 OnError = Callable[[str], None]
 
 
-def _default_on_error(message: str) -> None:
+def default_on_error(message: str) -> None:
     raise SpecViolationError(message)
 
 
@@ -208,7 +208,7 @@ def _make_wrapper(
     return wrapped_sync
 
 
-def instrument_function(func: Callable, spec: Spec, on_error: OnError = _default_on_error) -> Callable:
+def instrument_function(func: Callable, spec: Spec, on_error: OnError = default_on_error) -> Callable:
     if is_instrumented(func):
         return func
     func = unwrap(func)

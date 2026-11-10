@@ -497,23 +497,25 @@ def generate_is_lambda_p(predicate: IsLambdaPredicate) -> Iterator:
         yield from random_lambdas(nr_of_parameters_p=nr_of_parameters_p)
 
 
+def _attempt_n(producer: Predicate, condition: Predicate, n: int = 100) -> bool:
+    _sentinel = object()
+    candidate = next((item for item in take(n, generate_false(producer)) if not condition(item)), _sentinel)
+    return candidate is not _sentinel
+
+
 @generate_false.register
 def generate_or(predicate: OrPredicate) -> Iterator:
-    attempts = 100
-    _sentinel = object()
+    left = predicate.left
+    right = predicate.right
 
-    first_left = next(
-        (item for item in take(attempts, generate_false(predicate.left)) if not predicate.right(item)), _sentinel
-    )
-    first_right = next(
-        (item for item in take(attempts, generate_false(predicate.right)) if not predicate.left(item)), _sentinel
-    )
+    found_left = _attempt_n(producer=left, condition=right)
+    found_right = _attempt_n(producer=right, condition=left)
 
     iterables = []
-    if first_left is not _sentinel:
-        iterables.append(item for item in generate_false(predicate.left) if not predicate.right(item))
-    if first_right is not _sentinel:
-        iterables.append(item for item in generate_false(predicate.right) if not predicate.left(item))
+    if found_left:
+        iterables.append(item for item in generate_false(left) if not right(item))
+    if found_right:
+        iterables.append(item for item in generate_false(right) if not left(item))
 
     if not iterables:
         raise ValueError(f"Couldn't generate values that satisfy {predicate}")

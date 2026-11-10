@@ -7,7 +7,7 @@ from more_itertools import consume, side_effect
 
 from predicate.spec.instrument_function import (
     OnError,
-    _default_on_error,
+    default_on_error,
     instrument_function,
     is_instrumentation_enabled,  # noqa: F401
     is_instrumented,
@@ -18,7 +18,7 @@ from predicate.spec.spec import Spec
 _EMPTY_SPEC: Spec = {"args": {}}
 
 
-def instrument(spec_or_func: Spec | Callable = None, *, on_error: OnError = _default_on_error) -> Callable:  # type: ignore[assignment]
+def instrument(spec_or_func: Spec | Callable = None, *, on_error: OnError = default_on_error) -> Callable:  # type: ignore[assignment]
     if isclass(spec_or_func):
         instrument_class(spec_or_func, on_error=on_error)
         return spec_or_func
@@ -41,12 +41,12 @@ def _include_in_module(func: Callable, module: ModuleType, pattern: str | None) 
     return func.__module__ == module.__name__ and (pattern is None or fnmatch(func.__name__, pattern))
 
 
-def instrument_module(module: ModuleType, pattern: str | None = None, on_error: OnError = _default_on_error) -> None:
+def instrument_module(module: ModuleType, pattern: str | None = None, on_error: OnError = default_on_error) -> None:
     funcs = [func for _, func in getmembers(module, isfunction) if _include_in_module(func, module, pattern)]
     consume(side_effect(lambda func: instrument_function(func, _EMPTY_SPEC, on_error), funcs))
 
 
-def instrument_class(cls: type, pattern: str | None = None, on_error: OnError = _default_on_error) -> None:
+def instrument_class(cls: type, pattern: str | None = None, on_error: OnError = default_on_error) -> None:
     for name, member in list(vars(cls).items()):
         descriptor = type(member) if isinstance(member, (staticmethod, classmethod)) else None
         func = member.__func__ if descriptor else member

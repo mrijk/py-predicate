@@ -740,7 +740,7 @@ def _random_async_iterators(annotation: Any) -> Iterator[AsyncIterator]:
     yield from (_async_iterator(items) for items in lists)
 
 
-async def _async_iterator(items: list) -> AsyncIterator:
+async def _async_iterator[T](items: list[T]) -> AsyncIterator[T]:
     for item in items:
         yield item
 
