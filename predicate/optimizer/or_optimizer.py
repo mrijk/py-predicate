@@ -112,7 +112,7 @@ def optimize_or_predicate[T](predicate: OrPredicate[T]) -> MaybeOptimized[T]:  #
 
 
 def _match_recursive_and[T](
-    predicate: AndPredicate[T],
+    predicate: OrPredicate[T],
     and_left_left: Predicate[T],
     and_left_right: Predicate[T],
     and_right_left: Predicate[T],

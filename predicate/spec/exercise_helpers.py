@@ -16,6 +16,7 @@ from typing import (
     Callable,
     Final,
     ForwardRef,
+    Iterable,
     Iterator,
     Literal,
     LiteralString,
@@ -255,12 +256,12 @@ def _type_var_predicate(type_var: TypeVar) -> Predicate:
 _named_tuple_class_p: Final[Predicate] = fn_p(is_named_tuple_class, generate_true_fn=random_named_tuple_classes)
 
 
-def is_typed_dict_class(klass: Any) -> bool:
-    # typing.is_typeddict doesn't recognise typing_extensions.TypedDict classes before Python 3.14
+def _is_typed_dict_class(klass: Any) -> bool:
+    # typing.is_typeddict doesn't recognize typing_extensions.TypedDict classes before Python 3.14
     return isinstance(klass, type) and issubclass(klass, dict) and hasattr(klass, "__required_keys__")
 
 
-_typed_dict_class_p: Final[Predicate] = fn_p(is_typed_dict_class, generate_true_fn=random_typed_dict_classes)
+_typed_dict_class_p: Final[Predicate] = fn_p(_is_typed_dict_class, generate_true_fn=random_typed_dict_classes)
 
 
 def _is_typing_special(klass: Any, name: str) -> bool:
@@ -384,7 +385,7 @@ def annotation_to_predicate(annotation: Any) -> Predicate:  # noqa: C901 # compl
         return reduce(and_, constraints, annotation_to_predicate(annotation.__origin__))
     if annotation is None or annotation is types.NoneType:
         return is_none_p
-    if is_typed_dict_class(annotation):
+    if _is_typed_dict_class(annotation):
         # isinstance() rejects TypedDicts; check keys and values instead (#283)
         return _typed_dict_predicate(annotation)
     if annotation in (Any, object):
@@ -499,18 +500,14 @@ def check_signature_against_spec(f: Callable, spec: Spec) -> Spec:
 
 def _check_parameter(key: str, parameter: Parameter, parameters: dict[str, Predicate]) -> None:
     annotation = parameter.annotation
-    if annotation == parameter.empty:
-        if key not in parameters:
-            raise InvalidSpecError(f"Unannotated parameter '{key}' not in spec")
-    elif type(annotation) is TypeVar:
+    if annotation == parameter.empty or type(annotation) is TypeVar:
         if key not in parameters:
             raise InvalidSpecError(f"Unannotated parameter '{key}' not in spec")
     else:
         if key not in parameters:
             parameters[key] = exercise_param_predicate(parameter)
-        else:
-            if not implies(parameters[key], param_predicate(parameter)):
-                raise InvalidSpecError("Spec predicate is not a constrained annotation")
+        elif not implies(parameters[key], param_predicate(parameter)):
+            raise InvalidSpecError("Spec predicate is not a constrained annotation")
 
 
 def exercise_param_predicate(param: Parameter) -> Predicate:
@@ -561,17 +558,22 @@ def call_args(sig: Signature, value: dict) -> tuple[list, dict]:
     return args, kwargs
 
 
+def _generate_with_pre_condition[T](candidates: Iterable[T], *, pre: Callable[..., bool], n: int) -> list[T]:
+    max_attempts = 100 * n
+    filtered_candidates = (value for value in islice(candidates, max_attempts) if pre(**value))  # type: ignore[arg-type]
+    values = take(n, filtered_candidates)
+    if len(values) < n:
+        raise InvalidSpecError(f"Could not generate values satisfying pre after {max_attempts} attempts")
+    return values
+
+
 def generate_values(spec: Spec, n: int) -> tuple:
     parameters = spec["args"]
     return_p = spec["ret"]
     if predicates := tuple(parameters.items()):
         candidates = generate_true(is_dict_of_p(*predicates))
         if pre := spec.get("pre"):
-            max_attempts = 100 * n
-            candidates = (value for value in islice(candidates, max_attempts) if pre(**value))
-            values = take(n, candidates)
-            if len(values) < n:
-                raise InvalidSpecError(f"Could not generate values satisfying pre after {max_attempts} attempts")
+            values = _generate_with_pre_condition(candidates, pre=pre, n=n)
         else:
             values = take(n, candidates)
     else:
