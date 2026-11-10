@@ -799,27 +799,36 @@ def generate_raises(predicate: RaisesPredicate) -> Iterator:
     yield from repeat(lambda: None)
 
 
-@generate_false.register
-def generate_struct(predicate: StructPredicate) -> Iterator:
+def _false_struct_required_fields(predicate: StructPredicate) -> Iterator:
+    required = predicate.required
+    optional = predicate.optional
+
+    dict_of_predicate = DictOfPredicate(key_value_predicates=list(required.items()))
+
+    optional_generators = {key: generate_false(value_p) for key, value_p in optional.items()}
+    yield from (
+        d | sample_optional_fields(optional, optional_generators) for d in generate_dict_of_p(dict_of_predicate)
+    )
+
+
+def _false_struct_extra_key_dicts(predicate: StructPredicate) -> Iterator:
     from predicate import generate_true
 
     required = predicate.required
     optional = predicate.optional
 
     known_keys = set(required) | set(optional)
-    dict_of_predicate = DictOfPredicate(key_value_predicates=list(required.items()))
 
-    def false_required_fields() -> Iterator:
-        optional_generators = {key: generate_false(value_p) for key, value_p in optional.items()}
-        yield from (
-            d | sample_optional_fields(optional, optional_generators) for d in generate_dict_of_p(dict_of_predicate)
-        )
+    required_true_generators = {key: generate_true(value_p) for key, value_p in required.items()}
+    optional_true_generators = {key: generate_true(value_p) for key, value_p in optional.items()}
+    for extra_key in (key for key in random_strings(min_size=1) if key not in known_keys):
+        required_fields = {key: next(required_true_generators[key]) for key in required}
+        yield required_fields | sample_optional_fields(optional, optional_true_generators) | {extra_key: None}
 
-    def extra_key_dicts() -> Iterator:
-        required_true_generators = {key: generate_true(value_p) for key, value_p in required.items()}
-        optional_true_generators = {key: generate_true(value_p) for key, value_p in optional.items()}
-        for extra_key in (key for key in random_strings(min_size=1) if key not in known_keys):
-            required_fields = {key: next(required_true_generators[key]) for key in required}
-            yield required_fields | sample_optional_fields(optional, optional_true_generators) | {extra_key: None}
 
-    yield from random_first_from_iterables(false_required_fields(), extra_key_dicts())
+@generate_false.register
+def generate_struct(predicate: StructPredicate) -> Iterator:
+    required_fields = _false_struct_required_fields(predicate)
+    extra_key_dicts = _false_struct_extra_key_dicts(predicate)
+
+    yield from random_first_from_iterables(required_fields, extra_key_dicts)
