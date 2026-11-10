@@ -1,6 +1,7 @@
 import pytest
 
-from predicate.spec.instrument import instrument, instrument_class
+from predicate import instrument_class
+from predicate.spec.instrument import instrument
 from predicate.spec.spec import SpecViolationError
 
 # --- @instrument on instance methods ---

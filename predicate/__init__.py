@@ -115,12 +115,15 @@ from predicate.set_predicates import (
 from predicate.spec.exercise import exercise
 from predicate.spec.instrument import (
     instrument,
-    instrument_class,
     instrument_module,
-    is_instrumentation_enabled,
-    set_instrumentation,
 )
-from predicate.spec.instrument_function import is_instrumented, instrument_function
+from predicate.spec.instrument_class import instrument_class
+from predicate.spec.instrument_function import (
+    is_instrumented,
+    instrument_function,
+    set_instrumentation,
+    is_instrumentation_enabled,
+)
 from predicate.spec.is_valid_spec_predicate import is_valid_spec_p
 from predicate.spec.spec import InvalidSpecError, Spec, SpecViolationError
 from predicate.standard_predicates import (

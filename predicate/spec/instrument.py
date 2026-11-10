@@ -5,17 +5,15 @@ from typing import Callable
 
 from more_itertools import consume, side_effect
 
+from predicate.spec.instrument_class import instrument_class
 from predicate.spec.instrument_function import (
     OnError,
     default_on_error,
     instrument_function,
-    is_instrumentation_enabled,  # noqa: F401
-    is_instrumented,
-    set_instrumentation,  # noqa: F401
+    # noqa: F401
+    # noqa: F401
 )
-from predicate.spec.spec import Spec
-
-_EMPTY_SPEC: Spec = {"args": {}}
+from predicate.spec.spec import EMPTY_SPEC, Spec
 
 
 def instrument(spec_or_func: Spec | Callable = None, *, on_error: OnError = default_on_error) -> Callable:  # type: ignore[assignment]
@@ -24,9 +22,9 @@ def instrument(spec_or_func: Spec | Callable = None, *, on_error: OnError = defa
         return spec_or_func
 
     if callable(spec_or_func):
-        return instrument_function(spec_or_func, _EMPTY_SPEC, on_error)
+        return instrument_function(spec_or_func, EMPTY_SPEC, on_error)
 
-    spec = spec_or_func or _EMPTY_SPEC
+    spec = spec_or_func or EMPTY_SPEC
 
     def decorator(func: Callable) -> Callable:
         if isclass(func):
@@ -43,13 +41,4 @@ def _include_in_module(func: Callable, module: ModuleType, pattern: str | None) 
 
 def instrument_module(module: ModuleType, pattern: str | None = None, on_error: OnError = default_on_error) -> None:
     funcs = [func for _, func in getmembers(module, isfunction) if _include_in_module(func, module, pattern)]
-    consume(side_effect(lambda func: instrument_function(func, _EMPTY_SPEC, on_error), funcs))
-
-
-def instrument_class(cls: type, pattern: str | None = None, on_error: OnError = default_on_error) -> None:
-    for name, member in list(vars(cls).items()):
-        descriptor = type(member) if isinstance(member, (staticmethod, classmethod)) else None
-        func = member.__func__ if descriptor else member
-        if isfunction(func) and not is_instrumented(func) and (pattern is None or fnmatch(name, pattern)):
-            wrapped = instrument_function(func, _EMPTY_SPEC, on_error)
-            setattr(cls, name, descriptor(wrapped) if descriptor else wrapped)
+    consume(side_effect(lambda func: instrument_function(func, EMPTY_SPEC, on_error), funcs))
