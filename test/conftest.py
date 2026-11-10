@@ -2,10 +2,9 @@ from dataclasses import dataclass
 
 import pytest
 
-from predicate import is_int_p
+from predicate import instrument_function, is_int_p
 from predicate.named_predicate import NamedPredicate
 from predicate.predicate import Predicate
-from predicate.spec.instrument import instrument_function
 from predicate.spec.spec import Spec
 
 # Couple of pre-defined predicates as fixtures.

@@ -33,13 +33,14 @@ from predicate import (
     exercise,
     generate_false,
     generate_true,
+    instrument_function,
     is_instance_p,
     is_int_p,
     is_str_p,
     is_struct_p,
 )
 from predicate.spec.exercise_helpers import annotation_to_predicate
-from predicate.spec.instrument import instrument, instrument_function
+from predicate.spec.instrument import instrument
 from predicate.spec.spec import SpecViolationError
 from spec.test_functions.typed_dicts_postponed import Options
 

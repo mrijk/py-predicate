@@ -5,14 +5,16 @@ from typing import Any
 
 import pytest
 
-from predicate import ge_p, is_instrumentation_enabled, is_instrumented, is_int_p, set_instrumentation
-from predicate.spec.instrument import (
-    _enabled_from_environment,
-    enrich_spec,
-    instrument,
+from predicate import (
+    ge_p,
     instrument_function,
-    instrument_module,
+    is_instrumentation_enabled,
+    is_instrumented,
+    is_int_p,
+    set_instrumentation,
 )
+from predicate.spec.instrument import instrument, instrument_module
+from predicate.spec.instrument_function import _enabled_from_environment, enrich_spec
 from predicate.spec.spec import InvalidSpecError, Spec, SpecViolationError
 
 
@@ -622,7 +624,7 @@ def test_instrument_forward_reference_without_future_import():
 
 
 def test_instrument_signature_computed_once(monkeypatch):
-    import predicate.spec.instrument as instrument_module_
+    import predicate.spec.instrument_function as instrument_module_
 
     calls = []
     original = instrument_module_.signature
