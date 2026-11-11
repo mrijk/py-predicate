@@ -42,7 +42,7 @@ class _PredicateTransformer(Transformer):
     def value(self, item) -> int:
         return int(item[0].value)
 
-    def and_expression(self, items: tuple[Predicate, Predicate]):
+    def and_expression(self, items: tuple[Predicate, Predicate]) -> Predicate:
         left, right = items
         return left & right
 
@@ -58,7 +58,7 @@ class _PredicateTransformer(Transformer):
     def grouped_expression(self, item):
         return item[0]
 
-    def implies_expression(self, items: tuple[Predicate, Predicate]):
+    def implies_expression(self, items: tuple[Predicate, Predicate]) -> Implies:
         left, right = items
         return Implies(left=left, right=right)
 

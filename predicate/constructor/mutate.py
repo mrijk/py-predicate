@@ -16,37 +16,37 @@ from predicate.xor_predicate import XorPredicate
 
 
 @singledispatch
-def mutations(predicate: Predicate, false_set: list, true_set: list, nr: int = 3) -> Iterator[Predicate]:
+def mutations[T](predicate: Predicate, false_set: list[T], true_set: list[T], nr: int = 3) -> Iterator[Predicate]:
     """Return nr of mutations."""
     yield predicate
 
 
-def int_value_mutations(n: int, values: list, nr: int) -> Iterator[int]:
+def int_value_mutations[T](n: int, values: list[T], nr: int) -> Iterator[int]:
     yield choice(values)
     yield n - randint(0, 10)
     yield n + randint(0, 10)
 
 
 @mutations.register
-def _(predicate: AndPredicate, false_set: list, true_set: list, nr: int = 3) -> Iterator[Predicate]:
+def _[T](predicate: AndPredicate, false_set: list[T], true_set: list[T], nr: int = 3) -> Iterator[Predicate]:
     yield from mutations(predicate.left, false_set=false_set, true_set=true_set, nr=nr)
     yield from mutations(predicate.right, false_set=false_set, true_set=true_set, nr=nr)
 
 
 @mutations.register
-def _(predicate: OrPredicate, false_set: list, true_set: list, nr: int = 3) -> Iterator[Predicate]:
+def _[T](predicate: OrPredicate, false_set: list[T], true_set: list[T], nr: int = 3) -> Iterator[Predicate]:
     yield from mutations(predicate.left, false_set=false_set, true_set=true_set, nr=nr)
     yield from mutations(predicate.right, false_set=false_set, true_set=true_set, nr=nr)
 
 
 @mutations.register
-def _(predicate: XorPredicate, false_set: list, true_set: list, nr: int = 3) -> Iterator[Predicate]:
+def _[T](predicate: XorPredicate, false_set: list[T], true_set: list[T], nr: int = 3) -> Iterator[Predicate]:
     yield from mutations(predicate.left, false_set=false_set, true_set=true_set, nr=nr)
     yield from mutations(predicate.right, false_set=false_set, true_set=true_set, nr=nr)
 
 
 @mutations.register
-def _(predicate: EqPredicate, false_set: list, true_set: list, nr: int = 3) -> Iterator[Predicate]:
+def _[T](predicate: EqPredicate, false_set: list[T], true_set: list[T], nr: int = 3) -> Iterator[Predicate]:
     match predicate.v:
         case int(n):
             yield from (eq_p(v) for v in int_value_mutations(n, true_set, nr))
@@ -55,7 +55,7 @@ def _(predicate: EqPredicate, false_set: list, true_set: list, nr: int = 3) -> I
 
 
 @mutations.register
-def _(predicate: NePredicate, false_set, true_set: list, nr: int = 3) -> Iterator[Predicate]:
+def _[T](predicate: NePredicate, false_set: list[T], true_set: list[T], nr: int = 3) -> Iterator[Predicate]:
     match predicate.v:
         case int(n):
             yield from (ne_p(v) for v in int_value_mutations(n, false_set, nr))
@@ -64,7 +64,7 @@ def _(predicate: NePredicate, false_set, true_set: list, nr: int = 3) -> Iterato
 
 
 @mutations.register
-def _(predicate: GePredicate, false_set, true_set: list, nr: int = 3) -> Iterator[Predicate]:
+def _[T](predicate: GePredicate, false_set: list[T], true_set: list[T], nr: int = 3) -> Iterator[Predicate]:
     match predicate.v:
         case int(n):
             yield from (ge_p(v) for v in int_value_mutations(n, true_set, nr))
@@ -73,7 +73,7 @@ def _(predicate: GePredicate, false_set, true_set: list, nr: int = 3) -> Iterato
 
 
 @mutations.register
-def _(predicate: GtPredicate, false_set, true_set: list, nr: int = 3) -> Iterator[Predicate]:
+def _[T](predicate: GtPredicate, false_set: list[T], true_set: list[T], nr: int = 3) -> Iterator[Predicate]:
     match predicate.v:
         case int(n):
             yield from (gt_p(v) for v in int_value_mutations(n, false_set, nr))
@@ -82,7 +82,7 @@ def _(predicate: GtPredicate, false_set, true_set: list, nr: int = 3) -> Iterato
 
 
 @mutations.register
-def _(predicate: LePredicate, false_set, true_set: list, nr: int = 3) -> Iterator[Predicate]:
+def _[T](predicate: LePredicate, false_set: list[T], true_set: list[T], nr: int = 3) -> Iterator[Predicate]:
     match predicate.v:
         case int(n):
             yield from (le_p(v) for v in int_value_mutations(n, true_set, nr))
@@ -91,7 +91,7 @@ def _(predicate: LePredicate, false_set, true_set: list, nr: int = 3) -> Iterato
 
 
 @mutations.register
-def _(predicate: LtPredicate, false_set, true_set: list, nr: int = 3) -> Iterator[Predicate]:
+def _[T](predicate: LtPredicate, false_set: list[T], true_set: list[T], nr: int = 3) -> Iterator[Predicate]:
     match predicate.v:
         case int(n):
             yield from (lt_p(v) for v in int_value_mutations(n, false_set, nr))

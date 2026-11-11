@@ -12,7 +12,7 @@ class TeePredicate[T](Predicate[T]):
 
     fn: Callable[[T], None]
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         if is_async_p(self.fn):
             self._call = lambda x: asyncio.run(self.fn(x))  # type: ignore[arg-type]
         else:

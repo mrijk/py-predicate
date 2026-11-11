@@ -14,7 +14,7 @@ class ReducePredicate[T](Predicate[T]):
     initial: T
     _call: Callable[[T, T], tuple[T, Predicate[T]]] = field(init=False, repr=False)
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         if is_async_p(self.fn):
             self._call = lambda acc, x: asyncio.run(self.fn(acc, x))
         else:

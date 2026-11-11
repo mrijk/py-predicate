@@ -697,7 +697,7 @@ async def take_async(values: Any, n: int) -> list:
     return items
 
 
-def verify_items(item_p: Predicate, value: dict, items: list) -> None:
+def verify_items[T](item_p: Predicate, value: dict, items: list[T]) -> None:
     """Check the items a generator function yielded for the inputs in value."""
     items_p = all_p(item_p)
     if not items_p(items):

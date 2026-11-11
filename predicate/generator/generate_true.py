@@ -1077,7 +1077,7 @@ def generate_is_callable_p(predicate: IsCallablePredicate) -> Iterator:
 
 @generate_true.register
 def generate_is_async_p(predicate: IsAsyncPredicate) -> Iterator:
-    async def _async_fn():
+    async def _async_fn() -> None:
         pass
 
     while True:
