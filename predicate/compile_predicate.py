@@ -92,7 +92,7 @@ def _const(v) -> ast.Constant:
     return ast.Constant(value=v)
 
 
-def _cmp[T](ops: list, comparators: list[T]) -> ast.Compare:
+def _cmp(ops: list, comparators: list[ast.expr]) -> ast.Compare:
     return ast.Compare(left=_x(), ops=ops, comparators=comparators)
 
 

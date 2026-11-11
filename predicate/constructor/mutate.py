@@ -1,6 +1,6 @@
 from functools import singledispatch
 from random import choice, randint
-from typing import Iterator
+from typing import Any, Iterator
 
 from predicate import eq_p, ge_p, gt_p, le_p, lt_p, ne_p
 from predicate.and_predicate import AndPredicate
@@ -21,7 +21,7 @@ def mutations[T](predicate: Predicate, false_set: list[T], true_set: list[T], nr
     yield predicate
 
 
-def int_value_mutations[T](n: int, values: list[T], nr: int) -> Iterator[int]:
+def int_value_mutations(n: int, values: list[Any], nr: int) -> Iterator[int]:
     yield choice(values)
     yield n - randint(0, 10)
     yield n + randint(0, 10)

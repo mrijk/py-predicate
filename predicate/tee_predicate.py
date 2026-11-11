@@ -14,7 +14,7 @@ class TeePredicate[T](Predicate[T]):
 
     def __post_init__(self) -> None:
         if is_async_p(self.fn):
-            self._call = lambda x: asyncio.run(self.fn(x))  # type: ignore[arg-type]
+            self._call: Callable[[T], Any] = lambda x: asyncio.run(self.fn(x))  # type: ignore[arg-type, func-returns-value]
         else:
             self._call = self.fn
 
