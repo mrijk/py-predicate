@@ -30,10 +30,10 @@ from more_itertools import interleave, random_permutation, repeatfunc, take, uni
 
 from predicate.eq_predicate import eq_p
 from predicate.generator.generate_predicate import generate_predicate, typed_predicate_type_registry
+from predicate.is_instance_predicate import is_int_p, is_str_p
 from predicate.predicate import Predicate
 from predicate.range_predicate import ge_le_p
 from predicate.regex_predicate import regex_p
-from predicate.standard_predicates import is_int_p, is_str_p
 
 
 def random_first_from_iterables(*iterables: Iterable) -> Iterator[Any]:

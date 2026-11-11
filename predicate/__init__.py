@@ -15,9 +15,8 @@ from predicate.exactly_predicate import exactly_n
 from predicate.exception_predicate import exception_p
 from predicate.compile_predicate import compile_predicate, try_compile_predicate
 from predicate.explain import explain
-from predicate.function_predicate import as_predicate
+from predicate.function_predicate import as_predicate, fn_p
 from predicate.fn_predicate import (
-    fn_p,
     is_even_p,
     is_finite_p,
     is_inf_p,
@@ -47,7 +46,12 @@ from predicate.is_instance_predicate import (
     is_complex_p,
     is_container_p,
     is_date_p,
+    is_dict_p,
     is_datetime_p,
+    is_float_p,
+    is_int_p,
+    is_list_p,
+    is_str_p,
     is_frozenset_p,
     is_hashable_p,
     is_instance_p,
@@ -127,13 +131,8 @@ from predicate.spec.instrument_function import (
 from predicate.spec.is_valid_spec_predicate import is_valid_spec_p
 from predicate.spec.spec import InvalidSpecError, Spec, SpecViolationError
 from predicate.standard_predicates import (
-    is_dict_p,
-    is_float_p,
-    is_int_p,
     is_iterable_of_p,
-    is_list_p,
     is_number_p,
-    is_str_p,
     root_p,
     this_p,
 )

@@ -61,7 +61,7 @@ from predicate.is_async_predicate import IsAsyncPredicate
 from predicate.is_callable_predicate import IsCallablePredicate
 from predicate.is_close_predicate import IsClosePredicate
 from predicate.is_falsy_predicate import IsFalsyPredicate
-from predicate.is_instance_predicate import IsInstancePredicate
+from predicate.is_instance_predicate import IsInstancePredicate, is_int_p
 from predicate.is_lambda_predicate import IsLambdaPredicate
 from predicate.is_named_tuple_predicate import IsNamedTuplePredicate
 from predicate.is_none_predicate import IsNonePredicate
@@ -98,7 +98,6 @@ from predicate.set_predicates import (
     IsSubsetPredicate,
     IsSupersetPredicate,
 )
-from predicate.standard_predicates import is_int_p
 from predicate.star_predicate import StarPredicate
 from predicate.struct_predicate import StructPredicate
 from predicate.tee_predicate import TeePredicate

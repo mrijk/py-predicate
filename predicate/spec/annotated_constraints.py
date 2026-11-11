@@ -9,7 +9,8 @@ from collections.abc import Callable, Iterator
 from datetime import UTC, datetime, tzinfo
 from typing import Any
 
-from predicate.fn_predicate import fn_p, is_finite_p, is_inf_p, is_nan_p
+from predicate.fn_predicate import is_finite_p, is_inf_p, is_nan_p
+from predicate.function_predicate import fn_p
 from predicate.ge_predicate import ge_p
 from predicate.gt_predicate import gt_p
 from predicate.has_length_predicate import has_length_p

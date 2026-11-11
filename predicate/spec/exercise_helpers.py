@@ -43,9 +43,9 @@ from predicate import all_p, always_false_p, always_true_p, generate_true, is_in
 from predicate.dict_of_predicate import is_dict_of_p
 from predicate.eq_predicate import eq_p
 from predicate.explain import explain
-from predicate.fn_predicate import fn_p
 from predicate.frozendict_of_predicate import is_frozendict_of_p
 from predicate.frozenset_of_predicate import is_frozenset_of_p
+from predicate.function_predicate import fn_p
 from predicate.generator.helpers import random_named_tuple_classes, random_typed_dict_classes
 from predicate.has_length_predicate import is_empty_p
 from predicate.implies import implies
