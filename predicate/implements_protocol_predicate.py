@@ -8,7 +8,7 @@ from predicate.same_signature_predicate import same_signature_p
 
 def protocol_members(protocol: type) -> set[str]:
     # ponytail: __protocol_attrs__ is private API (3.12+); typing.get_protocol_members once we require 3.13
-    return protocol.__protocol_attrs__  # type: ignore[attr-defined]
+    return set(protocol.__protocol_attrs__)  # type: ignore[attr-defined]
 
 
 @dataclass

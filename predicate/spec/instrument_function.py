@@ -57,10 +57,10 @@ def enrich_spec(func: Callable[..., Any], spec: Spec) -> Spec:
         if name not in args and param.annotation is not param.empty:
             args[name] = param_predicate(param)
 
-    enriched = spec | {"args": args}
+    enriched: Spec = {**spec, "args": args}
 
     if not enriched.get("ret") and sig.return_annotation is not sig.empty:
-        enriched = enriched | {"ret": get_return_predicate(sig)}
+        enriched["ret"] = get_return_predicate(sig)
 
     return enriched
 

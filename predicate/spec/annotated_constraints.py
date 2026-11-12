@@ -54,7 +54,7 @@ def _multiple_of_p(n: Any) -> Predicate[Any]:
     from predicate.generator.helpers import random_ints
 
     def is_multiple(x: Any) -> bool:
-        return x % n == 0
+        return bool(x % n == 0)
 
     is_multiple.__name__ = f"is_multiple_of_{n}"
     return fn_p(is_multiple, generate_true_fn=lambda: (n * k for k in random_ints(lower=-1000, upper=1000)))

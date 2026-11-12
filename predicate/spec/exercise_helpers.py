@@ -480,7 +480,7 @@ def get_return_spec(f: Callable[..., Any], spec: Spec) -> Spec:
 
         if sig.return_annotation == sig.empty:
             raise InvalidSpecError("Return annotation not in spec")
-        return spec | {"ret": annotation_to_predicate(sig.return_annotation)}
+        return {**spec, "ret": annotation_to_predicate(sig.return_annotation)}
     return spec
 
 

@@ -6,7 +6,7 @@ from predicate.helpers import join_as_str
 from predicate.predicate import Predicate
 
 
-def class_from_set(v: Iterable[Any]) -> Any:
+def class_from_set(v: Iterable[Any]) -> type:
     types = {type(value) for value in v}
     if len(types) == 1:
         return next(iter(types))
@@ -34,7 +34,7 @@ class InPredicate[T](Predicate[T]):
         match other:
             case InPredicate(v) if isinstance(self.v, Iterable) and isinstance(v, Iterable):
                 if isinstance(self.v, Sized) and isinstance(v, Sized) and (len(self.v) > 1000 or len(v) > 1000):
-                    return self.v == v
+                    return self.v == v  # type: ignore[comparison-overlap]
                 return set(self.v) == set(v)
             case _:
                 return False
