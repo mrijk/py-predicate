@@ -1,6 +1,7 @@
 import inspect
 from dataclasses import dataclass
 from functools import cached_property
+from typing import Any
 
 from predicate.predicate import Predicate
 
@@ -12,7 +13,7 @@ class LazyPredicate[T](Predicate[T]):
     ref: str
 
     @cached_property
-    def predicate(self) -> Predicate | None:
+    def predicate(self) -> Predicate[Any] | None:
         return find_predicate_by_ref(self.frame, self.ref)
 
     def __call__(self, x: T) -> bool:
@@ -25,7 +26,7 @@ class LazyPredicate[T](Predicate[T]):
         return f'lazy_p("{self.ref}")'
 
 
-def find_predicate_by_ref(frame, ref: str) -> Predicate | None:
+def find_predicate_by_ref(frame, ref: str) -> Predicate[Any] | None:
     for key, value in frame.f_locals.items():
         if key == ref:
             return value
@@ -34,6 +35,6 @@ def find_predicate_by_ref(frame, ref: str) -> Predicate | None:
     return None
 
 
-def lazy_p(ref: str) -> LazyPredicate:
+def lazy_p(ref: str) -> LazyPredicate[Any]:
     """Return True if the predicate holds for each item in the iterable, otherwise False."""
     return LazyPredicate(ref=ref)

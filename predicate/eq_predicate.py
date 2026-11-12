@@ -31,11 +31,11 @@ def eq_p[T](v: T) -> EqPredicate[T]:
     return EqPredicate(v=v)
 
 
-zero_p: Final[EqPredicate] = eq_p(0)
+zero_p: Final[EqPredicate[Any]] = eq_p(0)
 """Returns True of the value is zero, otherwise False."""
 
-eq_true_p: Final[EqPredicate] = eq_p(True)
+eq_true_p: Final[EqPredicate[Any]] = eq_p(True)
 """Returns True if the value is True, otherwise False."""
 
-eq_false_p: Final[EqPredicate] = eq_p(False)
+eq_false_p: Final[EqPredicate[Any]] = eq_p(False)
 """Returns True if the value is False, otherwise False."""

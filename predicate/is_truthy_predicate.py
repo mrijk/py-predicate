@@ -19,5 +19,5 @@ class IsTruthyPredicate[T](Predicate[T]):
         return {"reason": f"{x} is not a truthy value"}
 
 
-is_truthy_p: Final[IsTruthyPredicate] = IsTruthyPredicate()
+is_truthy_p: Final[IsTruthyPredicate[Any]] = IsTruthyPredicate()
 """Returns True if the value is truthy, otherwise False."""

@@ -48,6 +48,6 @@ class ImplementsProtocolPredicate[T](Predicate[T]):
         return {"reason": self._failure(x)}
 
 
-def implements_protocol_p(protocol: type, args_match: bool = False) -> Predicate:
+def implements_protocol_p(protocol: type, args_match: bool = False) -> Predicate[Any]:
     """Return True if value is Protocol, otherwise False."""
     return ImplementsProtocolPredicate(protocol=protocol, args_match=args_match)

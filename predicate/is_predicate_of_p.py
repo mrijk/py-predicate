@@ -18,7 +18,7 @@ class IsPredicateOfPredicate[T](Predicate[T]):
                 return False
 
     def __repr__(self) -> str:
-        name = self.predicate_klass.__name__  # type: ignore
+        name = self.predicate_klass.__name__
         return f"is_predicate_of_p({name!r})"
 
     @override
@@ -30,5 +30,5 @@ class IsPredicateOfPredicate[T](Predicate[T]):
                 return {"reason": f"Value `{x}` is not a predicate"}
 
 
-def is_predicate_of_p(klass: type) -> Predicate:
+def is_predicate_of_p(klass: type) -> Predicate[Any]:
     return IsPredicateOfPredicate(predicate_klass=klass)

@@ -11,12 +11,12 @@ class PropertyPredicate[T](Predicate[T]):
 
     getter: property
 
-    def __init__(self, getter: Callable):
+    def __init__(self, getter: Callable[..., Any]):
         self.getter = getter  # type: ignore
 
     def __call__(self, obj: T) -> bool:
         if sys.version_info.minor > 12:
-            if not hasattr(obj, self.getter.__name__):  # type: ignore
+            if not hasattr(obj, self.getter.__name__):
                 return False
 
         return self.getter.fget(obj)  # type: ignore
@@ -28,11 +28,11 @@ class PropertyPredicate[T](Predicate[T]):
     def explain_failure(self, obj: T) -> dict[str, Any]:
         object_type = type(obj).__name__
         if sys.version_info.minor > 12:
-            property_name = self.getter.__name__  # type: ignore
+            property_name = self.getter.__name__
             if not hasattr(obj, property_name):
                 return {"reason": f"Object {object_type} has no property {property_name}"}
         return {"reason": f"Property in Object {object_type} returned False"}
 
 
-def property_p(getter: Callable) -> Predicate:
+def property_p(getter: Callable[..., Any]) -> Predicate[Any]:
     return PropertyPredicate(getter=getter)

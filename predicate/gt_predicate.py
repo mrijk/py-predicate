@@ -8,7 +8,7 @@ from predicate.predicate import ConstrainedT, Predicate
 class GtPredicate[T](Predicate[T]):
     """A predicate class that models the 'gt' (>) predicate."""
 
-    v: ConstrainedT
+    v: ConstrainedT  # type: ignore[type-arg]
 
     def __call__(self, x: T) -> bool:
         return x > self.v
@@ -26,10 +26,10 @@ class GtPredicate[T](Predicate[T]):
         return {"reason": f"{x} is not greater than {self.v!r}"}
 
 
-def gt_p(v: ConstrainedT) -> GtPredicate[ConstrainedT]:
+def gt_p(v: ConstrainedT) -> GtPredicate[ConstrainedT]:  # type: ignore[type-arg]
     """Return True if the value is greater than the constant, otherwise False."""
     return GtPredicate(v=v)
 
 
-pos_p: Final[GtPredicate] = gt_p(0)
+pos_p: Final[GtPredicate[Any]] = gt_p(0)
 """Returns True of the value is positive, otherwise False."""

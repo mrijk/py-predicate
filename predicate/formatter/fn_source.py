@@ -1,12 +1,12 @@
 import ast
 import inspect
 import textwrap
-from typing import Callable
+from typing import Any, Callable
 
 from more_itertools import first
 
 
-def get_fn_source(fn: Callable) -> dict[str, str]:
+def get_fn_source(fn: Callable[..., Any]) -> dict[str, str]:
     """Return serializable info about fn's source."""
     try:
         source_file = inspect.getfile(fn)
@@ -23,7 +23,7 @@ def get_fn_source(fn: Callable) -> dict[str, str]:
     return _get_lambda_source(source_file, fn)
 
 
-def _get_lambda_source(source_file: str, fn: Callable) -> dict[str, str]:
+def _get_lambda_source(source_file: str, fn: Callable[..., Any]) -> dict[str, str]:
     # Lambda: parse full file, find Lambda node on the right line
     try:
         with open(source_file) as f:
@@ -47,14 +47,14 @@ def _get_lambda_source(source_file: str, fn: Callable) -> dict[str, str]:
     return {"source": ast.unparse(chosen)}
 
 
-def _builtin_info(fn: Callable) -> dict[str, str]:
+def _builtin_info(fn: Callable[..., Any]) -> dict[str, str]:
     name = getattr(fn, "__qualname__", getattr(fn, "__name__", str(fn)))
     module = getattr(fn, "__module__", None)
     qualname = f"{module}.{name}" if module else name
     return {"qualname": qualname}
 
 
-def _get_body_col(fn: Callable) -> int | None:
+def _get_body_col(fn: Callable[..., Any]) -> int | None:
     try:
         cols = [col for _, _, col, _ in fn.__code__.co_positions() if col]
         return first(cols, default=None)

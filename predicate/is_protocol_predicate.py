@@ -19,6 +19,6 @@ class IsProtocolPredicate[T](Predicate[T]):
         return {"reason": f"{x} is not a Protocol"}
 
 
-def is_protocol_p() -> Predicate:
+def is_protocol_p() -> Predicate[Any]:
     """Return True if value is Protocol, otherwise False."""
     return IsProtocolPredicate()

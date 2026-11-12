@@ -32,4 +32,4 @@ class IsRegexPredicate[T](Predicate[T]):
         raise AssertionError("unreachable")  # ponytail: only called on failure
 
 
-is_regex_p: Final[IsRegexPredicate] = IsRegexPredicate()
+is_regex_p: Final[IsRegexPredicate[Any]] = IsRegexPredicate()

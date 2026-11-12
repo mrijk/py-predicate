@@ -10,7 +10,7 @@ from predicate.spec.spec import InvalidSpecError, Spec
 class IsValidSpecPredicate(Predicate[Spec]):
     """A predicate class that models the 'is valid spec for function' predicate."""
 
-    function: Callable
+    function: Callable[..., Any]
 
     def __call__(self, spec: Spec) -> bool:
         return self._failure(spec) is None
@@ -30,6 +30,6 @@ class IsValidSpecPredicate(Predicate[Spec]):
         return {"reason": self._failure(spec)}
 
 
-def is_valid_spec_p(function: Callable) -> Predicate[Spec]:
+def is_valid_spec_p(function: Callable[..., Any]) -> Predicate[Spec]:
     """Return True if the spec is valid for the function, otherwise False."""
     return IsValidSpecPredicate(function=function)

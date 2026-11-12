@@ -15,7 +15,7 @@ from predicate.star_predicate import StarPredicate
 class MatchPredicate[T](Predicate[T]):
     """A predicate class that models 'match iterable' predicate."""
 
-    predicates: list[Predicate]
+    predicates: list[Predicate[Any]]
     full_match: bool = False
 
     def __call__(self, iterable: Iterable[T]) -> bool:
@@ -30,12 +30,12 @@ class MatchPredicate[T](Predicate[T]):
         return {"reason": reason(iterable, predicates=self.predicates, full_match=self.full_match)}
 
 
-def match_p[T](*predicates: Predicate, full_match: bool = False) -> MatchPredicate[T]:
+def match_p[T](*predicates: Predicate[Any], full_match: bool = False) -> MatchPredicate[T]:
     """Return True if the predicate holds for each item in the iterable, otherwise False."""
     return MatchPredicate(predicates=list(predicates), full_match=full_match)
 
 
-def reason(iterable: Iterable, *, predicates: list[Predicate], full_match: bool) -> dict[str, Any]:
+def reason(iterable: Iterable[Any], *, predicates: list[Predicate[Any]], full_match: bool) -> dict[str, Any]:
     if not predicates:
         return {"reason": "Iterable has more items than predicates to match", "result": False}
     predicate, *rest_predicates = predicates
@@ -53,7 +53,7 @@ def reason(iterable: Iterable, *, predicates: list[Predicate], full_match: bool)
             raise NotImplementedError
 
 
-def match(iterable: Iterable, *, predicates: list[Predicate], full_match: bool) -> bool:
+def match(iterable: Iterable[Any], *, predicates: list[Predicate[Any]], full_match: bool) -> bool:
     if not predicates:
         # Nothing left to match: a partial match succeeds, a full match only if the iterable is exhausted
         return not full_match or not list(iterable)
@@ -68,7 +68,7 @@ def match(iterable: Iterable, *, predicates: list[Predicate], full_match: bool) 
 
 
 def _match_recur(
-    iterable: Iterable, *, predicate: Predicate, rest_predicates: list[Predicate], full_match: bool
+    iterable: Iterable[Any], *, predicate: Predicate[Any], rest_predicates: list[Predicate[Any]], full_match: bool
 ) -> bool:
     consumed = list(consumes(predicate, iterable))
 

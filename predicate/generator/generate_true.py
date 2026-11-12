@@ -1025,7 +1025,7 @@ def _get_type_registry() -> dict[Any, Callable[[], Iterator[Any]]]:
 
 @generate_true.register(IsInstancePredicate)
 def generate_is_instance_p(predicate: IsInstancePredicate[Any], **kwargs: Any) -> Iterator[Any]:
-    annotation = predicate.instance_klass[0]  # type: ignore
+    annotation = predicate.instance_klass[0]
     # Generic aliases such as Predicate[int], typing.Callable and Iterable[int] map to their origin class
     klass = get_origin(annotation) or annotation
 
@@ -1141,7 +1141,7 @@ if sys.version_info.minor > 12:
     def generate_property_p(property_predicate: PropertyPredicate[Any]) -> Iterator[Any]:
         getter = property_predicate.getter
 
-        attributes = {getter.__name__: getter}  # type: ignore
+        attributes = {getter.__name__: getter}
         klass = type("Foo", (object,), attributes)
 
         yield klass

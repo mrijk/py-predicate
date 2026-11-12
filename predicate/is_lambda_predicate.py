@@ -6,7 +6,7 @@ from typing import Any, Final, override
 from predicate.predicate import Predicate
 
 
-def func_is_lambda(func: Callable) -> bool:
+def func_is_lambda(func: Callable[..., Any]) -> bool:
     lambda_name = (lambda: 0).__name__
     return getattr(func, "__name__", None) == lambda_name
 
@@ -19,7 +19,7 @@ class IsLambdaPredicate[T](Predicate[T]):
 
     def __call__(self, x: Any) -> bool:
         match x:
-            case Callable() as func if func_is_lambda(func):  # type: ignore
+            case func if callable(func) and func_is_lambda(func):
                 if self.nr_of_parameters is not None:
                     sig = signature(func)
                     return len(sig.parameters) == self.nr_of_parameters
@@ -37,19 +37,19 @@ class IsLambdaPredicate[T](Predicate[T]):
     @override
     def explain_failure(self, x: Any) -> dict[str, Any]:
         match x:
-            case Callable() as func if func_is_lambda(func):  # type: ignore
+            case func if callable(func) and func_is_lambda(func):
                 sig = signature(func)
                 return {
                     "reason": f"Lambda has {len(sig.parameters)} parameters, expected: {self.nr_of_parameters}",
                 }
-            case Callable() as func:  # type: ignore
+            case func if callable(func):
                 return {"reason": f"Function {func.__name__} is not a lambda"}
             case _:
                 return {"reason": f"Value {x} is not a lambda"}
 
 
-is_lambda_p: Final[IsLambdaPredicate] = IsLambdaPredicate()
+is_lambda_p: Final[IsLambdaPredicate[Any]] = IsLambdaPredicate()
 
 
-def is_lambda_with_signature_p(*, nr_of_parameters: int) -> Predicate:
+def is_lambda_with_signature_p(*, nr_of_parameters: int) -> Predicate[Any]:
     return IsLambdaPredicate(nr_of_parameters=nr_of_parameters)

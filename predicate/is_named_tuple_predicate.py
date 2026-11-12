@@ -23,4 +23,4 @@ class IsNamedTuplePredicate[T](Predicate[T]):
         return {"reason": f"{x} is not a named tuple"}
 
 
-is_named_tuple_p: Final[IsNamedTuplePredicate] = IsNamedTuplePredicate()
+is_named_tuple_p: Final[IsNamedTuplePredicate[Any]] = IsNamedTuplePredicate()

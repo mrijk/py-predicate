@@ -29,6 +29,6 @@ class IsClosePredicate[T](Predicate[T]):
         return {"reason": f"{x} is not close to {self.target!r}"}
 
 
-def is_close_p(target: float, *, rel_tol: float = 1e-9, abs_tol: float = 0.0) -> IsClosePredicate:
+def is_close_p(target: float, *, rel_tol: float = 1e-9, abs_tol: float = 0.0) -> IsClosePredicate[Any]:
     """Return True if the value is approximately equal to target, otherwise False."""
     return IsClosePredicate(target=target, rel_tol=rel_tol, abs_tol=abs_tol)

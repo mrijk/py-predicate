@@ -9,7 +9,7 @@ from predicate.predicate import Predicate
 class SetOfPredicate[T](Predicate[T]):
     """A predicate class that models the set_of predicate."""
 
-    predicate: Predicate
+    predicate: Predicate[Any]
 
     def __call__(self, x: Any) -> TypeGuard[set[T]]:
         match x:

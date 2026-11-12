@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Final
+from typing import Any, Final
 
 from predicate.predicate import Predicate
 
@@ -21,5 +21,5 @@ class ExceptionPredicate[T](Predicate[T]):
         return "exception_p"
 
 
-exception_p: Final[ExceptionPredicate] = ExceptionPredicate()
+exception_p: Final[ExceptionPredicate[Any]] = ExceptionPredicate()
 """Always throw an exception."""

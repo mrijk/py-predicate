@@ -26,6 +26,6 @@ class CompPredicate[S, T](Predicate[T]):
         return {"reason": self.predicate.explain(x)}
 
 
-def comp_p[T](fn: Callable[[Any], T], predicate: Predicate[T]) -> CompPredicate:
+def comp_p[T](fn: Callable[[Any], T], predicate: Predicate[T]) -> CompPredicate[Any, Any]:
     """Return a predicate, composed of a function and another predicate."""
     return CompPredicate(fn=fn, predicate=predicate)

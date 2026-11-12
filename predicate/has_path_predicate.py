@@ -10,7 +10,7 @@ from predicate.predicate import Predicate
 class HasPathPredicate[T](Predicate[T]):
     """A predicate class that models the 'length' predicate."""
 
-    path: list[Predicate]
+    path: list[Predicate[Any]]
 
     def __call__(self, x: Any) -> bool:
         if isinstance(x, Mapping):
@@ -35,13 +35,13 @@ class HasPathPredicate[T](Predicate[T]):
         return {"reason": f"Mapping {x} didn't match path"}  # pragma: no cover
 
 
-def _match_dict(x: Mapping, *, path: list[Predicate]) -> bool:
+def _match_dict(x: Mapping[Any, Any], *, path: list[Predicate[Any]]) -> bool:
     first_p, *rest = path
     found = (v for k, v in x.items() if first_p(k))
     return any(_match_rest(value, rest) for value in found)
 
 
-def _match_rest(value: Any, rest_path: list[Predicate]) -> bool:
+def _match_rest(value: Any, rest_path: list[Predicate[Any]]) -> bool:
     match (value, rest_path):
         case (_, [_, *_]) if isinstance(value, Mapping):
             return _match_dict(value, path=rest_path)
@@ -55,6 +55,6 @@ def _match_rest(value: Any, rest_path: list[Predicate]) -> bool:
             return False
 
 
-def has_path_p(*predicates: Predicate) -> Predicate:
+def has_path_p(*predicates: Predicate[Any]) -> Predicate[Any]:
     """Return True if value is a dict, and contains the path specified by the predicates, otherwise False."""
     return HasPathPredicate(list(predicates))

@@ -60,7 +60,7 @@ class _PredicateTransformer(Transformer[Token, Predicate[Any]]):
     def grouped_expression(self, item: list[Predicate[Any]]) -> Predicate[Any]:
         return item[0]
 
-    def implies_expression(self, items: list[Predicate[Any]]) -> Implies:
+    def implies_expression(self, items: list[Predicate[Any]]) -> Implies[Any]:
         left, right = items
         return Implies(left=left, right=right)
 

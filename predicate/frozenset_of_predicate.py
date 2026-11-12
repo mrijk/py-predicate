@@ -9,7 +9,7 @@ from predicate.predicate import Predicate
 class FrozenSetOfPredicate[T](Predicate[T]):
     """A predicate class that models the frozenset_of predicate."""
 
-    predicate: Predicate
+    predicate: Predicate[Any]
 
     def __call__(self, x: Any) -> TypeGuard[frozenset[T]]:
         match x:

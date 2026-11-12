@@ -20,4 +20,4 @@ class IsAsyncPredicate[T](Predicate[T]):
         return {"reason": f"{x} is not an async function"}
 
 
-is_async_p: Final[IsAsyncPredicate] = IsAsyncPredicate()
+is_async_p: Final[IsAsyncPredicate[Any]] = IsAsyncPredicate()

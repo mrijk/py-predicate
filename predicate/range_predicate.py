@@ -12,8 +12,8 @@ class RangePredicate[T](Predicate[T]):
     @abstractmethod
     def __call__(self, x: T) -> bool: ...
 
-    lower: ConstrainedT
-    upper: ConstrainedT
+    lower: ConstrainedT  # type: ignore[type-arg]
+    upper: ConstrainedT  # type: ignore[type-arg]
 
     @override
     @property
@@ -84,21 +84,21 @@ class GtLtPredicate[T](RangePredicate[T]):
         return {"reason": f"{x!r} is not greater than {self.lower!r} and less than {self.upper!r}"}
 
 
-def ge_le_p(lower: ConstrainedT, upper: ConstrainedT) -> GeLePredicate[ConstrainedT]:
+def ge_le_p(lower: ConstrainedT, upper: ConstrainedT) -> GeLePredicate[ConstrainedT]:  # type: ignore[type-arg]
     """Return True if the value is greater or equal than the constant, otherwise False."""
     return GeLePredicate(lower=lower, upper=upper)
 
 
-def ge_lt_p(lower: ConstrainedT, upper: ConstrainedT) -> GeLtPredicate[ConstrainedT]:
+def ge_lt_p(lower: ConstrainedT, upper: ConstrainedT) -> GeLtPredicate[ConstrainedT]:  # type: ignore[type-arg]
     """Return True if the value is greater or equal than the constant, otherwise False."""
     return GeLtPredicate(lower=lower, upper=upper)
 
 
-def gt_le_p(lower: ConstrainedT, upper: ConstrainedT) -> GtLePredicate[ConstrainedT]:
+def gt_le_p(lower: ConstrainedT, upper: ConstrainedT) -> GtLePredicate[ConstrainedT]:  # type: ignore[type-arg]
     """Return True if the value is greater or equal than the constant, otherwise False."""
     return GtLePredicate(lower=lower, upper=upper)
 
 
-def gt_lt_p(lower: ConstrainedT, upper: ConstrainedT) -> GtLtPredicate[ConstrainedT]:
+def gt_lt_p(lower: ConstrainedT, upper: ConstrainedT) -> GtLtPredicate[ConstrainedT]:  # type: ignore[type-arg]
     """Return True if the value is greater or equal than the constant, otherwise False."""
     return GtLtPredicate(lower=lower, upper=upper)

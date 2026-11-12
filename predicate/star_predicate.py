@@ -9,9 +9,9 @@ from predicate.predicate import Predicate
 class StarPredicate[T](Predicate[T]):
     """Match any instances of the given predicate."""
 
-    predicate: Predicate
+    predicate: Predicate[Any]
 
-    def __call__(self, iterable: Iterable, *, predicates: list[Predicate], full_match: bool) -> bool:
+    def __call__(self, iterable: Iterable[Any], *, predicates: list[Predicate[Any]], full_match: bool) -> bool:
         from predicate.match_predicate import match
 
         if not iterable:
@@ -32,12 +32,12 @@ class StarPredicate[T](Predicate[T]):
 
     @override
     def explain_failure(
-        self, iterable: Iterable[T], *, predicates: list[Predicate], full_match: bool
-    ) -> dict[str, Any]:  # type: ignore
+        self, iterable: Iterable[T], *, predicates: list[Predicate[Any]], full_match: bool
+    ) -> dict[str, Any]:
         return {"reason": f"tbd {self.predicate!r}"}
 
 
-def star(predicate: Predicate) -> Predicate:
+def star(predicate: Predicate[Any]) -> Predicate[Any]:
     """Match any instances of the given predicate."""
     return StarPredicate(predicate=predicate)
 

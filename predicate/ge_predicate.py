@@ -8,7 +8,7 @@ from predicate.predicate import ConstrainedT, Predicate
 class GePredicate[T](Predicate[T]):
     """A predicate class that models the 'ge' (>=) predicate."""
 
-    v: ConstrainedT
+    v: ConstrainedT  # type: ignore[type-arg]
 
     def __call__(self, x: T) -> bool:
         return x >= self.v
@@ -26,6 +26,6 @@ class GePredicate[T](Predicate[T]):
         return {"reason": f"{x} is not greater or equal to {self.v!r}"}
 
 
-def ge_p(v: ConstrainedT) -> GePredicate[ConstrainedT]:
+def ge_p(v: ConstrainedT) -> GePredicate[ConstrainedT]:  # type: ignore[type-arg]
     """Return True if the value is greater or equal than the constant, otherwise False."""
     return GePredicate(v=v)

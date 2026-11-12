@@ -28,6 +28,6 @@ class JuxtPredicate[T](Predicate[T]):
         }
 
 
-def juxt_p(*predicates: Predicate, evaluate: Predicate[Iterable[bool]]) -> Predicate:
+def juxt_p(*predicates: Predicate[Any], evaluate: Predicate[Iterable[bool]]) -> Predicate[Any]:
     """Apply each predicate to the same value, then evaluate the boolean results with the evaluate predicate."""
     return JuxtPredicate(predicates=list(predicates), evaluate=evaluate)

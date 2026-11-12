@@ -11,17 +11,17 @@ class HasKeyPredicate[T](Predicate[T]):
 
     key_p: Predicate[T]
 
-    def __call__(self, v: Mapping) -> bool:
+    def __call__(self, v: Mapping[Any, Any]) -> bool:
         return any(self.key_p(k) for k in v.keys())
 
     def __repr__(self) -> str:
         return f"has_key_p({self.key_p!r})"
 
     @override
-    def explain_failure(self, v: Mapping) -> dict[str, Any]:
+    def explain_failure(self, v: Mapping[Any, Any]) -> dict[str, Any]:
         return {"reason": f"No key satisfying {self.key_p!r} found in {v}"}
 
 
-def has_key_p[T](key_p: Predicate[T]) -> HasKeyPredicate:
+def has_key_p[T](key_p: Predicate[T]) -> HasKeyPredicate[Any]:
     """Return True if dict contains a key satisfying key_p, otherwise False."""
     return HasKeyPredicate(key_p=key_p)

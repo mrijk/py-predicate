@@ -8,7 +8,7 @@ from predicate.predicate import ConstrainedT, Predicate
 class LtPredicate[T](Predicate[T]):
     """A predicate class that models the 'lt' (<) predicate."""
 
-    v: ConstrainedT
+    v: ConstrainedT  # type: ignore[type-arg]
 
     def __call__(self, x: T) -> bool:
         return x < self.v
@@ -26,10 +26,10 @@ class LtPredicate[T](Predicate[T]):
         return {"reason": f"{x} is not less than {self.v!r}"}
 
 
-def lt_p(v: ConstrainedT) -> LtPredicate[ConstrainedT]:
+def lt_p(v: ConstrainedT) -> LtPredicate[ConstrainedT]:  # type: ignore[type-arg]
     """Return True if the value is less than the constant, otherwise False."""
     return LtPredicate(v=v)
 
 
-neg_p: Final[LtPredicate] = lt_p(0)
+neg_p: Final[LtPredicate[Any]] = lt_p(0)
 """Returns True of the value is negative, otherwise False."""

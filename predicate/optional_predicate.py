@@ -8,9 +8,9 @@ from predicate.predicate import Predicate
 class OptionalPredicate[T](Predicate[T]):
     """Match 0 or 1 instances of the given predicate."""
 
-    predicate: Predicate
+    predicate: Predicate[Any]
 
-    def __call__(self, iterable: Iterable, *, predicates: list[Predicate], full_match: bool) -> bool:
+    def __call__(self, iterable: Iterable[Any], *, predicates: list[Predicate[Any]], full_match: bool) -> bool:
         if not iterable:
             return True
         item, *rest = iterable
@@ -27,8 +27,8 @@ class OptionalPredicate[T](Predicate[T]):
 
     @override
     def explain_failure(
-        self, iterable: Iterable[T], *, predicates: list[Predicate], full_match: bool
-    ) -> dict[str, Any]:  # type: ignore
+        self, iterable: Iterable[T], *, predicates: list[Predicate[Any]], full_match: bool
+    ) -> dict[str, Any]:
         item, *rest = iterable
 
         if predicates:
@@ -36,12 +36,12 @@ class OptionalPredicate[T](Predicate[T]):
 
             if not self.predicate(item):
                 return reason(iterable, predicates=predicates, full_match=full_match)
-            if not match(rest, predicates=predicates, full_match=full_match):  # type: ignore
+            if not match(rest, predicates=predicates, full_match=full_match):
                 return reason(rest, predicates=predicates, full_match=full_match)
 
         return self.predicate.explain_failure(item)
 
 
-def optional(predicate: Predicate) -> Predicate:
+def optional(predicate: Predicate[Any]) -> Predicate[Any]:
     """Match 0 or 1 instances of the given predicate."""
     return OptionalPredicate(predicate=predicate)

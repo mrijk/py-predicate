@@ -40,7 +40,7 @@ def is_instrumentation_enabled() -> bool:
     return _enabled
 
 
-def enrich_spec(func: Callable, spec: Spec) -> Spec:
+def enrich_spec(func: Callable[..., Any], spec: Spec) -> Spec:
     sig = resolve_signature(func)  # unresolvable annotations become Any, with an UnresolvedAnnotationWarning
 
     snapshot = spec.get("snapshot", {})
@@ -72,11 +72,11 @@ def default_on_error(message: str) -> None:
     raise SpecViolationError(message)
 
 
-def is_instrumented(func: Callable) -> bool:
+def is_instrumented(func: Callable[..., Any]) -> bool:
     return hasattr(func, "__spec__")
 
 
-def _get_reason(predicate: Predicate, value: Any) -> str | None:
+def _get_reason(predicate: Predicate[Any], value: Any) -> str | None:
     if predicate(value):
         return None
     result = explain(predicate, value)
@@ -112,7 +112,7 @@ def _check_type_vars(sig: Signature, func_name: str, arguments: dict[str, Any], 
     return None
 
 
-def _format_expected_exceptions(expected: type | tuple) -> str:
+def _format_expected_exceptions(expected: type | tuple[Any, ...]) -> str:
     if isinstance(expected, tuple):
         return ", ".join(e.__name__ for e in expected)
     return expected.__name__
@@ -162,7 +162,7 @@ def _check_constraints(
     yield from _check_fn_p_constraints(spec, func_name, arguments, result, old)
 
 
-def _replace_in_module(func: Callable, wrapped: Callable) -> None:
+def _replace_in_module(func: Callable[..., Any], wrapped: Callable[..., Any]) -> None:
     # A partial or a callable instance has no __name__: it isn't a module-level function to replace (#362)
     name = getattr(func, "__name__", None)
     module = sys.modules.get(getattr(func, "__module__", None) or "")
@@ -176,11 +176,11 @@ def _report(on_error: OnError, error: str | None) -> None:
 
 
 def _make_wrapper(
-    func: Callable,
+    func: Callable[..., Any],
     before: Callable[..., BeforeContext],
     on_exception: Callable[[Exception], None],
     after: Callable[[BeforeContext, Any], Any],
-) -> Callable:
+) -> Callable[..., Any]:
     from predicate import is_async_p
 
     if is_async_p(func):
@@ -214,7 +214,9 @@ def _make_wrapper(
     return wrapped_sync
 
 
-def instrument_function(func: Callable, spec: Spec, on_error: OnError = default_on_error) -> Callable:
+def instrument_function(
+    func: Callable[..., Any], spec: Spec, on_error: OnError = default_on_error
+) -> Callable[..., Any]:
     if is_instrumented(func):
         return func
     func = unwrap(func)
@@ -224,7 +226,7 @@ def instrument_function(func: Callable, spec: Spec, on_error: OnError = default_
     resolved_spec = cache(lambda: enrich_spec(func, spec))
     typed_signature = cache(lambda: resolve_signature(func))
 
-    def _before(args: tuple, kwargs: dict[str, Any]) -> tuple[dict, dict]:
+    def _before(args: tuple[Any, ...], kwargs: dict[str, Any]) -> tuple[dict[Any, Any], dict[Any, Any]]:
         bound = resolved_signature().bind(*args, **kwargs)
         bound.apply_defaults()
 

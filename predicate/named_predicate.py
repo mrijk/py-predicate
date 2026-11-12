@@ -29,7 +29,7 @@ class NamedPredicate[T](Predicate[T]):
         return {"reason": f"{self.name} is False for {x}"}
 
 
-def _to_named_predicate(predicate: Predicate, names_map: dict[str, NamedPredicate]) -> Predicate:
+def _to_named_predicate(predicate: Predicate[Any], names_map: dict[str, NamedPredicate[Any]]) -> Predicate[Any]:
     """Convert any predicate to a named predicate."""
 
     def next_name() -> str:
@@ -52,5 +52,5 @@ def _to_named_predicate(predicate: Predicate, names_map: dict[str, NamedPredicat
             return named_predicate
 
 
-def to_named_predicate(predicate: Predicate) -> Predicate:
+def to_named_predicate(predicate: Predicate[Any]) -> Predicate[Any]:
     return _to_named_predicate(predicate, {})

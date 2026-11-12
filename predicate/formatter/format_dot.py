@@ -93,7 +93,7 @@ def to_dot(predicate: Predicate[Any], predicate_string: str | None = None, show_
     return dot
 
 
-def render(dot: Digraph, predicate: Predicate[Any], node_nr: count) -> None:  # noqa: C901 # complexipy: ignore
+def render(dot: Digraph, predicate: Predicate[Any], node_nr: "count[Any]") -> None:  # noqa: C901 # complexipy: ignore
     node_predicate_mapping: dict[str, Predicate[Any]] = {}
 
     def _add_node(name: str, *, label: str, predicate: Predicate[Any] | None) -> str:
@@ -193,7 +193,7 @@ def render(dot: Digraph, predicate: Predicate[Any], node_nr: count) -> None:  # 
             case Implies(left, right):
                 return add_node_left_right("implies", label="=>", left=left, right=right)
             case IsInstancePredicate(klass):
-                name = klass[0].__name__  # type: ignore
+                name = klass[0].__name__
                 return add_node("instance", label=f"is_{name}_p")
             case IsNonePredicate():
                 return add_node("none", label="x = None")
@@ -309,14 +309,14 @@ def _render_lazy_references(dot: Digraph, node_predicate_mapping: dict[str, Pred
                 add_dashed_line(node, this)
 
 
-def _render_original(dot: Digraph, predicate: Predicate[Any], node_nr: count) -> None:
+def _render_original(dot: Digraph, predicate: Predicate[Any], node_nr: "count[Any]") -> None:
     with dot.subgraph(name="cluster_original") as original:
         original.attr(style="filled", color="lightgrey")
         original.attr(label="Original predicate")
         render(original, predicate, node_nr)
 
 
-def _render_optimized(dot: Digraph, predicate: Predicate[Any], node_nr: count) -> None:
+def _render_optimized(dot: Digraph, predicate: Predicate[Any], node_nr: "count[Any]") -> None:
     optimized_predicate = optimize(predicate)
 
     with dot.subgraph(name="cluster_optimized") as optimized:

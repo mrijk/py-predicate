@@ -1,3 +1,5 @@
+from typing import Any
+
 import yaml
 
 from predicate import (
@@ -52,7 +54,7 @@ from predicate.is_same_predicate import is_same_p
 from predicate.named_predicate import NamedPredicate
 
 
-def parsed(predicate) -> dict:
+def parsed(predicate) -> dict[Any, Any]:
     """Round-trip helper: parse the YAML output back to a dict."""
     return yaml.safe_load(to_yaml(predicate))
 

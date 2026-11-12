@@ -19,5 +19,5 @@ class IsFalsyPredicate[T](Predicate[T]):
         return {"reason": f"{x} is not a falsy value"}
 
 
-is_falsy_p: Final[IsFalsyPredicate] = IsFalsyPredicate()
+is_falsy_p: Final[IsFalsyPredicate[Any]] = IsFalsyPredicate()
 """Returns True if the value is falsy, otherwise False."""

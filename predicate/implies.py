@@ -30,7 +30,7 @@ from predicate.set_predicates import (
 
 
 @singledispatch
-def implies(predicate: Predicate, other: Predicate) -> bool:
+def implies(predicate: Predicate[Any], other: Predicate[Any]) -> bool:
     """Return True if predicate implies another predicate, otherwise False."""
     if predicate == other:
         return True
@@ -42,17 +42,17 @@ def implies(predicate: Predicate, other: Predicate) -> bool:
 
 
 @implies.register
-def _(_predicate: AlwaysFalsePredicate, _other: Predicate) -> bool:
+def _(_predicate: AlwaysFalsePredicate, _other: Predicate[Any]) -> bool:
     return True
 
 
 @implies.register
-def _(_predicate: AlwaysTruePredicate, other: Predicate) -> bool:
+def _(_predicate: AlwaysTruePredicate, other: Predicate[Any]) -> bool:
     return other == AlwaysTruePredicate()
 
 
-@implies.register
-def _(predicate: AndPredicate, other: Predicate) -> bool:
+@implies.register(AndPredicate)
+def _(predicate: AndPredicate[Any], other: Predicate[Any]) -> bool:
     if predicate == other:
         return True
     if isinstance(other, AndPredicate):
@@ -61,8 +61,8 @@ def _(predicate: AndPredicate, other: Predicate) -> bool:
     return implies(predicate.left, other) or implies(predicate.right, other)
 
 
-@implies.register
-def _(predicate: GePredicate, other: Predicate) -> bool:
+@implies.register(GePredicate)
+def _(predicate: GePredicate[Any], other: Predicate[Any]) -> bool:
     match other:
         case GePredicate(v):
             return predicate.v >= v
@@ -74,8 +74,8 @@ def _(predicate: GePredicate, other: Predicate) -> bool:
             return False
 
 
-@implies.register
-def _(predicate: GtPredicate, other: Predicate) -> bool:
+@implies.register(GtPredicate)
+def _(predicate: GtPredicate[Any], other: Predicate[Any]) -> bool:
     match other:
         case IsInstancePredicate(instance_klass):
             return predicate.klass == instance_klass[0]  # type: ignore
@@ -89,8 +89,8 @@ def _(predicate: GtPredicate, other: Predicate) -> bool:
             return False
 
 
-@implies.register
-def _(predicate: LePredicate, other: Predicate) -> bool:
+@implies.register(LePredicate)
+def _(predicate: LePredicate[Any], other: Predicate[Any]) -> bool:
     match other:
         case LePredicate(v):
             return predicate.v <= v
@@ -102,8 +102,8 @@ def _(predicate: LePredicate, other: Predicate) -> bool:
             return False
 
 
-@implies.register
-def _(predicate: LtPredicate, other: Predicate) -> bool:
+@implies.register(LtPredicate)
+def _(predicate: LtPredicate[Any], other: Predicate[Any]) -> bool:
     match other:
         case LePredicate(v):
             return predicate.v <= v
@@ -115,8 +115,8 @@ def _(predicate: LtPredicate, other: Predicate) -> bool:
             return False
 
 
-@implies.register
-def _(predicate: EqPredicate, other: Predicate) -> bool:
+@implies.register(EqPredicate)
+def _(predicate: EqPredicate[Any], other: Predicate[Any]) -> bool:
     match other:
         case IsInstancePredicate(instance_klass):
             return predicate.klass == instance_klass[0]  # type: ignore
@@ -140,8 +140,8 @@ def _(predicate: EqPredicate, other: Predicate) -> bool:
             return False
 
 
-@implies.register
-def _(predicate: IsRealSubsetPredicate, other: Predicate) -> bool:
+@implies.register(IsRealSubsetPredicate)
+def _(predicate: IsRealSubsetPredicate[Any], other: Predicate[Any]) -> bool:
     match other:
         case IsSubsetPredicate(v):
             return predicate.v <= v
@@ -149,8 +149,8 @@ def _(predicate: IsRealSubsetPredicate, other: Predicate) -> bool:
             return False
 
 
-@implies.register
-def _(predicate: IsRealSupersetPredicate, other: Predicate) -> bool:
+@implies.register(IsRealSupersetPredicate)
+def _(predicate: IsRealSupersetPredicate[Any], other: Predicate[Any]) -> bool:
     match other:
         case IsSupersetPredicate(v):
             return v <= predicate.v
@@ -160,8 +160,8 @@ def _(predicate: IsRealSupersetPredicate, other: Predicate) -> bool:
             return False
 
 
-@implies.register
-def _(predicate: IsSupersetPredicate, other: Predicate) -> bool:
+@implies.register(IsSupersetPredicate)
+def _(predicate: IsSupersetPredicate[Any], other: Predicate[Any]) -> bool:
     match other:
         case IntersectsPredicate(v) if predicate.v & v:
             return True
@@ -169,8 +169,8 @@ def _(predicate: IsSupersetPredicate, other: Predicate) -> bool:
             return False
 
 
-@implies.register
-def _(predicate: IntersectsPredicate, other: Predicate) -> bool:
+@implies.register(IntersectsPredicate)
+def _(predicate: IntersectsPredicate[Any], other: Predicate[Any]) -> bool:
     match other:
         case IntersectsPredicate(v):
             return predicate.v <= v
@@ -178,8 +178,8 @@ def _(predicate: IntersectsPredicate, other: Predicate) -> bool:
             return False
 
 
-@implies.register
-def _(predicate: InPredicate, other: Predicate) -> bool:
+@implies.register(InPredicate)
+def _(predicate: InPredicate[Any], other: Predicate[Any]) -> bool:
     match other:
         case InPredicate(v) if isinstance(v, Iterable) and isinstance(predicate.v, Iterable):
             return set(predicate.v).issubset(v)
@@ -187,8 +187,8 @@ def _(predicate: InPredicate, other: Predicate) -> bool:
             return False
 
 
-@implies.register
-def _(predicate: IsInstancePredicate, other: Predicate) -> bool:
+@implies.register(IsInstancePredicate)
+def _(predicate: IsInstancePredicate[Any], other: Predicate[Any]) -> bool:
     match other:
         case IsInstancePredicate(instance_klass):
             return set(predicate.instance_klass) <= set(instance_klass)
@@ -198,8 +198,8 @@ def _(predicate: IsInstancePredicate, other: Predicate) -> bool:
             return False
 
 
-@implies.register
-def _(predicate: OrPredicate, other: Predicate) -> bool:
+@implies.register(OrPredicate)
+def _(predicate: OrPredicate[Any], other: Predicate[Any]) -> bool:
     return predicate == other or (implies(predicate.left, other) and implies(predicate.right, other))
 
 
@@ -207,7 +207,7 @@ def _(predicate: OrPredicate, other: Predicate) -> bool:
 @implies.register(ListOfPredicate)
 @implies.register(SetOfPredicate)
 @implies.register(FrozenSetOfPredicate)
-def _(predicate: Predicate, other: Predicate) -> bool:
+def _(predicate: Predicate[Any], other: Predicate[Any]) -> bool:
     # Element-wise predicates of the same kind: implied when the element predicate is implied
     return type(predicate) is type(other) and implies(predicate.predicate, other.predicate)  # type: ignore
 
@@ -216,8 +216,8 @@ def _(predicate: Predicate, other: Predicate) -> bool:
 class Implies[T](Predicate[T]):
     """A predicate class that models the 'implies' (=>) predicate."""
 
-    left: Predicate
-    right: Predicate
+    left: Predicate[Any]
+    right: Predicate[Any]
 
     def __call__(self, x) -> bool:
         return not self.left(x) or self.right(x)
@@ -230,5 +230,5 @@ class Implies[T](Predicate[T]):
         return {"reason": f"{self.left} doesn't imply {self.right}"}
 
 
-def implies_p_p(left: Predicate, right: Predicate) -> Predicate:
+def implies_p_p(left: Predicate[Any], right: Predicate[Any]) -> Predicate[Any]:
     return Implies(left=left, right=right)

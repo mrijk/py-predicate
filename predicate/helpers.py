@@ -14,20 +14,22 @@ def first_false[T](iterable: Iterable[T], predicate: Predicate[T]) -> T | None:
     return first(filterfalse(predicate, iterable), default=None)
 
 
-def predicates_repr(predicates: list[Predicate]) -> str:
+def predicates_repr(predicates: list[Predicate[Any]]) -> str:
     return ", ".join(repr(predicate) for predicate in predicates)
 
 
-def dict_predicates_repr(predicates: dict[str, Predicate]) -> str:
+def dict_predicates_repr(predicates: dict[str, Predicate[Any]]) -> str:
     items = ", ".join(f'"{k}": {v!r}' for k, v in predicates.items())
     return "{" + items + "}"
 
 
-def key_value_pairs_repr(pairs: list[tuple[Predicate | str, Predicate]], from_key: Callable[[Any], str] = repr) -> str:
+def key_value_pairs_repr(
+    pairs: list[tuple[Predicate[Any] | str, Predicate[Any]]], from_key: Callable[[Any], str] = repr
+) -> str:
     return ", ".join(f"({from_key(k)}, {v!r})" for k, v in pairs)
 
 
-def join_as_str(v: Iterable) -> str:
+def join_as_str(v: Iterable[Any]) -> str:
     return ", ".join(str(item) for item in v)
 
 

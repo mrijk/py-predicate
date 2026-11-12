@@ -11,16 +11,16 @@ from predicate.predicate import Predicate
 class TupleOfPredicate[T](Predicate[T]):
     """A predicate class that models the tuple_of predicate."""
 
-    predicates: list[Predicate]
+    predicates: list[Predicate[Any]]
 
-    def __call__(self, x: tuple) -> bool:
+    def __call__(self, x: tuple[Any, ...]) -> bool:
         return ilen(x) == len(self.predicates) and all(p(v) for p, v in zip(self.predicates, x, strict=False))
 
     def __repr__(self) -> str:
         return f"is_tuple_of_p({predicates_repr(self.predicates)})"
 
     @override
-    def explain_failure(self, x: tuple) -> dict[str, Any]:
+    def explain_failure(self, x: tuple[Any, ...]) -> dict[str, Any]:
         if (actual_length := ilen(x)) != (expected_length := len(self.predicates)):
             return {"reason": f"Incorrect tuple size, expected: {expected_length}, actual: {actual_length}"}
 
@@ -30,6 +30,6 @@ class TupleOfPredicate[T](Predicate[T]):
         return {"index": index, "value": fail_v} | fail_p.explain_failure(fail_v)
 
 
-def is_tuple_of_p(*predicates: Predicate) -> Predicate:
+def is_tuple_of_p(*predicates: Predicate[Any]) -> Predicate[Any]:
     """Return True if value is a tuple, and for all elements in the tuple the predicate is True, otherwise False."""
     return TupleOfPredicate(predicates=list(predicates))

@@ -20,7 +20,7 @@ from predicate.predicate import Predicate
 from predicate.str_predicates import is_digit_p, is_lower_p, is_upper_p
 
 # The functions annotated-types' LowerCase, UpperCase, IsDigits, IsFinite, IsNan and IsInfinite wrap
-_known_functions: list[tuple[Callable, Predicate]] = [
+_known_functions: list[tuple[Callable[..., Any], Predicate[Any]]] = [
     (str.islower, is_lower_p),
     (str.isupper, is_upper_p),
     (str.isdigit, is_digit_p),
@@ -30,7 +30,7 @@ _known_functions: list[tuple[Callable, Predicate]] = [
 ]
 
 
-def constraint_predicates(metadata: Any) -> Iterator[Predicate]:
+def constraint_predicates(metadata: Any) -> Iterator[Predicate[Any]]:
     """Yield the predicates for one Annotated metadata item; anything but an annotated-types constraint yields none."""
     if type(metadata).__module__ != "annotated_types":
         return
@@ -42,7 +42,7 @@ def constraint_predicates(metadata: Any) -> Iterator[Predicate]:
         yield make(metadata)
 
 
-def _callable_predicate(func: Any) -> Predicate:
+def _callable_predicate(func: Any) -> Predicate[Any]:
     if isinstance(func, Predicate):
         return func  # e.g. Predicate(ge_lt_p(0, 150)): a py-predicate predicate used as annotated-types metadata
     if type(func).__module__ == "annotated_types" and type(func).__name__ == "Not":
@@ -50,7 +50,7 @@ def _callable_predicate(func: Any) -> Predicate:
     return next((predicate for known, predicate in _known_functions if known is func), None) or fn_p(func)
 
 
-def _multiple_of_p(n: Any) -> Predicate:
+def _multiple_of_p(n: Any) -> Predicate[Any]:
     from predicate.generator.helpers import random_ints
 
     def is_multiple(x: Any) -> bool:
@@ -60,7 +60,7 @@ def _multiple_of_p(n: Any) -> Predicate:
     return fn_p(is_multiple, generate_true_fn=lambda: (n * k for k in random_ints(lower=-1000, upper=1000)))
 
 
-def _timezone_p(tz: Any) -> Predicate:
+def _timezone_p(tz: Any) -> Predicate[Any]:
     """Timezone(None) means naive, Timezone(...) aware, and Timezone('Europe/Amsterdam') or Timezone(UTC) that zone."""
     from predicate.generator.helpers import random_datetimes
 
@@ -79,7 +79,7 @@ def _in_zone(values: Iterator[datetime], zone: tzinfo) -> Iterator[datetime]:
 
 
 # One predicate per annotated-types constraint class, by class name
-_constraints: dict[str, Callable[[Any], Predicate]] = {
+_constraints: dict[str, Callable[[Any], Predicate[Any]]] = {
     "Gt": lambda c: gt_p(c.gt),
     "Ge": lambda c: ge_p(c.ge),
     "Lt": lambda c: lt_p(c.lt),

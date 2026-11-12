@@ -50,16 +50,16 @@ class IsSubclassPredicate[T](Predicate[T]):
         return {"reason": f"{x} is not a subclass of type {klasses}"}
 
 
-def is_subclass_p(klass: type | UnionType | tuple[Any, ...]) -> Predicate:
+def is_subclass_p(klass: type | UnionType | tuple[Any, ...]) -> Predicate[Any]:
     """Return True if value is an instance of one of the classes, otherwise False."""
     return IsSubclassPredicate(class_or_tuple=klass)
 
 
-is_enum_p: Final[Predicate] = is_subclass_p(Enum)
+is_enum_p: Final[Predicate[Any]] = is_subclass_p(Enum)
 """Returns True if the value is an Enum, otherwise False."""
 
-is_int_enum_p: Final[Predicate] = is_subclass_p(IntEnum)
+is_int_enum_p: Final[Predicate[Any]] = is_subclass_p(IntEnum)
 """Returns True if the value is an IntEnum, otherwise False."""
 
-is_str_enum_p: Final[Predicate] = is_subclass_p(StrEnum)
+is_str_enum_p: Final[Predicate[Any]] = is_subclass_p(StrEnum)
 """Returns True if the value is a StrEnum, otherwise False."""

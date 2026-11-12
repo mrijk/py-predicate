@@ -44,10 +44,10 @@ class RaisesPredicate[T](Predicate[T]):
             return {"reason": f"raised {type(e).__name__}, expected {self.exception_type.__name__}"}
 
 
-raises_p: Final[RaisesPredicate] = RaisesPredicate()
+raises_p: Final[RaisesPredicate[Any]] = RaisesPredicate()
 """Return True if the callable raises any exception."""
 
 
-def raises_exception_p(exception_type: type[Exception]) -> RaisesPredicate:
+def raises_exception_p(exception_type: type[Exception]) -> RaisesPredicate[Any]:
     """Return True if the callable raises the specified exception type."""
     return RaisesPredicate(exception_type=exception_type)

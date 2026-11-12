@@ -14,7 +14,7 @@ from predicate.predicate import Predicate
 from predicate.xor_predicate import XorPredicate
 
 
-def truth_table(predicate: Predicate) -> Iterable[tuple]:
+def truth_table(predicate: Predicate[Any]) -> Iterable[tuple[Any, ...]]:
     """Generate a truth table."""
     named_predicates = get_named_predicates(predicate)
 
@@ -27,7 +27,7 @@ def truth_table(predicate: Predicate) -> Iterable[tuple]:
         yield combination, _execute_predicate(predicate, values=values)
 
 
-def get_named_predicates(predicate: Predicate) -> list[str]:
+def get_named_predicates(predicate: Predicate[Any]) -> list[str]:
     """Return the names used in the predicate."""
 
     def get_names() -> Iterator[str]:
@@ -49,14 +49,14 @@ def get_named_predicates(predicate: Predicate) -> list[str]:
     return sorted(set(get_names()))
 
 
-def _execute_predicate(predicate: Predicate, values: dict[str, Any]) -> bool:
+def _execute_predicate(predicate: Predicate[Any], values: dict[str, Any]) -> bool:
     set_named_values(predicate, values)
 
     dummy = False
     return predicate(dummy)
 
 
-def set_named_values(predicate: Predicate, values: dict[str, Any]) -> None:
+def set_named_values(predicate: Predicate[Any], values: dict[str, Any]) -> None:
     """Set the named predicate values."""
     match predicate:
         case AndPredicate(left, right) | OrPredicate(left, right) | XorPredicate(left, right) | Implies(left, right):

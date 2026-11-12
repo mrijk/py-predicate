@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from itertools import pairwise
-from typing import Callable, Iterable
+from typing import Any, Callable, Iterable
 
 from more_itertools import spy
 
@@ -14,7 +14,7 @@ class MutualRecurPredicate[T](Predicate[T]):
 
     predicate_0: Predicate[T]
     predicate_1: Predicate[T]
-    predicate_n: Callable[[T], tuple]
+    predicate_n: Callable[[T], tuple[Any, ...]]
 
     def __call__(self, iterable: Iterable[T]) -> bool:
         head, _ = spy(iterable, 2)
@@ -35,7 +35,7 @@ class MutualRecurPredicate[T](Predicate[T]):
 
 
 def mutual_recur_p[T](
-    predicate_n: Callable[[T], tuple],
+    predicate_n: Callable[[T], tuple[Any, ...]],
     predicate_0: Predicate[T] = always_true_p,
     predicate_1: Predicate[T] = always_true_p,
 ) -> Predicate[T]:

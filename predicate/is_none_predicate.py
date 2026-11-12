@@ -27,7 +27,7 @@ class IsNonePredicate[T](Predicate[T]):
         return {"reason": f"{x} is not None"}
 
 
-is_none_p: Final[IsNonePredicate] = IsNonePredicate()
+is_none_p: Final[IsNonePredicate[Any]] = IsNonePredicate()
 """Return True if value is None, otherwise False."""
 
 

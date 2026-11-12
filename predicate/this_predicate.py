@@ -13,7 +13,7 @@ class ThisPredicate[T](Predicate[T]):
     """A predicate class that lazily references another predicate."""
 
     @cached_property
-    def this_predicate(self) -> Predicate:
+    def this_predicate(self) -> Predicate[Any]:
         return find_this_predicate(self.frame, self)
 
     def __call__(self, x: T) -> bool:
@@ -24,7 +24,7 @@ class ThisPredicate[T](Predicate[T]):
         return "this_p"
 
 
-def find_in_locals(locals: Iterable[tuple[str, Any]], predicate: Predicate) -> Predicate | None:
+def find_in_locals(locals: Iterable[tuple[str, Any]], predicate: Predicate[Any]) -> Predicate[Any] | None:
     def is_other_predicate(key: str, value: Any) -> bool:
         return isinstance(value, Predicate) and value != predicate and key != "self"
 
@@ -33,7 +33,7 @@ def find_in_locals(locals: Iterable[tuple[str, Any]], predicate: Predicate) -> P
     return first_true(other_predicates, pred=lambda other: predicate in other)
 
 
-def find_this_predicate(frame, predicate: Predicate) -> Predicate:
+def find_this_predicate(frame, predicate: Predicate[Any]) -> Predicate[Any]:
     locals = frame.f_locals.items()
     if found := find_in_locals(locals, predicate):
         return found

@@ -5,7 +5,7 @@ from more_itertools import spy
 from predicate.predicate import Predicate
 
 
-def consumes(predicate: Predicate, iterable: Iterable[Any]) -> Iterator[int]:
+def consumes(predicate: Predicate[Any], iterable: Iterable[Any]) -> Iterator[int]:
     head, _ = spy(iterable, 1)
     if head:
         yield from predicate.consumes(iterable)

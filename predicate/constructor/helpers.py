@@ -4,7 +4,7 @@ from predicate.accepts_predicate import accepts_p
 from predicate.predicate import Predicate
 
 
-def safe_call_false(predicate: Predicate, value: Any) -> bool:
+def safe_call_false(predicate: Predicate[Any], value: Any) -> bool:
     # For performance reasons type checking is not part of the predicate itself
     try:
         return predicate(value)
@@ -12,7 +12,7 @@ def safe_call_false(predicate: Predicate, value: Any) -> bool:
         return True
 
 
-def safe_call_true(predicate: Predicate, value: Any) -> bool:
+def safe_call_true(predicate: Predicate[Any], value: Any) -> bool:
     # For performance reasons type checking is not part of the predicate itself
     accepts = accepts_p(predicate=predicate)
     try:
@@ -21,7 +21,7 @@ def safe_call_true(predicate: Predicate, value: Any) -> bool:
         return False
 
 
-def predicate_match(predicate: Predicate, false_set: list, true_set: list) -> dict[str, int]:
+def predicate_match(predicate: Predicate[Any], false_set: list[Any], true_set: list[Any]) -> dict[str, int]:
     false_misses = sum(safe_call_false(predicate, value) for value in false_set)
     false_matches = len(false_set) - false_misses
 
@@ -36,7 +36,7 @@ def predicate_match(predicate: Predicate, false_set: list, true_set: list) -> di
     }
 
 
-def sort_by_match(predicates: list[Predicate], false_set: list, true_set: list) -> list[Predicate]:
+def sort_by_match(predicates: list[Predicate[Any]], false_set: list[Any], true_set: list[Any]) -> list[Predicate[Any]]:
     def best_match(predicate) -> int:
         match = predicate_match(predicate, false_set=false_set, true_set=true_set)
 
@@ -45,6 +45,6 @@ def sort_by_match(predicates: list[Predicate], false_set: list, true_set: list) 
     return sorted(predicates, key=best_match, reverse=True)
 
 
-def perfect_match(predicate: Predicate, false_set: list, true_set: list) -> bool:
+def perfect_match(predicate: Predicate[Any], false_set: list[Any], true_set: list[Any]) -> bool:
     match = predicate_match(predicate, false_set=false_set, true_set=true_set)
     return match["false_misses"] + match["true_misses"] == 0

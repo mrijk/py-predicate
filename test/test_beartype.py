@@ -1,4 +1,4 @@
-from typing import Annotated
+from typing import Annotated, Any
 
 import pytest
 from beartype import beartype
@@ -21,7 +21,7 @@ def broken_volume(level: int) -> Percentage:
 
 
 @beartype
-def join(words: Annotated[list, Is[is_list_of_p(is_str_p)]]) -> str:
+def join(words: Annotated[list[Any], Is[is_list_of_p(is_str_p)]]) -> str:
     return " ".join(words)
 
 

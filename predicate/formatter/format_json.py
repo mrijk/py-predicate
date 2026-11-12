@@ -114,7 +114,7 @@ def _to_value(predicate: Predicate[Any]) -> tuple[str, Any]:  # noqa: C901
         case ImpliesPredicate(predicate):
             return "implies", {"predicate": to_json(predicate)}
         case InPredicate(v):
-            return "in", {"v": list(cast(Iterable, v))}
+            return "in", {"v": list(cast(Iterable[Any], v))}
         case IntersectsPredicate(v):
             return "intersects", {"v": list(v)}
         case IsClosePredicate(target, rel_tol, abs_tol):
@@ -168,7 +168,7 @@ def _to_value(predicate: Predicate[Any]) -> tuple[str, Any]:  # noqa: C901
         case NePredicate(v):
             return "ne", {"v": v}
         case NotInPredicate(v):
-            return "not_in", {"v": list(cast(Iterable, v))}
+            return "not_in", {"v": list(cast(Iterable[Any], v))}
         case NotPredicate(not_predicate):
             return "not", {"predicate": to_json(not_predicate)}
         case OptionalPredicate(predicate):

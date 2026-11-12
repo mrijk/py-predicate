@@ -7,7 +7,7 @@ from typing import Any, Final, override
 from predicate.predicate import Predicate
 
 
-def func_is_partial(func: Callable) -> bool:
+def func_is_partial(func: Callable[..., Any]) -> bool:
     return isinstance(func, partial)
 
 
@@ -19,7 +19,7 @@ class IsPartialPredicate[T](Predicate[T]):
 
     def __call__(self, x: Any) -> bool:
         match x:
-            case Callable() as func if func_is_partial(func):  # type: ignore
+            case func if callable(func) and func_is_partial(func):
                 if self.nr_of_parameters is not None:
                     sig = signature(func)
                     return len(sig.parameters) == self.nr_of_parameters
@@ -37,20 +37,20 @@ class IsPartialPredicate[T](Predicate[T]):
     @override
     def explain_failure(self, x: Any) -> dict[str, Any]:
         match x:
-            case Callable() as func if func_is_partial(func):  # type: ignore
+            case func if callable(func) and func_is_partial(func):
                 sig = signature(func)
                 return {
                     "reason": f"Partial has {len(sig.parameters)} parameters, expected: {self.nr_of_parameters}",
                 }
-            case Callable() as func:  # type: ignore
+            case func if callable(func):
                 name = getattr(func, "__name__", repr(func))
                 return {"reason": f"Function {name} is not a partial"}
             case _:
                 return {"reason": f"Value {x} is not a partial"}
 
 
-is_partial_p: Final[IsPartialPredicate] = IsPartialPredicate()
+is_partial_p: Final[IsPartialPredicate[Any]] = IsPartialPredicate()
 
 
-def is_partial_with_signature_p(*, nr_of_parameters: int) -> Predicate:
+def is_partial_with_signature_p(*, nr_of_parameters: int) -> Predicate[Any]:
     return IsPartialPredicate(nr_of_parameters=nr_of_parameters)

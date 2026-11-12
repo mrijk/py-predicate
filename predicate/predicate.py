@@ -23,12 +23,12 @@ class Predicate[T]:
         raise NotImplementedError
 
     @overload
-    def __and__(self, other: "Predicate") -> "Predicate": ...
+    def __and__(self, other: "Predicate[Any]") -> "Predicate[Any]": ...
 
     @overload
-    def __and__(self, other: Callable[[T], bool]) -> "Predicate": ...
+    def __and__(self, other: Callable[[T], bool]) -> "Predicate[Any]": ...
 
-    def __and__(self, other: Any) -> "Predicate":
+    def __and__(self, other: Any) -> "Predicate[Any]":
         """Return the 'and' predicate."""
         from predicate.and_predicate import AndPredicate
 
@@ -37,17 +37,17 @@ class Predicate[T]:
 
         return AndPredicate(left=left, right=right)
 
-    def __rand__(self, other) -> "Predicate":
+    def __rand__(self, other) -> "Predicate[Any]":
         """Return the 'rand' predicate."""
         return self & other
 
     @overload
-    def __or__(self, other: "Predicate") -> "Predicate": ...
+    def __or__(self, other: "Predicate[Any]") -> "Predicate[Any]": ...
 
     @overload
-    def __or__(self, other: Callable[[T], bool]) -> "Predicate": ...
+    def __or__(self, other: Callable[[T], bool]) -> "Predicate[Any]": ...
 
-    def __or__(self, other: Any) -> "Predicate":
+    def __or__(self, other: Any) -> "Predicate[Any]":
         """Return the 'or' predicate."""
         from predicate.or_predicate import OrPredicate
 
@@ -56,7 +56,7 @@ class Predicate[T]:
 
         return OrPredicate(left=left, right=right)
 
-    def __ror__(self, other: Any) -> "Predicate":
+    def __ror__(self, other: Any) -> "Predicate[Any]":
         """Return the 'ror' predicate."""
         from predicate.or_predicate import OrPredicate
 
@@ -66,12 +66,12 @@ class Predicate[T]:
         return OrPredicate(left=left, right=right)
 
     @overload
-    def __xor__(self, other: "Predicate") -> "Predicate": ...
+    def __xor__(self, other: "Predicate[Any]") -> "Predicate[Any]": ...
 
     @overload
-    def __xor__(self, other: Callable[[T], bool]) -> "Predicate": ...
+    def __xor__(self, other: Callable[[T], bool]) -> "Predicate[Any]": ...
 
-    def __xor__(self, other: Any) -> "Predicate":
+    def __xor__(self, other: Any) -> "Predicate[Any]":
         """Return the 'xor' predicate."""
         from predicate.xor_predicate import XorPredicate
 
@@ -80,17 +80,17 @@ class Predicate[T]:
 
         return XorPredicate(left=left, right=right)
 
-    def __rxor__(self, other) -> "Predicate":
+    def __rxor__(self, other) -> "Predicate[Any]":
         """Return the 'rxor' predicate."""
         return self ^ other
 
-    def __invert__(self) -> "Predicate":
+    def __invert__(self) -> "Predicate[Any]":
         """Return the 'negated' predicate."""
         from predicate.not_predicate import NotPredicate
 
         return NotPredicate(predicate=self)
 
-    def __contains__(self, predicate: "Predicate") -> bool:
+    def __contains__(self, predicate: "Predicate[Any]") -> bool:
         """Return True if the predicate argument is part of this predicate, otherwise False."""
         return predicate == self
 
@@ -123,7 +123,7 @@ class Predicate[T]:
         yield 1 if self(item) else 0
 
 
-def _as_predicate(candidate: Any) -> Predicate:
+def _as_predicate(candidate: Any) -> Predicate[Any]:
     match candidate:
         case Predicate():
             return resolve_predicate(candidate)
@@ -135,7 +135,7 @@ def _as_predicate(candidate: Any) -> Predicate:
             return NotImplemented
 
 
-def repr_operand(predicate: Predicate, precedence: int) -> str:
+def repr_operand(predicate: Predicate[Any], precedence: int) -> str:
     """Return repr of predicate, parenthesized if it binds looser than precedence."""
     return f"({predicate!r})" if predicate.precedence < precedence else repr(predicate)
 

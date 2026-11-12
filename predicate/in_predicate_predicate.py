@@ -8,18 +8,18 @@ from predicate.predicate import Predicate
 class InPredicatePredicate[T](Predicate[T]):
     """A predicate class that models the 'in predicate tree'  predicate."""
 
-    predicate: Predicate
+    predicate: Predicate[Any]
 
-    def __call__(self, predicate: Predicate) -> bool:
+    def __call__(self, predicate: Predicate[Any]) -> bool:
         return predicate in self.predicate
 
     def __repr__(self) -> str:
         return f"in_predicate_p({self.predicate})"
 
     @override
-    def explain_failure(self, predicate: Predicate) -> dict[str, Any]:
+    def explain_failure(self, predicate: Predicate[Any]) -> dict[str, Any]:
         return {"reason": f"{predicate} is not part of predicate {self.predicate}"}
 
 
-def in_predicate_p(predicate: Predicate) -> InPredicatePredicate:
+def in_predicate_p(predicate: Predicate[Any]) -> InPredicatePredicate[Any]:
     return InPredicatePredicate(predicate)

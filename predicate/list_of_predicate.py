@@ -48,6 +48,6 @@ def is_list_of_p[T](predicate: Predicate[T]) -> "ListOfPredicate[T]":
     return ListOfPredicate(predicate)
 
 
-def is_single_or_list_of_p[T](predicate: Predicate[T]) -> Predicate:
+def is_single_or_list_of_p[T](predicate: Predicate[T]) -> Predicate[Any]:
     """Return True if value is a list or a single value, and for all elements in the list the predicate is True, otherwise False."""
     return is_list_of_p(predicate) | predicate

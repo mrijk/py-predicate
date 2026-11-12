@@ -5,7 +5,7 @@ from predicate.predicate import Predicate
 
 
 @dataclass
-class AlwaysFalsePredicate(Predicate):
+class AlwaysFalsePredicate(Predicate[Any]):
     """A predicate class that models the 'False' predicate."""
 
     def __call__(self, *args, **kwargs) -> bool:

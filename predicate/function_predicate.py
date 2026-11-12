@@ -5,7 +5,7 @@ from typing import Any, Callable, Iterator, overload, override
 from predicate.predicate import Predicate
 
 
-def _undefined() -> Iterator:
+def _undefined() -> Iterator[Any]:
     raise ValueError("Please register generator type")
 
 
@@ -14,8 +14,8 @@ class FnPredicate[T](Predicate[T]):
     """A predicate class that can hold a function."""
 
     predicate_fn: Callable[[T], bool]
-    generate_false_fn: Callable[[], Iterator] = _undefined
-    generate_true_fn: Callable[[], Iterator] = _undefined
+    generate_false_fn: Callable[[], Iterator[Any]] = _undefined
+    generate_true_fn: Callable[[], Iterator[Any]] = _undefined
     _call: Callable[[T], bool] = field(init=False, repr=False)
 
     def __post_init__(self) -> None:

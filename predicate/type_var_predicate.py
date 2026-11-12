@@ -1,3 +1,5 @@
+from typing import Any
+
 from predicate.always_true_predicate import AlwaysTruePredicate
 from predicate.or_predicate import OrPredicate
 
@@ -12,7 +14,7 @@ class FreeTypeVarPredicate(AlwaysTruePredicate):
         return isinstance(other, AlwaysTruePredicate)
 
 
-class ConstrainedTypeVarPredicate(OrPredicate):
+class ConstrainedTypeVarPredicate(OrPredicate[Any]):
     """c1 | c2 for TypeVar("T", c1, c2), whose generated values all fit one of the constraints (#375).
 
     It equals the plain OrPredicate, so checking is unchanged; only generation differs.

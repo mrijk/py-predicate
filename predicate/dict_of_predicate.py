@@ -10,12 +10,12 @@ from predicate.predicate import Predicate
 
 
 @dataclass
-class DictOfPredicate(Predicate):
+class DictOfPredicate(Predicate[Any]):
     """A predicate class that models the dict_of predicate."""
 
-    key_value_predicates: list[tuple[Predicate, Predicate]]
+    key_value_predicates: list[tuple[Predicate[Any], Predicate[Any]]]
 
-    def __init__(self, key_value_predicates: Sequence[tuple[Predicate | str, Predicate]]):
+    def __init__(self, key_value_predicates: Sequence[tuple[Predicate[Any] | str, Predicate[Any]]]):
         self.key_value_predicates = [(to_key_p(key_p), value_p) for key_p, value_p in key_value_predicates]
 
     def __call__(self, x: Any) -> bool:
@@ -24,7 +24,7 @@ class DictOfPredicate(Predicate):
 
         return bool(x) and not any(self._failing(x)) and not any(self._unmatched(x))
 
-    def _failing(self, x: Mapping) -> Iterator[tuple[Any, Any, Predicate]]:
+    def _failing(self, x: Mapping[Any, Any]) -> Iterator[tuple[Any, Any, Predicate[Any]]]:
         return (
             (key, value, value_p)
             for key_p, value_p in self.key_value_predicates
@@ -32,7 +32,7 @@ class DictOfPredicate(Predicate):
             if key_p(key) and not value_p(value)
         )
 
-    def _unmatched(self, x: Mapping) -> Iterator[tuple[Any, Any]]:
+    def _unmatched(self, x: Mapping[Any, Any]) -> Iterator[tuple[Any, Any]]:
         return (
             (key, value) for key, value in x.items() if not any(key_p(key) for key_p, _ in self.key_value_predicates)
         )
@@ -56,7 +56,7 @@ class DictOfPredicate(Predicate):
         return {}
 
 
-def to_key_p(key_p: Predicate | str) -> Predicate:
+def to_key_p(key_p: Predicate[Any] | str) -> Predicate[Any]:
     from predicate import eq_p
 
     match key_p:
@@ -66,7 +66,7 @@ def to_key_p(key_p: Predicate | str) -> Predicate:
             return key_p
 
 
-def from_key_p(key_p: Predicate) -> Predicate | str:
+def from_key_p(key_p: Predicate[Any]) -> Predicate[Any] | str:
     match key_p:
         case EqPredicate(v):
             return v
@@ -74,7 +74,7 @@ def from_key_p(key_p: Predicate) -> Predicate | str:
             return key_p
 
 
-def is_dict_of_p(*predicates: tuple[Predicate | str, Predicate]) -> Predicate:
+def is_dict_of_p(*predicates: tuple[Predicate[Any] | str, Predicate[Any]]) -> Predicate[Any]:
     """Return True if value is a set, and for all elements in the set the predicate is True, otherwise False."""
     # return is_set_p & all_p(predicate)
     return DictOfPredicate(list(predicates))
