@@ -932,7 +932,8 @@ def _random_predicates_of_type(klass: type[Predicate], kwargs: dict[str, Any]) -
         # No dedicated generator, e.g. ListOfPredicate: build it from its annotated __init__
         return _constructed_instances(klass)
     # A concrete predicate class with a dedicated generator, e.g. InPredicate
-    return generate_predicate(klass, **{"max_depth": 10, "klass": int} | accepted_kwargs(random_predicates, kwargs))
+    generator_kwargs: dict[str, Any] = {"max_depth": 10, "klass": int} | accepted_kwargs(random_predicates, kwargs)
+    return generate_predicate(klass, **generator_kwargs)
 
 
 def _type_arg_predicate(arg: Any) -> Predicate:

@@ -154,7 +154,7 @@ def _warn(message: str, code: types.CodeType | None, module: str) -> None:
     )
 
 
-_unresolved_warning_registry = {}
+_unresolved_warning_registry: dict[str | tuple[str, type[Warning], int], int] = {}
 
 
 def _raw_annotations(owner: Callable) -> dict[str, Any]:

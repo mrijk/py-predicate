@@ -432,7 +432,7 @@ def compile_predicate[T](predicate: Predicate[T]) -> CompiledPredicate[T]:
 
     Raises NotCompilableError for unsupported predicate types (fn_p, regex_p, etc.).
     """
-    namespace: dict[str, Any][str, Any] = {}
+    namespace: dict[str, Any] = {}
     body = _to_ast(predicate, namespace)
 
     lambda_ast = ast.Expression(
