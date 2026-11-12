@@ -1,6 +1,7 @@
 import inspect
 from dataclasses import dataclass
 from functools import cached_property
+from types import FrameType
 from typing import Any, Iterator
 
 from predicate.predicate import Predicate
@@ -23,7 +24,7 @@ class RootPredicate[T](Predicate[T]):
         return "root_p"
 
 
-def find_root_predicate(start_frame, predicate: Predicate[Any]) -> Predicate[Any]:
+def find_root_predicate(start_frame: FrameType | None, predicate: Predicate[Any]) -> Predicate[Any]:
     for frame in _get_frames(start_frame):
         locals = reversed(frame.f_locals.items())
         if found := find_in_locals(locals, predicate):
@@ -31,7 +32,7 @@ def find_root_predicate(start_frame, predicate: Predicate[Any]) -> Predicate[Any
     raise ValueError("Could not find 'root' predicate")
 
 
-def _get_frames(frame) -> Iterator[Any]:
+def _get_frames(frame: FrameType | None) -> Iterator[Any]:
     if frame:
         yield frame
         yield from _get_frames(frame.f_back)

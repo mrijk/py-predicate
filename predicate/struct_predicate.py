@@ -41,7 +41,7 @@ class StructPredicate[T](Predicate[T]):
         )
 
     @override
-    def explain_failure(self, x: Any, *args, **kwargs) -> dict[str, Any]:
+    def explain_failure(self, x: Any, *args: Any, **kwargs: Any) -> dict[str, Any]:
         if not isinstance(x, Mapping):
             return {"reason": f"{x} is not an instance of a Mapping"}
 

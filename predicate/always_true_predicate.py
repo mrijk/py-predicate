@@ -8,7 +8,7 @@ from predicate.predicate import Predicate
 class AlwaysTruePredicate(Predicate[Any]):
     """A predicate class that models the 'True' predicate."""
 
-    def __call__(self, *args, **kwargs) -> bool:
+    def __call__(self, *args: Any, **kwargs: Any) -> bool:
         return True
 
     def __repr__(self) -> str:

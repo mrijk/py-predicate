@@ -88,7 +88,7 @@ def _x() -> ast.Name:
     return _name("x")
 
 
-def _const(v) -> ast.Constant:
+def _const(v: Any) -> ast.Constant:
     return ast.Constant(value=v)
 
 

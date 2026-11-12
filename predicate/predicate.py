@@ -19,7 +19,7 @@ class Predicate[T]:
     precedence: ClassVar[int] = 5
 
     @abstractmethod
-    def __call__(self, *args, **kwargs) -> bool:
+    def __call__(self, *args: Any, **kwargs: Any) -> bool:
         raise NotImplementedError
 
     @overload
@@ -37,7 +37,13 @@ class Predicate[T]:
 
         return AndPredicate(left=left, right=right)
 
-    def __rand__(self, other) -> "Predicate[Any]":
+    @overload
+    def __rand__(self, other: "Predicate[Any]") -> "Predicate[Any]": ...
+
+    @overload
+    def __rand__(self, other: Callable[[T], bool]) -> "Predicate[Any]": ...
+
+    def __rand__(self, other: Any) -> "Predicate[Any]":
         """Return the 'rand' predicate."""
         return self & other
 
@@ -80,7 +86,7 @@ class Predicate[T]:
 
         return XorPredicate(left=left, right=right)
 
-    def __rxor__(self, other) -> "Predicate[Any]":
+    def __rxor__(self, other: Any) -> "Predicate[Any]":
         """Return the 'rxor' predicate."""
         return self ^ other
 
@@ -104,14 +110,14 @@ class Predicate[T]:
         raise NotImplementedError
 
     @final
-    def explain(self, x: Any, *args, **kwargs) -> dict[str, Any]:
+    def explain(self, x: Any, *args: Any, **kwargs: Any) -> dict[str, Any]:
         if self(x, *args, **kwargs):
             return {"result": True}
         return {
             "result": False,
         } | self.explain_failure(x, *args, **kwargs)
 
-    def explain_failure(self, x: Any, /, *args, **kwargs) -> dict[str, Any]:
+    def explain_failure(self, x: Any, /, *args: Any, **kwargs: Any) -> dict[str, Any]:
         raise NotImplementedError
 
     def consumes(self, iterable: Iterable[Any]) -> Iterator[int]:
@@ -154,6 +160,6 @@ type ConstrainedT[T: (int, str, float, datetime, date, Decimal, Fraction, UUID, 
 
 
 def predicate_partial[T](
-    func: Callable[[Predicate[T], Predicate[T]], Predicate[T]], /, *args, **kwargs
+    func: Callable[[Predicate[T], Predicate[T]], Predicate[T]], /, *args: Any, **kwargs: Any
 ) -> Callable[[Predicate[T]], Predicate[T]]:
     return partial(func, *args, **kwargs)

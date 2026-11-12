@@ -186,7 +186,7 @@ def _make_wrapper(
     if is_async_p(func):
 
         @wraps(func)
-        async def wrapped(*args, **kwargs):
+        async def wrapped(*args: Any, **kwargs: Any) -> Any:
             if not _enabled:
                 return await func(*args, **kwargs)
             arguments = before(args, kwargs)
@@ -200,7 +200,7 @@ def _make_wrapper(
         return wrapped
 
     @wraps(func)
-    def wrapped_sync(*args, **kwargs):
+    def wrapped_sync(*args: Any, **kwargs: Any) -> Any:
         if not _enabled:
             return func(*args, **kwargs)
         arguments = before(args, kwargs)

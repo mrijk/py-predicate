@@ -425,7 +425,7 @@ def generate_odd_numbers() -> Iterator[int]:
 
 def function_with_signature(sig: Signature) -> Callable[..., Any]:
     # inspect.signature reads __signature__, so the function only needs to carry it
-    def function(*args, **kwargs):
+    def function(*args: Any, **kwargs: Any) -> None:
         return None
 
     function.__signature__ = sig  # type: ignore[attr-defined]
@@ -438,7 +438,7 @@ class CallableObject:
     # Callables usually have a name; code that reports on them (e.g. instrument) reads it
     __name__ = "callable_object"
 
-    def __call__(self, *args, **kwargs):
+    def __call__(self, *args: Any, **kwargs: Any) -> None:
         return None
 
 
@@ -477,7 +477,7 @@ def ignore_unknown_kwargs[F: Callable[..., Any]](dispatcher: F) -> F:
     """Drop keyword arguments the dispatched generator doesn't accept."""
 
     @wraps(dispatcher)
-    def wrapper(predicate, /, **kwargs):
+    def wrapper(predicate: Predicate[Any], /, **kwargs: Any) -> Any:
         f = dispatcher.dispatch(type(predicate))  # type: ignore[attr-defined]
         return f(predicate, **accepted_kwargs(f, kwargs))
 

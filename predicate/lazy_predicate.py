@@ -1,6 +1,7 @@
 import inspect
 from dataclasses import dataclass
 from functools import cached_property
+from types import FrameType
 from typing import Any
 
 from predicate.predicate import Predicate
@@ -26,13 +27,13 @@ class LazyPredicate[T](Predicate[T]):
         return f'lazy_p("{self.ref}")'
 
 
-def find_predicate_by_ref(frame, ref: str) -> Predicate[Any] | None:
+def find_predicate_by_ref(frame: FrameType | None, ref: str) -> Predicate[Any] | None:
+    if frame is None:
+        return None
     for key, value in frame.f_locals.items():
         if key == ref:
             return value
-    if next_frame := frame.f_back:
-        return find_predicate_by_ref(next_frame, ref)
-    return None
+    return find_predicate_by_ref(frame.f_back, ref)
 
 
 def lazy_p(ref: str) -> LazyPredicate[Any]:

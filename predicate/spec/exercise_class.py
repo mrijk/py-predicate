@@ -51,7 +51,7 @@ def _get_param_predicate(f: Callable[..., Any], key: str, parameter: Parameter) 
     if annotation == parameter.empty:
         raise no_spec_error(name, f"parameter '{key}' has no annotation")
 
-    if isinstance(f, Predicate):
+    if isinstance(f, Predicate) and parameter.kind not in (Parameter.VAR_POSITIONAL, Parameter.VAR_KEYWORD):
         try:
             return is_instance_p(f.klass)
         except NotImplementedError:

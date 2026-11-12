@@ -37,7 +37,7 @@ def predicate_match(predicate: Predicate[Any], false_set: list[Any], true_set: l
 
 
 def sort_by_match(predicates: list[Predicate[Any]], false_set: list[Any], true_set: list[Any]) -> list[Predicate[Any]]:
-    def best_match(predicate) -> int:
+    def best_match(predicate: Predicate[Any]) -> int:
         match = predicate_match(predicate, false_set=false_set, true_set=true_set)
 
         return match["false_matches"] + match["true_matches"]

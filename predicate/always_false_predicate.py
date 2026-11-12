@@ -8,14 +8,14 @@ from predicate.predicate import Predicate
 class AlwaysFalsePredicate(Predicate[Any]):
     """A predicate class that models the 'False' predicate."""
 
-    def __call__(self, *args, **kwargs) -> bool:
+    def __call__(self, *args: Any, **kwargs: Any) -> bool:
         return False
 
     def __repr__(self) -> str:
         return "always_false_p"
 
     @override
-    def explain_failure(self, *args, **kwargs) -> dict[str, Any]:
+    def explain_failure(self, *args: Any, **kwargs: Any) -> dict[str, Any]:
         return {"reason": "Always returns False"}
 
     @override

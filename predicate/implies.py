@@ -219,14 +219,14 @@ class Implies[T](Predicate[T]):
     left: Predicate[Any]
     right: Predicate[Any]
 
-    def __call__(self, x) -> bool:
+    def __call__(self, x: Any) -> bool:
         return not self.left(x) or self.right(x)
 
     def __repr__(self) -> str:
         return f"{self.left} => {self.right}"
 
     @override
-    def explain_failure(self, x) -> dict[str, Any]:
+    def explain_failure(self, x: Any) -> dict[str, Any]:
         return {"reason": f"{self.left} doesn't imply {self.right}"}
 
 

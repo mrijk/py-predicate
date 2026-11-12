@@ -29,7 +29,7 @@ class FrozenDictOfPredicate(Predicate[Any]):
         return f"is_frozendict_of_p({key_value_pairs_repr(pairs)})"
 
     @override
-    def explain_failure(self, x: Any, *args, **kwargs) -> dict[str, Any]:
+    def explain_failure(self, x: Any, *args: Any, **kwargs: Any) -> dict[str, Any]:
         if not is_frozendict_p(x):
             return {"reason": f"{x} is not an instance of a frozendict"}
         return self.dict_of_predicate.explain_failure(x)

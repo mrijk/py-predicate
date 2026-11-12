@@ -637,7 +637,7 @@ def generate_not(predicate: NotPredicate[Any]) -> Iterator[Any]:
     yield from generate_false(predicate.predicate)
 
 
-def _generator_for_item(item, predicate: NotInPredicate[Any]) -> Iterator[Any]:
+def _generator_for_item(item: Any, predicate: NotInPredicate[Any]) -> Iterator[Any]:
     match item:
         case datetime():
             return generate_datetimes(predicate)

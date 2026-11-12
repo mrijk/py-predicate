@@ -539,11 +539,11 @@ def param_predicate(param: Parameter) -> Predicate[Any]:
 _positional_kinds = (Parameter.POSITIONAL_ONLY, Parameter.POSITIONAL_OR_KEYWORD, Parameter.VAR_POSITIONAL)
 
 
-def _positional_values(param: Parameter, arg) -> Iterator[Any]:
+def _positional_values(param: Parameter, arg: Any) -> Iterator[Any]:
     yield from arg if param.kind == Parameter.VAR_POSITIONAL else [arg]
 
 
-def _keyword_items(param: Parameter, arg) -> Iterator[tuple[str, Any]]:
+def _keyword_items(param: Parameter, arg: Any) -> Iterator[tuple[str, Any]]:
     yield from arg.items() if param.kind == Parameter.VAR_KEYWORD else [(param.name, arg)]
 
 

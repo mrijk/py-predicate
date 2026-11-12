@@ -1,6 +1,7 @@
 import inspect
 from dataclasses import dataclass
 from functools import cached_property
+from types import FrameType
 from typing import Any, Iterable
 
 from more_itertools import first_true
@@ -33,7 +34,9 @@ def find_in_locals(locals: Iterable[tuple[str, Any]], predicate: Predicate[Any])
     return first_true(other_predicates, pred=lambda other: predicate in other)
 
 
-def find_this_predicate(frame, predicate: Predicate[Any]) -> Predicate[Any]:
+def find_this_predicate(frame: FrameType | None, predicate: Predicate[Any]) -> Predicate[Any]:
+    if frame is None:
+        raise LookupError("No predicate found that contains this_p")
     locals = frame.f_locals.items()
     if found := find_in_locals(locals, predicate):
         return found
