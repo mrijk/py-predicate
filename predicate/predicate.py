@@ -5,7 +5,7 @@ from decimal import Decimal
 from fractions import Fraction
 from functools import partial
 from ipaddress import IPv4Address, IPv6Address
-from typing import Any, Callable, ClassVar, Iterable, Iterator, final, overload
+from typing import Any, Callable, ClassVar, Iterable, Iterator, cast, final, overload
 from uuid import UUID
 
 from more_itertools import spy
@@ -45,7 +45,12 @@ class Predicate[T]:
 
     def __rand__(self, other: Any) -> "Predicate[Any]":
         """Return the 'rand' predicate."""
-        return self & other
+        from predicate.and_predicate import AndPredicate
+
+        left = _as_predicate(other)
+        right = resolve_predicate(self)
+
+        return AndPredicate(left=left, right=right)
 
     @overload
     def __or__(self, other: "Predicate[Any]") -> "Predicate[Any]": ...
@@ -61,6 +66,12 @@ class Predicate[T]:
         right = _as_predicate(other)
 
         return OrPredicate(left=left, right=right)
+
+    @overload
+    def __ror__(self, other: "Predicate[Any]") -> "Predicate[Any]": ...
+
+    @overload
+    def __ror__(self, other: Callable[[T], bool]) -> "Predicate[Any]": ...
 
     def __ror__(self, other: Any) -> "Predicate[Any]":
         """Return the 'ror' predicate."""
@@ -86,9 +97,20 @@ class Predicate[T]:
 
         return XorPredicate(left=left, right=right)
 
+    @overload
+    def __rxor__(self, other: "Predicate[Any]") -> "Predicate[Any]": ...
+
+    @overload
+    def __rxor__(self, other: Callable[[T], bool]) -> "Predicate[Any]": ...
+
     def __rxor__(self, other: Any) -> "Predicate[Any]":
         """Return the 'rxor' predicate."""
-        return self ^ other
+        from predicate.xor_predicate import XorPredicate
+
+        left = _as_predicate(other)
+        right = resolve_predicate(self)
+
+        return XorPredicate(left=left, right=right)
 
     def __invert__(self) -> "Predicate[Any]":
         """Return the 'negated' predicate."""
@@ -138,7 +160,7 @@ def _as_predicate(candidate: Any) -> Predicate[Any]:
 
             return fn_p(candidate)
         case _:
-            return NotImplemented
+            return cast("Predicate[Any]", NotImplemented)
 
 
 def repr_operand(predicate: Predicate[Any], precedence: int) -> str:
