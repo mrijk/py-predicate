@@ -133,8 +133,8 @@ def generate_any_p(any_predicate: AnyPredicate, length_p: Predicate = default_si
         yield random_permutation(false_values)
 
 
-@generate_false.register
-def generate_and(predicate: AndPredicate) -> Iterator:
+@generate_false.register(AndPredicate)
+def generate_and(predicate: AndPredicate[Any]) -> Iterator:
     if optimize(predicate) != always_true_p:
         yield from random_first_from_iterables(generate_false(predicate.left), generate_false(predicate.right))
 
@@ -144,13 +144,13 @@ def generate_always_true(_predicate: AlwaysTruePredicate) -> Iterator:
     yield from []
 
 
-@generate_false.register
-def generate_exception(_predicate: ExceptionPredicate) -> Iterator:
+@generate_false.register(ExceptionPredicate)
+def generate_exception(_predicate: ExceptionPredicate[Any]) -> Iterator:
     yield from []
 
 
-@generate_false.register
-def generate_eq(predicate: EqPredicate) -> Iterator:
+@generate_false.register(EqPredicate)
+def generate_eq(predicate: EqPredicate[Any]) -> Iterator:
     match v := predicate.v:
         case bool():
             if not v:
@@ -169,25 +169,25 @@ def generate_always_false(_predicate: AlwaysFalsePredicate) -> Iterator:
     yield from random_anys()
 
 
-@generate_false.register
-def generate_is_close_p(predicate: IsClosePredicate) -> Iterator:
+@generate_false.register(IsClosePredicate)
+def generate_is_close_p(predicate: IsClosePredicate[Any]) -> Iterator:
     yield from (v for v in random_floats() if not predicate(v))
 
 
-@generate_false.register
-def generate_has_key(predicate: HasKeyPredicate) -> Iterator:
+@generate_false.register(HasKeyPredicate)
+def generate_has_key(predicate: HasKeyPredicate[Any]) -> Iterator:
     without_predicate_key = ~has_key_p(predicate.key_p)
 
     yield from (random_dict for random_dict in random_dicts() if without_predicate_key(random_dict))
 
 
-@generate_false.register
-def generate_has_length(predicate: HasLengthPredicate, *, value_p: Predicate = is_int_p) -> Iterator:
+@generate_false.register(HasLengthPredicate)
+def generate_has_length(predicate: HasLengthPredicate[Any], *, value_p: Predicate[Any] = is_int_p) -> Iterator:
     yield from random_iterables(length_p=~predicate.length_p, value_p=value_p)
 
 
-@generate_false.register
-def generate_has_path(predicate: HasPathPredicate) -> Iterator:
+@generate_false.register(HasPathPredicate)
+def generate_has_path(predicate: HasPathPredicate[Any]) -> Iterator:
     from predicate import generate_true
 
     yield {}
@@ -207,8 +207,8 @@ def generate_has_path(predicate: HasPathPredicate) -> Iterator:
             yield {next(false_keys): None}
 
 
-@generate_false.register
-def generate_ge_le(predicate: GeLePredicate) -> Iterator:
+@generate_false.register(GeLePredicate)
+def generate_ge_le(predicate: GeLePredicate[Any]) -> Iterator:
     match lower := predicate.lower, upper := predicate.upper:
         case datetime(), _:
             yield from interleave(

@@ -43,7 +43,7 @@ from predicate.struct_predicate import is_struct_p
 from predicate.tuple_of_predicate import is_tuple_of_p
 
 
-def from_json(data: dict[str, Any]) -> Predicate:  # noqa: C901
+def from_json(data: dict[str, Any]) -> Predicate[Any]:  # noqa: C901
     """Parse a predicate from its JSON representation."""
     ((key, value),) = data.items()
 
@@ -160,17 +160,17 @@ def from_json(data: dict[str, Any]) -> Predicate:  # noqa: C901
             raise ValueError(f"Unknown predicate type: {key!r}")
 
 
-def _is_subclass_from_json(value: dict[str, Any]) -> Predicate:
+def _is_subclass_from_json(value: dict[str, Any]) -> Predicate[Any]:
     klasses = [_resolve_class(name) for name in value["klass"]]
     return is_subclass_p(tuple(klasses) if len(klasses) > 1 else klasses[0])
 
 
-def _juxt_p_from_json(value: dict[str, Any]) -> Predicate:
+def _juxt_p_from_json(value: dict[str, Any]) -> Predicate[Any]:
     predicates = [from_json(p) for p in value["predicates"]]
     return juxt_p(*predicates, evaluate=from_json(value["evaluate"]))
 
 
-def _struct_p_from_json(value: dict[str, Any]) -> Predicate:
+def _struct_p_from_json(value: dict[str, Any]) -> Predicate[Any]:
     required = {k: from_json(v) for k, v in value["required"].items()}
     optional_fields = {k: from_json(v) for k, v in value["optional"].items()}
     return is_struct_p(required=required, optional=optional_fields)
