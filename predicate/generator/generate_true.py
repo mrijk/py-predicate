@@ -925,7 +925,7 @@ def _construct(klass: type, params: list[Parameter]) -> Any:
     return klass(*args, **kwargs)
 
 
-def _random_predicates_of_type(klass: type[Predicate], kwargs: dict) -> Iterator[Predicate]:
+def _random_predicates_of_type(klass: type[Predicate], kwargs: dict[str, Any]) -> Iterator[Predicate]:
     if klass is Predicate:
         return random_predicates(**kwargs)
     if klass not in predicate_type_registry():

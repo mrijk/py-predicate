@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Iterable, override
+from typing import Any, Iterable, override
 
 from predicate.predicate import Predicate
 
@@ -23,7 +23,9 @@ class PlusPredicate[T](Predicate[T]):
         return f"plus({self.predicate!r})"
 
     @override
-    def explain_failure(self, iterable: Iterable[T], *, predicates: list[Predicate], full_match: bool) -> dict:
+    def explain_failure(
+        self, iterable: Iterable[T], *, predicates: list[Predicate], full_match: bool
+    ) -> dict[str, Any]:
         if not iterable:
             return {"reason": f"Iterable should have at least one element to match against {self.predicate!r}"}
 

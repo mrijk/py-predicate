@@ -22,7 +22,7 @@ class CompPredicate[S, T](Predicate[T]):
         return predicate in self.predicate
 
     @override
-    def explain_failure(self, x: S) -> dict:
+    def explain_failure(self, x: S) -> dict[str, Any]:
         return {"reason": self.predicate.explain(x)}
 
 

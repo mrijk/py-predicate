@@ -83,7 +83,7 @@ def _get_reason(predicate: Predicate, value: Any) -> str | None:
     return result.get("reason") or str(result)
 
 
-def _check_args(spec: Spec, func_name: str, arguments: dict) -> str | None:
+def _check_args(spec: Spec, func_name: str, arguments: dict[str, Any]) -> str | None:
     failures = (
         (name, reason)
         for name, predicate in spec["args"].items()
@@ -106,7 +106,7 @@ def _check_return_value(spec: Spec, func_name: str, result: Any) -> str | None:
     return None
 
 
-def _check_type_vars(sig: Signature, func_name: str, arguments: dict, result: Any) -> str | None:
+def _check_type_vars(sig: Signature, func_name: str, arguments: dict[str, Any], result: Any) -> str | None:
     if reason := type_var_failure(sig, arguments, result):
         return f"Type variable binding for function {func_name} failed. Reason: {reason}"
     return None
@@ -127,7 +127,9 @@ def _check_exception(spec: Spec, func_name: str, exc: Exception) -> str | None:
     return None
 
 
-def _check_fn_constraints(spec: Spec, func_name: str, arguments: dict, result: Any, old: dict) -> Iterator[str]:
+def _check_fn_constraints(
+    spec: Spec, func_name: str, arguments: dict[str, Any], result: Any, old: dict[str, Any]
+) -> Iterator[str]:
     if fn := spec.get("fn"):
         kwargs = arguments | {ret_name(spec): result}
 
@@ -139,7 +141,9 @@ def _check_fn_constraints(spec: Spec, func_name: str, arguments: dict, result: A
             yield f"fn constraint for function {func_name} failed. Arguments: {args_str}, {ret_name(spec)}={result!r}"
 
 
-def _check_fn_p_constraints(spec: Spec, func_name: str, arguments: dict, result: Any, old: dict) -> Iterator[str]:
+def _check_fn_p_constraints(
+    spec: Spec, func_name: str, arguments: dict[str, Any], result: Any, old: dict[str, Any]
+) -> Iterator[str]:
     if fn_p := spec.get("fn_p"):
         kwargs = arguments
 
@@ -151,7 +155,9 @@ def _check_fn_p_constraints(spec: Spec, func_name: str, arguments: dict, result:
             yield f"fn_p constraint for function {func_name} failed. Reason: {reason}"
 
 
-def _check_constraints(spec: Spec, func_name: str, arguments: dict, result: Any, old: dict) -> Iterator[str]:
+def _check_constraints(
+    spec: Spec, func_name: str, arguments: dict[str, Any], result: Any, old: dict[str, Any]
+) -> Iterator[str]:
     yield from _check_fn_constraints(spec, func_name, arguments, result, old)
     yield from _check_fn_p_constraints(spec, func_name, arguments, result, old)
 
@@ -218,7 +224,7 @@ def instrument_function(func: Callable, spec: Spec, on_error: OnError = default_
     resolved_spec = cache(lambda: enrich_spec(func, spec))
     typed_signature = cache(lambda: resolve_signature(func))
 
-    def _before(args: tuple, kwargs: dict) -> tuple[dict, dict]:
+    def _before(args: tuple, kwargs: dict[str, Any]) -> tuple[dict, dict]:
         bound = resolved_signature().bind(*args, **kwargs)
         bound.apply_defaults()
 
@@ -233,7 +239,7 @@ def instrument_function(func: Callable, spec: Spec, on_error: OnError = default_
     def _on_exception(exc: Exception) -> None:
         _report(on_error, _check_exception(resolved_spec(), func_name, exc))
 
-    def _after(context: tuple[dict, dict], result: Any) -> Any:
+    def _after(context: tuple[dict[str, Any], dict[str, Any]], result: Any) -> Any:
         arguments, old = context
 
         _report(on_error, _check_return_value(resolved_spec(), func_name, result))

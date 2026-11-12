@@ -35,7 +35,7 @@ class IsPartialPredicate[T](Predicate[T]):
         )
 
     @override
-    def explain_failure(self, x: Any) -> dict:
+    def explain_failure(self, x: Any) -> dict[str, Any]:
         match x:
             case Callable() as func if func_is_partial(func):  # type: ignore
                 sig = signature(func)

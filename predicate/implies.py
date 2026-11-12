@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from functools import singledispatch
-from typing import Iterable, override
+from typing import Any, Iterable, override
 
 from predicate.all_predicate import AllPredicate
 from predicate.always_false_predicate import AlwaysFalsePredicate
@@ -226,7 +226,7 @@ class Implies[T](Predicate[T]):
         return f"{self.left} => {self.right}"
 
     @override
-    def explain_failure(self, x) -> dict:
+    def explain_failure(self, x) -> dict[str, Any]:
         return {"reason": f"{self.left} doesn't imply {self.right}"}
 
 

@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import override
+from typing import Any, override
 
 from predicate.named_predicate import to_named_predicate
 from predicate.predicate import Predicate
@@ -19,7 +19,7 @@ class IsSamePredicate[T](Predicate[T]):
         return f"is_same_p({self.predicate!r})"
 
     @override
-    def explain_failure(self, predicate: Predicate[T]) -> dict:
+    def explain_failure(self, predicate: Predicate[T]) -> dict[str, Any]:
         if get_named_predicates(self.predicate) != get_named_predicates(predicate):
             return {"reason": "Predicates are not equivalent."}
 

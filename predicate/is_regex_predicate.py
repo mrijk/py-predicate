@@ -22,7 +22,7 @@ class IsRegexPredicate[T](Predicate[T]):
         return "is_regex_p"
 
     @override
-    def explain_failure(self, x: Any) -> dict:
+    def explain_failure(self, x: Any) -> dict[str, Any]:
         if not isinstance(x, str):
             return {"reason": f"{x} is not a string"}
         try:

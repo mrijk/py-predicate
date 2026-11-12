@@ -160,17 +160,17 @@ def from_json(data: dict[str, Any]) -> Predicate:  # noqa: C901
             raise ValueError(f"Unknown predicate type: {key!r}")
 
 
-def _is_subclass_from_json(value: dict) -> Predicate:
+def _is_subclass_from_json(value: dict[str, Any]) -> Predicate:
     klasses = [_resolve_class(name) for name in value["klass"]]
     return is_subclass_p(tuple(klasses) if len(klasses) > 1 else klasses[0])
 
 
-def _juxt_p_from_json(value: dict) -> Predicate:
+def _juxt_p_from_json(value: dict[str, Any]) -> Predicate:
     predicates = [from_json(p) for p in value["predicates"]]
     return juxt_p(*predicates, evaluate=from_json(value["evaluate"]))
 
 
-def _struct_p_from_json(value: dict) -> Predicate:
+def _struct_p_from_json(value: dict[str, Any]) -> Predicate:
     required = {k: from_json(v) for k, v in value["required"].items()}
     optional_fields = {k: from_json(v) for k, v in value["optional"].items()}
     return is_struct_p(required=required, optional=optional_fields)

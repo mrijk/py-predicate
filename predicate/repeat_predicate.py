@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Iterable, override
+from typing import Any, Iterable, override
 
 from predicate.predicate import Predicate
 
@@ -25,7 +25,9 @@ class RepeatPredicate[T](Predicate[T]):
         return f"repeat({self.m}, {self.n}, {self.predicate!r})"
 
     @override
-    def explain_failure(self, iterable: Iterable[T], *, predicates: list[Predicate], full_match: bool) -> dict:  # type: ignore
+    def explain_failure(
+        self, iterable: Iterable[T], *, predicates: list[Predicate], full_match: bool
+    ) -> dict[str, Any]:  # type: ignore
         return {"reason": f"Expected between {self.m} and {self.n} matches of predicate `{self.predicate!r}`"}
 
 

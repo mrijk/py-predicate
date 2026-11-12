@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from inspect import getmembers, isfunction
-from typing import override
+from typing import Any, override
 
 from predicate.predicate import Predicate
 from predicate.same_signature_predicate import same_signature_p
@@ -44,7 +44,7 @@ class ImplementsProtocolPredicate[T](Predicate[T]):
         return f"implements_protocol_p({self.protocol.__name__}{args_match})"
 
     @override
-    def explain_failure(self, x: type) -> dict:
+    def explain_failure(self, x: type) -> dict[str, Any]:
         return {"reason": self._failure(x)}
 
 

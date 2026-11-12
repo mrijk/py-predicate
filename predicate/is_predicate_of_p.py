@@ -22,7 +22,7 @@ class IsPredicateOfPredicate[T](Predicate[T]):
         return f"is_predicate_of_p({name!r})"
 
     @override
-    def explain_failure(self, x: T) -> dict:
+    def explain_failure(self, x: T) -> dict[str, Any]:
         match x:
             case Predicate():
                 return {"reason": f"{x} is not a predicate of type {self.predicate_klass.__name__!r}"}

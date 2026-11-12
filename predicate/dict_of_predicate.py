@@ -42,7 +42,7 @@ class DictOfPredicate(Predicate):
         return f"is_dict_of_p({key_value_pairs_repr(pairs)})"
 
     @override
-    def explain_failure(self, x: Any, *args, **kwargs) -> dict:
+    def explain_failure(self, x: Any, *args, **kwargs) -> dict[str, Any]:
         if not isinstance(x, Mapping):
             return {"reason": f"{x} is not an instance of a Mapping"}
         if not x:

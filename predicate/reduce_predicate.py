@@ -1,6 +1,6 @@
 import asyncio
 from dataclasses import dataclass, field
-from typing import Callable, Iterable, override
+from typing import Any, Callable, Iterable, override
 
 from predicate.is_async_predicate import is_async_p
 from predicate.predicate import Predicate
@@ -33,7 +33,7 @@ class ReducePredicate[T](Predicate[T]):
         return f"reduce_p({name}, {self.initial!r})"
 
     @override
-    def explain_failure(self, iterable: Iterable[T]) -> dict:
+    def explain_failure(self, iterable: Iterable[T]) -> dict[str, Any]:
         acc = self.initial
         for index, x in enumerate(iterable):
             acc, predicate = self._call(acc, x)

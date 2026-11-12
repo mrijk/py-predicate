@@ -21,7 +21,7 @@ class StructPredicate[T](Predicate[T]):
 
         return not any(self._failures(x))
 
-    def _failures(self, x: Mapping) -> Iterator[dict]:
+    def _failures(self, x: Mapping) -> Iterator[dict[str, Any]]:
         if additional := set(x) - set(self.required) - set(self.optional):
             yield {"reason": f"Field `{first(additional)}` is unknown"}
 
@@ -41,14 +41,14 @@ class StructPredicate[T](Predicate[T]):
         )
 
     @override
-    def explain_failure(self, x: Any, *args, **kwargs) -> dict:
+    def explain_failure(self, x: Any, *args, **kwargs) -> dict[str, Any]:
         if not isinstance(x, Mapping):
             return {"reason": f"{x} is not an instance of a Mapping"}
 
         return first(self._failures(x), {"reason": "Unknown"})
 
 
-def value_failure(key: str, value: Any, predicate: Predicate) -> dict:
+def value_failure(key: str, value: Any, predicate: Predicate) -> dict[str, Any]:
     return {
         "key": key,
         "value": value,

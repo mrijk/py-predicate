@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Final, override
+from typing import Any, Final, override
 
 from predicate.predicate import Predicate
 
@@ -22,7 +22,7 @@ class EqPredicate[T](Predicate[T]):
         return type(self.v)
 
     @override
-    def explain_failure(self, x: T) -> dict:
+    def explain_failure(self, x: T) -> dict[str, Any]:
         return {"reason": f"{x} is not equal to {self.v!r}"}
 
 

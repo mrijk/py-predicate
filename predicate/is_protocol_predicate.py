@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Protocol, override
+from typing import Any, Protocol, override
 
 from predicate.predicate import Predicate
 
@@ -15,7 +15,7 @@ class IsProtocolPredicate[T](Predicate[T]):
         return "is_protocol_p"
 
     @override
-    def explain_failure(self, x: type) -> dict:
+    def explain_failure(self, x: type) -> dict[str, Any]:
         return {"reason": f"{x} is not a Protocol"}
 
 

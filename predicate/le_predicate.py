@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import override
+from typing import Any, override
 
 from predicate.predicate import ConstrainedT, Predicate
 
@@ -22,7 +22,7 @@ class LePredicate[T](Predicate[T]):
         return type(self.v)
 
     @override
-    def explain_failure(self, x: T) -> dict:
+    def explain_failure(self, x: T) -> dict[str, Any]:
         return {"reason": f"{x} is not less than or equal to {self.v!r}"}
 
 

@@ -120,7 +120,7 @@ class SameSignaturePredicate[T](Predicate[T]):
         return f"same_signature_p({self.function.__name__})"
 
     @override
-    def explain_failure(self, function: type) -> dict:
+    def explain_failure(self, function: type) -> dict[str, Any]:
         return {"reason": self._failure(function)}
 
 

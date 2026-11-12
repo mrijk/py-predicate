@@ -458,7 +458,7 @@ def _accepted_names(f: Callable) -> frozenset[str] | None:
     return frozenset(p.name for p in params)
 
 
-def accepted_kwargs(f: Callable, kwargs: dict) -> dict:
+def accepted_kwargs(f: Callable, kwargs: dict) -> dict[str, Any]:
     """Keep only the keyword arguments f accepts, e.g. drop length_p for a generator that has no length."""
     if not kwargs or (names := _accepted_names(f)) is None:
         return kwargs

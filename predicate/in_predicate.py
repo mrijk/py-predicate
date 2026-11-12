@@ -40,7 +40,7 @@ class InPredicate[T](Predicate[T]):
                 return False
 
     @override
-    def explain_failure(self, x: Any) -> dict:
+    def explain_failure(self, x: Any) -> dict[str, Any]:
         return {"reason": f"{x} is not in {self!r}"}
 
     @override

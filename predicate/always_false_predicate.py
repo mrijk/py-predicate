@@ -15,7 +15,7 @@ class AlwaysFalsePredicate(Predicate):
         return "always_false_p"
 
     @override
-    def explain_failure(self, *args, **kwargs) -> dict:
+    def explain_failure(self, *args, **kwargs) -> dict[str, Any]:
         return {"reason": "Always returns False"}
 
     @override

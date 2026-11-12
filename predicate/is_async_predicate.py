@@ -16,7 +16,7 @@ class IsAsyncPredicate[T](Predicate[T]):
         return "is_async_p"
 
     @override
-    def explain_failure(self, x: Any) -> dict:
+    def explain_failure(self, x: Any) -> dict[str, Any]:
         return {"reason": f"{x} is not an async function"}
 
 

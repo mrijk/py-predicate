@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from datetime import date, datetime, time, timedelta
 from pathlib import PurePath
 from types import ModuleType
-from typing import Hashable, TypeGuard, get_origin, override
+from typing import Any, Hashable, TypeGuard, get_origin, override
 from uuid import UUID
 
 from predicate import always_false_p
@@ -36,7 +36,7 @@ class IsInstancePredicate[T](Predicate[T]):
         return self.instance_klass  # type: ignore
 
     @override
-    def explain_failure(self, x: T) -> dict:
+    def explain_failure(self, x: T) -> dict[str, Any]:
         klasses = join_with_or([klass.__name__ for klass in self.instance_klass])
 
         return {"reason": f"{x} is not an instance of type {klasses}"}

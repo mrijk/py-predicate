@@ -30,7 +30,7 @@ class IsCallablePredicate[T](Predicate[T]):
         return f"is_callable_p([], {return_type})"
 
     @override
-    def explain_failure(self, x: Any) -> dict:
+    def explain_failure(self, x: Any) -> dict[str, Any]:
         match x:
             case Callable() as c:  # type: ignore
                 annotations = c.__annotations__

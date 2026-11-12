@@ -1,5 +1,5 @@
 from itertools import repeat
-from typing import Iterable, Iterator
+from typing import Any, Iterable, Iterator
 
 from more_itertools import gray_product
 
@@ -49,14 +49,14 @@ def get_named_predicates(predicate: Predicate) -> list[str]:
     return sorted(set(get_names()))
 
 
-def _execute_predicate(predicate: Predicate, values: dict) -> bool:
+def _execute_predicate(predicate: Predicate, values: dict[str, Any]) -> bool:
     set_named_values(predicate, values)
 
     dummy = False
     return predicate(dummy)
 
 
-def set_named_values(predicate: Predicate, values: dict) -> None:
+def set_named_values(predicate: Predicate, values: dict[str, Any]) -> None:
     """Set the named predicate values."""
     match predicate:
         case AndPredicate(left, right) | OrPredicate(left, right) | XorPredicate(left, right) | Implies(left, right):

@@ -29,7 +29,7 @@ class FrozenSetOfPredicate[T](Predicate[T]):
         return self.predicate.klass
 
     @override
-    def explain_failure(self, x: frozenset[T]) -> dict:
+    def explain_failure(self, x: frozenset[T]) -> dict[str, Any]:
         match x:
             case frozenset() as s:
                 fail = first_false(s, self.predicate)

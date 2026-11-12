@@ -30,7 +30,7 @@ from predicate.constructor.mutate import mutations
 from predicate.predicate import Predicate
 
 
-def construct[T](false_set: list[T], true_set: list[T], attempts: int = 30) -> Predicate | None:
+def construct[T](false_set: list[T], true_set: list[T], attempts: int = 30) -> Predicate[T] | None:
     predicates = initial_predicates()
 
     while attempts:
@@ -46,8 +46,8 @@ def construct[T](false_set: list[T], true_set: list[T], attempts: int = 30) -> P
     return None
 
 
-def _compatible_klasses(left: Predicate, right: Predicate) -> bool:
-    def to_set(p: Predicate) -> set[type] | None:
+def _compatible_klasses(left: Predicate[Any], right: Predicate[Any]) -> bool:
+    def to_set(p: Predicate[Any]) -> set[type] | None:
         try:
             klass = p.klass
         except NotImplementedError:
@@ -63,7 +63,9 @@ def _compatible_klasses(left: Predicate, right: Predicate) -> bool:
     return bool(left_set & right_set)
 
 
-def create_mutations[T](candidates: list[Predicate], false_set: list[T], true_set: list[T]) -> Iterator[Predicate]:
+def create_mutations[T](
+    candidates: list[Predicate[Any]], false_set: list[T], true_set: list[T]
+) -> Iterator[Predicate[Any]]:
     for candidate in candidates:
         yield from mutations(candidate, false_set=false_set, true_set=true_set)
 
@@ -74,7 +76,7 @@ def create_mutations[T](candidates: list[Predicate], false_set: list[T], true_se
             yield left ^ right
 
 
-def initial_predicates() -> Iterator[Predicate]:
+def initial_predicates() -> Iterator[Predicate[Any]]:
     yield always_false_p
     yield always_true_p
     yield ge_p(0)

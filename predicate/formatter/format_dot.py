@@ -81,9 +81,7 @@ def to_dot(predicate: Predicate, predicate_string: str | None = None, show_optim
 
     node_attr = {"shape": "rectangle", "style": "filled", "fillcolor": "#B7D7A8"}
 
-    edge_attr: dict = {}
-
-    dot = graphviz.Digraph(graph_attr=graph_attr, node_attr=node_attr, edge_attr=edge_attr)
+    dot = graphviz.Digraph(graph_attr=graph_attr, node_attr=node_attr, edge_attr={})
 
     node_nr = count()
 

@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from functools import partial
-from typing import Final, Iterable, override
+from typing import Any, Final, Iterable, override
 
 from more_itertools import ilen
 
@@ -22,7 +22,7 @@ class CountPredicate[T](Predicate[T]):
         return f"count_p({self.predicate!r}, {self.length_p!r})"
 
     @override
-    def explain_failure(self, iterable: Iterable[T]) -> dict:
+    def explain_failure(self, iterable: Iterable[T]) -> dict[str, Any]:
         actual_length = ilen(x for x in iterable if self.predicate(x))
         return {"reason": f"Expected count {self.length_p!r}, actual: {actual_length}"}
 

@@ -412,7 +412,7 @@ def generate_implements_protocol(predicate: ImplementsProtocolPredicate) -> Iter
     valid = next(generate_true(predicate))
     attributes = {name: getattr(valid, name) for name in protocol_members(protocol)}
 
-    def implementation(members: dict) -> type:
+    def implementation(members: dict[str, Any]) -> type:
         return type(f"{protocol.__name__}Implementation", (), members)
 
     # Leave out one member at a time

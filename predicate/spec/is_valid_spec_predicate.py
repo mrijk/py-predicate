@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Callable, override
+from typing import Any, Callable, override
 
 from predicate.predicate import Predicate
 from predicate.spec.exercise_helpers import check_signature_against_spec
@@ -26,7 +26,7 @@ class IsValidSpecPredicate(Predicate[Spec]):
         return f"is_valid_spec_p({self.function.__name__})"
 
     @override
-    def explain_failure(self, spec: Spec) -> dict:
+    def explain_failure(self, spec: Spec) -> dict[str, Any]:
         return {"reason": self._failure(spec)}
 
 

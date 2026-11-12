@@ -1,6 +1,6 @@
 from abc import abstractmethod
 from dataclasses import dataclass
-from typing import override
+from typing import Any, override
 
 from predicate.predicate import ConstrainedT, Predicate
 
@@ -33,7 +33,7 @@ class GeLePredicate[T](RangePredicate[T]):
         return f"ge_le_p({self.lower!r}, {self.upper!r})"
 
     @override
-    def explain_failure(self, x: T) -> dict:
+    def explain_failure(self, x: T) -> dict[str, Any]:
         return {"reason": f"{x!r} is not greater equal {self.lower!r} and less equal {self.upper!r}"}
 
 
@@ -48,7 +48,7 @@ class GeLtPredicate[T](RangePredicate[T]):
         return f"ge_lt_p({self.lower!r}, {self.upper!r})"
 
     @override
-    def explain_failure(self, x: T) -> dict:
+    def explain_failure(self, x: T) -> dict[str, Any]:
         return {"reason": f"{x!r} is not greater equal {self.lower!r} and less than {self.upper!r}"}
 
 
@@ -63,7 +63,7 @@ class GtLePredicate[T](RangePredicate[T]):
         return f"gt_le_p({self.lower!r}, {self.upper!r})"
 
     @override
-    def explain_failure(self, x: T) -> dict:
+    def explain_failure(self, x: T) -> dict[str, Any]:
         return {
             "reason": f"{x!r} is not greater than {self.lower!r} and less than or equal to {self.upper!r}",
         }
@@ -80,7 +80,7 @@ class GtLtPredicate[T](RangePredicate[T]):
         return f"gt_lt_p({self.lower!r}, {self.upper!r})"
 
     @override
-    def explain_failure(self, x: T) -> dict:
+    def explain_failure(self, x: T) -> dict[str, Any]:
         return {"reason": f"{x!r} is not greater than {self.lower!r} and less than {self.upper!r}"}
 
 

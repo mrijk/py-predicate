@@ -22,7 +22,7 @@ class HasLengthPredicate[T](Predicate[T]):
         return f"has_length_p({self.length_p!r})"
 
     @override
-    def explain_failure(self, iterable: Iterable[T]) -> dict:
+    def explain_failure(self, iterable: Iterable[T]) -> dict[str, Any]:
         return {"reason": f"Expected length {self.length_p!r}, actual: {ilen(iterable)}"}
 
     @override

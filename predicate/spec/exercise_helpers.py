@@ -154,7 +154,7 @@ def _warn(message: str, code: types.CodeType | None, module: str) -> None:
     )
 
 
-_unresolved_warning_registry: dict = {}
+_unresolved_warning_registry = {}
 
 
 def _raw_annotations(owner: Callable) -> dict[str, Any]:
@@ -547,7 +547,7 @@ def _keyword_items(param: Parameter, arg) -> Iterator[tuple[str, Any]]:
     yield from arg.items() if param.kind == Parameter.VAR_KEYWORD else [(param.name, arg)]
 
 
-def call_args(sig: Signature, value: dict) -> tuple[list, dict]:
+def call_args(sig: Signature, value: dict[str, Any]) -> tuple[list, dict[str, Any]]:
     # Leading parameters go positionally (in signature order) so *args and positional-only parameters bind correctly
     positional = list(
         takewhile(lambda param: param.name in value and param.kind in _positional_kinds, sig.parameters.values())
@@ -620,7 +620,7 @@ def _conforms(annotation: Any, value: Any, bindings: dict[TypeVar, tuple[type, .
     return True  # ponytail: other generics (Callable[[T], U], Iterator[T], ...) can't be bound at runtime
 
 
-def type_var_failure(sig: Signature, arguments: dict, result: Any) -> str | None:
+def type_var_failure(sig: Signature, arguments: dict[str, Any], result: Any) -> str | None:
     """Return why result isn't an instance of the types the arguments bind the return's type variables to (#258).
 
     No evidence (an empty container, T only in the return) means no check. Arguments needn't share one type.
@@ -641,7 +641,7 @@ def _get_values(argument: Any, param: Parameter) -> list:
     return argument if param.kind == Parameter.VAR_POSITIONAL else [argument]
 
 
-def _get_bound_arguments(sig: Signature, arguments: dict) -> dict[TypeVar, set[type]]:
+def _get_bound_arguments(sig: Signature, arguments: dict[str, Any]) -> dict[TypeVar, set[type]]:
     bound: dict[TypeVar, set[type]] = {}
     bound_arguments = (
         (param, _get_values(arguments[name], param)) for name, param in sig.parameters.items() if name in arguments
@@ -654,7 +654,9 @@ def _get_bound_arguments(sig: Signature, arguments: dict) -> dict[TypeVar, set[t
     return bound
 
 
-def verify_result(spec: Spec, return_p: Predicate, value: dict, result: Any, sig: Signature | None = None) -> None:
+def verify_result(
+    spec: Spec, return_p: Predicate, value: dict[str, Any], result: Any, sig: Signature | None = None
+) -> None:
     if not return_p(result):
         raise SpecViolationError(f"Not conform spec: {explain(return_p, result)}")
 
@@ -697,14 +699,14 @@ async def take_async(values: Any, n: int) -> list:
     return items
 
 
-def verify_items[T](item_p: Predicate, value: dict, items: list[T]) -> None:
+def verify_items[T](item_p: Predicate, value: dict[str, Any], items: list[T]) -> None:
     """Check the items a generator function yielded for the inputs in value."""
     items_p = all_p(item_p)
     if not items_p(items):
         raise SpecViolationError(f"Not conform spec: yielded {explain(items_p, items)} for inputs {value}")
 
 
-def check_exception(spec: Spec, value: dict, exc: Exception) -> Exception:
+def check_exception(spec: Spec, value: dict[str, Any], exc: Exception) -> Exception:
     expected = spec.get("raises")
     if not expected:
         raise exc

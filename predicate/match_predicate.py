@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from itertools import islice, tee
-from typing import Iterable, override
+from typing import Any, Iterable, override
 
 from predicate.consumes import consumes
 from predicate.exactly_predicate import ExactlyPredicate
@@ -26,7 +26,7 @@ class MatchPredicate[T](Predicate[T]):
         return f"match_p({param})"
 
     @override
-    def explain_failure(self, iterable: Iterable[T]) -> dict:
+    def explain_failure(self, iterable: Iterable[T]) -> dict[str, Any]:
         return {"reason": reason(iterable, predicates=self.predicates, full_match=self.full_match)}
 
 
@@ -35,7 +35,7 @@ def match_p[T](*predicates: Predicate, full_match: bool = False) -> MatchPredica
     return MatchPredicate(predicates=list(predicates), full_match=full_match)
 
 
-def reason(iterable: Iterable, *, predicates: list[Predicate], full_match: bool) -> dict:
+def reason(iterable: Iterable, *, predicates: list[Predicate], full_match: bool) -> dict[str, Any]:
     if not predicates:
         return {"reason": "Iterable has more items than predicates to match", "result": False}
     predicate, *rest_predicates = predicates

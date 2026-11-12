@@ -29,7 +29,7 @@ class SetOfPredicate[T](Predicate[T]):
         return self.predicate.klass
 
     @override
-    def explain_failure(self, x: set[T]) -> dict:
+    def explain_failure(self, x: set[T]) -> dict[str, Any]:
         match x:
             case set() as s:
                 fail = first_false(s, self.predicate)

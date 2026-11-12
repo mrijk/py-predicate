@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Iterable, override
+from typing import Any, Iterable, override
 
 from predicate.predicate import Predicate
 
@@ -27,7 +27,9 @@ class ExactlyPredicate[T](Predicate[T]):
         return f"exactly({self.n}, {self.predicate!r})"
 
     @override
-    def explain_failure(self, iterable: Iterable[T], *, predicates: list[Predicate], full_match: bool) -> dict:  # type: ignore
+    def explain_failure(
+        self, iterable: Iterable[T], *, predicates: list[Predicate], full_match: bool
+    ) -> dict[str, Any]:  # type: ignore
         from predicate.match_predicate import reason
 
         head, rest = self._split(iterable)

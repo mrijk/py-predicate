@@ -20,7 +20,7 @@ class JuxtPredicate[T](Predicate[T]):
         return f"juxt_p({predicates_repr(self.predicates)})"
 
     @override
-    def explain_failure(self, x: Any) -> dict:
+    def explain_failure(self, x: Any) -> dict[str, Any]:
         results = [predicate(x) for predicate in self.predicates]
         return {
             "results": results,

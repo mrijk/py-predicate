@@ -1,6 +1,6 @@
 import sys
 from dataclasses import dataclass
-from typing import Callable, override
+from typing import Any, Callable, override
 
 from predicate.predicate import Predicate
 
@@ -25,7 +25,7 @@ class PropertyPredicate[T](Predicate[T]):
         return "property_p()"
 
     @override
-    def explain_failure(self, obj: T) -> dict:
+    def explain_failure(self, obj: T) -> dict[str, Any]:
         object_type = type(obj).__name__
         if sys.version_info.minor > 12:
             property_name = self.getter.__name__  # type: ignore

@@ -34,7 +34,7 @@ class RaisesPredicate[T](Predicate[T]):
         return f"raises_exception_p({self.exception_type.__name__})"
 
     @override
-    def explain_failure(self, x: Any) -> dict:
+    def explain_failure(self, x: Any) -> dict[str, Any]:
         try:
             _call(x)
             return {"reason": "callable did not raise an exception"}

@@ -1,6 +1,6 @@
 import sys
 from dataclasses import dataclass
-from typing import Final, override
+from typing import Any, Final, override
 
 if sys.version_info >= (3, 13):
     from typing import TypeIs
@@ -23,7 +23,7 @@ class IsNonePredicate[T](Predicate[T]):
         return "is_none_p"
 
     @override
-    def explain_failure(self, x: T) -> dict:
+    def explain_failure(self, x: T) -> dict[str, Any]:
         return {"reason": f"{x} is not None"}
 
 

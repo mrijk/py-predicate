@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Iterable, override
+from typing import Any, Iterable, override
 
 from predicate.predicate import Predicate
 
@@ -26,7 +26,9 @@ class OptionalPredicate[T](Predicate[T]):
         return f"optional({self.predicate!r})"
 
     @override
-    def explain_failure(self, iterable: Iterable[T], *, predicates: list[Predicate], full_match: bool) -> dict:  # type: ignore
+    def explain_failure(
+        self, iterable: Iterable[T], *, predicates: list[Predicate], full_match: bool
+    ) -> dict[str, Any]:  # type: ignore
         item, *rest = iterable
 
         if predicates:

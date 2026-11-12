@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import override
+from typing import Any, override
 
 from more_itertools import first, ilen
 
@@ -20,7 +20,7 @@ class TupleOfPredicate[T](Predicate[T]):
         return f"is_tuple_of_p({predicates_repr(self.predicates)})"
 
     @override
-    def explain_failure(self, x: tuple) -> dict:
+    def explain_failure(self, x: tuple) -> dict[str, Any]:
         if (actual_length := ilen(x)) != (expected_length := len(self.predicates)):
             return {"reason": f"Incorrect tuple size, expected: {expected_length}, actual: {actual_length}"}
 

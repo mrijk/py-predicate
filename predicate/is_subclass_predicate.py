@@ -37,7 +37,7 @@ class IsSubclassPredicate[T](Predicate[T]):
         return self.class_or_tuple  # type: ignore
 
     @override
-    def explain_failure(self, x: T) -> dict:
+    def explain_failure(self, x: T) -> dict[str, Any]:
         def class_names() -> Iterator[str]:
             match self.class_or_tuple:
                 case tuple(klasses):

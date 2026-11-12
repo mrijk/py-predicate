@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import override
+from typing import Any, override
 
 from predicate.and_predicate import AndPredicate
 from predicate.implies import Implies
@@ -25,7 +25,7 @@ class NamedPredicate[T](Predicate[T]):
         return self.name
 
     @override
-    def explain_failure(self, x: T) -> dict:
+    def explain_failure(self, x: T) -> dict[str, Any]:
         return {"reason": f"{self.name} is False for {x}"}
 
 

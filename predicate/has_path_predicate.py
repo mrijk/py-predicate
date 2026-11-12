@@ -21,7 +21,7 @@ class HasPathPredicate[T](Predicate[T]):
         return f"has_path_p({predicates_repr(self.path)})"
 
     @override
-    def explain_failure(self, x: Any) -> dict:
+    def explain_failure(self, x: Any) -> dict[str, Any]:
         if not isinstance(x, Mapping):
             return {"reason": f"Value {x} is not a Mapping"}
         current = x

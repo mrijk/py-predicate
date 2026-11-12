@@ -34,7 +34,7 @@ class ListOfPredicate[T](Predicate[T]):
         return Predicate[self.predicate.klass]  # type: ignore[name-defined]
 
     @override
-    def explain_failure(self, x: Any, *args, **kwargs) -> dict:
+    def explain_failure(self, x: Any, *args, **kwargs) -> dict[str, Any]:
         match x:
             case list(l):
                 index, item = first((i, v) for i, v in enumerate(l) if not self.predicate(v))

@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Iterable, override
+from typing import Any, Iterable, override
 
 from predicate import always_true_p
 from predicate.predicate import Predicate
@@ -31,7 +31,9 @@ class StarPredicate[T](Predicate[T]):
         return f"star({self.predicate!r})"
 
     @override
-    def explain_failure(self, iterable: Iterable[T], *, predicates: list[Predicate], full_match: bool) -> dict:  # type: ignore
+    def explain_failure(
+        self, iterable: Iterable[T], *, predicates: list[Predicate], full_match: bool
+    ) -> dict[str, Any]:  # type: ignore
         return {"reason": f"tbd {self.predicate!r}"}
 
 

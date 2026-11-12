@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import ClassVar, override
+from typing import Any, ClassVar, override
 
 from predicate.predicate import Predicate, repr_operand
 
@@ -49,7 +49,7 @@ class OrPredicate[T](Predicate[T]):
         return 1 + self.left.count + self.right.count
 
     @override
-    def explain_failure(self, x: T) -> dict:
+    def explain_failure(self, x: T) -> dict[str, Any]:
         return {
             "left": self.left.explain(x),
             "right": self.right.explain(x),
