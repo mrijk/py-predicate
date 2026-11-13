@@ -131,7 +131,7 @@ With the optional extra (`pip install py-predicate[hypothesis]`), predicates can
 
 ```python
 from predicate import ge_p, lt_p
-from predicate.integrations.hypothesis import from_predicate, given_predicate
+from predicate.hypothesis import from_predicate, given_predicate
 
 
 @given_predicate(ge_p(0) & lt_p(100))
@@ -148,7 +148,7 @@ A [Spec](#runtime-instrumentation-spec) can drive a property test too. `given_sp
 
 ```python
 from predicate import ge_p, is_int_p
-from predicate.integrations.hypothesis import from_spec, given_spec
+from predicate.hypothesis import from_spec, given_spec
 
 
 def add(x, y):

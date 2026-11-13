@@ -10,6 +10,9 @@ first:
 
     pip install py_predicate[hypothesis]
 
+Everything is importable from ``predicate.hypothesis``, which is a short alias for
+``predicate.integrations.hypothesis``.
+
 Strategies from predicates
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -22,7 +25,7 @@ by keyword:
     from hypothesis import given
 
     from predicate import ge_le_p, ge_p, is_list_of_p, lt_p
-    from predicate.integrations.hypothesis import from_predicate, given_predicate
+    from predicate.hypothesis import from_predicate, given_predicate
 
 
     @given_predicate(ge_p(0) & lt_p(100))
@@ -98,7 +101,7 @@ Parameters that the spec doesn't mention are generated from their annotations.
 .. code-block:: python
 
     from predicate import ge_p, is_int_p
-    from predicate.integrations.hypothesis import from_spec, given_spec
+    from predicate.hypothesis import from_spec, given_spec
 
 
     def clamp(x, low, high):
