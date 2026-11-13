@@ -18,7 +18,7 @@ from predicate.lt_predicate import LtPredicate
 from predicate.ne_predicate import NePredicate
 from predicate.not_in_predicate import NotInPredicate
 from predicate.or_predicate import OrPredicate
-from predicate.predicate import Predicate
+from predicate.predicate import Predicate, SupportsComparison
 from predicate.set_of_predicate import SetOfPredicate
 from predicate.set_predicates import (
     IntersectsPredicate,
@@ -62,55 +62,55 @@ def _(predicate: AndPredicate[Any], other: Predicate[Any]) -> bool:
 
 
 @implies.register(GePredicate)
-def _(predicate: GePredicate[Any], other: Predicate[Any]) -> bool:
+def _(predicate: GePredicate[SupportsComparison], other: Predicate[Any]) -> bool:
     match other:
         case GePredicate(v):
-            return predicate.v >= v
+            return bool(predicate.v >= v)
         case GtPredicate(v):
-            return predicate.v > v
+            return bool(predicate.v > v)
         case NePredicate(v):
-            return predicate.v > v
+            return bool(predicate.v > v)
         case _:
             return False
 
 
 @implies.register(GtPredicate)
-def _(predicate: GtPredicate[Any], other: Predicate[Any]) -> bool:
+def _(predicate: GtPredicate[SupportsComparison], other: Predicate[Any]) -> bool:
     match other:
         case IsInstancePredicate(instance_klass):
             return predicate.klass == instance_klass[0]  # type: ignore
         case GePredicate(v):
-            return predicate.v >= v
+            return bool(predicate.v >= v)
         case GtPredicate(v):
-            return predicate.v >= v
+            return bool(predicate.v >= v)
         case NePredicate(v):
-            return predicate.v >= v
+            return bool(predicate.v >= v)
         case _:
             return False
 
 
 @implies.register(LePredicate)
-def _(predicate: LePredicate[Any], other: Predicate[Any]) -> bool:
+def _(predicate: LePredicate[SupportsComparison], other: Predicate[Any]) -> bool:
     match other:
         case LePredicate(v):
-            return predicate.v <= v
+            return bool(predicate.v <= v)
         case LtPredicate(v):
-            return predicate.v < v
+            return bool(predicate.v < v)
         case NePredicate(v):
-            return predicate.v < v
+            return bool(predicate.v < v)
         case _:
             return False
 
 
 @implies.register(LtPredicate)
-def _(predicate: LtPredicate[Any], other: Predicate[Any]) -> bool:
+def _(predicate: LtPredicate[SupportsComparison], other: Predicate[Any]) -> bool:
     match other:
         case LePredicate(v):
-            return predicate.v <= v
+            return bool(predicate.v <= v)
         case LtPredicate(v):
-            return predicate.v <= v
+            return bool(predicate.v <= v)
         case NePredicate(v):
-            return predicate.v <= v
+            return bool(predicate.v <= v)
         case _:
             return False
 
@@ -121,17 +121,17 @@ def _(predicate: EqPredicate[Any], other: Predicate[Any]) -> bool:
         case IsInstancePredicate(instance_klass):
             return predicate.klass == instance_klass[0]  # type: ignore
         case EqPredicate(v):
-            return predicate.v == v
+            return bool(predicate.v == v)
         case NePredicate(v):
-            return predicate.v != v
+            return bool(predicate.v != v)
         case GePredicate(v):
-            return predicate.v >= v
+            return bool(predicate.v >= v)
         case GtPredicate(v):
-            return predicate.v > v
+            return bool(predicate.v > v)
         case LePredicate(v):
-            return predicate.v <= v
+            return bool(predicate.v <= v)
         case LtPredicate(v):
-            return predicate.v < v
+            return bool(predicate.v < v)
         case InPredicate(v):
             return predicate.v in v
         case NotInPredicate(v):

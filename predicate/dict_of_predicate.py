@@ -68,7 +68,7 @@ def to_key_p(key_p: Predicate[Any] | str) -> Predicate[Any]:
 
 def from_key_p(key_p: Predicate[Any]) -> Predicate[Any] | str:
     match key_p:
-        case EqPredicate(v):
+        case EqPredicate(v) if isinstance(v, str):
             return v
         case _:
             return key_p

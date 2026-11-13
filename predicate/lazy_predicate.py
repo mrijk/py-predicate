@@ -2,7 +2,7 @@ import inspect
 from dataclasses import dataclass
 from functools import cached_property
 from types import FrameType
-from typing import Any
+from typing import Any, cast
 
 from predicate.predicate import Predicate
 
@@ -32,7 +32,7 @@ def find_predicate_by_ref(frame: FrameType | None, ref: str) -> Predicate[Any] |
         return None
     for key, value in frame.f_locals.items():
         if key == ref:
-            return value
+            return cast(Predicate[Any], value)
     return find_predicate_by_ref(frame.f_back, ref)
 
 

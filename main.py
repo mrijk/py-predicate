@@ -1,5 +1,6 @@
 import json as json_lib
 import sys
+from collections.abc import Iterable
 from typing import Annotated, Any
 
 import typer
@@ -62,7 +63,7 @@ def table(expression: Expression, optimize: Optimize = False, as_json: Json = Fa
         named_predicates = get_named_predicates(predicate)
         return " ".join(named_predicates)
 
-    def format_values(values) -> str:
+    def format_values(values: Iterable[Any]) -> str:
         bits = [str(as_bit(value)) for value in values]
         return " ".join(bits)
 

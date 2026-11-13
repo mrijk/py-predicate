@@ -2,18 +2,18 @@ from abc import abstractmethod
 from dataclasses import dataclass
 from typing import Any, override
 
-from predicate.predicate import ConstrainedT, Predicate
+from predicate.predicate import Predicate, SupportsComparison
 
 
 @dataclass
-class RangePredicate[T](Predicate[T]):
+class RangePredicate[T: SupportsComparison](Predicate[T]):
     """Abstract base class."""
 
     @abstractmethod
     def __call__(self, x: T) -> bool: ...
 
-    lower: ConstrainedT  # type: ignore[type-arg]
-    upper: ConstrainedT  # type: ignore[type-arg]
+    lower: T
+    upper: T
 
     @override
     @property
@@ -22,8 +22,7 @@ class RangePredicate[T](Predicate[T]):
 
 
 @dataclass
-# class GeLePredicate[T](Predicate[T]):
-class GeLePredicate[T](RangePredicate[T]):
+class GeLePredicate[T: SupportsComparison](RangePredicate[T]):
     """A predicate class that models the 'lower <= x <= upper' predicate."""
 
     def __call__(self, x: T) -> bool:
@@ -38,7 +37,7 @@ class GeLePredicate[T](RangePredicate[T]):
 
 
 @dataclass
-class GeLtPredicate[T](RangePredicate[T]):
+class GeLtPredicate[T: SupportsComparison](RangePredicate[T]):
     """A predicate class that models the 'lower <= x < upper' predicate."""
 
     def __call__(self, x: T) -> bool:
@@ -53,7 +52,7 @@ class GeLtPredicate[T](RangePredicate[T]):
 
 
 @dataclass
-class GtLePredicate[T](RangePredicate[T]):
+class GtLePredicate[T: SupportsComparison](RangePredicate[T]):
     """A predicate class that models the 'lower < x <= upper' predicate."""
 
     def __call__(self, x: T) -> bool:
@@ -70,7 +69,7 @@ class GtLePredicate[T](RangePredicate[T]):
 
 
 @dataclass
-class GtLtPredicate[T](RangePredicate[T]):
+class GtLtPredicate[T: SupportsComparison](RangePredicate[T]):
     """A predicate class that models the 'lower < x < upper' predicate."""
 
     def __call__(self, x: T) -> bool:
@@ -84,21 +83,21 @@ class GtLtPredicate[T](RangePredicate[T]):
         return {"reason": f"{x!r} is not greater than {self.lower!r} and less than {self.upper!r}"}
 
 
-def ge_le_p(lower: ConstrainedT, upper: ConstrainedT) -> GeLePredicate[ConstrainedT]:  # type: ignore[type-arg]
+def ge_le_p[T: SupportsComparison](lower: T, upper: T) -> GeLePredicate[T]:
     """Return True if the value is greater or equal than the constant, otherwise False."""
     return GeLePredicate(lower=lower, upper=upper)
 
 
-def ge_lt_p(lower: ConstrainedT, upper: ConstrainedT) -> GeLtPredicate[ConstrainedT]:  # type: ignore[type-arg]
+def ge_lt_p[T: SupportsComparison](lower: T, upper: T) -> GeLtPredicate[T]:
     """Return True if the value is greater or equal than the constant, otherwise False."""
     return GeLtPredicate(lower=lower, upper=upper)
 
 
-def gt_le_p(lower: ConstrainedT, upper: ConstrainedT) -> GtLePredicate[ConstrainedT]:  # type: ignore[type-arg]
+def gt_le_p[T: SupportsComparison](lower: T, upper: T) -> GtLePredicate[T]:
     """Return True if the value is greater or equal than the constant, otherwise False."""
     return GtLePredicate(lower=lower, upper=upper)
 
 
-def gt_lt_p(lower: ConstrainedT, upper: ConstrainedT) -> GtLtPredicate[ConstrainedT]:  # type: ignore[type-arg]
+def gt_lt_p[T: SupportsComparison](lower: T, upper: T) -> GtLtPredicate[T]:
     """Return True if the value is greater or equal than the constant, otherwise False."""
     return GtLtPredicate(lower=lower, upper=upper)

@@ -64,7 +64,7 @@ def _[T](predicate: NePredicate[Any], false_set: list[T], true_set: list[T], nr:
 
 
 @mutations.register(GePredicate)
-def _[T](predicate: GePredicate[Any], false_set: list[T], true_set: list[T], nr: int = 3) -> Iterator[Predicate[T]]:
+def _[T](predicate: GePredicate[Any], false_set: list[T], true_set: list[T], nr: int = 3) -> Iterator[Predicate[Any]]:
     match predicate.v:
         case int(n):
             yield from (ge_p(v) for v in _int_value_mutations(n, true_set, nr))
@@ -73,7 +73,7 @@ def _[T](predicate: GePredicate[Any], false_set: list[T], true_set: list[T], nr:
 
 
 @mutations.register(GtPredicate)
-def _[T](predicate: GtPredicate[Any], false_set: list[T], true_set: list[T], nr: int = 3) -> Iterator[Predicate[T]]:
+def _[T](predicate: GtPredicate[Any], false_set: list[T], true_set: list[T], nr: int = 3) -> Iterator[Predicate[Any]]:
     match predicate.v:
         case int(n):
             yield from (gt_p(v) for v in _int_value_mutations(n, false_set, nr))
@@ -82,7 +82,7 @@ def _[T](predicate: GtPredicate[Any], false_set: list[T], true_set: list[T], nr:
 
 
 @mutations.register(LePredicate)
-def _[T](predicate: LePredicate[Any], false_set: list[T], true_set: list[T], nr: int = 3) -> Iterator[Predicate[T]]:
+def _[T](predicate: LePredicate[Any], false_set: list[T], true_set: list[T], nr: int = 3) -> Iterator[Predicate[Any]]:
     match predicate.v:
         case int(n):
             yield from (le_p(v) for v in _int_value_mutations(n, true_set, nr))
@@ -91,7 +91,7 @@ def _[T](predicate: LePredicate[Any], false_set: list[T], true_set: list[T], nr:
 
 
 @mutations.register(LtPredicate)
-def _[T](predicate: LtPredicate[Any], false_set: list[T], true_set: list[T], nr: int = 3) -> Iterator[Predicate[T]]:
+def _[T](predicate: LtPredicate[Any], false_set: list[T], true_set: list[T], nr: int = 3) -> Iterator[Predicate[Any]]:
     match predicate.v:
         case int(n):
             yield from (lt_p(v) for v in _int_value_mutations(n, false_set, nr))

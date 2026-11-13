@@ -1,14 +1,14 @@
 from dataclasses import dataclass
 from typing import Any, Final, override
 
-from predicate.predicate import ConstrainedT, Predicate
+from predicate.predicate import Predicate, SupportsComparison
 
 
 @dataclass
-class GtPredicate[T](Predicate[T]):
+class GtPredicate[T: SupportsComparison](Predicate[T]):
     """A predicate class that models the 'gt' (>) predicate."""
 
-    v: ConstrainedT  # type: ignore[type-arg]
+    v: T
 
     def __call__(self, x: T) -> bool:
         return x > self.v
@@ -26,7 +26,7 @@ class GtPredicate[T](Predicate[T]):
         return {"reason": f"{x} is not greater than {self.v!r}"}
 
 
-def gt_p(v: ConstrainedT) -> GtPredicate[ConstrainedT]:  # type: ignore[type-arg]
+def gt_p[T: SupportsComparison](v: T) -> GtPredicate[T]:
     """Return True if the value is greater than the constant, otherwise False."""
     return GtPredicate(v=v)
 

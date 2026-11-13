@@ -5,7 +5,7 @@ from decimal import Decimal
 from fractions import Fraction
 from functools import partial
 from ipaddress import IPv4Address, IPv6Address
-from typing import Any, Callable, ClassVar, Iterable, Iterator, cast, final, overload
+from typing import Any, Callable, ClassVar, Iterable, Iterator, Protocol, cast, final, overload
 from uuid import UUID
 
 from more_itertools import spy
@@ -179,6 +179,18 @@ def resolve_predicate[T](predicate: Predicate[T]) -> Predicate[T]:
 
 
 type ConstrainedT[T: (int, str, float, datetime, date, Decimal, Fraction, UUID, IPv4Address, IPv6Address)] = T
+
+
+class SupportsComparison(Protocol):
+    """A type that supports the ordering operators <, <=, > and >=."""
+
+    def __lt__(self, other: Any, /) -> bool: ...
+
+    def __le__(self, other: Any, /) -> bool: ...
+
+    def __gt__(self, other: Any, /) -> bool: ...
+
+    def __ge__(self, other: Any, /) -> bool: ...
 
 
 def predicate_partial[T](

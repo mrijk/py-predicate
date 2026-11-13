@@ -190,7 +190,7 @@ from predicate.optimizer.predicate_optimizer import optimize
 from predicate.optional_predicate import OptionalPredicate
 from predicate.or_predicate import OrPredicate
 from predicate.plus_predicate import PlusPredicate
-from predicate.predicate import ConstrainedT, Predicate
+from predicate.predicate import ConstrainedT, Predicate, SupportsComparison
 from predicate.property_predicate import PropertyPredicate
 from predicate.raises_predicate import RaisesPredicate
 from predicate.range_predicate import GeLePredicate, GeLtPredicate, GtLePredicate, GtLtPredicate, ge_le_p
@@ -1055,7 +1055,7 @@ def generate_is_instance_p(predicate: IsInstancePredicate[Any], **kwargs: Any) -
         yield from generate_true(_type_arg_predicate(first(get_args(annotation), object)))
         return
 
-    if klass == ConstrainedT:
+    if klass in (ConstrainedT, SupportsComparison):
         iterables = [random_ints()]
         yield from random_first_from_iterables(*iterables)
         return
