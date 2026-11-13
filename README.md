@@ -125,6 +125,25 @@ take(5, generate_true(between))  # e.g. [2, 3, 4, 5, 2]
 take(5, generate_false(between))  # e.g. [0, 1, 6, 7, -1]
 ```
 
+## Hypothesis integration
+
+With the optional extra (`pip install py-predicate[hypothesis]`), predicates can be used as [Hypothesis](https://hypothesis.readthedocs.io) strategies:
+
+```python
+from predicate import ge_p, lt_p
+from predicate.integrations.hypothesis import from_predicate, given_predicate
+
+
+@given_predicate(ge_p(0) & lt_p(100))
+def test_something(x):
+    assert 0 <= x < 100
+
+
+from_predicate(ge_p(0) & lt_p(100))  # a regular SearchStrategy
+```
+
+Numeric bounds are merged into a single native strategy. Predicates without a dedicated mapping are generated from their type and filtered.
+
 ## Recursive predicates
 
 Use `root_p` (or `this_p`) to define self-referencing predicates over arbitrarily nested structures without writing recursive functions:

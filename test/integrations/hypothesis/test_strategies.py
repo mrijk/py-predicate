@@ -22,7 +22,7 @@ from predicate import (
     le_p,
     lt_p,
 )
-from predicate.strategies import from_predicate, given_predicate
+from predicate.integrations.hypothesis import from_predicate, given_predicate
 
 predicates = [
     eq_p(5),
