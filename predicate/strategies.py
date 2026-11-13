@@ -3,26 +3,35 @@
 Requires the optional dependency: pip install py-predicate[hypothesis]
 """
 
+import builtins
+from collections.abc import Callable
 from functools import reduce
 from typing import Any, Literal
 
+from hypothesis import given
 from hypothesis import strategies as st
 from hypothesis.strategies import SearchStrategy
 
 from predicate.all_predicate import AllPredicate
 from predicate.and_predicate import AndPredicate
 from predicate.any_predicate import AnyPredicate
+from predicate.dict_of_predicate import DictOfPredicate
 from predicate.eq_predicate import EqPredicate
+from predicate.frozendict_of_predicate import FrozenDictOfPredicate
+from predicate.frozenset_of_predicate import FrozenSetOfPredicate
 from predicate.ge_predicate import GePredicate
 from predicate.gt_predicate import GtPredicate
 from predicate.is_instance_predicate import IsInstancePredicate
 from predicate.le_predicate import LePredicate
+from predicate.list_of_predicate import ListOfPredicate
 from predicate.lt_predicate import LtPredicate
 from predicate.negate import negate
 from predicate.not_predicate import NotPredicate
 from predicate.or_predicate import OrPredicate
 from predicate.predicate import Predicate
 from predicate.range_predicate import GeLePredicate, GeLtPredicate, GtLePredicate, GtLtPredicate
+from predicate.set_of_predicate import SetOfPredicate
+from predicate.tuple_of_predicate import TupleOfPredicate
 
 type _Constraint = tuple[Literal["lo", "hi"], Any, bool]  # (side, value, exclusive)
 type _Bounds = dict[str, tuple[Any, bool]]
@@ -42,6 +51,13 @@ def from_predicate(predicate: Predicate[Any]) -> SearchStrategy[Any]:
     return reduce(lambda strategy, p: strategy.filter(p), filters, base)
 
 
+def given_predicate(
+    *args: Predicate[Any], **kwargs: Predicate[Any]
+) -> Callable[[Callable[..., Any]], Callable[..., Any]]:
+    """Like hypothesis.given, but takes predicates instead of strategies."""
+    return given(*(from_predicate(p) for p in args), **{k: from_predicate(p) for k, p in kwargs.items()})
+
+
 def _leaves(predicate: Predicate[Any]) -> list[Predicate[Any]]:
     match predicate:
         case AndPredicate(left, right):
@@ -56,17 +72,50 @@ def _from_leaf(predicate: Predicate[Any]) -> SearchStrategy[Any]:
             return st.just(v)
         case OrPredicate(left, right):
             return st.one_of(from_predicate(left), from_predicate(right))
-        case AllPredicate(inner):
-            return st.lists(from_predicate(inner))
-        case AnyPredicate(inner):
-            # ponytail: every element matches; add non-matching filler elements if diversity matters
-            return st.lists(from_predicate(inner), min_size=1)
         case NotPredicate(inner):
             return _from_not(predicate, inner)
         case IsInstancePredicate(klasses):
             return st.one_of(*(st.from_type(klass) for klass in klasses))
         case _:
+            return _from_collection(predicate)
+
+
+def _from_collection(predicate: Predicate[Any]) -> SearchStrategy[Any]:
+    match predicate:
+        case AllPredicate(inner) | ListOfPredicate(inner):
+            return st.lists(from_predicate(inner))
+        case AnyPredicate(inner):
+            # ponytail: every element matches; add non-matching filler elements if diversity matters
+            return st.lists(from_predicate(inner), min_size=1)
+        case SetOfPredicate(inner):
+            return st.sets(from_predicate(inner))
+        case FrozenSetOfPredicate(inner):
+            return st.frozensets(from_predicate(inner))
+        case TupleOfPredicate(predicates):
+            return st.tuples(*(from_predicate(p) for p in predicates))
+        case DictOfPredicate(pairs):
+            return _from_dict_of(predicate, pairs)
+        case FrozenDictOfPredicate(pairs):
+            return _from_frozendict_of(predicate, pairs)
+        case _:
             return _from_type(predicate).filter(predicate)
+
+
+def _from_dict_of(
+    predicate: DictOfPredicate, pairs: list[tuple[Predicate[Any], Predicate[Any]]]
+) -> SearchStrategy[Any]:
+    """Merge one small dict per (key, value) pair; the filter drops empty dicts and key/value clashes."""
+    parts = [st.dictionaries(from_predicate(key_p), from_predicate(value_p)) for key_p, value_p in pairs]
+    return st.tuples(*parts).map(lambda ds: {k: v for d in ds for k, v in d.items()}).filter(predicate)
+
+
+def _from_frozendict_of(
+    predicate: FrozenDictOfPredicate, pairs: list[tuple[Predicate[Any], Predicate[Any]]]
+) -> SearchStrategy[Any]:
+    # frozendict is only a builtin from Python 3.15; before that is_frozendict_p is never true
+    if (frozendict := getattr(builtins, "frozendict", None)) is None:
+        return st.nothing()
+    return _from_dict_of(predicate.dict_of_predicate, pairs).map(frozendict).filter(predicate)
 
 
 def _from_type(predicate: Predicate[Any]) -> SearchStrategy[Any]:
