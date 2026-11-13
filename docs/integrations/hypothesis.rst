@@ -70,6 +70,8 @@ Predicate                                                       Strategy
 ``starts_with_p``, ``ends_with_p``                              ``st.text`` with the prefix or suffix added
 ``regex_p``                                                     ``st.from_regex``, generating strings that match fully
 ``is_regex_p``                                                  ``st.text``, filtered for valid regular expressions
+``is_subset_p``, ``is_superset_p``, ``intersects_p``, ...       ``st.sets`` of elements of the given set, plus extra elements
+                                                                of the same type for supersets
 ``is_int_p``, ``is_str_p``, ... (``is_instance_p``)             ``st.from_type``
 ``all_p``, ``is_list_of_p``                                     ``st.lists``
 ``any_p``                                                       ``st.lists`` with at least one item

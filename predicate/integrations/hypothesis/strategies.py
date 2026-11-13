@@ -25,6 +25,8 @@ from predicate.frozenset_of_predicate import FrozenSetOfPredicate
 from predicate.ge_predicate import GePredicate
 from predicate.gt_predicate import GtPredicate
 from predicate.in_predicate import InPredicate
+from predicate.integrations.hypothesis.helpers import sampled_from
+from predicate.integrations.hypothesis.sets import from_set
 from predicate.integrations.hypothesis.strings import from_text
 from predicate.is_falsy_predicate import IsFalsyPredicate
 from predicate.is_instance_predicate import IsInstancePredicate
@@ -125,15 +127,11 @@ def _from_leaf(predicate: Predicate[Any]) -> SearchStrategy[Any]:
         case IsInstancePredicate(klasses):
             return st.one_of(*(st.from_type(klass) for klass in klasses))
         case InPredicate(v) if isinstance(v, Iterable):
-            return _sampled_from(list(v))
+            return sampled_from(v)
         case XorPredicate(left, right):
             return from_predicate(OrPredicate(AndPredicate(left, negate(right)), AndPredicate(negate(left), right)))
         case _:
             return _from_base(predicate)
-
-
-def _sampled_from(values: list[Any]) -> SearchStrategy[Any]:
-    return st.sampled_from(values) if values else st.nothing()
 
 
 def _from_base(predicate: Predicate[Any]) -> SearchStrategy[Any]:
@@ -159,7 +157,14 @@ def _from_collection(predicate: Predicate[Any]) -> SearchStrategy[Any]:
         case FrozenDictOfPredicate(pairs):
             return _from_frozendict_of(predicate, pairs)
         case _:
-            return text if (text := from_text(predicate)) is not None else _from_type(predicate).filter(predicate)
+            return _from_specialised(predicate)
+
+
+def _from_specialised(predicate: Predicate[Any]) -> SearchStrategy[Any]:
+    """Strings and sets have dedicated strategies; anything else is generated from its type and filtered."""
+    strategies = (strategy for from_ in (from_text, from_set) if (strategy := from_(predicate)) is not None)
+    found = next(strategies, None)
+    return found if found is not None else _from_type(predicate).filter(predicate)
 
 
 def _from_dict_of(
