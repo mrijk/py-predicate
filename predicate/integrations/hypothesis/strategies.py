@@ -24,6 +24,8 @@ from predicate.frozendict_of_predicate import FrozenDictOfPredicate
 from predicate.frozenset_of_predicate import FrozenSetOfPredicate
 from predicate.ge_predicate import GePredicate
 from predicate.gt_predicate import GtPredicate
+from predicate.has_key_predicate import HasKeyPredicate
+from predicate.has_length_predicate import HasLengthPredicate
 from predicate.in_predicate import InPredicate
 from predicate.integrations.hypothesis.helpers import sampled_from
 from predicate.integrations.hypothesis.sets import from_set
@@ -161,10 +163,39 @@ def _from_collection(predicate: Predicate[Any]) -> SearchStrategy[Any]:
 
 
 def _from_specialised(predicate: Predicate[Any]) -> SearchStrategy[Any]:
-    """Strings and sets have dedicated strategies; anything else is generated from its type and filtered."""
-    strategies = (strategy for from_ in (from_text, from_set) if (strategy := from_(predicate)) is not None)
+    """Strings, sets, lengths and keys have dedicated strategies; anything else is generated from its type and filtered."""
+    candidates = (from_text, from_set, _from_sized)
+    strategies = (strategy for from_ in candidates if (strategy := from_(predicate)) is not None)
     found = next(strategies, None)
     return found if found is not None else _from_type(predicate).filter(predicate)
+
+
+# ponytail: longer lengths aren't generated, raise it if a has_length_p needs them
+_MAX_LENGTH = 100
+
+_scalars: SearchStrategy[Any] = st.integers() | st.text() | st.none()
+
+
+def _from_sized(predicate: Predicate[Any]) -> SearchStrategy[Any] | None:
+    match predicate:
+        case HasLengthPredicate(length_p):
+            # sampled_from checks the whole range for a filter, so even a narrow length_p can't fail a health check
+            lengths = st.sampled_from(range(_MAX_LENGTH + 1)).filter(length_p)
+            return lengths.flatmap(lambda n: st.lists(st.integers(), min_size=n, max_size=n))
+        case HasKeyPredicate(key_p):
+            return from_predicate(key_p).flatmap(_dicts_with_key).filter(predicate)
+        case _:
+            return None
+
+
+def _dicts_with_key(key: Any) -> SearchStrategy[dict[Any, Any]]:
+    # The other keys have the type of key: key_p is applied to every key, and may raise for another type
+    others = st.dictionaries(st.from_type(type(key)), _scalars)
+    return st.builds(_with_key, others, st.just(key), _scalars)
+
+
+def _with_key(extra: dict[Any, Any], key: Any, value: Any) -> dict[Any, Any]:
+    return {**extra, key: value}
 
 
 def _from_dict_of(

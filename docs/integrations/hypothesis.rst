@@ -72,6 +72,10 @@ Predicate                                                       Strategy
 ``is_regex_p``                                                  ``st.text``, filtered for valid regular expressions
 ``is_subset_p``, ``is_superset_p``, ``intersects_p``, ...       ``st.sets`` of elements of the given set, plus extra elements
                                                                 of the same type for supersets
+``has_length_p``, ``is_empty_p``, ``is_not_empty_p``            a list of ints whose length satisfies the length predicate
+                                                                (lengths up to 100)
+``has_key_p``                                                   a dict with a key satisfying the key predicate, plus other
+                                                                keys of the same type
 ``is_int_p``, ``is_str_p``, ... (``is_instance_p``)             ``st.from_type``
 ``all_p``, ``is_list_of_p``                                     ``st.lists``
 ``any_p``                                                       ``st.lists`` with at least one item
@@ -84,6 +88,10 @@ Predicate                                                       Strategy
 Merging bounds means ``ge_p(0) & lt_p(100)`` generates from ``st.integers(0, 99)`` directly, without throwing away
 random integers. Bounds that can't be satisfied, such as ``ge_p(10) & lt_p(5)``, give a strategy that generates
 nothing.
+
+``has_length_p`` only constrains the length, so its lists hold ints. Combined with an element predicate, put the
+element predicate first and keep the length small: ``is_list_of_p(is_str_p) & has_length_p(eq_p(3))`` works, while
+``has_length_p(eq_p(3)) & is_list_of_p(is_str_p)`` starts from lists of ints and is filtered down to almost nothing.
 
 Any other predicate is generated from its type and filtered, so the result is always correct. It can be slow when the
 predicate rarely holds, in which case Hypothesis fails with a ``filter_too_much`` health check. A predicate that has
