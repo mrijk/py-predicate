@@ -144,6 +144,25 @@ from_predicate(ge_p(0) & lt_p(100))  # a regular SearchStrategy
 
 Numeric bounds are merged into a single native strategy. Predicates without a dedicated mapping are generated from their type and filtered.
 
+A [Spec](#runtime-instrumentation-spec) can drive a property test too. `given_spec` calls the function with generated arguments and checks the result against `ret`, `fn`, `fn_p` and `raises`, with Hypothesis' shrinking and replay. `from_spec` returns just the strategy of arguments:
+
+```python
+from predicate import ge_p, is_int_p
+from predicate.integrations.hypothesis import from_spec, given_spec
+
+
+def add(x, y):
+    return x + y
+
+
+spec = {"args": {"x": ge_p(0), "y": is_int_p}, "ret": is_int_p}
+
+test_add = given_spec(add, spec)  # pytest collects this; or call test_add() directly
+arguments = from_spec(add, spec)  # strategy of {"x": ..., "y": ...} dicts
+```
+
+Plain functions only for now: async functions, generators and classes aren't supported yet.
+
 ## Recursive predicates
 
 Use `root_p` (or `this_p`) to define self-referencing predicates over arbitrarily nested structures without writing recursive functions:

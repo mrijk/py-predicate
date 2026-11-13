@@ -75,7 +75,8 @@ def _leaves(predicate: Predicate[Any]) -> list[Predicate[Any]]:
 
 
 def _anything() -> SearchStrategy[Any]:
-    return st.from_type(object)
+    # NotImplemented is excluded: bool(NotImplemented) is deprecated, and a TypeError from Python 3.14
+    return st.from_type(object).filter(lambda x: x is not NotImplemented)
 
 
 def _falsy() -> SearchStrategy[Any]:
@@ -174,7 +175,7 @@ def _from_not(predicate: NotPredicate[Any], inner: Predicate[Any]) -> SearchStra
         case OrPredicate(left, right):
             return from_predicate(AndPredicate(negate(left), negate(right)))
         case IsInstancePredicate():
-            return st.from_type(object).filter(predicate)
+            return _anything().filter(predicate)
         case _:
             negated = negate(inner)
             return _from_type(predicate).filter(predicate) if negated == predicate else from_predicate(negated)
