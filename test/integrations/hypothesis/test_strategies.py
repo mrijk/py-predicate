@@ -5,22 +5,30 @@ from hypothesis import given, settings
 
 from predicate import (
     all_p,
+    always_false_p,
+    always_true_p,
     any_p,
     eq_p,
     fn_p,
     ge_p,
     gt_p,
+    in_p,
     is_dict_of_p,
     is_even_p,
+    is_falsy_p,
     is_frozendict_of_p,
     is_frozenset_of_p,
     is_int_p,
     is_list_of_p,
+    is_none_p,
+    is_not_none_p,
     is_set_of_p,
     is_str_p,
+    is_truthy_p,
     is_tuple_of_p,
     le_p,
     lt_p,
+    not_in_p,
 )
 from predicate.integrations.hypothesis import from_predicate, given_predicate
 
@@ -66,6 +74,20 @@ predicates = [
     is_tuple_of_p(),
     is_frozenset_of_p(is_int_p),
     is_frozenset_of_p(ge_p(0) & lt_p(10)),
+    in_p({1, 2, 3}),
+    in_p("abc"),
+    in_p([1, "a", None]),
+    not_in_p({1, 2, 3}),
+    is_none_p,
+    is_not_none_p,
+    is_truthy_p,
+    is_falsy_p,
+    always_true_p,
+    ge_p(0) ^ lt_p(10),
+    is_int_p ^ ge_p(0),
+    all_p(is_none_p | is_int_p),
+    ~is_none_p,
+    ~is_truthy_p,
 ]
 
 
@@ -131,3 +153,19 @@ def test_from_frozendict_of_unsupported_before_3_15():
 @given_predicate(is_frozendict_of_p(("name", is_str_p), ("age", ge_p(0))))
 def test_from_frozendict_of(x):
     assert isinstance(x, frozendict) and x  # noqa: F821
+
+
+def test_from_always_false_is_empty():
+    assert from_predicate(always_false_p).is_empty
+
+
+def test_from_in_p_only_generates_members():
+    @given_predicate(in_p({1, 2, 3}))
+    def check(x):
+        assert x in {1, 2, 3}
+
+    check()
+
+
+def test_from_in_p_empty_is_empty():
+    assert from_predicate(in_p(set())).is_empty

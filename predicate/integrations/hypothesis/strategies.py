@@ -4,7 +4,7 @@ Requires the optional dependency: pip install py-predicate[hypothesis]
 """
 
 import builtins
-from collections.abc import Callable
+from collections.abc import Callable, Iterable
 from functools import reduce
 from typing import Any, Literal
 
@@ -13,6 +13,8 @@ from hypothesis import strategies as st
 from hypothesis.strategies import SearchStrategy
 
 from predicate.all_predicate import AllPredicate
+from predicate.always_false_predicate import AlwaysFalsePredicate
+from predicate.always_true_predicate import AlwaysTruePredicate
 from predicate.and_predicate import AndPredicate
 from predicate.any_predicate import AnyPredicate
 from predicate.dict_of_predicate import DictOfPredicate
@@ -21,7 +23,12 @@ from predicate.frozendict_of_predicate import FrozenDictOfPredicate
 from predicate.frozenset_of_predicate import FrozenSetOfPredicate
 from predicate.ge_predicate import GePredicate
 from predicate.gt_predicate import GtPredicate
+from predicate.in_predicate import InPredicate
+from predicate.is_falsy_predicate import IsFalsyPredicate
 from predicate.is_instance_predicate import IsInstancePredicate
+from predicate.is_none_predicate import IsNonePredicate
+from predicate.is_not_none_predicate import IsNotNonePredicate
+from predicate.is_truthy_predicate import IsTruthyPredicate
 from predicate.le_predicate import LePredicate
 from predicate.list_of_predicate import ListOfPredicate
 from predicate.lt_predicate import LtPredicate
@@ -32,6 +39,7 @@ from predicate.predicate import Predicate
 from predicate.range_predicate import GeLePredicate, GeLtPredicate, GtLePredicate, GtLtPredicate
 from predicate.set_of_predicate import SetOfPredicate
 from predicate.tuple_of_predicate import TupleOfPredicate
+from predicate.xor_predicate import XorPredicate
 
 type _Constraint = tuple[Literal["lo", "hi"], Any, bool]  # (side, value, exclusive)
 type _Bounds = dict[str, tuple[Any, bool]]
@@ -66,6 +74,26 @@ def _leaves(predicate: Predicate[Any]) -> list[Predicate[Any]]:
             return [predicate]
 
 
+def _anything() -> SearchStrategy[Any]:
+    return st.from_type(object)
+
+
+def _falsy() -> SearchStrategy[Any]:
+    empties = (st.none(), st.just(0), st.just(0.0), st.just(False), st.just(""), st.just(b""), st.just(()))
+    return st.one_of(*empties, st.builds(list), st.builds(dict), st.builds(set))
+
+
+# Parameterless predicates: a base strategy; the predicate itself is applied as a filter on top
+_BASE: dict[type, Callable[[], SearchStrategy[Any]]] = {
+    AlwaysTruePredicate: _anything,
+    AlwaysFalsePredicate: st.nothing,
+    IsNonePredicate: st.none,
+    IsNotNonePredicate: _anything,
+    IsTruthyPredicate: _anything,
+    IsFalsyPredicate: _falsy,
+}
+
+
 def _from_leaf(predicate: Predicate[Any]) -> SearchStrategy[Any]:
     match predicate:
         case EqPredicate(v):
@@ -76,8 +104,21 @@ def _from_leaf(predicate: Predicate[Any]) -> SearchStrategy[Any]:
             return _from_not(predicate, inner)
         case IsInstancePredicate(klasses):
             return st.one_of(*(st.from_type(klass) for klass in klasses))
+        case InPredicate(v) if isinstance(v, Iterable):
+            return _sampled_from(list(v))
+        case XorPredicate(left, right):
+            return from_predicate(OrPredicate(AndPredicate(left, negate(right)), AndPredicate(negate(left), right)))
         case _:
-            return _from_collection(predicate)
+            return _from_base(predicate)
+
+
+def _sampled_from(values: list[Any]) -> SearchStrategy[Any]:
+    return st.sampled_from(values) if values else st.nothing()
+
+
+def _from_base(predicate: Predicate[Any]) -> SearchStrategy[Any]:
+    base = _BASE.get(type(predicate))
+    return base().filter(predicate) if base else _from_collection(predicate)
 
 
 def _from_collection(predicate: Predicate[Any]) -> SearchStrategy[Any]:
