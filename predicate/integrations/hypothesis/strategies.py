@@ -4,7 +4,8 @@ Requires the optional dependency: pip install py-predicate[hypothesis]
 """
 
 import builtins
-from collections.abc import Callable, Iterable
+from collections.abc import Callable, Iterable, Iterator
+from contextlib import suppress
 from functools import reduce
 from typing import Any, Literal
 
@@ -24,6 +25,7 @@ from predicate.frozenset_of_predicate import FrozenSetOfPredicate
 from predicate.ge_predicate import GePredicate
 from predicate.gt_predicate import GtPredicate
 from predicate.in_predicate import InPredicate
+from predicate.integrations.hypothesis.strings import from_text
 from predicate.is_falsy_predicate import IsFalsyPredicate
 from predicate.is_instance_predicate import IsInstancePredicate
 from predicate.is_none_predicate import IsNonePredicate
@@ -53,10 +55,27 @@ def from_predicate(predicate: Predicate[Any]) -> SearchStrategy[Any]:
     """
     leaves = _leaves(predicate)
     constraints = [c for leaf in leaves for c in _constraints(leaf)]
-    others = [leaf for leaf in leaves if not _constraints(leaf)]
+    # A plain isinstance leaf is the weakest base (is_str_p & starts_with_p("a") should start from the prefix), so last
+    others = sorted(
+        (leaf for leaf in leaves if not _constraints(leaf)), key=lambda leaf: isinstance(leaf, IsInstancePredicate)
+    )
 
-    base, filters = (_numeric(constraints), others) if constraints else (_from_leaf(others[0]), others[1:])
+    base, filters = (_numeric(constraints), others) if constraints else _base(others)
     return reduce(lambda strategy, p: strategy.filter(p), filters, base)
+
+
+def _base(leaves: list[Predicate[Any]]) -> tuple[SearchStrategy[Any], list[Predicate[Any]]]:
+    """Return the strategy of the first leaf that has one, and the other leaves to filter on."""
+    if (found := next(_strategies(leaves), None)) is None:
+        return _from_leaf(leaves[0]), leaves[1:]  # raises the TypeError that says why there is none
+    index, strategy = found
+    return strategy, leaves[:index] + leaves[index + 1 :]
+
+
+def _strategies(leaves: list[Predicate[Any]]) -> Iterator[tuple[int, SearchStrategy[Any]]]:
+    for index, leaf in enumerate(leaves):
+        with suppress(TypeError):
+            yield index, _from_leaf(leaf)
 
 
 def given_predicate(
@@ -140,7 +159,7 @@ def _from_collection(predicate: Predicate[Any]) -> SearchStrategy[Any]:
         case FrozenDictOfPredicate(pairs):
             return _from_frozendict_of(predicate, pairs)
         case _:
-            return _from_type(predicate).filter(predicate)
+            return text if (text := from_text(predicate)) is not None else _from_type(predicate).filter(predicate)
 
 
 def _from_dict_of(

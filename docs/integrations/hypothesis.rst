@@ -65,6 +65,11 @@ Predicate                                                       Strategy
 ``is_falsy_p``                                                  a mix of falsy values: ``None``, ``0``, ``""``, empty
                                                                 collections, ...
 ``always_false_p``                                              ``st.nothing``, so no values are generated
+``is_alpha_p``, ``is_digit_p``, ``is_upper_p``, ...             ``st.text`` over the matching Unicode categories, for
+                                                                example letters for ``is_alpha_p``
+``starts_with_p``, ``ends_with_p``                              ``st.text`` with the prefix or suffix added
+``regex_p``                                                     ``st.from_regex``, generating strings that match fully
+``is_regex_p``                                                  ``st.text``, filtered for valid regular expressions
 ``is_int_p``, ``is_str_p``, ... (``is_instance_p``)             ``st.from_type``
 ``all_p``, ``is_list_of_p``                                     ``st.lists``
 ``any_p``                                                       ``st.lists`` with at least one item
