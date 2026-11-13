@@ -160,7 +160,7 @@ def random_dicts(
 if sys.version_info >= (3, 15):
 
     def random_frozendicts(
-        key_p: Predicate = is_str_p, value_p: Predicate = is_int_p, size_p: Predicate = default_size_p
+        key_p: Predicate[Any] = is_str_p, value_p: Predicate[Any] = is_int_p, size_p: Predicate[Any] = default_size_p
     ) -> Iterator[frozendict[Any, Any]]:  # noqa: F821
         yield from (
             frozendict(random_dict)  # noqa: F821

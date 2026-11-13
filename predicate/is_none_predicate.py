@@ -5,7 +5,7 @@ from typing import Any, Final, override
 if sys.version_info >= (3, 13):
     from typing import TypeIs
 else:
-    from typing import TypeGuard as TypeIs  # type: ignore[assignment]  # approximation for Python < 3.13
+    from typing import TypeGuard as TypeIs  # type: ignore[assignment,unused-ignore]  # approximation for Python < 3.13
 
 from predicate import exception_p
 from predicate.or_predicate import or_p

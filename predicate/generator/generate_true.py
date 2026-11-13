@@ -1141,7 +1141,7 @@ if sys.version_info.minor > 12:
     def generate_property_p(property_predicate: PropertyPredicate[Any]) -> Iterator[Any]:
         getter = property_predicate.getter
 
-        attributes = {getter.__name__: getter}
+        attributes = {getter.__name__: getter}  # type: ignore[attr-defined,unused-ignore]
         klass = type("Foo", (object,), attributes)
 
         yield klass
