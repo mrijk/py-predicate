@@ -1,3 +1,5 @@
+from typing import Any
+
 from predicate import comp_p, eq_p, has_key_p, is_dict_p, is_int_p, is_iterable_of_p
 from predicate.explain import explain
 from predicate.list_of_predicate import is_single_or_list_of_p
@@ -82,7 +84,7 @@ def test_depth_gt_p():
     assert depth_gt_3({"x": {"y": {"z": 5}}})
 
 
-def dict_values(x: dict):
+def dict_values(x: dict[Any, Any]):
     return x.values()
 
 

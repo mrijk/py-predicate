@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Iterable, override
+from typing import Any, Iterable, override
 
 from predicate import always_true_p
 from predicate.predicate import Predicate
@@ -9,9 +9,9 @@ from predicate.predicate import Predicate
 class StarPredicate[T](Predicate[T]):
     """Match any instances of the given predicate."""
 
-    predicate: Predicate
+    predicate: Predicate[Any]
 
-    def __call__(self, iterable: Iterable, *, predicates: list[Predicate], full_match: bool) -> bool:
+    def __call__(self, iterable: Iterable[Any], *, predicates: list[Predicate[Any]], full_match: bool) -> bool:
         from predicate.match_predicate import match
 
         if not iterable:
@@ -31,11 +31,13 @@ class StarPredicate[T](Predicate[T]):
         return f"star({self.predicate!r})"
 
     @override
-    def explain_failure(self, iterable: Iterable[T], *, predicates: list[Predicate], full_match: bool) -> dict:  # type: ignore
+    def explain_failure(
+        self, iterable: Iterable[T], *, predicates: list[Predicate[Any]], full_match: bool
+    ) -> dict[str, Any]:
         return {"reason": f"tbd {self.predicate!r}"}
 
 
-def star(predicate: Predicate) -> Predicate:
+def star(predicate: Predicate[Any]) -> Predicate[Any]:
     """Match any instances of the given predicate."""
     return StarPredicate(predicate=predicate)
 

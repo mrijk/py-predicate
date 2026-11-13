@@ -1,7 +1,7 @@
 from fnmatch import fnmatch
 from inspect import getmembers, isclass, isfunction
 from types import ModuleType
-from typing import Callable
+from typing import Any, Callable
 
 from more_itertools import consume, side_effect
 
@@ -16,7 +16,11 @@ from predicate.spec.instrument_function import (
 from predicate.spec.spec import EMPTY_SPEC, Spec
 
 
-def instrument(spec_or_func: Spec | Callable = None, *, on_error: OnError = default_on_error) -> Callable:  # type: ignore[assignment]
+def instrument(
+    spec_or_func: Spec | Callable[..., Any] = None,  # type: ignore[assignment]
+    *,
+    on_error: OnError = default_on_error,
+) -> Callable[..., Any]:
     if isclass(spec_or_func):
         instrument_class(spec_or_func, on_error=on_error)
         return spec_or_func
@@ -26,7 +30,7 @@ def instrument(spec_or_func: Spec | Callable = None, *, on_error: OnError = defa
 
     spec = spec_or_func or EMPTY_SPEC
 
-    def decorator(func: Callable) -> Callable:
+    def decorator(func: Callable[..., Any]) -> Callable[..., Any]:
         if isclass(func):
             instrument_class(func, on_error=on_error)
             return func
@@ -35,7 +39,7 @@ def instrument(spec_or_func: Spec | Callable = None, *, on_error: OnError = defa
     return decorator
 
 
-def _include_in_module(func: Callable, module: ModuleType, pattern: str | None) -> bool:
+def _include_in_module(func: Callable[..., Any], module: ModuleType, pattern: str | None) -> bool:
     return func.__module__ == module.__name__ and (pattern is None or fnmatch(func.__name__, pattern))
 
 

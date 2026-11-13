@@ -40,7 +40,7 @@ def is_instrumentation_enabled() -> bool:
     return _enabled
 
 
-def enrich_spec(func: Callable, spec: Spec) -> Spec:
+def enrich_spec(func: Callable[..., Any], spec: Spec) -> Spec:
     sig = resolve_signature(func)  # unresolvable annotations become Any, with an UnresolvedAnnotationWarning
 
     snapshot = spec.get("snapshot", {})
@@ -57,10 +57,10 @@ def enrich_spec(func: Callable, spec: Spec) -> Spec:
         if name not in args and param.annotation is not param.empty:
             args[name] = param_predicate(param)
 
-    enriched = spec | {"args": args}
+    enriched: Spec = {**spec, "args": args}
 
     if not enriched.get("ret") and sig.return_annotation is not sig.empty:
-        enriched = enriched | {"ret": get_return_predicate(sig)}
+        enriched["ret"] = get_return_predicate(sig)
 
     return enriched
 
@@ -72,18 +72,18 @@ def default_on_error(message: str) -> None:
     raise SpecViolationError(message)
 
 
-def is_instrumented(func: Callable) -> bool:
+def is_instrumented(func: Callable[..., Any]) -> bool:
     return hasattr(func, "__spec__")
 
 
-def _get_reason(predicate: Predicate, value: Any) -> str | None:
+def _get_reason(predicate: Predicate[Any], value: Any) -> str | None:
     if predicate(value):
         return None
     result = explain(predicate, value)
     return result.get("reason") or str(result)
 
 
-def _check_args(spec: Spec, func_name: str, arguments: dict) -> str | None:
+def _check_args(spec: Spec, func_name: str, arguments: dict[str, Any]) -> str | None:
     failures = (
         (name, reason)
         for name, predicate in spec["args"].items()
@@ -106,13 +106,13 @@ def _check_return_value(spec: Spec, func_name: str, result: Any) -> str | None:
     return None
 
 
-def _check_type_vars(sig: Signature, func_name: str, arguments: dict, result: Any) -> str | None:
+def _check_type_vars(sig: Signature, func_name: str, arguments: dict[str, Any], result: Any) -> str | None:
     if reason := type_var_failure(sig, arguments, result):
         return f"Type variable binding for function {func_name} failed. Reason: {reason}"
     return None
 
 
-def _format_expected_exceptions(expected: type | tuple) -> str:
+def _format_expected_exceptions(expected: type | tuple[Any, ...]) -> str:
     if isinstance(expected, tuple):
         return ", ".join(e.__name__ for e in expected)
     return expected.__name__
@@ -127,7 +127,9 @@ def _check_exception(spec: Spec, func_name: str, exc: Exception) -> str | None:
     return None
 
 
-def _check_fn_constraints(spec: Spec, func_name: str, arguments: dict, result: Any, old: dict) -> Iterator[str]:
+def _check_fn_constraints(
+    spec: Spec, func_name: str, arguments: dict[str, Any], result: Any, old: dict[str, Any]
+) -> Iterator[str]:
     if fn := spec.get("fn"):
         kwargs = arguments | {ret_name(spec): result}
 
@@ -139,7 +141,9 @@ def _check_fn_constraints(spec: Spec, func_name: str, arguments: dict, result: A
             yield f"fn constraint for function {func_name} failed. Arguments: {args_str}, {ret_name(spec)}={result!r}"
 
 
-def _check_fn_p_constraints(spec: Spec, func_name: str, arguments: dict, result: Any, old: dict) -> Iterator[str]:
+def _check_fn_p_constraints(
+    spec: Spec, func_name: str, arguments: dict[str, Any], result: Any, old: dict[str, Any]
+) -> Iterator[str]:
     if fn_p := spec.get("fn_p"):
         kwargs = arguments
 
@@ -151,12 +155,14 @@ def _check_fn_p_constraints(spec: Spec, func_name: str, arguments: dict, result:
             yield f"fn_p constraint for function {func_name} failed. Reason: {reason}"
 
 
-def _check_constraints(spec: Spec, func_name: str, arguments: dict, result: Any, old: dict) -> Iterator[str]:
+def _check_constraints(
+    spec: Spec, func_name: str, arguments: dict[str, Any], result: Any, old: dict[str, Any]
+) -> Iterator[str]:
     yield from _check_fn_constraints(spec, func_name, arguments, result, old)
     yield from _check_fn_p_constraints(spec, func_name, arguments, result, old)
 
 
-def _replace_in_module(func: Callable, wrapped: Callable) -> None:
+def _replace_in_module(func: Callable[..., Any], wrapped: Callable[..., Any]) -> None:
     # A partial or a callable instance has no __name__: it isn't a module-level function to replace (#362)
     name = getattr(func, "__name__", None)
     module = sys.modules.get(getattr(func, "__module__", None) or "")
@@ -170,17 +176,17 @@ def _report(on_error: OnError, error: str | None) -> None:
 
 
 def _make_wrapper(
-    func: Callable,
+    func: Callable[..., Any],
     before: Callable[..., BeforeContext],
     on_exception: Callable[[Exception], None],
     after: Callable[[BeforeContext, Any], Any],
-) -> Callable:
+) -> Callable[..., Any]:
     from predicate import is_async_p
 
     if is_async_p(func):
 
         @wraps(func)
-        async def wrapped(*args, **kwargs):
+        async def wrapped(*args: Any, **kwargs: Any) -> Any:
             if not _enabled:
                 return await func(*args, **kwargs)
             arguments = before(args, kwargs)
@@ -194,7 +200,7 @@ def _make_wrapper(
         return wrapped
 
     @wraps(func)
-    def wrapped_sync(*args, **kwargs):
+    def wrapped_sync(*args: Any, **kwargs: Any) -> Any:
         if not _enabled:
             return func(*args, **kwargs)
         arguments = before(args, kwargs)
@@ -208,7 +214,9 @@ def _make_wrapper(
     return wrapped_sync
 
 
-def instrument_function(func: Callable, spec: Spec, on_error: OnError = default_on_error) -> Callable:
+def instrument_function(
+    func: Callable[..., Any], spec: Spec, on_error: OnError = default_on_error
+) -> Callable[..., Any]:
     if is_instrumented(func):
         return func
     func = unwrap(func)
@@ -218,7 +226,7 @@ def instrument_function(func: Callable, spec: Spec, on_error: OnError = default_
     resolved_spec = cache(lambda: enrich_spec(func, spec))
     typed_signature = cache(lambda: resolve_signature(func))
 
-    def _before(args: tuple, kwargs: dict) -> tuple[dict, dict]:
+    def _before(args: tuple[Any, ...], kwargs: dict[str, Any]) -> tuple[dict[Any, Any], dict[Any, Any]]:
         bound = resolved_signature().bind(*args, **kwargs)
         bound.apply_defaults()
 
@@ -233,7 +241,7 @@ def instrument_function(func: Callable, spec: Spec, on_error: OnError = default_
     def _on_exception(exc: Exception) -> None:
         _report(on_error, _check_exception(resolved_spec(), func_name, exc))
 
-    def _after(context: tuple[dict, dict], result: Any) -> Any:
+    def _after(context: tuple[dict[str, Any], dict[str, Any]], result: Any) -> Any:
         arguments, old = context
 
         _report(on_error, _check_return_value(resolved_spec(), func_name, result))

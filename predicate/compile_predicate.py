@@ -4,7 +4,7 @@ import ast
 from collections.abc import Callable, Iterable
 from dataclasses import dataclass, field
 from functools import singledispatch
-from typing import override
+from typing import Any, override
 
 from predicate.all_predicate import AllPredicate
 from predicate.always_false_predicate import AlwaysFalsePredicate
@@ -71,7 +71,7 @@ class CompiledPredicate[T](Predicate[T]):
         return self.predicate.count
 
     @override
-    def explain_failure(self, x: T) -> dict:
+    def explain_failure(self, x: T) -> dict[str, Any]:
         return self.predicate.explain_failure(x)
 
     @override
@@ -88,95 +88,95 @@ def _x() -> ast.Name:
     return _name("x")
 
 
-def _const(v) -> ast.Constant:
+def _const(v: Any) -> ast.Constant:
     return ast.Constant(value=v)
 
 
-def _cmp(ops: list, comparators: list) -> ast.Compare:
+def _cmp(ops: list[Any], comparators: list[ast.expr]) -> ast.Compare:
     return ast.Compare(left=_x(), ops=ops, comparators=comparators)
 
 
-def _delegate(predicate: Predicate, namespace: dict) -> ast.Call:
+def _delegate(predicate: Predicate[Any], namespace: dict[str, Any]) -> ast.Call:
     key = f"_p{len(namespace)}"
     namespace[key] = predicate
     return ast.Call(func=_name(key), args=[_x()], keywords=[])
 
 
 @singledispatch
-def _to_ast(predicate: Predicate, namespace: dict) -> ast.expr:
+def _to_ast(predicate: Predicate[Any], namespace: dict[str, Any]) -> ast.expr:
     raise NotCompilableError(f"Cannot compile predicate of type {type(predicate).__name__}")
 
 
 @_to_ast.register
-def _(predicate: AlwaysTruePredicate, namespace: dict) -> ast.expr:
+def _(predicate: AlwaysTruePredicate, namespace: dict[str, Any]) -> ast.expr:
     return _const(True)
 
 
 @_to_ast.register
-def _(predicate: AlwaysFalsePredicate, namespace: dict) -> ast.expr:
+def _(predicate: AlwaysFalsePredicate, namespace: dict[str, Any]) -> ast.expr:
     return _const(False)
 
 
-@_to_ast.register
-def _(predicate: NamedPredicate, namespace: dict) -> ast.expr:
+@_to_ast.register(NamedPredicate)
+def _(predicate: NamedPredicate[Any], namespace: dict[str, Any]) -> ast.expr:
     return _const(predicate.v)
 
 
-@_to_ast.register
-def _(predicate: EqPredicate, namespace: dict) -> ast.expr:
+@_to_ast.register(EqPredicate)
+def _(predicate: EqPredicate[Any], namespace: dict[str, Any]) -> ast.expr:
     return _cmp([ast.Eq()], [_const(predicate.v)])
 
 
-@_to_ast.register
-def _(predicate: NePredicate, namespace: dict) -> ast.expr:
+@_to_ast.register(NePredicate)
+def _(predicate: NePredicate[Any], namespace: dict[str, Any]) -> ast.expr:
     return _cmp([ast.NotEq()], [_const(predicate.v)])
 
 
-@_to_ast.register
-def _(predicate: GtPredicate, namespace: dict) -> ast.expr:
+@_to_ast.register(GtPredicate)
+def _(predicate: GtPredicate[Any], namespace: dict[str, Any]) -> ast.expr:
     return _cmp([ast.Gt()], [_const(predicate.v)])
 
 
-@_to_ast.register
-def _(predicate: GePredicate, namespace: dict) -> ast.expr:
+@_to_ast.register(GePredicate)
+def _(predicate: GePredicate[Any], namespace: dict[str, Any]) -> ast.expr:
     return _cmp([ast.GtE()], [_const(predicate.v)])
 
 
-@_to_ast.register
-def _(predicate: LtPredicate, namespace: dict) -> ast.expr:
+@_to_ast.register(LtPredicate)
+def _(predicate: LtPredicate[Any], namespace: dict[str, Any]) -> ast.expr:
     return _cmp([ast.Lt()], [_const(predicate.v)])
 
 
-@_to_ast.register
-def _(predicate: LePredicate, namespace: dict) -> ast.expr:
+@_to_ast.register(LePredicate)
+def _(predicate: LePredicate[Any], namespace: dict[str, Any]) -> ast.expr:
     return _cmp([ast.LtE()], [_const(predicate.v)])
 
 
-@_to_ast.register
-def _(predicate: IsNonePredicate, namespace: dict) -> ast.expr:
+@_to_ast.register(IsNonePredicate)
+def _(predicate: IsNonePredicate[Any], namespace: dict[str, Any]) -> ast.expr:
     return _cmp([ast.Is()], [_const(None)])
 
 
-@_to_ast.register
-def _(predicate: IsNotNonePredicate, namespace: dict) -> ast.expr:
+@_to_ast.register(IsNotNonePredicate)
+def _(predicate: IsNotNonePredicate[Any], namespace: dict[str, Any]) -> ast.expr:
     return _cmp([ast.IsNot()], [_const(None)])
 
 
-@_to_ast.register
-def _(predicate: IsTruthyPredicate, namespace: dict) -> ast.expr:
+@_to_ast.register(IsTruthyPredicate)
+def _(predicate: IsTruthyPredicate[Any], namespace: dict[str, Any]) -> ast.expr:
     return ast.Call(func=_name("bool"), args=[_x()], keywords=[])
 
 
-@_to_ast.register
-def _(predicate: IsFalsyPredicate, namespace: dict) -> ast.expr:
+@_to_ast.register(IsFalsyPredicate)
+def _(predicate: IsFalsyPredicate[Any], namespace: dict[str, Any]) -> ast.expr:
     return ast.UnaryOp(
         op=ast.Not(),
         operand=ast.Call(func=_name("bool"), args=[_x()], keywords=[]),
     )
 
 
-@_to_ast.register
-def _(predicate: InPredicate, namespace: dict) -> ast.expr:
+@_to_ast.register(InPredicate)
+def _(predicate: InPredicate[Any], namespace: dict[str, Any]) -> ast.expr:
     if not isinstance(predicate.v, Iterable):
         raise NotCompilableError(f"Cannot compile InPredicate with non-iterable value {predicate.v!r}")
     key = f"_s{len(namespace)}"
@@ -184,8 +184,8 @@ def _(predicate: InPredicate, namespace: dict) -> ast.expr:
     return _cmp([ast.In()], [_name(key)])
 
 
-@_to_ast.register
-def _(predicate: NotInPredicate, namespace: dict) -> ast.expr:
+@_to_ast.register(NotInPredicate)
+def _(predicate: NotInPredicate[Any], namespace: dict[str, Any]) -> ast.expr:
     if not isinstance(predicate.v, Iterable):
         raise NotCompilableError(f"Cannot compile NotInPredicate with non-iterable value {predicate.v!r}")
     key = f"_s{len(namespace)}"
@@ -193,13 +193,13 @@ def _(predicate: NotInPredicate, namespace: dict) -> ast.expr:
     return _cmp([ast.NotIn()], [_name(key)])
 
 
-@_to_ast.register
-def _(predicate: HasKeyPredicate, namespace: dict) -> ast.expr:
+@_to_ast.register(HasKeyPredicate)
+def _(predicate: HasKeyPredicate[Any], namespace: dict[str, Any]) -> ast.expr:
     return _any_all_ast(predicate.key_p, "any", namespace)
 
 
-@_to_ast.register
-def _(predicate: HasLengthPredicate, namespace: dict) -> ast.expr:
+@_to_ast.register(HasLengthPredicate)
+def _(predicate: HasLengthPredicate[Any], namespace: dict[str, Any]) -> ast.expr:
     # _length_p(sum(1 for _ in x))
     length_key = f"_p{len(namespace)}"
     namespace[length_key] = try_compile_predicate(predicate.length_p)
@@ -223,69 +223,69 @@ def _(predicate: HasLengthPredicate, namespace: dict) -> ast.expr:
     return ast.Call(func=_name(length_key), args=[count_expr], keywords=[])
 
 
-@_to_ast.register
-def _(predicate: GeLePredicate, namespace: dict) -> ast.expr:
+@_to_ast.register(GeLePredicate)
+def _(predicate: GeLePredicate[Any], namespace: dict[str, Any]) -> ast.expr:
     return ast.Compare(
         left=_const(predicate.lower), ops=[ast.LtE(), ast.LtE()], comparators=[_x(), _const(predicate.upper)]
     )
 
 
-@_to_ast.register
-def _(predicate: GeLtPredicate, namespace: dict) -> ast.expr:
+@_to_ast.register(GeLtPredicate)
+def _(predicate: GeLtPredicate[Any], namespace: dict[str, Any]) -> ast.expr:
     return ast.Compare(
         left=_const(predicate.lower), ops=[ast.LtE(), ast.Lt()], comparators=[_x(), _const(predicate.upper)]
     )
 
 
-@_to_ast.register
-def _(predicate: GtLePredicate, namespace: dict) -> ast.expr:
+@_to_ast.register(GtLePredicate)
+def _(predicate: GtLePredicate[Any], namespace: dict[str, Any]) -> ast.expr:
     return ast.Compare(
         left=_const(predicate.lower), ops=[ast.Lt(), ast.LtE()], comparators=[_x(), _const(predicate.upper)]
     )
 
 
-@_to_ast.register
-def _(predicate: GtLtPredicate, namespace: dict) -> ast.expr:
+@_to_ast.register(GtLtPredicate)
+def _(predicate: GtLtPredicate[Any], namespace: dict[str, Any]) -> ast.expr:
     return ast.Compare(
         left=_const(predicate.lower), ops=[ast.Lt(), ast.Lt()], comparators=[_x(), _const(predicate.upper)]
     )
 
 
-@_to_ast.register
-def _(predicate: IsInstancePredicate, namespace: dict) -> ast.expr:
+@_to_ast.register(IsInstancePredicate)
+def _(predicate: IsInstancePredicate[Any], namespace: dict[str, Any]) -> ast.expr:
     # Delegate to preserve special bool/int and generic-type semantics.
     return _delegate(predicate, namespace)
 
 
-@_to_ast.register
-def _(predicate: AndPredicate, namespace: dict) -> ast.expr:
+@_to_ast.register(AndPredicate)
+def _(predicate: AndPredicate[Any], namespace: dict[str, Any]) -> ast.expr:
     return ast.BoolOp(op=ast.And(), values=[_to_ast(predicate.left, namespace), _to_ast(predicate.right, namespace)])
 
 
-@_to_ast.register
-def _(predicate: OrPredicate, namespace: dict) -> ast.expr:
+@_to_ast.register(OrPredicate)
+def _(predicate: OrPredicate[Any], namespace: dict[str, Any]) -> ast.expr:
     return ast.BoolOp(op=ast.Or(), values=[_to_ast(predicate.left, namespace), _to_ast(predicate.right, namespace)])
 
 
-@_to_ast.register
-def _(predicate: NotPredicate, namespace: dict) -> ast.expr:
+@_to_ast.register(NotPredicate)
+def _(predicate: NotPredicate[Any], namespace: dict[str, Any]) -> ast.expr:
     return ast.UnaryOp(op=ast.Not(), operand=_to_ast(predicate.predicate, namespace))
 
 
-@_to_ast.register
-def _(predicate: XorPredicate, namespace: dict) -> ast.expr:
+@_to_ast.register(XorPredicate)
+def _(predicate: XorPredicate[Any], namespace: dict[str, Any]) -> ast.expr:
     # bool(left_expr) ^ bool(right_expr)
     bool_left = ast.Call(func=_name("bool"), args=[_to_ast(predicate.left, namespace)], keywords=[])
     bool_right = ast.Call(func=_name("bool"), args=[_to_ast(predicate.right, namespace)], keywords=[])
     return ast.BinOp(left=bool_left, op=ast.BitXor(), right=bool_right)
 
 
-@_to_ast.register
-def _(predicate: AllPredicate, namespace: dict) -> ast.expr:
+@_to_ast.register(AllPredicate)
+def _(predicate: AllPredicate[Any], namespace: dict[str, Any]) -> ast.expr:
     return _any_all_ast(predicate.predicate, "all", namespace)
 
 
-def _any_all_ast(inner: Predicate, fn_name: str, namespace: dict) -> ast.expr:
+def _any_all_ast(inner: Predicate[Any], fn_name: str, namespace: dict[str, Any]) -> ast.expr:
     try:
         inner_fn = compile_predicate(inner).fn
     except NotCompilableError:
@@ -313,12 +313,12 @@ def _any_all_ast(inner: Predicate, fn_name: str, namespace: dict) -> ast.expr:
     return ast.Call(func=_name(fn_name), args=[gen], keywords=[])
 
 
-@_to_ast.register
-def _(predicate: AnyPredicate, namespace: dict) -> ast.expr:
+@_to_ast.register(AnyPredicate)
+def _(predicate: AnyPredicate[Any], namespace: dict[str, Any]) -> ast.expr:
     return _any_all_ast(predicate.predicate, "any", namespace)
 
 
-def _isinstance_and_all_ast(inner: Predicate, type_name: str, namespace: dict) -> ast.expr:
+def _isinstance_and_all_ast(inner: Predicate[Any], type_name: str, namespace: dict[str, Any]) -> ast.expr:
     isinstance_check = ast.Call(
         func=_name("isinstance"),
         args=[_x(), _name(type_name)],
@@ -328,23 +328,23 @@ def _isinstance_and_all_ast(inner: Predicate, type_name: str, namespace: dict) -
     return ast.BoolOp(op=ast.And(), values=[isinstance_check, all_check])
 
 
-@_to_ast.register
-def _(predicate: ListOfPredicate, namespace: dict) -> ast.expr:
+@_to_ast.register(ListOfPredicate)
+def _(predicate: ListOfPredicate[Any], namespace: dict[str, Any]) -> ast.expr:
     return _isinstance_and_all_ast(predicate.predicate, "list", namespace)
 
 
-@_to_ast.register
-def _(predicate: SetOfPredicate, namespace: dict) -> ast.expr:
+@_to_ast.register(SetOfPredicate)
+def _(predicate: SetOfPredicate[Any], namespace: dict[str, Any]) -> ast.expr:
     return _isinstance_and_all_ast(predicate.predicate, "set", namespace)
 
 
-@_to_ast.register
-def _(predicate: FrozenSetOfPredicate, namespace: dict) -> ast.expr:
+@_to_ast.register(FrozenSetOfPredicate)
+def _(predicate: FrozenSetOfPredicate[Any], namespace: dict[str, Any]) -> ast.expr:
     return _isinstance_and_all_ast(predicate.predicate, "frozenset", namespace)
 
 
-@_to_ast.register
-def _(predicate: IsClosePredicate, namespace: dict) -> ast.expr:
+@_to_ast.register(IsClosePredicate)
+def _(predicate: IsClosePredicate[Any], namespace: dict[str, Any]) -> ast.expr:
     import math
 
     namespace["_isclose"] = math.isclose
@@ -358,8 +358,8 @@ def _(predicate: IsClosePredicate, namespace: dict) -> ast.expr:
     )
 
 
-@_to_ast.register
-def _(predicate: CompPredicate, namespace: dict) -> ast.expr:
+@_to_ast.register(CompPredicate)
+def _(predicate: CompPredicate[Any, Any], namespace: dict[str, Any]) -> ast.expr:
     try:
         inner_fn = compile_predicate(predicate.predicate).fn
     except NotCompilableError:
@@ -375,8 +375,8 @@ def _(predicate: CompPredicate, namespace: dict) -> ast.expr:
     )
 
 
-@_to_ast.register
-def _(predicate: CountPredicate, namespace: dict) -> ast.expr:
+@_to_ast.register(CountPredicate)
+def _(predicate: CountPredicate[Any], namespace: dict[str, Any]) -> ast.expr:
     # sum(1 for _e in x if _filter_p(_e))  — replaces ilen(...) with no extra dependency
     loop_var = "_e"
     filter_key = f"_p{len(namespace)}"
@@ -403,8 +403,8 @@ def _(predicate: CountPredicate, namespace: dict) -> ast.expr:
     return ast.Call(func=_name(length_key), args=[count_expr], keywords=[])
 
 
-@_to_ast.register
-def _(predicate: TupleOfPredicate, namespace: dict) -> ast.expr:
+@_to_ast.register(TupleOfPredicate)
+def _(predicate: TupleOfPredicate[Any], namespace: dict[str, Any]) -> ast.expr:
     n = len(predicate.predicates)
     len_check = ast.Compare(
         left=ast.Call(func=_name("len"), args=[_x()], keywords=[]),
@@ -414,7 +414,7 @@ def _(predicate: TupleOfPredicate, namespace: dict) -> ast.expr:
     if n == 0:
         return len_check
 
-    def element_check(i: int, p: Predicate) -> ast.expr:
+    def element_check(i: int, p: Predicate[Any]) -> ast.expr:
         key = f"_p{len(namespace)}"
         namespace[key] = try_compile_predicate(p)
         return ast.Call(
@@ -432,7 +432,7 @@ def compile_predicate[T](predicate: Predicate[T]) -> CompiledPredicate[T]:
 
     Raises NotCompilableError for unsupported predicate types (fn_p, regex_p, etc.).
     """
-    namespace: dict = {}
+    namespace: dict[str, Any] = {}
     body = _to_ast(predicate, namespace)
 
     lambda_ast = ast.Expression(

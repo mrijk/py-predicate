@@ -1,14 +1,14 @@
 from dataclasses import dataclass
-from typing import override
+from typing import Any, override
 
-from predicate.predicate import ConstrainedT, Predicate
+from predicate.predicate import Predicate, SupportsComparison
 
 
 @dataclass
-class GePredicate[T](Predicate[T]):
+class GePredicate[T: SupportsComparison](Predicate[T]):
     """A predicate class that models the 'ge' (>=) predicate."""
 
-    v: ConstrainedT
+    v: T
 
     def __call__(self, x: T) -> bool:
         return x >= self.v
@@ -22,10 +22,10 @@ class GePredicate[T](Predicate[T]):
         return type(self.v)
 
     @override
-    def explain_failure(self, x: T) -> dict:
+    def explain_failure(self, x: T) -> dict[str, Any]:
         return {"reason": f"{x} is not greater or equal to {self.v!r}"}
 
 
-def ge_p(v: ConstrainedT) -> GePredicate[ConstrainedT]:
+def ge_p[T: SupportsComparison](v: T) -> GePredicate[T]:
     """Return True if the value is greater or equal than the constant, otherwise False."""
     return GePredicate(v=v)

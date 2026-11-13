@@ -1,14 +1,14 @@
 from dataclasses import dataclass
-from typing import Final, override
+from typing import Any, Final, override
 
-from predicate.predicate import ConstrainedT, Predicate
+from predicate.predicate import Predicate, SupportsComparison
 
 
 @dataclass
-class LtPredicate[T](Predicate[T]):
+class LtPredicate[T: SupportsComparison](Predicate[T]):
     """A predicate class that models the 'lt' (<) predicate."""
 
-    v: ConstrainedT
+    v: T
 
     def __call__(self, x: T) -> bool:
         return x < self.v
@@ -22,14 +22,14 @@ class LtPredicate[T](Predicate[T]):
         return type(self.v)
 
     @override
-    def explain_failure(self, x: T) -> dict:
+    def explain_failure(self, x: T) -> dict[str, Any]:
         return {"reason": f"{x} is not less than {self.v!r}"}
 
 
-def lt_p(v: ConstrainedT) -> LtPredicate[ConstrainedT]:
+def lt_p[T: SupportsComparison](v: T) -> LtPredicate[T]:
     """Return True if the value is less than the constant, otherwise False."""
     return LtPredicate(v=v)
 
 
-neg_p: Final[LtPredicate] = lt_p(0)
+neg_p: Final[LtPredicate[Any]] = lt_p(0)
 """Returns True of the value is negative, otherwise False."""

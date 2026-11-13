@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Iterable, override
+from typing import Any, Iterable, override
 
 from predicate.predicate import Predicate
 
@@ -8,9 +8,9 @@ from predicate.predicate import Predicate
 class PlusPredicate[T](Predicate[T]):
     """Match at least one instance of the given predicate."""
 
-    predicate: Predicate
+    predicate: Predicate[Any]
 
-    def __call__(self, iterable: Iterable, *, predicates: list[Predicate], full_match: bool) -> bool:
+    def __call__(self, iterable: Iterable[Any], *, predicates: list[Predicate[Any]], full_match: bool) -> bool:
         from predicate import star
 
         if not iterable:
@@ -23,7 +23,9 @@ class PlusPredicate[T](Predicate[T]):
         return f"plus({self.predicate!r})"
 
     @override
-    def explain_failure(self, iterable: Iterable[T], *, predicates: list[Predicate], full_match: bool) -> dict:
+    def explain_failure(
+        self, iterable: Iterable[T], *, predicates: list[Predicate[Any]], full_match: bool
+    ) -> dict[str, Any]:
         if not iterable:
             return {"reason": f"Iterable should have at least one element to match against {self.predicate!r}"}
 
@@ -34,6 +36,6 @@ class PlusPredicate[T](Predicate[T]):
         return {"reason": f"`{self.predicate!r}`"}
 
 
-def plus(predicate: Predicate) -> Predicate:
+def plus(predicate: Predicate[Any]) -> Predicate[Any]:
     """Match at least one instance of the given predicate."""
     return PlusPredicate(predicate=predicate)

@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Iterable, override
+from typing import Any, Iterable, override
 
 from predicate.predicate import Predicate
 
@@ -9,9 +9,9 @@ class ExactlyPredicate[T](Predicate[T]):
     """Match exactly n instances of the given predicate."""
 
     n: int
-    predicate: Predicate
+    predicate: Predicate[Any]
 
-    def __call__(self, iterable: Iterable, *, predicates: list[Predicate], full_match: bool) -> bool:
+    def __call__(self, iterable: Iterable[Any], *, predicates: list[Predicate[Any]], full_match: bool) -> bool:
         from predicate.match_predicate import match
 
         head, rest = self._split(iterable)
@@ -19,7 +19,7 @@ class ExactlyPredicate[T](Predicate[T]):
             return False
         return match(rest, predicates=predicates, full_match=full_match) if predicates else True
 
-    def _split(self, iterable: Iterable) -> tuple[list, list]:
+    def _split(self, iterable: Iterable[Any]) -> tuple[list[Any], list[Any]]:
         items = list(iterable)
         return items[: self.n], items[self.n :]
 
@@ -27,7 +27,9 @@ class ExactlyPredicate[T](Predicate[T]):
         return f"exactly({self.n}, {self.predicate!r})"
 
     @override
-    def explain_failure(self, iterable: Iterable[T], *, predicates: list[Predicate], full_match: bool) -> dict:  # type: ignore
+    def explain_failure(
+        self, iterable: Iterable[T], *, predicates: list[Predicate[Any]], full_match: bool
+    ) -> dict[str, Any]:
         from predicate.match_predicate import reason
 
         head, rest = self._split(iterable)
@@ -39,6 +41,6 @@ class ExactlyPredicate[T](Predicate[T]):
         return reason(rest, predicates=predicates, full_match=full_match)
 
 
-def exactly_n(n: int, predicate: Predicate) -> Predicate:
+def exactly_n(n: int, predicate: Predicate[Any]) -> Predicate[Any]:
     """Match exactly n instances of the given predicate."""
     return ExactlyPredicate(n=n, predicate=predicate)

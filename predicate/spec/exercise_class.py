@@ -1,5 +1,5 @@
 from inspect import Parameter
-from typing import AsyncIterator, Callable, Iterator, TypeVar, get_origin
+from typing import Any, AsyncIterator, Callable, Iterator, TypeVar, get_origin
 
 from more_itertools import take
 
@@ -24,7 +24,7 @@ from predicate.spec.exercise_helpers import (
 from predicate.spec.spec import Spec
 
 
-def _get_spec_from_class_annotation(f: Callable) -> Spec:
+def _get_spec_from_class_annotation(f: Callable[..., Any]) -> Spec:
     sig = resolved_signature(f.__call__)  # type: ignore
     name = type(f).__name__
 
@@ -44,14 +44,14 @@ def _get_spec_from_class_annotation(f: Callable) -> Spec:
     return spec
 
 
-def _get_param_predicate(f: Callable, key: str, parameter: Parameter) -> Predicate:
+def _get_param_predicate(f: Callable[..., Any], key: str, parameter: Parameter) -> Predicate[Any]:
     annotation = parameter.annotation
     name = type(f).__name__
 
     if annotation == parameter.empty:
         raise no_spec_error(name, f"parameter '{key}' has no annotation")
 
-    if isinstance(f, Predicate):
+    if isinstance(f, Predicate) and parameter.kind not in (Parameter.VAR_POSITIONAL, Parameter.VAR_KEYWORD):
         try:
             return is_instance_p(f.klass)
         except NotImplementedError:
@@ -63,13 +63,13 @@ def _get_param_predicate(f: Callable, key: str, parameter: Parameter) -> Predica
         return exercise_param_predicate(parameter)
 
 
-def _resolve_class_spec(f: Callable, spec: Spec | None) -> Spec:
+def _resolve_class_spec(f: Callable[..., Any], spec: Spec | None) -> Spec:
     if not spec:
         return _get_spec_from_class_annotation(f)
     return check_signature_against_spec(f, spec)
 
 
-def exercise_class(f: Callable, spec: Spec | None, n: int) -> Iterator[tuple]:
+def exercise_class(f: Callable[..., Any], spec: Spec | None, n: int) -> Iterator[tuple[Any, ...]]:
     spec = _resolve_class_spec(f, spec)
     return_p, values = generate_values(spec, n)
     sig = resolved_signature(f.__call__)  # type: ignore
@@ -91,7 +91,7 @@ def exercise_class(f: Callable, spec: Spec | None, n: int) -> Iterator[tuple]:
         yield tuple(value.values()), result
 
 
-async def async_exercise_class(f: Callable, spec: Spec | None, n: int) -> AsyncIterator[tuple]:
+async def async_exercise_class(f: Callable[..., Any], spec: Spec | None, n: int) -> AsyncIterator[tuple[Any, ...]]:
     spec = _resolve_class_spec(f, spec)
     return_p, values = generate_values(spec, n)
     sig = resolved_signature(f.__call__)  # type: ignore

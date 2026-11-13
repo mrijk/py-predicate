@@ -1,6 +1,7 @@
 import json as json_lib
 import sys
-from typing import Annotated
+from collections.abc import Iterable
+from typing import Annotated, Any
 
 import typer
 from more_itertools import take
@@ -58,11 +59,11 @@ def table(expression: Expression, optimize: Optimize = False, as_json: Json = Fa
     def as_bit(value: bool) -> int:
         return 1 if value else 0
 
-    def format_header(predicate: Predicate) -> str:
+    def format_header(predicate: Predicate[Any]) -> str:
         named_predicates = get_named_predicates(predicate)
         return " ".join(named_predicates)
 
-    def format_values(values) -> str:
+    def format_values(values: Iterable[Any]) -> str:
         bits = [str(as_bit(value)) for value in values]
         return " ".join(bits)
 
@@ -90,7 +91,7 @@ def failed_to_pass(expression: str) -> None:
     sys.stderr.write(f'Could not parse expression: "{expression}"\n')
 
 
-def expression_to_predicate(expression: str, optimize: bool = False, *, as_json: bool = False) -> Predicate | None:
+def expression_to_predicate(expression: str, optimize: bool = False, *, as_json: bool = False) -> Predicate[Any] | None:
     if as_json:
         try:
             return from_json(json_lib.loads(expression))

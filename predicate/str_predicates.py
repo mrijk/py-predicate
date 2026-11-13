@@ -1,12 +1,12 @@
 import random
 import string
-from typing import Callable, Iterator
+from typing import Any, Callable, Iterator
 
 from predicate import fn_p
 from predicate.predicate import Predicate
 
 
-def create_is_str_p(fn: Callable, alphabet: str | None = None) -> Predicate[str]:
+def create_is_str_p(fn: Callable[..., Any], alphabet: str | None = None) -> Predicate[str]:
     """Return a predicate for a str method such as str.isdigit; with an alphabet, it generates strings from it."""
     if alphabet is None:
         return fn_p(fn=fn)

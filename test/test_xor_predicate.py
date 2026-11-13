@@ -1,6 +1,6 @@
 from functools import partial
 from operator import ge
-from typing import cast
+from typing import Any, cast
 
 from predicate import ge_p, is_predicate_p
 from predicate.xor_predicate import XorPredicate
@@ -25,7 +25,7 @@ def test_xor_callable_right():
 
     predicate = ge_2 ^ ge_4
 
-    assert is_predicate_p(cast(XorPredicate, predicate).right)
+    assert is_predicate_p(cast(XorPredicate[Any], predicate).right)
 
 
 def test_xor_callable_left():
@@ -37,7 +37,7 @@ def test_xor_callable_left():
 
     predicate = ge_2 ^ ge_4
 
-    assert is_predicate_p(cast(XorPredicate, predicate).right)
+    assert is_predicate_p(cast(XorPredicate[Any], predicate).right)
 
 
 def test_xor_commutative():

@@ -1,4 +1,6 @@
-from lark import Lark, Transformer, UnexpectedEOF  # type: ignore
+from typing import Any
+
+from lark import Lark, Token, Transformer, UnexpectedEOF
 
 from predicate import always_false_p, always_true_p, ge_p, le_p
 from predicate.implies import Implies
@@ -35,56 +37,53 @@ grammar = Lark(
 )
 
 
-class _PredicateTransformer(Transformer):
-    def predicate(self, item) -> Predicate:
+class _PredicateTransformer(Transformer[Token, Predicate[Any]]):
+    def predicate(self, item: list[Predicate[Any]]) -> Predicate[Any]:
         return item[0]
 
-    def value(self, item) -> int:
+    def value(self, item: list[Token]) -> int:
         return int(item[0].value)
 
-    def and_expression(self, items: tuple[Predicate, Predicate]):
+    def and_expression(self, items: list[Predicate[Any]]) -> Predicate[Any]:
         left, right = items
         return left & right
 
-    def false(self, _item) -> Predicate:
+    def false(self, _item: list[Any]) -> Predicate[Any]:
         return always_false_p
 
-    def ge_p(self, item) -> Predicate:
+    def ge_p(self, item: list[int]) -> Predicate[Any]:
         return ge_p(v=item[0])
 
-    def le_p(self, item) -> Predicate:
+    def le_p(self, item: list[int]) -> Predicate[Any]:
         return le_p(v=item[0])
 
-    def grouped_expression(self, item):
+    def grouped_expression(self, item: list[Predicate[Any]]) -> Predicate[Any]:
         return item[0]
 
-    def implies_expression(self, items: tuple[Predicate, Predicate]):
+    def implies_expression(self, items: list[Predicate[Any]]) -> Implies[Any]:
         left, right = items
         return Implies(left=left, right=right)
 
-    def not_expression(self, item: tuple[Predicate]) -> Predicate:
+    def not_expression(self, item: list[Predicate[Any]]) -> Predicate[Any]:
         predicate = item[0]
         return ~predicate
 
-    def or_expression(self, items: tuple[Predicate, Predicate]) -> Predicate:
+    def or_expression(self, items: list[Predicate[Any]]) -> Predicate[Any]:
         left, right = items
         return left | right
 
-    def true(self, _item) -> Predicate:
+    def true(self, _item: list[Any]) -> Predicate[Any]:
         return always_true_p
 
-    def variable(self, item) -> Predicate:
-        (name,) = item[0]
-        return NamedPredicate(name=name)
+    def variable(self, item: list[Token]) -> Predicate[Any]:
+        return NamedPredicate(name=str(item[0]))
 
-    def xor_expression(self, items: tuple[Predicate, Predicate]) -> Predicate:
+    def xor_expression(self, items: list[Predicate[Any]]) -> Predicate[Any]:
         left, right = items
         return left ^ right
 
-    pass
 
-
-def parse_expression(expression: str) -> Predicate | None:
+def parse_expression(expression: str) -> Predicate[Any] | None:
     try:
         predicate_tree = grammar.parse(expression)
     except UnexpectedEOF:

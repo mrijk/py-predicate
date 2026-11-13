@@ -9,12 +9,12 @@ from predicate.predicate import Predicate
 
 
 @dataclass
-class FrozenDictOfPredicate(Predicate):
+class FrozenDictOfPredicate(Predicate[Any]):
     """A predicate class that models the frozendict_of predicate."""
 
-    key_value_predicates: list[tuple[Predicate, Predicate]]
+    key_value_predicates: list[tuple[Predicate[Any], Predicate[Any]]]
 
-    def __init__(self, key_value_predicates: Sequence[tuple[Predicate | str, Predicate]]):
+    def __init__(self, key_value_predicates: Sequence[tuple[Predicate[Any] | str, Predicate[Any]]]):
         self.key_value_predicates = [(to_key_p(key_p), value_p) for key_p, value_p in key_value_predicates]
 
     @property
@@ -29,12 +29,12 @@ class FrozenDictOfPredicate(Predicate):
         return f"is_frozendict_of_p({key_value_pairs_repr(pairs)})"
 
     @override
-    def explain_failure(self, x: Any, *args, **kwargs) -> dict:
+    def explain_failure(self, x: Any, *args: Any, **kwargs: Any) -> dict[str, Any]:
         if not is_frozendict_p(x):
             return {"reason": f"{x} is not an instance of a frozendict"}
         return self.dict_of_predicate.explain_failure(x)
 
 
-def is_frozendict_of_p(*predicates: tuple[Predicate | str, Predicate]) -> Predicate:
+def is_frozendict_of_p(*predicates: tuple[Predicate[Any] | str, Predicate[Any]]) -> Predicate[Any]:
     """Return True if value is a frozendict, and all keys and values match the predicates, otherwise False."""
     return FrozenDictOfPredicate(list(predicates))

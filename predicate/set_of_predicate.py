@@ -9,7 +9,7 @@ from predicate.predicate import Predicate
 class SetOfPredicate[T](Predicate[T]):
     """A predicate class that models the set_of predicate."""
 
-    predicate: Predicate
+    predicate: Predicate[Any]
 
     def __call__(self, x: Any) -> TypeGuard[set[T]]:
         match x:
@@ -29,7 +29,7 @@ class SetOfPredicate[T](Predicate[T]):
         return self.predicate.klass
 
     @override
-    def explain_failure(self, x: set[T]) -> dict:
+    def explain_failure(self, x: set[T]) -> dict[str, Any]:
         match x:
             case set() as s:
                 fail = first_false(s, self.predicate)

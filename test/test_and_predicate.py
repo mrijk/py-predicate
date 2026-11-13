@@ -1,6 +1,6 @@
 from functools import partial
 from operator import ge
-from typing import cast
+from typing import Any, cast
 
 from helpers import is_and_p
 
@@ -32,7 +32,7 @@ def test_and_callable_left():
     between_2_and_3 = ge_2 & le_3
 
     assert is_and_p(between_2_and_3)
-    assert is_predicate_p(cast(AndPredicate, between_2_and_3).left)
+    assert is_predicate_p(cast(AndPredicate[Any], between_2_and_3).left)
 
 
 def test_and_callable_right():
@@ -42,7 +42,7 @@ def test_and_callable_right():
     between_2_and_3 = ge_2 & le_3
 
     assert is_and_p(between_2_and_3)
-    assert is_predicate_p(cast(AndPredicate, between_2_and_3).right)
+    assert is_predicate_p(cast(AndPredicate[Any], between_2_and_3).right)
 
 
 def test_and_commutative():

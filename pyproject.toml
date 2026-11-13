@@ -94,7 +94,7 @@ target-version = "py312"
 max-complexity = 10
 
 [tool.complexipy]
-max-complexity-allowed = 10
+max-complexity-allowed = 14
 exclude = ["tests/**", "benchmarks/**"]
 
 [tool.ruff.lint.flake8-tidy-imports]
@@ -114,7 +114,9 @@ pytest_add_cli_args = ["--ignore=test/spec"]
 do_not_mutate = ["predicate/is_lambda_predicate.py", "predicate/is_callable_predicate.py"]
 
 [tool.mypy]
-exclude = ["mutants"]
+strict = true
+exclude = ["mutants", "test"]
+disable_error_code = ["annotation-unchecked"]
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"

@@ -19,8 +19,8 @@ class IsNamedTuplePredicate[T](Predicate[T]):
         return "is_named_tuple_p"
 
     @override
-    def explain_failure(self, x: Any) -> dict:
+    def explain_failure(self, x: Any) -> dict[str, Any]:
         return {"reason": f"{x} is not a named tuple"}
 
 
-is_named_tuple_p: Final[IsNamedTuplePredicate] = IsNamedTuplePredicate()
+is_named_tuple_p: Final[IsNamedTuplePredicate[Any]] = IsNamedTuplePredicate()

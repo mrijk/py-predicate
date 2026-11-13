@@ -1,4 +1,5 @@
 from functools import singledispatch
+from typing import Any
 
 from predicate import (
     always_false_p,
@@ -33,83 +34,83 @@ def negate[T](predicate: Predicate[T]) -> Predicate[T]:
     return NotPredicate(predicate=predicate)
 
 
-@negate.register
-def negate_is_not(predicate: NotPredicate) -> Predicate:
+@negate.register(NotPredicate)
+def negate_is_not(predicate: NotPredicate[Any]) -> Predicate[Any]:
     return predicate.predicate
 
 
 @negate.register
-def negate_is_false(_predicate: AlwaysFalsePredicate) -> Predicate:
+def negate_is_false(_predicate: AlwaysFalsePredicate) -> Predicate[Any]:
     return always_true_p
 
 
 @negate.register
-def negate_is_true(_predicate: AlwaysTruePredicate) -> Predicate:
+def negate_is_true(_predicate: AlwaysTruePredicate) -> Predicate[Any]:
     return always_false_p
 
 
-@negate.register
-def negate_is_falsy(_predicate: IsFalsyPredicate) -> Predicate:
+@negate.register(IsFalsyPredicate)
+def negate_is_falsy(_predicate: IsFalsyPredicate[Any]) -> Predicate[Any]:
     return is_truthy_p
 
 
-@negate.register
-def negate_is_truthy(_predicate: IsTruthyPredicate) -> Predicate:
+@negate.register(IsTruthyPredicate)
+def negate_is_truthy(_predicate: IsTruthyPredicate[Any]) -> Predicate[Any]:
     return is_falsy_p
 
 
-@negate.register
-def negate_eq(predicate: EqPredicate) -> Predicate:
+@negate.register(EqPredicate)
+def negate_eq(predicate: EqPredicate[Any]) -> Predicate[Any]:
     return NePredicate(v=predicate.v)
 
 
-@negate.register
-def negate_ne(predicate: NePredicate) -> Predicate:
+@negate.register(NePredicate)
+def negate_ne(predicate: NePredicate[Any]) -> Predicate[Any]:
     return EqPredicate(v=predicate.v)
 
 
-@negate.register
-def negate_gt(predicate: GtPredicate) -> Predicate:
+@negate.register(GtPredicate)
+def negate_gt(predicate: GtPredicate[Any]) -> Predicate[Any]:
     return LePredicate(v=predicate.v)
 
 
-@negate.register
-def negate_ge(predicate: GePredicate) -> Predicate:
+@negate.register(GePredicate)
+def negate_ge(predicate: GePredicate[Any]) -> Predicate[Any]:
     return LtPredicate(v=predicate.v)
 
 
-@negate.register
-def negate_in(predicate: InPredicate) -> Predicate:
+@negate.register(InPredicate)
+def negate_in(predicate: InPredicate[Any]) -> Predicate[Any]:
     return NotInPredicate(v=predicate.v)
 
 
-@negate.register
-def negate_not_in(predicate: NotInPredicate) -> Predicate:
+@negate.register(NotInPredicate)
+def negate_not_in(predicate: NotInPredicate[Any]) -> Predicate[Any]:
     return InPredicate(v=predicate.v)
 
 
-@negate.register
-def negate_lt(predicate: LtPredicate) -> Predicate:
+@negate.register(LtPredicate)
+def negate_lt(predicate: LtPredicate[Any]) -> Predicate[Any]:
     return GePredicate(v=predicate.v)
 
 
-@negate.register
-def negate_le(predicate: LePredicate) -> Predicate:
+@negate.register(LePredicate)
+def negate_le(predicate: LePredicate[Any]) -> Predicate[Any]:
     return GtPredicate(v=predicate.v)
 
 
-@negate.register
-def negate_is_none(_predicate: IsNonePredicate) -> Predicate:
+@negate.register(IsNonePredicate)
+def negate_is_none(_predicate: IsNonePredicate[Any]) -> Predicate[Any]:
     return is_not_none_p
 
 
-@negate.register
-def negate_is_not_none(_predicate: IsNotNonePredicate) -> Predicate:
+@negate.register(IsNotNonePredicate)
+def negate_is_not_none(_predicate: IsNotNonePredicate[Any]) -> Predicate[Any]:
     return is_none_p
 
 
-@negate.register
-def negate_has_length(predicate: HasLengthPredicate) -> Predicate:
+@negate.register(HasLengthPredicate)
+def negate_has_length(predicate: HasLengthPredicate[Any]) -> Predicate[Any]:
     match predicate.length_p:
         case EqPredicate(v) if v == 0:
             return is_not_empty_p

@@ -20,7 +20,7 @@ class JuxtPredicate[T](Predicate[T]):
         return f"juxt_p({predicates_repr(self.predicates)})"
 
     @override
-    def explain_failure(self, x: Any) -> dict:
+    def explain_failure(self, x: Any) -> dict[str, Any]:
         results = [predicate(x) for predicate in self.predicates]
         return {
             "results": results,
@@ -28,6 +28,6 @@ class JuxtPredicate[T](Predicate[T]):
         }
 
 
-def juxt_p(*predicates: Predicate, evaluate: Predicate[Iterable[bool]]) -> Predicate:
+def juxt_p(*predicates: Predicate[Any], evaluate: Predicate[Iterable[bool]]) -> Predicate[Any]:
     """Apply each predicate to the same value, then evaluate the boolean results with the evaluate predicate."""
     return JuxtPredicate(predicates=list(predicates), evaluate=evaluate)

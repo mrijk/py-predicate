@@ -33,7 +33,7 @@ class AnyPredicate[T](Predicate[T]):
         return 1 + self.predicate.count
 
     @override
-    def explain_failure(self, iterable: Iterable[T]) -> dict:
+    def explain_failure(self, iterable: Iterable[T]) -> dict[str, Any]:
         failures = [
             {"index": index, "value": item} | self.predicate.explain_failure(item)
             for index, item in enumerate(iterable)

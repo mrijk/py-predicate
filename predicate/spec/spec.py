@@ -18,12 +18,12 @@ class UnresolvedAnnotationWarning(UserWarning):
 Spec = TypedDict(
     "Spec",
     {
-        "args": dict[str, Predicate],
-        "ret": NotRequired[Predicate],
+        "args": dict[str, Predicate[Any]],
+        "ret": NotRequired[Predicate[Any]],
         "ret_name": NotRequired[str],
         "pre": NotRequired[Callable[..., bool]],
         "fn": NotRequired[Callable[..., bool]],
-        "fn_p": NotRequired[Callable[..., Predicate]],
+        "fn_p": NotRequired[Callable[..., Predicate[Any]]],
         "raises": NotRequired[type[Exception] | tuple[type[Exception], ...]],
         "snapshot": NotRequired[dict[str, Callable[[Any], Any]]],
     },

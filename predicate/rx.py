@@ -67,7 +67,7 @@ def last_or_default_p[T](
     predicate: Predicate[T], default_value: T | None = None
 ) -> Callable[[rx.Observable[T]], rx.Observable[T | None]]:
     """Return an Rx operator that emits the last item satisfying the predicate, or the default if there is none."""
-    return ops.last_or_default(default_value, predicate)  # type: ignore[arg-type]  # stub wants default: T, but None is valid
+    return ops.last_or_default(default_value, predicate)  # stub wants default: T, but None is valid
 
 
 def single_or_default_p[T](

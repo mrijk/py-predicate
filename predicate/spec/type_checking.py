@@ -141,12 +141,12 @@ def _run_if_possible(statement: ast.stmt, module: ModuleType, namespace: dict[st
         return
 
 
-def _module_name(f: Callable) -> str | None:
+def _module_name(f: Callable[..., Any]) -> str | None:
     # The defining module, not __module__: libraries rewrite that to the public package (e.g. pandas' @set_module)
     return getattr(inspect.unwrap(f), "__globals__", {}).get("__name__") or getattr(f, "__module__", None)
 
 
-def type_checking_namespace(f: Callable) -> dict[str, Any]:
+def type_checking_namespace(f: Callable[..., Any]) -> dict[str, Any]:
     """Return the names f's module only imports under ``if TYPE_CHECKING:``, or {} if there are none."""
     module_name = _module_name(f)
     return _namespace_for_module(module_name) if module_name else {}
@@ -160,7 +160,7 @@ def _imported_from(module_name: str) -> Iterator[str]:
     yield from (_resolve_module(node, module) for node in statements if isinstance(node, ast.ImportFrom))
 
 
-def imported_namespace(f: Callable) -> dict[str, Any]:
+def imported_namespace(f: Callable[..., Any]) -> dict[str, Any]:
     """Like type_checking_namespace, plus the globals and TYPE_CHECKING names of every module f's module imports from.
 
     An alias like ``PolarsDataType = Union["DataTypeClass", "DataType"]`` holds quoted names that resolve in its own

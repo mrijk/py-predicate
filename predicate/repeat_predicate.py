@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Iterable, override
+from typing import Any, Iterable, override
 
 from predicate.predicate import Predicate
 
@@ -10,9 +10,9 @@ class RepeatPredicate[T](Predicate[T]):
 
     m: int
     n: int
-    predicate: Predicate
+    predicate: Predicate[Any]
 
-    def __call__(self, iterable: Iterable, *, predicates: list[Predicate], full_match: bool) -> bool:
+    def __call__(self, iterable: Iterable[Any], *, predicates: list[Predicate[Any]], full_match: bool) -> bool:
         from predicate import exactly_n
 
         for n in range(self.n, self.m - 1, -1):
@@ -25,10 +25,12 @@ class RepeatPredicate[T](Predicate[T]):
         return f"repeat({self.m}, {self.n}, {self.predicate!r})"
 
     @override
-    def explain_failure(self, iterable: Iterable[T], *, predicates: list[Predicate], full_match: bool) -> dict:  # type: ignore
+    def explain_failure(
+        self, iterable: Iterable[T], *, predicates: list[Predicate[Any]], full_match: bool
+    ) -> dict[str, Any]:
         return {"reason": f"Expected between {self.m} and {self.n} matches of predicate `{self.predicate!r}`"}
 
 
-def repeat(m: int, n: int, predicate: Predicate) -> Predicate:
+def repeat(m: int, n: int, predicate: Predicate[Any]) -> Predicate[Any]:
     """Match exactly m to n instances of the given predicate."""
     return RepeatPredicate(m=m, n=n, predicate=predicate)

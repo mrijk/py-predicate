@@ -1,6 +1,6 @@
 from collections.abc import Mapping
 from inspect import Parameter
-from typing import AsyncIterator, Callable, Iterator
+from typing import Any, AsyncIterator, Callable, Iterator
 
 from more_itertools import take
 
@@ -28,7 +28,7 @@ def _annotatable_parameters(parameters: Mapping[str, Parameter]) -> Iterator[tup
     yield from ((key, parameter) for key, parameter in parameters.items() if not is_skipped_param(parameter))
 
 
-def get_spec_from_function_annotation(f: Callable) -> Spec:
+def get_spec_from_function_annotation(f: Callable[..., Any]) -> Spec:
     sig = resolved_signature(f)
 
     if sig.return_annotation == sig.empty:
@@ -44,13 +44,13 @@ def get_spec_from_function_annotation(f: Callable) -> Spec:
     return spec
 
 
-def _resolve_function_spec(f: Callable, spec: Spec | None) -> Spec:
+def _resolve_function_spec(f: Callable[..., Any], spec: Spec | None) -> Spec:
     if not spec:
         return get_spec_from_function_annotation(f)
     return check_signature_against_spec(f, spec)
 
 
-def exercise_function(f: Callable, spec: Spec | None, n: int) -> Iterator[tuple]:
+def exercise_function(f: Callable[..., Any], spec: Spec | None, n: int) -> Iterator[tuple[Any, ...]]:
     spec = _resolve_function_spec(f, spec)
     return_p, values = generate_values(spec, n)
     sig = resolved_signature(f)
@@ -72,7 +72,7 @@ def exercise_function(f: Callable, spec: Spec | None, n: int) -> Iterator[tuple]
         yield tuple(value.values()), result
 
 
-async def async_exercise_function(f: Callable, spec: Spec | None, n: int) -> AsyncIterator[tuple]:
+async def async_exercise_function(f: Callable[..., Any], spec: Spec | None, n: int) -> AsyncIterator[tuple[Any, ...]]:
     spec = _resolve_function_spec(f, spec)
     return_p, values = generate_values(spec, n)
     sig = resolved_signature(f)

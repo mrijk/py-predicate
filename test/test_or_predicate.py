@@ -1,6 +1,6 @@
 from functools import partial
 from operator import le
-from typing import cast
+from typing import Any, cast
 
 from helpers import is_or_p
 
@@ -29,7 +29,7 @@ def test_or_callable_right():
     le_2_or_ge_4 = le_2 | ge_4
 
     assert is_or_p(le_2_or_ge_4)
-    assert is_predicate_p(cast(OrPredicate, le_2_or_ge_4).right)
+    assert is_predicate_p(cast(OrPredicate[Any], le_2_or_ge_4).right)
 
 
 def test_or_callable_left():
@@ -39,7 +39,7 @@ def test_or_callable_left():
     le_2_or_ge_4 = le_2 | ge_4
 
     assert is_or_p(le_2_or_ge_4)
-    assert is_predicate_p(cast(OrPredicate, le_2_or_ge_4).left)
+    assert is_predicate_p(cast(OrPredicate[Any], le_2_or_ge_4).left)
 
 
 def test_or_commutative():

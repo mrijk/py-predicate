@@ -1,4 +1,3 @@
-from collections.abc import Callable
 from dataclasses import dataclass
 from typing import Any, override
 
@@ -11,12 +10,12 @@ from predicate.predicate import Predicate
 class IsCallablePredicate[T](Predicate[T]):
     """A predicate class that models the is_callable predicate."""
 
-    params: list
+    params: list[Any]
     return_type: Any
 
     def __call__(self, x: Any) -> bool:
         match x:
-            case Callable() as c:  # type: ignore
+            case c if callable(c):
                 annotations = c.__annotations__
                 return_type = annotations["return"]
                 params = [param for key, param in annotations.items() if key != "return"]
@@ -30,9 +29,9 @@ class IsCallablePredicate[T](Predicate[T]):
         return f"is_callable_p([], {return_type})"
 
     @override
-    def explain_failure(self, x: Any) -> dict:
+    def explain_failure(self, x: Any) -> dict[str, Any]:
         match x:
-            case Callable() as c:  # type: ignore
+            case c if callable(c):
                 annotations = c.__annotations__
                 return_type = annotations["return"]
 
@@ -50,5 +49,5 @@ class IsCallablePredicate[T](Predicate[T]):
                 return {"reason": f"{x} is not a Callable"}
 
 
-def is_callable_p(params: list, return_type: Any) -> IsCallablePredicate:
+def is_callable_p(params: list[Any], return_type: Any) -> IsCallablePredicate[Any]:
     return IsCallablePredicate(params, return_type)

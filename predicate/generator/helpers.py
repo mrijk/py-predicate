@@ -30,13 +30,13 @@ from more_itertools import interleave, random_permutation, repeatfunc, take, uni
 
 from predicate.eq_predicate import eq_p
 from predicate.generator.generate_predicate import generate_predicate, typed_predicate_type_registry
+from predicate.is_instance_predicate import is_int_p, is_str_p
 from predicate.predicate import Predicate
 from predicate.range_predicate import ge_le_p
 from predicate.regex_predicate import regex_p
-from predicate.standard_predicates import is_int_p, is_str_p
 
 
-def random_first_from_iterables(*iterables: Iterable) -> Iterator[Any]:
+def random_first_from_iterables(*iterables: Iterable[Any]) -> Iterator[Any]:
     remaining = [it for it in iterables if it]
 
     # An iterable that runs out is dropped, instead of being picked (and failing) forever
@@ -67,7 +67,7 @@ def random_complex_numbers(radius: float = 1e6) -> Iterator[complex]:
     yield from (to_complex(amplitude, angle) for amplitude, angle in zip(valid_amplitudes, valid_angles, strict=False))
 
 
-def random_callables() -> Iterator[Callable]:
+def random_callables() -> Iterator[Callable[..., Any]]:
     yield from random_first_from_iterables(random_lambdas(), random_functions(), random_callable_objects())
 
 
@@ -85,7 +85,7 @@ def generate_lambda(arg_names: list[str]) -> types.FunctionType:
 default_nr_of_parameters_p: Final = eq_p(1)
 
 
-def random_lambdas(nr_of_parameters_p: Predicate = default_nr_of_parameters_p) -> Iterator[types.FunctionType]:
+def random_lambdas(nr_of_parameters_p: Predicate[Any] = default_nr_of_parameters_p) -> Iterator[types.FunctionType]:
     value_p = regex_p("[a-z]{2,3}")
     valid_parameter_lists = random_lists(length_p=nr_of_parameters_p, value_p=value_p)
     yield from (generate_lambda(list(arg_names)) for arg_names in valid_parameter_lists)
@@ -94,7 +94,7 @@ def random_lambdas(nr_of_parameters_p: Predicate = default_nr_of_parameters_p) -
 default_size_p: Final = ge_le_p(lower=0, upper=5)
 
 
-def random_signatures(nr_of_parameters_p: Predicate = default_size_p) -> Iterator[Signature]:
+def random_signatures(nr_of_parameters_p: Predicate[Any] = default_size_p) -> Iterator[Signature]:
     value_p = regex_p("[a-z]{2,3}")
     valid_parameter_lists = random_lists(length_p=nr_of_parameters_p, value_p=value_p)
 
@@ -121,15 +121,15 @@ def random_parameters() -> Iterator[Parameter]:
         )
 
 
-def random_functions(nr_of_parameters_p: Predicate = default_size_p) -> Iterator[Callable]:
+def random_functions(nr_of_parameters_p: Predicate[Any] = default_size_p) -> Iterator[Callable[..., Any]]:
     yield from (function_with_signature(sig) for sig in random_signatures(nr_of_parameters_p))
 
 
-def random_callable_objects(nr_of_parameters_p: Predicate = default_size_p) -> Iterator[Callable]:
+def random_callable_objects(nr_of_parameters_p: Predicate[Any] = default_size_p) -> Iterator[Callable[..., Any]]:
     yield from (callable_object_with_signature(sig) for sig in random_signatures(nr_of_parameters_p))
 
 
-def random_lengths(length_p: Predicate) -> Iterator[int]:
+def random_lengths(length_p: Predicate[Any]) -> Iterator[int]:
     """Return collection lengths: 0 (the empty collection) at most once and first, then only positive lengths (#356).
 
     The empty collection is a valuable edge case, but exercise with a small n only sees the start of the stream.
@@ -146,7 +146,7 @@ def random_lengths(length_p: Predicate) -> Iterator[int]:
 
 
 def random_dicts(
-    key_p: Predicate = is_str_p, value_p: Predicate = is_int_p, size_p: Predicate = default_size_p
+    key_p: Predicate[Any] = is_str_p, value_p: Predicate[Any] = is_int_p, size_p: Predicate[Any] = default_size_p
 ) -> Iterator[dict[Any, Any]]:
     from predicate import generate_true
 
@@ -160,7 +160,7 @@ def random_dicts(
 if sys.version_info >= (3, 15):
 
     def random_frozendicts(
-        key_p: Predicate = is_str_p, value_p: Predicate = is_int_p, size_p: Predicate = default_size_p
+        key_p: Predicate[Any] = is_str_p, value_p: Predicate[Any] = is_int_p, size_p: Predicate[Any] = default_size_p
     ) -> Iterator[frozendict[Any, Any]]:  # noqa: F821
         yield from (
             frozendict(random_dict)  # noqa: F821
@@ -196,10 +196,10 @@ def random_datetimes(lower: datetime | None = None, upper: datetime | None = Non
         yield start + timedelta(seconds=random_second)
 
 
-def random_predicates(*, max_depth: int = 10, klass: type = int) -> Iterator[Predicate]:
+def random_predicates(*, max_depth: int = 10, klass: type = int) -> Iterator[Predicate[Any]]:
     subclasses = [subclass for subclass in Predicate.__subclasses__() if subclass in typed_predicate_type_registry()]
 
-    iterables = [generate_predicate(subclass, max_depth=max_depth, klass=klass) for subclass in subclasses]  # type: ignore
+    iterables = [generate_predicate(subclass, max_depth=max_depth, klass=klass) for subclass in subclasses]
 
     yield from random_first_from_iterables(*iterables)
 
@@ -207,7 +207,7 @@ def random_predicates(*, max_depth: int = 10, klass: type = int) -> Iterator[Pre
 default_length_p: Final = ge_le_p(lower=0, upper=10)
 
 
-def random_sets(length_p: Predicate = default_length_p, value_p: Predicate = is_int_p) -> Iterator[set[Any]]:
+def random_sets(length_p: Predicate[Any] = default_length_p, value_p: Predicate[Any] = is_int_p) -> Iterator[set[Any]]:
     from predicate import generate_true
 
     for length in random_lengths(length_p):
@@ -216,7 +216,9 @@ def random_sets(length_p: Predicate = default_length_p, value_p: Predicate = is_
             yield result
 
 
-def random_frozensets(length_p: Predicate = default_length_p, value_p: Predicate = is_int_p) -> Iterator[frozenset]:
+def random_frozensets(
+    length_p: Predicate[Any] = default_length_p, value_p: Predicate[Any] = is_int_p
+) -> Iterator[frozenset[Any]]:
     yield from (frozenset(random_set) for random_set in random_sets(length_p=length_p, value_p=value_p))
 
 
@@ -281,7 +283,9 @@ def random_ints(lower: int = -sys.maxsize, upper: int = sys.maxsize, **_kwargs: 
         yield from between(100)
 
 
-def random_iterables(length_p: Predicate = default_length_p, value_p: Predicate = is_int_p) -> Iterator[Iterable]:
+def random_iterables(
+    length_p: Predicate[Any] = default_length_p, value_p: Predicate[Any] = is_int_p
+) -> Iterator[Iterable[Any]]:
     # A list or a tuple of each length, so the empty one comes once instead of once per kind; an empty one can be any
     # empty iterable, so e.g. is_dict_p & is_empty_p and is_str_p & is_empty_p still find values
     kinds = (list, tuple)
@@ -292,13 +296,17 @@ def random_iterables(length_p: Predicate = default_length_p, value_p: Predicate 
     )
 
 
-def random_lists(length_p: Predicate = default_length_p, value_p: Predicate = is_int_p) -> Iterator[list[Any]]:
+def random_lists(
+    length_p: Predicate[Any] = default_length_p, value_p: Predicate[Any] = is_int_p
+) -> Iterator[list[Any]]:
     from predicate import generate_true
 
     yield from (take(n, generate_true(value_p)) for n in random_lengths(length_p))
 
 
-def random_tuples(length_p: Predicate = default_length_p, value_p: Predicate = is_int_p) -> Iterator[tuple[Any, ...]]:
+def random_tuples(
+    length_p: Predicate[Any] = default_length_p, value_p: Predicate[Any] = is_int_p
+) -> Iterator[tuple[Any, ...]]:
     yield from (tuple(random_list) for random_list in random_lists(length_p=length_p, value_p=value_p))
 
 
@@ -317,7 +325,7 @@ def random_anys() -> Iterator[Any]:
     yield from interleave(random_bools(), random_ints(), random_strings(), random_floats(), random_datetimes())
 
 
-def random_named_tuples() -> Iterator[tuple]:
+def random_named_tuples() -> Iterator[tuple[Any, ...]]:
     # ponytail: every value gets a fresh namedtuple class; cache classes if that turns out to be slow
     field_names = random_lists(length_p=ge_le_p(lower=0, upper=4), value_p=regex_p("[a-z]{2,4}"))
     for names in field_names:
@@ -325,7 +333,7 @@ def random_named_tuples() -> Iterator[tuple]:
         yield klass(*take(len(klass._fields), random_anys()))
 
 
-def random_named_tuple_instances(klass: type) -> Iterator[tuple]:
+def random_named_tuple_instances(klass: type) -> Iterator[tuple[Any, ...]]:
     from predicate import generate_true
     from predicate.spec.exercise_helpers import annotation_to_predicate, class_hints
 
@@ -337,7 +345,7 @@ def random_named_tuple_instances(klass: type) -> Iterator[tuple]:
 
 
 def random_values_of_type(klass: type) -> Iterator[Any]:
-    type_registry: dict[type, Callable[[], Iterator]] = {
+    type_registry: dict[type, Callable[[], Iterator[Any]]] = {
         bool: random_bools,
         datetime: random_datetimes,
         int: random_ints,
@@ -354,7 +362,7 @@ def random_values_of_type(klass: type) -> Iterator[Any]:
 
 
 def random_constrained_values_of_type(klass: type) -> Iterator[Any]:
-    type_registry: dict[type, Callable[[], Iterator]] = {
+    type_registry: dict[type, Callable[[], Iterator[Any]]] = {
         int: random_ints,
         float: random_floats,
         str: random_strings,
@@ -403,7 +411,7 @@ def generate_uuids(predicate: Predicate[UUID]) -> Iterator[UUID]:
     yield from (item for item in random_uuids() if predicate(item))
 
 
-def generate_anys(predicate: Predicate) -> Iterator[Any]:
+def generate_anys(predicate: Predicate[Any]) -> Iterator[Any]:
     yield from (item for item in random_anys() if predicate(item))
 
 
@@ -415,9 +423,9 @@ def generate_odd_numbers() -> Iterator[int]:
     yield from (value + 1 for value in generate_even_numbers())
 
 
-def function_with_signature(sig: Signature) -> Callable:
+def function_with_signature(sig: Signature) -> Callable[..., Any]:
     # inspect.signature reads __signature__, so the function only needs to carry it
-    def function(*args, **kwargs):
+    def function(*args: Any, **kwargs: Any) -> None:
         return None
 
     function.__signature__ = sig  # type: ignore[attr-defined]
@@ -430,11 +438,11 @@ class CallableObject:
     # Callables usually have a name; code that reports on them (e.g. instrument) reads it
     __name__ = "callable_object"
 
-    def __call__(self, *args, **kwargs):
+    def __call__(self, *args: Any, **kwargs: Any) -> None:
         return None
 
 
-def callable_object_with_signature(sig: Signature) -> Callable:
+def callable_object_with_signature(sig: Signature) -> Callable[..., Any]:
     # inspect.signature reads __signature__ from the instance before it looks at type(obj).__call__
     obj = CallableObject()
     obj.__signature__ = sig  # type: ignore[attr-defined]
@@ -451,25 +459,25 @@ def unused_name(sig: Signature) -> str:
 
 
 @cache
-def _accepted_names(f: Callable) -> frozenset[str] | None:
+def _accepted_names(f: Callable[..., Any]) -> frozenset[str] | None:
     params = signature(f).parameters.values()
     if any(p.kind == Parameter.VAR_KEYWORD for p in params):
         return None  # accepts everything
     return frozenset(p.name for p in params)
 
 
-def accepted_kwargs(f: Callable, kwargs: dict) -> dict:
+def accepted_kwargs(f: Callable[..., Any], kwargs: dict[Any, Any]) -> dict[str, Any]:
     """Keep only the keyword arguments f accepts, e.g. drop length_p for a generator that has no length."""
     if not kwargs or (names := _accepted_names(f)) is None:
         return kwargs
     return {key: value for key, value in kwargs.items() if key in names}
 
 
-def ignore_unknown_kwargs[F: Callable](dispatcher: F) -> F:
+def ignore_unknown_kwargs[F: Callable[..., Any]](dispatcher: F) -> F:
     """Drop keyword arguments the dispatched generator doesn't accept."""
 
     @wraps(dispatcher)
-    def wrapper(predicate, /, **kwargs):
+    def wrapper(predicate: Predicate[Any], /, **kwargs: Any) -> Any:
         f = dispatcher.dispatch(type(predicate))  # type: ignore[attr-defined]
         return f(predicate, **accepted_kwargs(f, kwargs))
 
@@ -537,7 +545,7 @@ def random_sized() -> Iterator[Any]:
 _simple_patterns: Final = (r"", r"a", r"\d+", r"[a-z]*", r"^\w+$", r"(ab|cd)?", r".", r"x{2,3}")
 
 
-def random_patterns(kind: type = str) -> Iterator[re.Pattern]:
+def random_patterns(kind: type = str) -> Iterator[re.Pattern[Any]]:
     patterns = [pattern if kind is str else pattern.encode() for pattern in _simple_patterns]
     yield from repeatfunc(lambda: re.compile(random.choice(patterns)))
 
@@ -593,7 +601,7 @@ def random_ios() -> Iterator[io.IOBase]:
 
 def random_named_tuple_classes() -> Iterator[type]:
     field_names = random_lists(length_p=ge_le_p(lower=0, upper=4), value_p=regex_p("[a-z]{2,4}"))
-    yield from (namedtuple("RandomNamedTuple", unique_everseen(names)) for names in field_names)  # type: ignore[misc]  # noqa: PYI024
+    yield from (namedtuple("RandomNamedTuple", unique_everseen(names)) for names in field_names)  # noqa: PYI024
 
 
 def random_typed_dict_classes() -> Iterator[type]:

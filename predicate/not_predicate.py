@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import ClassVar, override
+from typing import Any, ClassVar, override
 
 from predicate.predicate import Predicate, repr_operand
 
@@ -39,5 +39,5 @@ class NotPredicate[T](Predicate[T]):
         return 1 + self.predicate.count
 
     @override
-    def explain_failure(self, x: T) -> dict:
+    def explain_failure(self, x: T) -> dict[str, Any]:
         return {"predicate": self.predicate.explain(x), "reason": f"not {self.predicate}"}

@@ -1,5 +1,5 @@
 from collections.abc import Iterator
-from typing import TypeGuard, TypeVar
+from typing import Any, TypeGuard, TypeVar
 
 import pytest
 
@@ -172,7 +172,7 @@ def test_exercise_class_with_fn_p_fail():
 
 
 def test_exercise_predicate_klass_not_implemented():
-    class MyPred(Predicate):
+    class MyPred(Predicate[Any]):
         def __call__(self, x: int) -> bool:
             return True
 

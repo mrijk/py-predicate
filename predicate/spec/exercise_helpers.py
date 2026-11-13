@@ -43,9 +43,9 @@ from predicate import all_p, always_false_p, always_true_p, generate_true, is_in
 from predicate.dict_of_predicate import is_dict_of_p
 from predicate.eq_predicate import eq_p
 from predicate.explain import explain
-from predicate.fn_predicate import fn_p
 from predicate.frozendict_of_predicate import is_frozendict_of_p
 from predicate.frozenset_of_predicate import is_frozenset_of_p
+from predicate.function_predicate import fn_p
 from predicate.generator.helpers import random_named_tuple_classes, random_typed_dict_classes
 from predicate.has_length_predicate import is_empty_p
 from predicate.implies import implies
@@ -70,16 +70,16 @@ from predicate.struct_predicate import is_struct_p
 from predicate.tuple_of_predicate import is_tuple_of_p
 from predicate.type_var_predicate import ConstrainedTypeVarPredicate, FreeTypeVarPredicate
 
-_type_narrowing_origins: set = {TypeGuard}
+_type_narrowing_origins: set[Any] = {TypeGuard}
 if sys.version_info >= (3, 13):  # pragma: no cover
     from typing import TypeIs
 
     _type_narrowing_origins.add(TypeIs)
 
-_union_origins: set = {Union, types.UnionType}
+_union_origins: set[Any] = {Union, types.UnionType}
 
 # Abstract collections whose single type argument is the item type; typing.Sequence etc. have the same origins
-_item_collection_origins: set = {
+_item_collection_origins: set[Any] = {
     collections.abc.Collection,
     collections.abc.MutableSequence,
     collections.abc.MutableSet,
@@ -87,10 +87,10 @@ _item_collection_origins: set = {
     collections.abc.Sequence,
     collections.abc.Set,
 }
-_mapping_origins: set = {collections.abc.Mapping, collections.abc.MutableMapping}
+_mapping_origins: set[Any] = {collections.abc.Mapping, collections.abc.MutableMapping}
 
 
-def _signature(f: Callable) -> Signature:
+def _signature(f: Callable[..., Any]) -> Signature:
     if sys.version_info >= (3, 14):  # pragma: no cover
         from annotationlib import Format
 
@@ -107,7 +107,7 @@ def _forward_refs(hint: Any) -> Iterator[ForwardRef]:
         yield from _forward_refs(arg)
 
 
-def _type_hints(owner: Callable, localns: dict[str, Any]) -> dict[str, Any]:
+def _type_hints(owner: Callable[..., Any], localns: dict[str, Any]) -> dict[str, Any]:
     if sys.version_info >= (3, 14):  # pragma: no cover
         from annotationlib import Format
 
@@ -120,7 +120,7 @@ def _type_hints(owner: Callable, localns: dict[str, Any]) -> dict[str, Any]:
     return get_type_hints(owner, localns=localns, include_extras=True)  # pragma: no cover
 
 
-def _hints_or_any(owner: Callable, localns: dict[str, Any]) -> dict[str, Any]:
+def _hints_or_any(owner: Callable[..., Any], localns: dict[str, Any]) -> dict[str, Any]:
     """Resolve each annotation on its own; one that can't be evaluated at runtime becomes Any, with a warning (#292)."""
     annotations = _raw_annotations(owner)
     hints: dict[str, Any] = {}
@@ -137,7 +137,7 @@ def _hints_or_any(owner: Callable, localns: dict[str, Any]) -> dict[str, Any]:
     return hints
 
 
-def _warn_unresolved(owner: Callable, name: str, error: Exception) -> None:
+def _warn_unresolved(owner: Callable[..., Any], name: str, error: Exception) -> None:
     message = f"Annotation of {name!r} in {owner.__qualname__} can't be evaluated at runtime ({error}); treated as Any"
     _warn(message, getattr(inspect.unwrap(owner), "__code__", None), owner.__module__)
 
@@ -154,10 +154,10 @@ def _warn(message: str, code: types.CodeType | None, module: str) -> None:
     )
 
 
-_unresolved_warning_registry: dict = {}
+_unresolved_warning_registry: dict[str | tuple[str, type[Warning], int], int] = {}
 
 
-def _raw_annotations(owner: Callable) -> dict[str, Any]:
+def _raw_annotations(owner: Callable[..., Any]) -> dict[str, Any]:
     if sys.version_info >= (3, 14):  # pragma: no cover
         from annotationlib import Format, get_annotations
 
@@ -172,14 +172,14 @@ def _empty() -> None: ...
 _empty_code = _empty.__code__
 
 
-def callable_name(f: Callable) -> str:
+def callable_name(f: Callable[..., Any]) -> str:
     """Return a name for any callable, e.g. for a partial or an instance of a class with __call__ (#362)."""
     if isinstance(f, partial):
         return callable_name(f.func)
     return getattr(f, "__name__", type(f).__name__)
 
 
-def resolved_signature(f: Callable) -> Signature:
+def resolved_signature(f: Callable[..., Any]) -> Signature:
     # get_type_hints also resolves nested string annotations, e.g. x: "str" under `from __future__ import annotations`
     sig = _signature(f)
     # Python < 3.14 get_type_hints rejects callable instances, so read the hints from their __call__
@@ -241,7 +241,7 @@ def _type_var_annotation(type_var: TypeVar) -> Any:
     return Union[tuple(resolved)]  # noqa: UP007  Union of a tuple; a single member stays itself
 
 
-def _type_var_predicate(type_var: TypeVar) -> Predicate:
+def _type_var_predicate(type_var: TypeVar) -> Predicate[Any]:
     """Return a predicate for a value within T's bound or constraints (binding T to other arguments is #258)."""
     if type_var.__constraints__:
         union = _type_var_annotation(type_var)
@@ -253,7 +253,7 @@ def _type_var_predicate(type_var: TypeVar) -> Predicate:
 
 
 # typing.NamedTuple and typing.TypedDict are functions at runtime: issubclass() and __subclasses__() reject them
-_named_tuple_class_p: Final[Predicate] = fn_p(is_named_tuple_class, generate_true_fn=random_named_tuple_classes)
+_named_tuple_class_p: Final[Predicate[Any]] = fn_p(is_named_tuple_class, generate_true_fn=random_named_tuple_classes)
 
 
 def _is_typed_dict_class(klass: Any) -> bool:
@@ -261,7 +261,7 @@ def _is_typed_dict_class(klass: Any) -> bool:
     return isinstance(klass, type) and issubclass(klass, dict) and hasattr(klass, "__required_keys__")
 
 
-_typed_dict_class_p: Final[Predicate] = fn_p(_is_typed_dict_class, generate_true_fn=random_typed_dict_classes)
+_typed_dict_class_p: Final[Predicate[Any]] = fn_p(_is_typed_dict_class, generate_true_fn=random_typed_dict_classes)
 
 
 def _is_typing_special(klass: Any, name: str) -> bool:
@@ -272,7 +272,7 @@ def _is_typing_special(klass: Any, name: str) -> bool:
     )
 
 
-def type_arg_predicate(arg: Any) -> Predicate:
+def type_arg_predicate(arg: Any) -> Predicate[Any]:
     """Return the predicate for the classes type[arg] stands for (without checking that the value is a class)."""
     match _type_arg_classes(arg):
         case (klass,) if _is_typing_special(klass, "NamedTuple"):
@@ -292,7 +292,7 @@ def _flatten_unions(classes: tuple[Any, ...]) -> Iterator[Any]:
             yield klass
 
 
-def _io_predicate(annotation: Any) -> Predicate | None:
+def _io_predicate(annotation: Any) -> Predicate[Any] | None:
     # typing.IO classes are for type checkers only: io.BytesIO() isn't an instance of typing.IO, but is an io.IOBase
     if annotation is BinaryIO or annotation == IO[bytes]:
         return is_instance_p(io.IOBase) & ~is_instance_p(io.TextIOBase)  # SpooledTemporaryFile isn't BufferedIOBase
@@ -342,7 +342,7 @@ def _class_hint(klass: type, name: str, raw: Any, namespace: dict[str, Any], inc
         return Any
 
 
-def _typed_dict_predicate(klass: type) -> Predicate:
+def _typed_dict_predicate(klass: type) -> Predicate[Any]:
     # ponytail: extra keys are rejected (like a dict literal for a type checker); a TypedDict subtype passed for its
     # base would fail. A recursive reference (children: list["Node"]) is only checked to be a dict.
     if klass in _typed_dicts_in_progress:
@@ -377,7 +377,7 @@ def _unwrap_alias(annotation: Any) -> Any:
             return annotation
 
 
-def annotation_to_predicate(annotation: Any) -> Predicate:  # noqa: C901 # complexipy: ignore
+def annotation_to_predicate(annotation: Any) -> Predicate[Any]:  # noqa: C901 # complexipy: ignore
     annotation = _unwrap_alias(annotation)
     if get_origin(annotation) is Annotated:
         # The type plus its annotated-types constraints, e.g. Annotated[int, Gt(0)] -> is_int_p & gt_p(0) (#384)
@@ -449,7 +449,7 @@ def annotation_to_predicate(annotation: Any) -> Predicate:  # noqa: C901 # compl
     return is_instance_p(annotation)
 
 
-def get_return_predicate(sig: Signature) -> Predicate:
+def get_return_predicate(sig: Signature) -> Predicate[Any]:
     return annotation_to_predicate(sig.return_annotation)
 
 
@@ -462,7 +462,7 @@ def check_ret_name(sig: Signature, spec: Spec) -> None:
         raise InvalidSpecError(f"Parameter '{name}' clashes with the fn return value name, set 'ret_name' in the spec")
 
 
-def _validate_args(f: Callable, spec: Spec) -> dict[str, Predicate]:
+def _validate_args(f: Callable[..., Any], spec: Spec) -> dict[str, Predicate[Any]]:
     # Copy, so filling in annotation predicates doesn't change the caller's spec
     parameters = dict(spec["args"])
     sig = resolved_signature(f)
@@ -474,17 +474,17 @@ def _validate_args(f: Callable, spec: Spec) -> dict[str, Predicate]:
     return parameters
 
 
-def get_return_spec(f: Callable, spec: Spec) -> Spec:
+def get_return_spec(f: Callable[..., Any], spec: Spec) -> Spec:
     if not spec.get("ret"):
         sig = resolved_signature(f)
 
         if sig.return_annotation == sig.empty:
             raise InvalidSpecError("Return annotation not in spec")
-        return spec | {"ret": annotation_to_predicate(sig.return_annotation)}
+        return {**spec, "ret": annotation_to_predicate(sig.return_annotation)}
     return spec
 
 
-def check_signature_against_spec(f: Callable, spec: Spec) -> Spec:
+def check_signature_against_spec(f: Callable[..., Any], spec: Spec) -> Spec:
     sig = resolved_signature(f)
 
     parameters = _validate_args(f, spec)
@@ -498,7 +498,7 @@ def check_signature_against_spec(f: Callable, spec: Spec) -> Spec:
     return spec
 
 
-def _check_parameter(key: str, parameter: Parameter, parameters: dict[str, Predicate]) -> None:
+def _check_parameter(key: str, parameter: Parameter, parameters: dict[str, Predicate[Any]]) -> None:
     annotation = parameter.annotation
     if annotation == parameter.empty or type(annotation) is TypeVar:
         if key not in parameters:
@@ -510,7 +510,7 @@ def _check_parameter(key: str, parameter: Parameter, parameters: dict[str, Predi
             raise InvalidSpecError("Spec predicate is not a constrained annotation")
 
 
-def exercise_param_predicate(param: Parameter) -> Predicate:
+def exercise_param_predicate(param: Parameter) -> Predicate[Any]:
     """Return the predicate exercise generates arguments from, when the spec doesn't name the parameter.
 
     A plain **kwargs gets no keywords: it's almost always forwarded to a callee with a fixed set of keywords, so random
@@ -522,7 +522,7 @@ def exercise_param_predicate(param: Parameter) -> Predicate:
     return param_predicate(param)
 
 
-def param_predicate(param: Parameter) -> Predicate:
+def param_predicate(param: Parameter) -> Predicate[Any]:
     if param.kind == Parameter.VAR_KEYWORD and get_origin(param.annotation) is Unpack:
         # **kwargs: Unpack[TD] (PEP 692): the kwargs dict itself must match TD, not each of its values (#343)
         return annotation_to_predicate(first(get_args(param.annotation)))
@@ -539,15 +539,15 @@ def param_predicate(param: Parameter) -> Predicate:
 _positional_kinds = (Parameter.POSITIONAL_ONLY, Parameter.POSITIONAL_OR_KEYWORD, Parameter.VAR_POSITIONAL)
 
 
-def _positional_values(param: Parameter, arg) -> Iterator:
+def _positional_values(param: Parameter, arg: Any) -> Iterator[Any]:
     yield from arg if param.kind == Parameter.VAR_POSITIONAL else [arg]
 
 
-def _keyword_items(param: Parameter, arg) -> Iterator[tuple[str, Any]]:
+def _keyword_items(param: Parameter, arg: Any) -> Iterator[tuple[str, Any]]:
     yield from arg.items() if param.kind == Parameter.VAR_KEYWORD else [(param.name, arg)]
 
 
-def call_args(sig: Signature, value: dict) -> tuple[list, dict]:
+def call_args(sig: Signature, value: dict[str, Any]) -> tuple[list[Any], dict[str, Any]]:
     # Leading parameters go positionally (in signature order) so *args and positional-only parameters bind correctly
     positional = list(
         takewhile(lambda param: param.name in value and param.kind in _positional_kinds, sig.parameters.values())
@@ -567,7 +567,7 @@ def _generate_with_pre_condition[T](candidates: Iterable[T], *, pre: Callable[..
     return values
 
 
-def generate_values(spec: Spec, n: int) -> tuple:
+def generate_values(spec: Spec, n: int) -> tuple[Any, ...]:
     parameters = spec["args"]
     return_p = spec["ret"]
     if predicates := tuple(parameters.items()):
@@ -620,7 +620,7 @@ def _conforms(annotation: Any, value: Any, bindings: dict[TypeVar, tuple[type, .
     return True  # ponytail: other generics (Callable[[T], U], Iterator[T], ...) can't be bound at runtime
 
 
-def type_var_failure(sig: Signature, arguments: dict, result: Any) -> str | None:
+def type_var_failure(sig: Signature, arguments: dict[str, Any], result: Any) -> str | None:
     """Return why result isn't an instance of the types the arguments bind the return's type variables to (#258).
 
     No evidence (an empty container, T only in the return) means no check. Arguments needn't share one type.
@@ -637,11 +637,11 @@ def type_var_failure(sig: Signature, arguments: dict, result: Any) -> str | None
     return f"{result!r} doesn't match the type variables bound by the arguments ({names})"
 
 
-def _get_values(argument: Any, param: Parameter) -> list:
+def _get_values(argument: Any, param: Parameter) -> list[Any]:
     return argument if param.kind == Parameter.VAR_POSITIONAL else [argument]
 
 
-def _get_bound_arguments(sig: Signature, arguments: dict) -> dict[TypeVar, set[type]]:
+def _get_bound_arguments(sig: Signature, arguments: dict[str, Any]) -> dict[TypeVar, set[type]]:
     bound: dict[TypeVar, set[type]] = {}
     bound_arguments = (
         (param, _get_values(arguments[name], param)) for name, param in sig.parameters.items() if name in arguments
@@ -654,7 +654,9 @@ def _get_bound_arguments(sig: Signature, arguments: dict) -> dict[TypeVar, set[t
     return bound
 
 
-def verify_result(spec: Spec, return_p: Predicate, value: dict, result: Any, sig: Signature | None = None) -> None:
+def verify_result(
+    spec: Spec, return_p: Predicate[Any], value: dict[str, Any], result: Any, sig: Signature | None = None
+) -> None:
     if not return_p(result):
         raise SpecViolationError(f"Not conform spec: {explain(return_p, result)}")
 
@@ -676,7 +678,7 @@ GENERATOR_ITEMS: Final = 100
 """How many items exercise takes from a (async) generator function's result: enough to run its body (#380)."""
 
 
-def yield_predicate(f: Callable) -> Predicate | None:
+def yield_predicate(f: Callable[..., Any]) -> Predicate[Any] | None:
     """Return the predicate for the items a (async) generator function yields, or None for any other function.
 
     T from Iterator[T], Iterable[T], Generator[T, S, R], AsyncIterator[T], ...; without a T, any item is fine.
@@ -687,9 +689,9 @@ def yield_predicate(f: Callable) -> Predicate | None:
     return annotation_to_predicate(args[0]) if args else always_true_p
 
 
-async def take_async(values: Any, n: int) -> list:
+async def take_async(values: Any, n: int) -> list[Any]:
     """Return the first n items of an async iterator, like take()."""
-    items: list = []
+    items: list[Any] = []
     async for item in values:
         items.append(item)
         if len(items) == n:
@@ -697,14 +699,14 @@ async def take_async(values: Any, n: int) -> list:
     return items
 
 
-def verify_items(item_p: Predicate, value: dict, items: list) -> None:
+def verify_items[T](item_p: Predicate[Any], value: dict[str, Any], items: list[T]) -> None:
     """Check the items a generator function yielded for the inputs in value."""
     items_p = all_p(item_p)
     if not items_p(items):
         raise SpecViolationError(f"Not conform spec: yielded {explain(items_p, items)} for inputs {value}")
 
 
-def check_exception(spec: Spec, value: dict, exc: Exception) -> Exception:
+def check_exception(spec: Spec, value: dict[str, Any], exc: Exception) -> Exception:
     expected = spec.get("raises")
     if not expected:
         raise exc

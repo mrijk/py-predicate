@@ -1,5 +1,5 @@
 from functools import partial
-from typing import Callable
+from typing import Any, Callable
 
 from predicate.all_predicate import all_p
 from predicate.comp_predicate import comp_p
@@ -29,21 +29,21 @@ is_number_p = is_int_p | is_float_p | is_complex_p
 """Returns True if the value is a number (int, float, or complex, but not bool), otherwise False."""
 
 
-def is_iterable_of_p[T](predicate: Predicate[T]) -> Predicate:
+def is_iterable_of_p[T](predicate: Predicate[T]) -> Predicate[Any]:
     """Return True if value is an iterable, and for all elements the predicate is True, otherwise False."""
     return is_iterable_p & all_p(predicate)
 
 
-def is_single_or_iterable_of_p[T](predicate: Predicate[T]) -> Predicate:
+def is_single_or_iterable_of_p[T](predicate: Predicate[T]) -> Predicate[Any]:
     """Return True if value is an iterable or a single value, and for all elements the predicate is True, otherwise False."""
     return is_iterable_of_p(predicate) | predicate
 
 
-root_p: PredicateFactory = PredicateFactory(factory=RootPredicate)
-this_p: PredicateFactory = PredicateFactory(factory=ThisPredicate)
+root_p: PredicateFactory[Any] = PredicateFactory(factory=RootPredicate)
+this_p: PredicateFactory[Any] = PredicateFactory(factory=ThisPredicate)
 
 
-def dict_depth(value: dict) -> int:
+def dict_depth(value: dict[Any, Any]) -> int:
     match value:
         case list(l):
             return 1 + max(dict_depth(item) for item in l) if l else 0
@@ -53,7 +53,7 @@ def dict_depth(value: dict) -> int:
             return 1
 
 
-def depth_op_p(depth: int, predicate: Callable[[int], Predicate]) -> Predicate[dict]:
+def depth_op_p(depth: int, predicate: Callable[[int], Predicate[Any]]) -> Predicate[dict[Any, Any]]:
     return comp_p(dict_depth, predicate(depth))
 
 

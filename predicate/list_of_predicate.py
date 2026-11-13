@@ -34,7 +34,7 @@ class ListOfPredicate[T](Predicate[T]):
         return Predicate[self.predicate.klass]  # type: ignore[name-defined]
 
     @override
-    def explain_failure(self, x: Any, *args, **kwargs) -> dict:
+    def explain_failure(self, x: Any, *args: Any, **kwargs: Any) -> dict[str, Any]:
         match x:
             case list(l):
                 index, item = first((i, v) for i, v in enumerate(l) if not self.predicate(v))
@@ -48,6 +48,6 @@ def is_list_of_p[T](predicate: Predicate[T]) -> "ListOfPredicate[T]":
     return ListOfPredicate(predicate)
 
 
-def is_single_or_list_of_p[T](predicate: Predicate[T]) -> Predicate:
+def is_single_or_list_of_p[T](predicate: Predicate[T]) -> Predicate[Any]:
     """Return True if value is a list or a single value, and for all elements in the list the predicate is True, otherwise False."""
     return is_list_of_p(predicate) | predicate

@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Callable
+from typing import Any, Callable
 
 from predicate.predicate import Predicate
 
@@ -8,13 +8,13 @@ from predicate.predicate import Predicate
 class PredicateFactory[T](Predicate[T]):
     """Test."""
 
-    factory: Callable[[], Predicate]
+    factory: Callable[[], Predicate[Any]]
 
     @property
-    def predicate(self) -> Predicate:
+    def predicate(self) -> Predicate[Any]:
         return self.factory()
 
-    def __call__(self, *args, **kwargs) -> bool:
+    def __call__(self, *args: Any, **kwargs: Any) -> bool:
         raise ValueError("Don't call PredicateFactory directly")
 
     def __repr__(self) -> str:

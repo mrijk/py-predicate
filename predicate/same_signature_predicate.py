@@ -97,7 +97,7 @@ def _compare_signatures(f_sig: Signature, g_sig: Signature) -> str | None:
 class SameSignaturePredicate[T](Predicate[T]):
     """A predicate class that models the 'same signature as predicate."""
 
-    function: Callable
+    function: Callable[..., Any]
     strict: bool
 
     def __call__(self, function: type) -> bool:
@@ -120,10 +120,10 @@ class SameSignaturePredicate[T](Predicate[T]):
         return f"same_signature_p({self.function.__name__})"
 
     @override
-    def explain_failure(self, function: type) -> dict:
+    def explain_failure(self, function: type) -> dict[str, Any]:
         return {"reason": self._failure(function)}
 
 
-def same_signature_p(function: Callable, strict: bool = False) -> Predicate:
+def same_signature_p(function: Callable[..., Any], strict: bool = False) -> Predicate[Any]:
     """Return True if value has the same signature, otherwise False."""
     return SameSignaturePredicate(function=function, strict=strict)

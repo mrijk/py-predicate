@@ -60,20 +60,20 @@ from predicate.tuple_of_predicate import TupleOfPredicate
 from predicate.xor_predicate import XorPredicate
 
 
-def dict_to_json(predicates: dict[str, Predicate]) -> dict[str, Any]:
+def dict_to_json(predicates: dict[str, Predicate[Any]]) -> dict[str, Any]:
     return {key: to_json(value) for key, value in predicates.items()}
 
 
-def list_to_json(predicates: list[Predicate]) -> list[dict[str, Any]]:
+def list_to_json(predicates: list[Predicate[Any]]) -> list[dict[str, Any]]:
     return [to_json(predicate) for predicate in predicates]
 
 
-def to_json(predicate: Predicate) -> dict[str, Any]:  # noqa: C901
+def to_json(predicate: Predicate[Any]) -> dict[str, Any]:  # noqa: C901
     """Format predicate as json."""
     return dict([_to_value(predicate)])
 
 
-def _to_value(predicate) -> tuple[str, Any]:  # noqa: C901
+def _to_value(predicate: Predicate[Any]) -> tuple[str, Any]:  # noqa: C901
     match predicate:
         case CompiledPredicate(predicate=inner):
             return _to_value(inner)
@@ -114,7 +114,7 @@ def _to_value(predicate) -> tuple[str, Any]:  # noqa: C901
         case ImpliesPredicate(predicate):
             return "implies", {"predicate": to_json(predicate)}
         case InPredicate(v):
-            return "in", {"v": list(cast(Iterable, v))}
+            return "in", {"v": list(cast(Iterable[Any], v))}
         case IntersectsPredicate(v):
             return "intersects", {"v": list(v)}
         case IsClosePredicate(target, rel_tol, abs_tol):
@@ -168,7 +168,7 @@ def _to_value(predicate) -> tuple[str, Any]:  # noqa: C901
         case NePredicate(v):
             return "ne", {"v": v}
         case NotInPredicate(v):
-            return "not_in", {"v": list(cast(Iterable, v))}
+            return "not_in", {"v": list(cast(Iterable[Any], v))}
         case NotPredicate(not_predicate):
             return "not", {"predicate": to_json(not_predicate)}
         case OptionalPredicate(predicate):

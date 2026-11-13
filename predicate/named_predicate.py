@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import override
+from typing import Any, override
 
 from predicate.and_predicate import AndPredicate
 from predicate.implies import Implies
@@ -25,11 +25,11 @@ class NamedPredicate[T](Predicate[T]):
         return self.name
 
     @override
-    def explain_failure(self, x: T) -> dict:
+    def explain_failure(self, x: T) -> dict[str, Any]:
         return {"reason": f"{self.name} is False for {x}"}
 
 
-def _to_named_predicate(predicate: Predicate, names_map: dict[str, NamedPredicate]) -> Predicate:
+def _to_named_predicate(predicate: Predicate[Any], names_map: dict[str, NamedPredicate[Any]]) -> Predicate[Any]:
     """Convert any predicate to a named predicate."""
 
     def next_name() -> str:
@@ -52,5 +52,5 @@ def _to_named_predicate(predicate: Predicate, names_map: dict[str, NamedPredicat
             return named_predicate
 
 
-def to_named_predicate(predicate: Predicate) -> Predicate:
+def to_named_predicate(predicate: Predicate[Any]) -> Predicate[Any]:
     return _to_named_predicate(predicate, {})

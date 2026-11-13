@@ -2,7 +2,7 @@ import inspect
 from functools import partial
 from itertools import count
 from types import UnionType
-from typing import Iterable, get_args
+from typing import Any, Iterable, get_args
 
 import graphviz  # type: ignore
 from graphviz import Digraph
@@ -73,7 +73,7 @@ from predicate.tuple_of_predicate import TupleOfPredicate
 from predicate.xor_predicate import XorPredicate
 
 
-def to_dot(predicate: Predicate, predicate_string: str | None = None, show_optimized: bool = False) -> Digraph:
+def to_dot(predicate: Predicate[Any], predicate_string: str | None = None, show_optimized: bool = False) -> Digraph:
     """Format predicate as a .dot file."""
     label = predicate_string if predicate_string else repr(predicate)
 
@@ -81,9 +81,7 @@ def to_dot(predicate: Predicate, predicate_string: str | None = None, show_optim
 
     node_attr = {"shape": "rectangle", "style": "filled", "fillcolor": "#B7D7A8"}
 
-    edge_attr: dict = {}
-
-    dot = graphviz.Digraph(graph_attr=graph_attr, node_attr=node_attr, edge_attr=edge_attr)
+    dot = graphviz.Digraph(graph_attr=graph_attr, node_attr=node_attr, edge_attr={})
 
     node_nr = count()
 
@@ -95,10 +93,10 @@ def to_dot(predicate: Predicate, predicate_string: str | None = None, show_optim
     return dot
 
 
-def render(dot: Digraph, predicate: Predicate, node_nr: count) -> None:  # noqa: C901 # complexipy: ignore
-    node_predicate_mapping: dict[str, Predicate] = {}
+def render(dot: Digraph, predicate: Predicate[Any], node_nr: "count[Any]") -> None:  # noqa: C901 # complexipy: ignore
+    node_predicate_mapping: dict[str, Predicate[Any]] = {}
 
-    def _add_node(name: str, *, label: str, predicate: Predicate | None) -> str:
+    def _add_node(name: str, *, label: str, predicate: Predicate[Any] | None) -> str:
         node = next(node_nr)
         unique_name = f"{name}_{node}"
         dot.node(unique_name, label=label)
@@ -106,19 +104,21 @@ def render(dot: Digraph, predicate: Predicate, node_nr: count) -> None:  # noqa:
             node_predicate_mapping[unique_name] = predicate
         return unique_name
 
-    def _add_node_left_right(name: str, *, label: str, predicate: Predicate, left: Predicate, right: Predicate) -> str:
+    def _add_node_left_right(
+        name: str, *, label: str, predicate: Predicate[Any], left: Predicate[Any], right: Predicate[Any]
+    ) -> str:
         node = _add_node(name, label=label, predicate=predicate)
         dot.edge(node, to_value(left))
         dot.edge(node, to_value(right))
 
         return node
 
-    def _add_node_with_child(name: str, *, label: str, predicate: Predicate, child: Predicate) -> str:
+    def _add_node_with_child(name: str, *, label: str, predicate: Predicate[Any], child: Predicate[Any]) -> str:
         node = _add_node(name, label=label, predicate=predicate)
         dot.edge(node, to_value(child))
         return node
 
-    def to_value(predicate: Predicate):  # noqa: C901
+    def to_value(predicate: Predicate[Any]) -> str:  # noqa: C901
         add_node = partial(_add_node, predicate=predicate)
         add_node_left_right = partial(_add_node_left_right, predicate=predicate)
         add_node_with_child = partial(_add_node_with_child, predicate=predicate)
@@ -193,7 +193,7 @@ def render(dot: Digraph, predicate: Predicate, node_nr: count) -> None:  # noqa:
             case Implies(left, right):
                 return add_node_left_right("implies", label="=>", left=left, right=right)
             case IsInstancePredicate(klass):
-                name = klass[0].__name__  # type: ignore
+                name = klass[0].__name__
                 return add_node("instance", label=f"is_{name}_p")
             case IsNonePredicate():
                 return add_node("none", label="x = None")
@@ -227,7 +227,7 @@ def render(dot: Digraph, predicate: Predicate, node_nr: count) -> None:  # noqa:
                         graph.node(unique_name, label=repr(predicate))
                         graph.edge(unique_name, "evaluate")
                     graph.node("evaluate", label=repr(evaluate))
-                    return None
+                    return "evaluate"
             case LazyPredicate(ref):
                 return add_node("lazy", label=ref)
             case LePredicate(v):
@@ -289,11 +289,11 @@ def render(dot: Digraph, predicate: Predicate, node_nr: count) -> None:  # noqa:
     _render_lazy_references(dot, node_predicate_mapping)
 
 
-def _render_lazy_references(dot: Digraph, node_predicate_mapping: dict[str, Predicate]) -> None:
-    def find_in_mapping(lookup: Predicate) -> str:
+def _render_lazy_references(dot: Digraph, node_predicate_mapping: dict[str, Predicate[Any]]) -> None:
+    def find_in_mapping(lookup: Predicate[Any]) -> str:
         return first(node for node, predicate in node_predicate_mapping.items() if predicate == lookup)
 
-    def add_dashed_line(node: str, lookup: Predicate) -> None:
+    def add_dashed_line(node: str, lookup: Predicate[Any]) -> None:
         found = find_in_mapping(lookup)
         dot.edge(node, found, style="dashed")
 
@@ -309,14 +309,14 @@ def _render_lazy_references(dot: Digraph, node_predicate_mapping: dict[str, Pred
                 add_dashed_line(node, this)
 
 
-def _render_original(dot: Digraph, predicate: Predicate, node_nr: count) -> None:
+def _render_original(dot: Digraph, predicate: Predicate[Any], node_nr: "count[Any]") -> None:
     with dot.subgraph(name="cluster_original") as original:
         original.attr(style="filled", color="lightgrey")
         original.attr(label="Original predicate")
         render(original, predicate, node_nr)
 
 
-def _render_optimized(dot: Digraph, predicate: Predicate, node_nr: count) -> None:
+def _render_optimized(dot: Digraph, predicate: Predicate[Any], node_nr: "count[Any]") -> None:
     optimized_predicate = optimize(predicate)
 
     with dot.subgraph(name="cluster_optimized") as optimized:

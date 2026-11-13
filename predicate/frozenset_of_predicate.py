@@ -9,7 +9,7 @@ from predicate.predicate import Predicate
 class FrozenSetOfPredicate[T](Predicate[T]):
     """A predicate class that models the frozenset_of predicate."""
 
-    predicate: Predicate
+    predicate: Predicate[Any]
 
     def __call__(self, x: Any) -> TypeGuard[frozenset[T]]:
         match x:
@@ -29,7 +29,7 @@ class FrozenSetOfPredicate[T](Predicate[T]):
         return self.predicate.klass
 
     @override
-    def explain_failure(self, x: frozenset[T]) -> dict:
+    def explain_failure(self, x: frozenset[T]) -> dict[str, Any]:
         match x:
             case frozenset() as s:
                 fail = first_false(s, self.predicate)

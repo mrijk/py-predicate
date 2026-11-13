@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from inspect import getmembers, isfunction
-from typing import override
+from typing import Any, override
 
 from predicate.predicate import Predicate
 from predicate.same_signature_predicate import same_signature_p
@@ -8,7 +8,7 @@ from predicate.same_signature_predicate import same_signature_p
 
 def protocol_members(protocol: type) -> set[str]:
     # ponytail: __protocol_attrs__ is private API (3.12+); typing.get_protocol_members once we require 3.13
-    return protocol.__protocol_attrs__  # type: ignore[attr-defined]
+    return set(protocol.__protocol_attrs__)  # type: ignore[attr-defined]
 
 
 @dataclass
@@ -44,10 +44,10 @@ class ImplementsProtocolPredicate[T](Predicate[T]):
         return f"implements_protocol_p({self.protocol.__name__}{args_match})"
 
     @override
-    def explain_failure(self, x: type) -> dict:
+    def explain_failure(self, x: type) -> dict[str, Any]:
         return {"reason": self._failure(x)}
 
 
-def implements_protocol_p(protocol: type, args_match: bool = False) -> Predicate:
+def implements_protocol_p(protocol: type, args_match: bool = False) -> Predicate[Any]:
     """Return True if value is Protocol, otherwise False."""
     return ImplementsProtocolPredicate(protocol=protocol, args_match=args_match)

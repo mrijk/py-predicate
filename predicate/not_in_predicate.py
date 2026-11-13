@@ -24,7 +24,7 @@ class NotInPredicate[T](Predicate[T]):
         return f"not_in_p({self.v.__class__.__name__}())"
 
     @override
-    def explain_failure(self, x: Any) -> dict:
+    def explain_failure(self, x: Any) -> dict[str, Any]:
         return {"reason": f"{x} is in {self!r}"}
 
     @override

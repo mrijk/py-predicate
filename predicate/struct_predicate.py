@@ -12,8 +12,8 @@ from predicate.predicate import Predicate
 class StructPredicate[T](Predicate[T]):
     """A predicate class that models the struct_p predicate."""
 
-    required: dict[str, Predicate]
-    optional: dict[str, Predicate]
+    required: dict[str, Predicate[Any]]
+    optional: dict[str, Predicate[Any]]
 
     def __call__(self, x: Any) -> bool:
         if not isinstance(x, Mapping):
@@ -21,7 +21,7 @@ class StructPredicate[T](Predicate[T]):
 
         return not any(self._failures(x))
 
-    def _failures(self, x: Mapping) -> Iterator[dict]:
+    def _failures(self, x: Mapping[Any, Any]) -> Iterator[dict[str, Any]]:
         if additional := set(x) - set(self.required) - set(self.optional):
             yield {"reason": f"Field `{first(additional)}` is unknown"}
 
@@ -41,14 +41,14 @@ class StructPredicate[T](Predicate[T]):
         )
 
     @override
-    def explain_failure(self, x: Any, *args, **kwargs) -> dict:
+    def explain_failure(self, x: Any, *args: Any, **kwargs: Any) -> dict[str, Any]:
         if not isinstance(x, Mapping):
             return {"reason": f"{x} is not an instance of a Mapping"}
 
         return first(self._failures(x), {"reason": "Unknown"})
 
 
-def value_failure(key: str, value: Any, predicate: Predicate) -> dict:
+def value_failure(key: str, value: Any, predicate: Predicate[Any]) -> dict[str, Any]:
     return {
         "key": key,
         "value": value,
@@ -57,7 +57,7 @@ def value_failure(key: str, value: Any, predicate: Predicate) -> dict:
 
 
 def is_struct_p(
-    required: dict[str, Predicate] | None = None, optional: dict[str, Predicate] | None = None
-) -> Predicate:
+    required: dict[str, Predicate[Any]] | None = None, optional: dict[str, Predicate[Any]] | None = None
+) -> Predicate[Any]:
     """Return True if value matches the defined struct, otherwise False."""
     return StructPredicate(required=required or {}, optional=optional or {})

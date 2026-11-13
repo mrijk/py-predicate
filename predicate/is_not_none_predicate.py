@@ -1,11 +1,11 @@
 import sys
 from dataclasses import dataclass
-from typing import Final, override
+from typing import Any, Final, override
 
 if sys.version_info >= (3, 13):
     from typing import TypeIs
 else:
-    from typing import TypeGuard as TypeIs  # type: ignore[assignment]  # approximation for Python < 3.13
+    from typing import TypeGuard as TypeIs  # type: ignore[assignment,unused-ignore]  # approximation for Python < 3.13
 
 from predicate.and_predicate import and_p
 from predicate.predicate import Predicate, predicate_partial
@@ -22,11 +22,11 @@ class IsNotNonePredicate[T](Predicate[T]):
         return "is_not_none_p"
 
     @override
-    def explain_failure(self, _x: T) -> dict:
+    def explain_failure(self, _x: T) -> dict[str, Any]:
         return {"reason": "Value is None"}
 
 
-is_not_none_p: Final[IsNotNonePredicate] = IsNotNonePredicate()
+is_not_none_p: Final[IsNotNonePredicate[Any]] = IsNotNonePredicate()
 """Return True if value is not None, otherwise False."""
 
 

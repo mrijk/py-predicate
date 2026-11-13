@@ -22,7 +22,7 @@ class HasLengthPredicate[T](Predicate[T]):
         return f"has_length_p({self.length_p!r})"
 
     @override
-    def explain_failure(self, iterable: Iterable[T]) -> dict:
+    def explain_failure(self, iterable: Iterable[T]) -> dict[str, Any]:
         return {"reason": f"Expected length {self.length_p!r}, actual: {ilen(iterable)}"}
 
     @override
@@ -33,13 +33,13 @@ class HasLengthPredicate[T](Predicate[T]):
                 yield end
 
 
-def has_length_p(length_p: Predicate[int]) -> Predicate[Iterable]:
+def has_length_p(length_p: Predicate[int]) -> Predicate[Iterable[Any]]:
     """Return True if length of iterable is equal to value, otherwise False."""
     return HasLengthPredicate(length_p=length_p)
 
 
-is_empty_p: Final[Predicate[Iterable]] = has_length_p(zero_p)
+is_empty_p: Final[Predicate[Iterable[Any]]] = has_length_p(zero_p)
 """Predicate that returns True if the iterable is empty, otherwise False."""
 
-is_not_empty_p: Final[Predicate[Iterable]] = has_length_p(pos_p)
+is_not_empty_p: Final[Predicate[Iterable[Any]]] = has_length_p(pos_p)
 """Predicate that returns True if the iterable is not empty, otherwise False."""

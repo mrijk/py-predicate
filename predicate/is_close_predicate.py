@@ -1,6 +1,6 @@
 import math
 from dataclasses import dataclass, field
-from typing import override
+from typing import Any, override
 
 from predicate.predicate import Predicate
 
@@ -25,10 +25,10 @@ class IsClosePredicate[T](Predicate[T]):
         return f"is_close_p({self.target!r}, rel_tol={self.rel_tol!r}, abs_tol={self.abs_tol!r})"
 
     @override
-    def explain_failure(self, x: float) -> dict:
+    def explain_failure(self, x: float) -> dict[str, Any]:
         return {"reason": f"{x} is not close to {self.target!r}"}
 
 
-def is_close_p(target: float, *, rel_tol: float = 1e-9, abs_tol: float = 0.0) -> IsClosePredicate:
+def is_close_p(target: float, *, rel_tol: float = 1e-9, abs_tol: float = 0.0) -> IsClosePredicate[Any]:
     """Return True if the value is approximately equal to target, otherwise False."""
     return IsClosePredicate(target=target, rel_tol=rel_tol, abs_tol=abs_tol)
