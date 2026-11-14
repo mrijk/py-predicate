@@ -20,6 +20,7 @@ from predicate.always_false_predicate import AlwaysFalsePredicate
 from predicate.always_true_predicate import AlwaysTruePredicate
 from predicate.and_predicate import AndPredicate
 from predicate.any_predicate import AnyPredicate
+from predicate.count_predicate import CountPredicate
 from predicate.dict_of_predicate import DictOfPredicate
 from predicate.eq_predicate import EqPredicate
 from predicate.fn_predicate import is_even_p, is_finite_p, is_inf_p, is_nan_p, is_normal_p, is_odd_p, is_subnormal_p
@@ -217,10 +218,24 @@ def _from_sized(predicate: Predicate[Any]) -> SearchStrategy[Any] | None:
             # sampled_from checks the whole range for a filter, so even a narrow length_p can't fail a health check
             lengths = st.sampled_from(range(_MAX_LENGTH + 1)).filter(length_p)
             return lengths.flatmap(lambda n: st.lists(st.integers(), min_size=n, max_size=n))
+        case CountPredicate(inner, length_p):
+            return _from_count(inner, length_p).filter(predicate)
         case HasKeyPredicate(key_p):
             return from_predicate(key_p).flatmap(_dicts_with_key).filter(predicate)
         case _:
             return None
+
+
+# ponytail: counts above this aren't generated, raise it if a count_p needs them
+_MAX_COUNT = 10
+
+
+def _from_count(inner: Predicate[Any], length_p: Predicate[int]) -> SearchStrategy[list[Any]]:
+    """Return a shuffled list with n elements matching inner, for an n that satisfies length_p, plus other elements."""
+    counts = sampled_from(range(_MAX_COUNT + 1)).filter(length_p)
+    fillers = st.lists(from_predicate(negate(inner)), max_size=_MAX_COUNT)
+    matching = counts.flatmap(lambda n: st.lists(from_predicate(inner), min_size=n, max_size=n))
+    return st.tuples(matching, fillers).flatmap(lambda parts: st.permutations([*parts[0], *parts[1]]))
 
 
 def _dicts_with_key(key: Any) -> SearchStrategy[dict[Any, Any]]:

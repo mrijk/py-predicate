@@ -8,7 +8,9 @@ from predicate import (
     always_false_p,
     always_true_p,
     any_p,
+    count_p,
     eq_p,
+    exactly_one_p,
     fn_p,
     ge_p,
     gt_p,
@@ -43,6 +45,9 @@ from predicate import (
 from predicate.integrations.hypothesis import from_predicate, given_predicate
 
 predicates = [
+    count_p(ge_p(0), eq_p(2)),
+    count_p(is_int_p, ge_p(1) & lt_p(4)),
+    exactly_one_p(is_str_p),
     is_even_p,
     is_odd_p,
     is_finite_p,
