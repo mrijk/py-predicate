@@ -15,6 +15,7 @@ from predicate import (
     ge_p,
     gt_p,
     in_p,
+    is_async_p,
     is_dict_of_p,
     is_enum_p,
     is_even_p,
@@ -25,7 +26,9 @@ from predicate import (
     is_inf_p,
     is_int_enum_p,
     is_int_p,
+    is_lambda_p,
     is_list_of_p,
+    is_named_tuple_p,
     is_nan_p,
     is_none_p,
     is_normal_p,
@@ -45,6 +48,9 @@ from predicate import (
 from predicate.integrations.hypothesis import from_predicate, given_predicate
 
 predicates = [
+    is_lambda_p,
+    is_async_p,
+    is_named_tuple_p,
     count_p(ge_p(0), eq_p(2)),
     count_p(is_int_p, ge_p(1) & lt_p(4)),
     exactly_one_p(is_str_p),

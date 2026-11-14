@@ -9,6 +9,7 @@ import sys
 from collections.abc import Callable, Iterable, Iterator
 from contextlib import suppress
 from functools import reduce
+from itertools import islice
 from typing import Any, Literal
 
 from hypothesis import given
@@ -27,6 +28,7 @@ from predicate.fn_predicate import is_even_p, is_finite_p, is_inf_p, is_nan_p, i
 from predicate.frozendict_of_predicate import FrozenDictOfPredicate
 from predicate.frozenset_of_predicate import FrozenSetOfPredicate
 from predicate.ge_predicate import GePredicate
+from predicate.generator.generate_true import generate_true
 from predicate.gt_predicate import GtPredicate
 from predicate.has_key_predicate import HasKeyPredicate
 from predicate.has_length_predicate import HasLengthPredicate
@@ -265,10 +267,22 @@ def _from_frozendict_of(
     return _from_dict_of(predicate.dict_of_predicate, pairs).map(frozendict).filter(predicate)
 
 
+# ponytail: a fixed random pool, so no shrinking and it differs per run; only for predicates without a type
+_POOL_SIZE = 20
+
+
 def _from_type(predicate: Predicate[Any]) -> SearchStrategy[Any]:
     try:
         return st.from_type(predicate.klass)
     except NotImplementedError:
+        return _from_generator(predicate)
+
+
+def _from_generator(predicate: Predicate[Any]) -> SearchStrategy[Any]:
+    """Sample from the generate_true generator, for a predicate that knows no type."""
+    try:
+        return sampled_from(list(islice(generate_true(predicate), _POOL_SIZE)))
+    except ValueError:  # no generator is registered for this predicate
         raise TypeError(f"Can't derive a strategy for {predicate!r}") from None
 
 
