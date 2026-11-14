@@ -34,6 +34,7 @@ from predicate.has_key_predicate import HasKeyPredicate
 from predicate.has_length_predicate import HasLengthPredicate
 from predicate.in_predicate import InPredicate
 from predicate.integrations.hypothesis.helpers import sampled_from
+from predicate.integrations.hypothesis.recur import from_recur
 from predicate.integrations.hypothesis.sets import from_set
 from predicate.integrations.hypothesis.strings import from_text
 from predicate.is_falsy_predicate import IsFalsyPredicate
@@ -201,8 +202,8 @@ def _from_collection(predicate: Predicate[Any]) -> SearchStrategy[Any]:
 
 
 def _from_specialised(predicate: Predicate[Any]) -> SearchStrategy[Any]:
-    """Strings, sets, lengths and keys have dedicated strategies; anything else is generated from its type and filtered."""
-    candidates = (from_text, from_set, _from_sized)
+    """Strings, sets, recursion, lengths and keys have dedicated strategies; anything else is generated from its type and filtered."""
+    candidates = (from_text, from_set, from_recur, _from_sized)
     strategies = (strategy for from_ in candidates if (strategy := from_(predicate)) is not None)
     found = next(strategies, None)
     return found if found is not None else _from_type(predicate).filter(predicate)

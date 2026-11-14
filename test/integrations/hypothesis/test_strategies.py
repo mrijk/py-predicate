@@ -43,11 +43,20 @@ from predicate import (
     is_tuple_of_p,
     le_p,
     lt_p,
+    mutual_recur_p,
     not_in_p,
+    recur_p,
 )
 from predicate.integrations.hypothesis import from_predicate, given_predicate
 
+_mutual_up = mutual_recur_p(predicate_n=lambda x: (gt_p(x), _mutual_down))
+_mutual_down = mutual_recur_p(predicate_n=lambda x: (lt_p(x), _mutual_up))
+_mutual_up_down = _mutual_up
+
 predicates = [
+    recur_p(predicate_n=ge_p),
+    recur_p(predicate_n=lambda x: eq_p(x + 1), predicate_1=ge_p(0)),
+    _mutual_up_down,
     is_lambda_p,
     is_async_p,
     is_named_tuple_p,
