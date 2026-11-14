@@ -4,6 +4,8 @@ Requires the optional dependency: pip install py-predicate[hypothesis]
 """
 
 import builtins
+import math
+import sys
 from collections.abc import Callable, Iterable, Iterator
 from contextlib import suppress
 from functools import reduce
@@ -20,6 +22,7 @@ from predicate.and_predicate import AndPredicate
 from predicate.any_predicate import AnyPredicate
 from predicate.dict_of_predicate import DictOfPredicate
 from predicate.eq_predicate import EqPredicate
+from predicate.fn_predicate import is_even_p, is_finite_p, is_inf_p, is_nan_p, is_normal_p, is_odd_p, is_subnormal_p
 from predicate.frozendict_of_predicate import FrozenDictOfPredicate
 from predicate.frozenset_of_predicate import FrozenSetOfPredicate
 from predicate.ge_predicate import GePredicate
@@ -34,6 +37,8 @@ from predicate.is_falsy_predicate import IsFalsyPredicate
 from predicate.is_instance_predicate import IsInstancePredicate
 from predicate.is_none_predicate import IsNonePredicate
 from predicate.is_not_none_predicate import IsNotNonePredicate
+from predicate.is_same_predicate import IsSamePredicate
+from predicate.is_subclass_predicate import IsSubclassPredicate
 from predicate.is_truthy_predicate import IsTruthyPredicate
 from predicate.le_predicate import LePredicate
 from predicate.list_of_predicate import ListOfPredicate
@@ -118,6 +123,32 @@ _BASE: dict[type, Callable[[], SearchStrategy[Any]]] = {
 }
 
 
+def _subclasses(klass: type[Any]) -> Iterator[type[Any]]:
+    yield klass
+    for sub in klass.__subclasses__():
+        yield from _subclasses(sub)
+
+
+def _from_subclass(klass_or_tuple: Any) -> SearchStrategy[Any]:
+    # ponytail: only the subclasses that are loaded now; a union type is not expanded
+    klasses = klass_or_tuple if isinstance(klass_or_tuple, tuple) else (klass_or_tuple,)
+    return sampled_from({sub for klass in klasses if isinstance(klass, type) for sub in _subclasses(klass)})
+
+
+# The predefined fn_p predicates, by identity: a function can't be inspected, but these are known
+_NAMED: dict[int, Callable[[], SearchStrategy[Any]]] = {
+    id(is_even_p): lambda: st.integers().map(lambda n: 2 * n),
+    id(is_odd_p): lambda: st.integers().map(lambda n: 2 * n + 1),
+    id(is_finite_p): lambda: st.floats(allow_nan=False, allow_infinity=False),
+    id(is_inf_p): lambda: st.sampled_from([-math.inf, math.inf]),
+    id(is_nan_p): lambda: st.just(math.nan),
+    id(is_normal_p): lambda: st.floats(allow_nan=False, allow_infinity=False, allow_subnormal=False),
+    id(is_subnormal_p): lambda: st.floats(5e-324, sys.float_info.min, exclude_max=True).flatmap(
+        lambda x: st.sampled_from([x, -x])
+    ),
+}
+
+
 def _from_leaf(predicate: Predicate[Any]) -> SearchStrategy[Any]:
     match predicate:
         case EqPredicate(v):
@@ -130,6 +161,10 @@ def _from_leaf(predicate: Predicate[Any]) -> SearchStrategy[Any]:
             return st.one_of(*(st.from_type(klass) for klass in klasses))
         case InPredicate(v) if isinstance(v, Iterable):
             return sampled_from(v)
+        case IsSamePredicate(same):
+            return st.just(same)
+        case IsSubclassPredicate(klass_or_tuple):
+            return _from_subclass(klass_or_tuple)
         case XorPredicate(left, right):
             return from_predicate(OrPredicate(AndPredicate(left, negate(right)), AndPredicate(negate(left), right)))
         case _:
@@ -137,7 +172,7 @@ def _from_leaf(predicate: Predicate[Any]) -> SearchStrategy[Any]:
 
 
 def _from_base(predicate: Predicate[Any]) -> SearchStrategy[Any]:
-    base = _BASE.get(type(predicate))
+    base = _BASE.get(type(predicate)) or _NAMED.get(id(predicate))
     return base().filter(predicate) if base else _from_collection(predicate)
 
 
