@@ -76,6 +76,15 @@ Predicate                                                       Strategy
                                                                 (lengths up to 100)
 ``has_key_p``                                                   a dict with a key satisfying the key predicate, plus other
                                                                 keys of the same type
+``is_even_p``, ``is_odd_p``                                     ``st.integers``, mapped to even or odd numbers
+``is_finite_p``, ``is_inf_p``, ``is_nan_p``, ``is_normal_p``    ``st.floats`` with matching flags, or the infinities and NaN
+``is_subclass_p``, ``is_enum_p``, ``is_int_enum_p``, ...        ``st.sampled_from`` the class and its subclasses that are
+                                                                loaded at that moment
+``is_same_p``                                                   ``st.just`` of the given predicate
+``count_p``, ``exactly_one_p``, ``exactly_zero_p``              a shuffled list with a number of matching elements that
+                                                                satisfies the count predicate (up to 10), plus others
+``recur_p``, ``mutual_recur_p``                                 a chain of 1 to 5 elements, each drawn from the predicate
+                                                                of the one before; starts from an int or a str
 ``is_int_p``, ``is_str_p``, ... (``is_instance_p``)             ``st.from_type``
 ``all_p``, ``is_list_of_p``                                     ``st.lists``
 ``any_p``                                                       ``st.lists`` with at least one item
@@ -94,16 +103,21 @@ element predicate first and keep the length small: ``is_list_of_p(is_str_p) & ha
 ``has_length_p(eq_p(3)) & is_list_of_p(is_str_p)`` starts from lists of ints and is filtered down to almost nothing.
 
 Any other predicate is generated from its type and filtered, so the result is always correct. It can be slow when the
-predicate rarely holds, in which case Hypothesis fails with a ``filter_too_much`` health check. A predicate that has
-no type, such as one made with ``fn_p``, raises a ``TypeError``. Combine it with a typed predicate to give it a type:
+predicate rarely holds, in which case Hypothesis fails with a ``filter_too_much`` health check.
+
+A predicate that has no type, such as ``is_lambda_p`` or ``implements_protocol_p``, falls back to a pool of 20 values
+from the ``generate_true`` generator. That pool is random, so it differs between runs and doesn't shrink. If the
+predicate has no generator either, ``from_predicate`` raises a ``TypeError``. This is the case for ``fn_p``,
+``has_path_p``, ``comp_p``, ``implies_p``, ``lazy_p``, ``root_p`` and ``this_p``. Combine such a predicate with a typed
+one to give it a type:
 
 .. code-block:: python
 
-    from predicate import is_even_p, is_int_p
+    from predicate import fn_p, is_int_p
 
-    @given_predicate(is_int_p & is_even_p)
-    def test_even(x):
-        assert x % 2 == 0
+    @given_predicate(is_int_p & fn_p(lambda x: x % 7 == 0))
+    def test_multiple_of_seven(x):
+        assert x % 7 == 0
 
 Specs
 ^^^^^
