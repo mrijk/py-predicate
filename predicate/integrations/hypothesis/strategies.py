@@ -77,6 +77,11 @@ def from_predicate(predicate: Predicate[Any]) -> SearchStrategy[Any]:
     return reduce(lambda strategy, p: strategy.filter(p), filters, base)
 
 
+def from_predicate_false(predicate: Predicate[Any]) -> SearchStrategy[Any]:
+    """Return a Hypothesis strategy that generates values not satisfying the predicate."""
+    return from_predicate(~predicate)
+
+
 def _base(leaves: list[Predicate[Any]]) -> tuple[SearchStrategy[Any], list[Predicate[Any]]]:
     """Return the strategy of the first leaf that has one, and the other leaves to filter on."""
     if (found := next(_strategies(leaves), None)) is None:
@@ -296,6 +301,10 @@ def _from_not(predicate: NotPredicate[Any], inner: Predicate[Any]) -> SearchStra
             return from_predicate(AndPredicate(negate(left), negate(right)))
         case IsInstancePredicate():
             return _anything().filter(predicate)
+        case AllPredicate(q):
+            return from_predicate(AnyPredicate(negate(q)))
+        case AnyPredicate(q):
+            return from_predicate(AllPredicate(negate(q)))
         case _:
             negated = negate(inner)
             return _from_type(predicate).filter(predicate) if negated == predicate else from_predicate(negated)

@@ -47,7 +47,7 @@ from predicate import (
     not_in_p,
     recur_p,
 )
-from predicate.integrations.hypothesis import from_predicate, given_predicate
+from predicate.integrations.hypothesis import from_predicate, from_predicate_false, given_predicate
 
 _mutual_up = mutual_recur_p(predicate_n=lambda x: (gt_p(x), _mutual_down))
 _mutual_down = mutual_recur_p(predicate_n=lambda x: (lt_p(x), _mutual_up))
@@ -100,6 +100,8 @@ predicates = [
     ~~ge_p(0),
     ~(ge_p(0) & lt_p(10)),
     ~(lt_p(0) | gt_p(100)),
+    ~all_p(is_int_p),
+    ~any_p(is_int_p),
     ge_p(0) & ~is_even_p,
     all_p(~eq_p(0)),
     is_list_of_p(is_int_p),
@@ -210,3 +212,29 @@ def test_from_in_p_only_generates_members():
 
 def test_from_in_p_empty_is_empty():
     assert from_predicate(in_p(set())).is_empty
+
+
+false_predicates = [
+    eq_p(5),
+    ge_p(0),
+    ge_p(0) & lt_p(100),
+    lt_p(0) | gt_p(100),
+    ~ge_p(0),
+    is_int_p,
+    is_even_p,
+    is_odd_p,
+    all_p(is_int_p),
+    any_p(is_int_p),
+    is_none_p,
+    in_p({1, 2, 3}),
+]
+
+
+@pytest.mark.parametrize("predicate", false_predicates, ids=repr)
+def test_from_predicate_false_does_not_satisfy_predicate(predicate):
+    @settings(max_examples=30)
+    @given(from_predicate_false(predicate))
+    def check(x):
+        assert not predicate(x)
+
+    check()

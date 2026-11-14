@@ -42,6 +42,10 @@ by keyword:
     def test_dice(rolls):
         assert all(1 <= roll <= 6 for roll in rolls)
 
+``from_predicate_false`` is the opposite: it generates values that do *not* satisfy the predicate, which is handy for
+testing that invalid input is rejected. It is ``from_predicate(~predicate)``, so it supports the same predicates, for
+example ``from_predicate_false(ge_p(0))`` generates negative numbers. Negating ``is_list_of_p`` isn't supported yet.
+
 ``given_predicate`` returns a real ``hypothesis.given`` decorator, so ``@settings``, ``@example`` and pytest fixtures
 work as usual. It doesn't mix plain strategies and predicates in one call.
 
