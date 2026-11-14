@@ -125,6 +125,44 @@ take(5, generate_true(between))  # e.g. [2, 3, 4, 5, 2]
 take(5, generate_false(between))  # e.g. [0, 1, 6, 7, -1]
 ```
 
+## Hypothesis integration
+
+With the optional extra (`pip install py-predicate[hypothesis]`), predicates can be used as [Hypothesis](https://hypothesis.readthedocs.io) strategies:
+
+```python
+from predicate import ge_p, lt_p
+from predicate.hypothesis import from_predicate, given_predicate
+
+
+@given_predicate(ge_p(0) & lt_p(100))
+def test_something(x):
+    assert 0 <= x < 100
+
+
+from_predicate(ge_p(0) & lt_p(100))  # a regular SearchStrategy
+```
+
+Numeric bounds are merged into a single native strategy. Predicates without a dedicated mapping are generated from their type and filtered.
+
+A [Spec](#runtime-instrumentation-spec) can drive a property test too. `given_spec` calls the function with generated arguments and checks the result against `ret`, `fn`, `fn_p` and `raises`, with Hypothesis' shrinking and replay. `from_spec` returns just the strategy of arguments:
+
+```python
+from predicate import ge_p, is_int_p
+from predicate.hypothesis import from_spec, given_spec
+
+
+def add(x, y):
+    return x + y
+
+
+spec = {"args": {"x": ge_p(0), "y": is_int_p}, "ret": is_int_p}
+
+test_add = given_spec(add, spec)  # pytest collects this; or call test_add() directly
+arguments = from_spec(add, spec)  # strategy of {"x": ..., "y": ...} dicts
+```
+
+Plain functions only for now: async functions, generators and classes aren't supported yet.
+
 ## Recursive predicates
 
 Use `root_p` (or `this_p`) to define self-referencing predicates over arbitrarily nested structures without writing recursive functions:
