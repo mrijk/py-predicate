@@ -66,6 +66,7 @@ from predicate.is_lambda_predicate import IsLambdaPredicate
 from predicate.is_named_tuple_predicate import IsNamedTuplePredicate
 from predicate.is_none_predicate import IsNonePredicate
 from predicate.is_not_none_predicate import IsNotNonePredicate
+from predicate.is_partial_predicate import IsPartialPredicate
 from predicate.is_predicate import IsPredicate
 from predicate.is_protocol_predicate import IsProtocolPredicate
 from predicate.is_regex_predicate import IsRegexPredicate
@@ -794,6 +795,11 @@ def generate_regex(predicate: RegexPredicate[Any]) -> Iterator[Any]:
 
 @generate_false.register(IsCallablePredicate)
 def generate_is_callable(predicate: IsCallablePredicate[Any]) -> Iterator[Any]:
+    yield from (item for item in random_anys() if not predicate(item))
+
+
+@generate_false.register(IsPartialPredicate)
+def generate_is_partial(predicate: IsPartialPredicate[Any]) -> Iterator[Any]:
     yield from (item for item in random_anys() if not predicate(item))
 
 
