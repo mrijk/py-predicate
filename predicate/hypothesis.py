@@ -6,6 +6,7 @@ from predicate.integrations.hypothesis import (
     from_spec,
     given_predicate,
     given_spec,
+    predicates,
 )
 
-__all__ = ["from_predicate", "from_predicate_false", "from_spec", "given_predicate", "given_spec"]
+__all__ = ["from_predicate", "from_predicate_false", "from_spec", "given_predicate", "given_spec", "predicates"]

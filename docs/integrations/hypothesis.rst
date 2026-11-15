@@ -123,6 +123,27 @@ one to give it a type:
     def test_multiple_of_seven(x):
         assert x % 7 == 0
 
+Generating predicates
+^^^^^^^^^^^^^^^^^^^^^
+
+``predicates`` goes the other way: it generates predicates, combining leaves with ``&``, ``|``, ``^`` and ``~``. Use it
+to property-test code that takes predicates. The default leaves are comparisons, ``in_p``, ``is_even_p`` and
+``is_odd_p`` over small integers, so every generated predicate can be called with an int. Pass ``leaves`` to use
+another domain, and ``max_leaves`` to bound the size.
+
+.. code-block:: python
+
+    from hypothesis import given
+
+    from predicate import optimize
+    from predicate.hypothesis import predicates
+
+
+    @given(predicates())
+    def test_optimize_keeps_the_meaning(predicate):
+        optimized = optimize(predicate)
+        assert all(predicate(x) == optimized(x) for x in range(-8, 9))
+
 Specs
 ^^^^^
 
