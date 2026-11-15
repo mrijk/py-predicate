@@ -3,6 +3,8 @@
 
 ## Unreleased
 
+- fix is_normal_p false-value generation getting stuck on infinities before reaching NaN and subnormal values
+
 Features:
 
 - new type check predicate is_frozendict_p (Python 3.15+, always False on older versions)
