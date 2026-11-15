@@ -34,7 +34,7 @@ from datetime import date, datetime, time, timedelta, timezone, tzinfo
 from decimal import Decimal
 from enum import Enum
 from fractions import Fraction
-from functools import cache, singledispatch
+from functools import cache, partial, singledispatch
 from inspect import Parameter, Signature, getmembers, isfunction, signature
 from itertools import chain, cycle, islice, repeat
 from pathlib import PurePath
@@ -172,6 +172,7 @@ from predicate.is_lambda_predicate import IsLambdaPredicate
 from predicate.is_named_tuple_predicate import IsNamedTuplePredicate, is_named_tuple_class
 from predicate.is_none_predicate import IsNonePredicate
 from predicate.is_not_none_predicate import IsNotNonePredicate
+from predicate.is_partial_predicate import IsPartialPredicate
 from predicate.is_predicate import IsPredicate
 from predicate.is_predicate_of_p import IsPredicateOfPredicate
 from predicate.is_protocol_predicate import IsProtocolPredicate
@@ -1075,6 +1076,15 @@ def generate_is_callable_p(predicate: IsCallablePredicate[Any]) -> Iterator[Any]
     fn.__annotations__["return"] = predicate.return_type
     while True:
         yield fn
+
+
+@generate_true.register(IsPartialPredicate)
+def generate_is_partial_p(predicate: IsPartialPredicate[Any]) -> Iterator[Any]:
+    while True:
+        n = random.randint(0, 3) if predicate.nr_of_parameters is None else predicate.nr_of_parameters
+        # one extra parameter that partial binds, leaving n
+        sig = Signature([Parameter(f"p{i}", Parameter.POSITIONAL_OR_KEYWORD) for i in range(n + 1)])
+        yield partial(function_with_signature(sig), None)
 
 
 @generate_true.register(IsAsyncPredicate)
