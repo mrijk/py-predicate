@@ -2,7 +2,7 @@ from typing import Iterable
 
 from predicate.all_predicate import AllPredicate
 from predicate.always_false_predicate import AlwaysFalsePredicate, always_false_p
-from predicate.always_true_predicate import AlwaysTruePredicate, always_true_p
+from predicate.always_true_predicate import AlwaysTruePredicate
 from predicate.and_predicate import AndPredicate
 from predicate.eq_predicate import EqPredicate
 from predicate.function_predicate import FnPredicate
@@ -73,7 +73,7 @@ def optimize_and_predicate[T](predicate: AndPredicate[T]) -> MaybeOptimized[T]: 
         case IsSubsetPredicate(v1), IsSubsetPredicate(v2):
             return Optimized(IsSubsetPredicate(v) if (v := v1 & v2) else always_false_p)
         case FnPredicate(predicate_fn), EqPredicate(v):
-            return Optimized(always_true_p if predicate_fn(v) else always_false_p)
+            return Optimized(right if predicate_fn(v) else always_false_p)
 
         # set optimizations
         case InPredicate(v1), InPredicate(v2) if isinstance(v1, Iterable) and isinstance(v2, Iterable):

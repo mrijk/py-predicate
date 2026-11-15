@@ -45,8 +45,10 @@ Documentation = "https://mrijk.github.io/py-predicate/"
 
 [project.optional-dependencies]
 rx = ["reactivex"]
+hypothesis = ["hypothesis"]
 test = [
     "beartype",
+    "hypothesis",
     "pandera[pandas]",
     "pandas-stubs",
     "pydantic",
