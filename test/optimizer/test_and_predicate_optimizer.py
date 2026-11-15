@@ -704,7 +704,7 @@ def test_optimize_fn_and_eq_true():
 
     optimized = optimize(predicate)
 
-    assert optimized == always_true_p
+    assert optimized == q
 
 
 def test_optimize_is_instance_different():
