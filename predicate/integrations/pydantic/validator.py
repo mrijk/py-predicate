@@ -1,9 +1,11 @@
 from dataclasses import dataclass
 from typing import Any
 
-from pydantic import GetCoreSchemaHandler
+from pydantic import GetCoreSchemaHandler, GetJsonSchemaHandler
+from pydantic.json_schema import JsonSchemaValue
 from pydantic_core import PydanticCustomError, core_schema
 
+from predicate.integrations.pydantic.json_schema import predicate_to_json_schema
 from predicate.predicate import Predicate
 
 
@@ -31,3 +33,8 @@ class PredicateValidator:
             )
 
         return core_schema.no_info_after_validator_function(validate, handler(source_type))
+
+    def __get_pydantic_json_schema__(
+        self, schema: core_schema.CoreSchema, handler: GetJsonSchemaHandler
+    ) -> JsonSchemaValue:
+        return handler(schema) | predicate_to_json_schema(self.predicate)

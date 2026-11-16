@@ -142,7 +142,7 @@ class Model(BaseModel):
     x: Annotated[int, PredicateValidator(ge_p(0) & lt_p(100))]
 ```
 
-A failure raises a `predicate_failed` error whose context holds the predicate and its `explain_failure` result.
+A failure raises a `predicate_failed` error whose context holds the predicate and its `explain_failure` result. Comparisons, `eq_p`, `in_p`, `&`, `|`, `~`, `all_p`, `any_p` and `regex_p` also appear in the JSON Schema of the field (`predicate_to_json_schema`).
 
 ## Hypothesis integration
 
