@@ -46,6 +46,7 @@ Documentation = "https://mrijk.github.io/py-predicate/"
 [project.optional-dependencies]
 rx = ["reactivex"]
 hypothesis = ["hypothesis"]
+pydantic = ["pydantic>=2"]
 test = [
     "beartype",
     "hypothesis",

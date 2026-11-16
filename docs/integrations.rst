@@ -12,4 +12,6 @@ returning a ``bool``. For some libraries py-predicate provides ready-made wrappe
 
 .. include:: integrations/pandera.rst
 
+.. include:: integrations/pydantic.rst
+
 .. include:: integrations/rx.rst
