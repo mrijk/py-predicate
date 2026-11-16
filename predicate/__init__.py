@@ -2,6 +2,7 @@
 
 __version__ = "1.12.0"
 
+from predicate.accepts_predicate import accepts_p
 from predicate.all_predicate import all_p
 from predicate.always_false_predicate import always_false_p, never_p
 from predicate.always_true_predicate import always_p, always_true_p
@@ -142,7 +143,7 @@ from predicate.tee_predicate import tee_p
 from predicate.tuple_of_predicate import is_tuple_of_p
 
 __all__ = [
-    "accepts_predicate",
+    "accepts_p",
     "are_equivalent",
     "as_predicate",
     "is_satisfiable",
