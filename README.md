@@ -125,6 +125,25 @@ take(5, generate_true(between))  # e.g. [2, 3, 4, 5, 2]
 take(5, generate_false(between))  # e.g. [0, 1, 6, 7, -1]
 ```
 
+## Pydantic integration
+
+With the optional extra (`pip install py-predicate[pydantic]`), a predicate can validate a [Pydantic](https://docs.pydantic.dev) v2 field, after the inner type's own validation:
+
+```python
+from typing import Annotated
+
+from pydantic import BaseModel
+
+from predicate import ge_p, lt_p
+from predicate.pydantic import PredicateValidator
+
+
+class Model(BaseModel):
+    x: Annotated[int, PredicateValidator(ge_p(0) & lt_p(100))]
+```
+
+A failure raises a `predicate_failed` error whose context holds the predicate and its `explain_failure` result.
+
 ## Hypothesis integration
 
 With the optional extra (`pip install py-predicate[hypothesis]`), predicates can be used as [Hypothesis](https://hypothesis.readthedocs.io) strategies:
