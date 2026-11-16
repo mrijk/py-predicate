@@ -163,6 +163,10 @@ arguments = from_spec(add, spec)  # strategy of {"x": ..., "y": ...} dicts
 
 Plain functions only for now: async functions, generators and classes aren't supported yet.
 
+## pytest integration
+
+The separate [pytest-predicate](https://github.com/mrijk/pytest-predicate) package (`pip install pytest-predicate`) provides assertion helpers (`assert_matches`, `assert_not_matches`) and a `predicate_examples` fixture that generates matching and non-matching values.
+
 ## Recursive predicates
 
 Use `root_p` (or `this_p`) to define self-referencing predicates over arbitrarily nested structures without writing recursive functions:
