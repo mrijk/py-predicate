@@ -1,4 +1,5 @@
 import random
+import re
 import string
 from typing import Any, Callable, Iterator
 
@@ -64,3 +65,53 @@ def starts_with_p(prefix: str) -> Predicate[str]:
 def ends_with_p(suffix: str) -> Predicate[str]:
     """Return True if the string ends with the specified suffix, False otherwise."""
     return fn_p(fn=lambda x: x.endswith(suffix))
+
+
+def _word() -> str:
+    return "".join(random.choices(string.ascii_lowercase, k=random.randint(1, 5)))
+
+
+def _words(sep: str) -> str:
+    return sep.join(_word() for _ in range(random.randint(1, 3)))
+
+
+def _camel() -> str:
+    return _word() + "".join(_word().capitalize() for _ in range(random.randint(0, 2)))
+
+
+def _forever(make: Callable[[], str]) -> Callable[[], Iterator[str]]:
+    return lambda: iter(make, None)
+
+
+def _str_p(fn: Callable[[str], bool], true: Callable[[], str], false: Callable[[], str]) -> Predicate[str]:
+    return fn_p(fn=fn, generate_true_fn=_forever(true), generate_false_fn=_forever(false))
+
+
+def _matches(pattern: str) -> Callable[[str], bool]:
+    regex = re.compile(pattern)
+    return lambda x: regex.fullmatch(x) is not None
+
+
+is_stripped_p = _str_p(
+    lambda x: x == x.strip(), _word, lambda: random.choice([" ", "\t", "\n"]) + _word() + random.choice([" ", "\n"])
+)
+"""Return True if the string has no leading or trailing whitespace, False otherwise."""
+
+is_blank_p = _str_p(lambda x: not x.strip(), lambda: random.choice(string.whitespace) * random.randint(0, 5), _word)
+"""Return True if the string is empty or only contains whitespace, False otherwise."""
+
+is_single_line_p = _str_p(lambda x: "\n" not in x, _word, lambda: _word() + "\n" + _word())
+"""Return True if the string contains no newline, False otherwise."""
+
+is_capitalized_p = _str_p(lambda x: x[:1].isupper() and x[1:] == x[1:].lower(), lambda: _word().capitalize(), _word)
+"""Return True if the first character is uppercase and the rest is lowercase, False otherwise."""
+
+# ponytail: ASCII only, no leading/trailing/double separators; loosen the patterns if that turns out too strict
+is_snake_case_p = _str_p(_matches(r"[a-z0-9]+(_[a-z0-9]+)*"), lambda: _words("_"), lambda: _words("_").upper())
+"""Return True if the string is snake_case, False otherwise."""
+
+is_kebab_case_p = _str_p(_matches(r"[a-z0-9]+(-[a-z0-9]+)*"), lambda: _words("-"), lambda: _words("-").upper())
+"""Return True if the string is kebab-case, False otherwise."""
+
+is_camel_case_p = _str_p(_matches(r"[a-z][a-zA-Z0-9]*"), _camel, lambda: _camel().capitalize())
+"""Return True if the string is camelCase (starts lowercase, no separators), False otherwise."""
