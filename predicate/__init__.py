@@ -27,7 +27,7 @@ from predicate.fn_predicate import (
     is_subnormal_p,
 )
 from predicate.formatter import to_dot, to_json, to_latex, to_yaml
-from predicate.ge_predicate import ge_p
+from predicate.ge_predicate import ge_p, non_neg_p
 from predicate.generator.generate_false import generate_false
 from predicate.generator.generate_true import generate_true
 from predicate.gt_predicate import gt_p, pos_p
@@ -86,7 +86,7 @@ from predicate.is_subclass_predicate import is_enum_p, is_int_enum_p, is_str_enu
 from predicate.is_truthy_predicate import is_truthy_p
 from predicate.juxt_predicate import juxt_p
 from predicate.lazy_predicate import lazy_p
-from predicate.le_predicate import le_p
+from predicate.le_predicate import le_p, non_pos_p
 from predicate.list_of_predicate import is_list_of_p
 from predicate.lt_predicate import lt_p, neg_p
 from predicate.match_predicate import match_p
@@ -286,6 +286,8 @@ __all__ = [
     "mutual_recur_p",
     "ne_p",
     "neg_p",
+    "non_neg_p",
+    "non_pos_p",
     "never_p",
     "none_is_exception_p",
     "none_is_false_p",
