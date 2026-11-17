@@ -3,7 +3,9 @@ from generator.generate_false.helpers import assert_generated_false
 from generator.generate_true.helpers import assert_generated_true
 
 from predicate import (
+    contains_p,
     ends_with_p,
+    generate_false,
     is_alnum_p,
     is_alpha_p,
     is_blank_p,
@@ -24,6 +26,32 @@ from predicate import (
     starts_with_p,
 )
 from predicate.str_predicates import create_is_str_p
+
+
+def test_contains_p():
+    predicate = contains_p("café")
+    assert predicate("un café noir")
+    assert predicate("café")
+    assert not predicate("CAFÉ")
+    assert not predicate("cafe")
+    assert repr(predicate) == "contains_p('café')"
+    assert predicate.klass is str
+    assert predicate.explain("tea") == {"result": False, "reason": "'tea' does not contain 'café'"}
+
+
+@pytest.mark.parametrize("substring", ["a", "café", "a long substring"])
+def test_contains_p_generators(substring):
+    predicate = contains_p(substring)
+    assert_generated_true(predicate)
+    assert_generated_false(predicate)
+
+
+def test_contains_p_empty_substring():
+    predicate = contains_p("")
+    assert predicate("")
+    assert predicate("any text")
+    assert_generated_true(predicate)
+    assert list(generate_false(predicate)) == []
 
 
 def test_is_alnum_p():

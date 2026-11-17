@@ -9,6 +9,7 @@ from predicate.integrations.hypothesis import strings
 from predicate.is_regex_predicate import is_regex_p
 from predicate.regex_predicate import RegexPredicate, regex_p
 from predicate.str_predicates import (
+    contains_p,
     ends_with_p,
     is_alnum_p,
     is_alpha_p,
@@ -39,6 +40,8 @@ predicates = {
     "is_title_p": is_title_p,
     "is_upper_p": is_upper_p,
     "fn_p(str.isalpha)": fn_p(str.isalpha),
+    "contains_p": contains_p("un café noir"),
+    "contains_p empty": contains_p(""),
     "starts_with_p": starts_with_p("ab"),
     "starts_with_p empty": starts_with_p(""),
     "ends_with_p": ends_with_p("yz"),

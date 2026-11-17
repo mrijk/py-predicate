@@ -161,6 +161,7 @@ __all__ = [
     "can_optimize",
     "compile_predicate",
     "comp_p",
+    "contains_p",
     "count_p",
     "eq_false_p",
     "eq_p",
@@ -333,6 +334,7 @@ __all__ = [
 ]
 
 from predicate.str_predicates import (
+    contains_p,
     ends_with_p,
     is_blank_p,
     is_camel_case_p,

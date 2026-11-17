@@ -3,6 +3,21 @@ String predicates
 
 A collection of predicates that act on strings.
 
+contains_p
+~~~~~~~~~~
+
+Return True if the input contains the given substring. Matching is case-sensitive.
+An empty substring matches every string, so there are no non-matching examples to generate.
+
+.. code-block:: python
+
+    from predicate import contains_p
+
+    contains_apple = contains_p("apple")
+
+    assert contains_apple("a green apple")
+    assert not contains_apple("a green pear")
+
 ends_with_p
 ~~~~~~~~~~~
 
