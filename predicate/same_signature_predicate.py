@@ -7,7 +7,7 @@ from typing import Any, Callable, Union, get_args, get_origin, override
 from more_itertools.recipes import first_true
 
 from predicate.is_subclass_predicate import is_subclass_p
-from predicate.predicate import Predicate
+from predicate.predicate import Explanation, Predicate
 
 
 def is_subtype(cls: Any, superclass: Any) -> bool:
@@ -120,7 +120,7 @@ class SameSignaturePredicate[T](Predicate[T]):
         return f"same_signature_p({self.function.__name__})"
 
     @override
-    def explain_failure(self, function: type) -> dict[str, Any]:
+    def explain_failure(self, function: type) -> Explanation:
         return {"reason": self._failure(function)}
 
 

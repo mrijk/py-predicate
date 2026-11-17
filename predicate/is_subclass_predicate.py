@@ -4,7 +4,7 @@ from types import NoneType, UnionType
 from typing import Any, Final, Iterator, Union, get_args, get_origin, override
 
 from predicate.helpers import join_with_or
-from predicate.predicate import Predicate
+from predicate.predicate import Explanation, Predicate
 
 
 @dataclass
@@ -37,7 +37,7 @@ class IsSubclassPredicate[T](Predicate[T]):
         return self.class_or_tuple  # type: ignore
 
     @override
-    def explain_failure(self, x: T) -> dict[str, Any]:
+    def explain_failure(self, x: T) -> Explanation:
         def class_names() -> Iterator[str]:
             match self.class_or_tuple:
                 case tuple(klasses):

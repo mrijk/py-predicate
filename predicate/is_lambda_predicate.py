@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from inspect import signature
 from typing import Any, Final, override
 
-from predicate.predicate import Predicate
+from predicate.predicate import Explanation, Predicate
 
 
 def func_is_lambda(func: Callable[..., Any]) -> bool:
@@ -35,7 +35,7 @@ class IsLambdaPredicate[T](Predicate[T]):
         )
 
     @override
-    def explain_failure(self, x: Any) -> dict[str, Any]:
+    def explain_failure(self, x: Any) -> Explanation:
         match x:
             case func if callable(func) and func_is_lambda(func):
                 sig = signature(func)

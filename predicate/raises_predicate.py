@@ -3,7 +3,7 @@ from dataclasses import dataclass, field
 from typing import Any, Final, override
 
 from predicate.is_async_predicate import is_async_p
-from predicate.predicate import Predicate
+from predicate.predicate import Explanation, Predicate
 
 
 def _call(x: Any) -> None:
@@ -34,7 +34,7 @@ class RaisesPredicate[T](Predicate[T]):
         return f"raises_exception_p({self.exception_type.__name__})"
 
     @override
-    def explain_failure(self, x: Any) -> dict[str, Any]:
+    def explain_failure(self, x: Any) -> Explanation:
         try:
             _call(x)
             return {"reason": "callable did not raise an exception"}

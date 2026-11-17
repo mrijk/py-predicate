@@ -6,7 +6,7 @@ from more_itertools import first
 
 from predicate.eq_predicate import EqPredicate
 from predicate.helpers import key_value_pairs_repr
-from predicate.predicate import Predicate
+from predicate.predicate import Explanation, Predicate
 
 
 @dataclass
@@ -42,7 +42,7 @@ class DictOfPredicate(Predicate[Any]):
         return f"is_dict_of_p({key_value_pairs_repr(pairs)})"
 
     @override
-    def explain_failure(self, x: Any, *args: Any, **kwargs: Any) -> dict[str, Any]:
+    def explain_failure(self, x: Any, *args: Any, **kwargs: Any) -> Explanation:
         if not isinstance(x, Mapping):
             return {"reason": f"{x} is not an instance of a Mapping"}
         if not x:

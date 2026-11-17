@@ -9,7 +9,7 @@ else:
 
 from predicate import exception_p
 from predicate.or_predicate import or_p
-from predicate.predicate import Predicate, predicate_partial
+from predicate.predicate import Explanation, Predicate, predicate_partial
 
 
 @dataclass
@@ -23,7 +23,7 @@ class IsNonePredicate[T](Predicate[T]):
         return "is_none_p"
 
     @override
-    def explain_failure(self, x: T) -> dict[str, Any]:
+    def explain_failure(self, x: T) -> Explanation:
         return {"reason": f"{x} is not None"}
 
 

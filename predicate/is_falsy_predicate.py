@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import Any, Final, override
 
-from predicate.predicate import Predicate
+from predicate.predicate import Explanation, Predicate
 
 
 @dataclass
@@ -15,7 +15,7 @@ class IsFalsyPredicate[T](Predicate[T]):
         return "is_falsy_p"
 
     @override
-    def explain_failure(self, x: T) -> dict[str, Any]:
+    def explain_failure(self, x: T) -> Explanation:
         return {"reason": f"{x} is not a falsy value"}
 
 

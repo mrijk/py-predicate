@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import Any, Final, override
 
-from predicate.predicate import Predicate, SupportsComparison
+from predicate.predicate import Explanation, Predicate, SupportsComparison
 
 
 @dataclass
@@ -22,7 +22,7 @@ class LtPredicate[T: SupportsComparison](Predicate[T]):
         return type(self.v)
 
     @override
-    def explain_failure(self, x: T) -> dict[str, Any]:
+    def explain_failure(self, x: T) -> Explanation:
         return {"reason": f"{x} is not less than {self.v!r}"}
 
 

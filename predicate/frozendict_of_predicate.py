@@ -5,7 +5,7 @@ from typing import Any, override
 from predicate.dict_of_predicate import DictOfPredicate, from_key_p, to_key_p
 from predicate.helpers import key_value_pairs_repr
 from predicate.is_instance_predicate import is_frozendict_p
-from predicate.predicate import Predicate
+from predicate.predicate import Explanation, Predicate
 
 
 @dataclass
@@ -29,7 +29,7 @@ class FrozenDictOfPredicate(Predicate[Any]):
         return f"is_frozendict_of_p({key_value_pairs_repr(pairs)})"
 
     @override
-    def explain_failure(self, x: Any, *args: Any, **kwargs: Any) -> dict[str, Any]:
+    def explain_failure(self, x: Any, *args: Any, **kwargs: Any) -> Explanation:
         if not is_frozendict_p(x):
             return {"reason": f"{x} is not an instance of a frozendict"}
         return self.dict_of_predicate.explain_failure(x)

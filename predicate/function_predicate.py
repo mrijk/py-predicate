@@ -2,7 +2,7 @@ import asyncio
 from dataclasses import dataclass, field
 from typing import Any, Callable, Iterator, overload, override
 
-from predicate.predicate import Predicate
+from predicate.predicate import Explanation, Predicate
 
 
 def _undefined() -> Iterator[Any]:
@@ -33,7 +33,7 @@ class FnPredicate[T](Predicate[T]):
         return f"fn_p(predicate_fn={self.predicate_fn.__name__})"
 
     @override
-    def explain_failure(self, x: T) -> dict[str, Any]:
+    def explain_failure(self, x: T) -> Explanation:
         return {"reason": f"Function returned False for value {x}"}
 
 

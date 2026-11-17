@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import Any, Final, override
 
-from predicate.predicate import Predicate
+from predicate.predicate import Explanation, Predicate
 
 
 def is_named_tuple_class(klass: Any) -> bool:
@@ -19,7 +19,7 @@ class IsNamedTuplePredicate[T](Predicate[T]):
         return "is_named_tuple_p"
 
     @override
-    def explain_failure(self, x: Any) -> dict[str, Any]:
+    def explain_failure(self, x: Any) -> Explanation:
         return {"reason": f"{x} is not a named tuple"}
 
 

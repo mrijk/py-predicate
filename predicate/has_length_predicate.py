@@ -6,7 +6,7 @@ from more_itertools import ilen
 
 from predicate.eq_predicate import zero_p
 from predicate.gt_predicate import pos_p
-from predicate.predicate import Predicate
+from predicate.predicate import Explanation, Predicate
 
 
 @dataclass
@@ -22,7 +22,7 @@ class HasLengthPredicate[T](Predicate[T]):
         return f"has_length_p({self.length_p!r})"
 
     @override
-    def explain_failure(self, iterable: Iterable[T]) -> dict[str, Any]:
+    def explain_failure(self, iterable: Iterable[T]) -> Explanation:
         return {"reason": f"Expected length {self.length_p!r}, actual: {ilen(iterable)}"}
 
     @override

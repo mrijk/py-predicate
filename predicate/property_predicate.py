@@ -2,7 +2,7 @@ import sys
 from dataclasses import dataclass
 from typing import Any, Callable, override
 
-from predicate.predicate import Predicate
+from predicate.predicate import Explanation, Predicate
 
 
 @dataclass
@@ -25,7 +25,7 @@ class PropertyPredicate[T](Predicate[T]):
         return "property_p()"
 
     @override
-    def explain_failure(self, obj: T) -> dict[str, Any]:
+    def explain_failure(self, obj: T) -> Explanation:
         object_type = type(obj).__name__
         if sys.version_info.minor > 12:
             property_name = self.getter.__name__  # type: ignore[attr-defined,unused-ignore]

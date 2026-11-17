@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from typing import Any, TypeGuard, override
 
 from predicate.helpers import all_true, first_false
-from predicate.predicate import Predicate
+from predicate.predicate import Explanation, Predicate
 
 
 @dataclass
@@ -29,7 +29,7 @@ class FrozenSetOfPredicate[T](Predicate[T]):
         return self.predicate.klass
 
     @override
-    def explain_failure(self, x: frozenset[T]) -> dict[str, Any]:
+    def explain_failure(self, x: frozenset[T]) -> Explanation:
         match x:
             case frozenset() as s:
                 fail = first_false(s, self.predicate)

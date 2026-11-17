@@ -1,8 +1,8 @@
 from abc import abstractmethod
 from dataclasses import dataclass
-from typing import Any, override
+from typing import override
 
-from predicate.predicate import Predicate, SupportsComparison
+from predicate.predicate import Explanation, Predicate, SupportsComparison
 
 
 @dataclass
@@ -32,7 +32,7 @@ class GeLePredicate[T: SupportsComparison](RangePredicate[T]):
         return f"ge_le_p({self.lower!r}, {self.upper!r})"
 
     @override
-    def explain_failure(self, x: T) -> dict[str, Any]:
+    def explain_failure(self, x: T) -> Explanation:
         return {"reason": f"{x!r} is not greater equal {self.lower!r} and less equal {self.upper!r}"}
 
 
@@ -47,7 +47,7 @@ class GeLtPredicate[T: SupportsComparison](RangePredicate[T]):
         return f"ge_lt_p({self.lower!r}, {self.upper!r})"
 
     @override
-    def explain_failure(self, x: T) -> dict[str, Any]:
+    def explain_failure(self, x: T) -> Explanation:
         return {"reason": f"{x!r} is not greater equal {self.lower!r} and less than {self.upper!r}"}
 
 
@@ -62,7 +62,7 @@ class GtLePredicate[T: SupportsComparison](RangePredicate[T]):
         return f"gt_le_p({self.lower!r}, {self.upper!r})"
 
     @override
-    def explain_failure(self, x: T) -> dict[str, Any]:
+    def explain_failure(self, x: T) -> Explanation:
         return {
             "reason": f"{x!r} is not greater than {self.lower!r} and less than or equal to {self.upper!r}",
         }
@@ -79,7 +79,7 @@ class GtLtPredicate[T: SupportsComparison](RangePredicate[T]):
         return f"gt_lt_p({self.lower!r}, {self.upper!r})"
 
     @override
-    def explain_failure(self, x: T) -> dict[str, Any]:
+    def explain_failure(self, x: T) -> Explanation:
         return {"reason": f"{x!r} is not greater than {self.lower!r} and less than {self.upper!r}"}
 
 

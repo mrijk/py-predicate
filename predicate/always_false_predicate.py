@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import Any, Final, Iterable, Iterator, override
 
-from predicate.predicate import Predicate
+from predicate.predicate import Explanation, Predicate
 
 
 @dataclass
@@ -15,7 +15,7 @@ class AlwaysFalsePredicate(Predicate[Any]):
         return "always_false_p"
 
     @override
-    def explain_failure(self, *args: Any, **kwargs: Any) -> dict[str, Any]:
+    def explain_failure(self, *args: Any, **kwargs: Any) -> Explanation:
         return {"reason": "Always returns False"}
 
     @override

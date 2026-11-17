@@ -3,7 +3,7 @@ from typing import Any, override
 
 from more_itertools import first_true
 
-from predicate.predicate import Predicate
+from predicate.predicate import Explanation, Predicate
 
 
 @dataclass
@@ -29,7 +29,7 @@ class IsCallablePredicate[T](Predicate[T]):
         return f"is_callable_p([], {return_type})"
 
     @override
-    def explain_failure(self, x: Any) -> dict[str, Any]:
+    def explain_failure(self, x: Any) -> Explanation:
         match x:
             case c if callable(c):
                 annotations = c.__annotations__

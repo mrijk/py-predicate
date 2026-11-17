@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import Any, override
 
-from predicate.predicate import Predicate
+from predicate.predicate import Explanation, Predicate
 
 
 @dataclass
@@ -17,7 +17,7 @@ class InPredicatePredicate[T](Predicate[T]):
         return f"in_predicate_p({self.predicate})"
 
     @override
-    def explain_failure(self, predicate: Predicate[Any]) -> dict[str, Any]:
+    def explain_failure(self, predicate: Predicate[Any]) -> Explanation:
         return {"reason": f"{predicate} is not part of predicate {self.predicate}"}
 
 

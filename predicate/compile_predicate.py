@@ -34,7 +34,7 @@ from predicate.ne_predicate import NePredicate
 from predicate.not_in_predicate import NotInPredicate
 from predicate.not_predicate import NotPredicate
 from predicate.or_predicate import OrPredicate
-from predicate.predicate import Predicate
+from predicate.predicate import Explanation, Predicate
 from predicate.range_predicate import GeLePredicate, GeLtPredicate, GtLePredicate, GtLtPredicate
 from predicate.set_of_predicate import SetOfPredicate
 from predicate.tuple_of_predicate import TupleOfPredicate
@@ -71,7 +71,7 @@ class CompiledPredicate[T](Predicate[T]):
         return self.predicate.count
 
     @override
-    def explain_failure(self, x: T) -> dict[str, Any]:
+    def explain_failure(self, x: T) -> Explanation:
         return self.predicate.explain_failure(x)
 
     @override

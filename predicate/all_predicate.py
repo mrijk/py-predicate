@@ -4,7 +4,7 @@ from typing import Any, Iterable, Iterator, override
 
 from more_itertools import first, ilen
 
-from predicate.predicate import Predicate, resolve_predicate
+from predicate.predicate import Explanation, Predicate, resolve_predicate
 
 
 @dataclass
@@ -33,7 +33,7 @@ class AllPredicate[T](Predicate[T]):
         return 1 + self.predicate.count
 
     @override
-    def explain_failure(self, iterable: Iterable[T]) -> dict[str, Any]:
+    def explain_failure(self, iterable: Iterable[T]) -> Explanation:
         index, item = first((i, x) for i, x in enumerate(iterable) if not self.predicate(x))
         return {"index": index, "value": item} | self.predicate.explain_failure(item)
 

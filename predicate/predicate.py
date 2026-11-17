@@ -10,6 +10,8 @@ from uuid import UUID
 
 from more_itertools import spy
 
+type Explanation = dict[str, Any]
+
 
 @dataclass
 class Predicate[T]:
@@ -132,14 +134,14 @@ class Predicate[T]:
         raise NotImplementedError
 
     @final
-    def explain(self, x: Any, *args: Any, **kwargs: Any) -> dict[str, Any]:
+    def explain(self, x: Any, *args: Any, **kwargs: Any) -> Explanation:
         if self(x, *args, **kwargs):
             return {"result": True}
         return {
             "result": False,
         } | self.explain_failure(x, *args, **kwargs)
 
-    def explain_failure(self, x: Any, /, *args: Any, **kwargs: Any) -> dict[str, Any]:
+    def explain_failure(self, x: Any, /, *args: Any, **kwargs: Any) -> Explanation:
         raise NotImplementedError
 
     def consumes(self, iterable: Iterable[Any]) -> Iterator[int]:

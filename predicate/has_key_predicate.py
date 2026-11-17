@@ -2,7 +2,7 @@ from collections.abc import Mapping
 from dataclasses import dataclass
 from typing import Any, override
 
-from predicate.predicate import Predicate
+from predicate.predicate import Explanation, Predicate
 
 
 @dataclass
@@ -18,7 +18,7 @@ class HasKeyPredicate[T](Predicate[T]):
         return f"has_key_p({self.key_p!r})"
 
     @override
-    def explain_failure(self, v: Mapping[Any, Any]) -> dict[str, Any]:
+    def explain_failure(self, v: Mapping[Any, Any]) -> Explanation:
         return {"reason": f"No key satisfying {self.key_p!r} found in {v}"}
 
 
