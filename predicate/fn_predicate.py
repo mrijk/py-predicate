@@ -57,7 +57,8 @@ def generate_subnormal() -> Iterator[Any]:
 def generate_non_normal() -> Iterator[Any]:
     while True:
         yield 0.0
-        yield from generate_inf()
+        yield math.inf
+        yield -math.inf
         yield math.nan
         yield next(generate_subnormal())
 

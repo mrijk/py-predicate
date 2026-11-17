@@ -3,6 +3,8 @@
 
 ## Unreleased
 
+- fix is_normal_p false-value generation getting stuck on infinities before reaching NaN and subnormal values
+
 Features:
 
 - non_neg_p and non_pos_p comparison shortcuts include zero
