@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from inspect import iscoroutinefunction
 from typing import Any, Final, override
 
-from predicate.predicate import Predicate
+from predicate.predicate import Explanation, Predicate
 
 
 @dataclass
@@ -16,7 +16,7 @@ class IsAsyncPredicate[T](Predicate[T]):
         return "is_async_p"
 
     @override
-    def explain_failure(self, x: Any) -> dict[str, Any]:
+    def explain_failure(self, x: Any) -> Explanation:
         return {"reason": f"{x} is not an async function"}
 
 

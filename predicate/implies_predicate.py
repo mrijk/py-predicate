@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from typing import Any, override
 
 from predicate.implies import implies
-from predicate.predicate import Predicate
+from predicate.predicate import Explanation, Predicate
 
 
 @dataclass
@@ -18,7 +18,7 @@ class ImpliesPredicate[T](Predicate[T]):
         return f"implies_p({self.predicate})"
 
     @override
-    def explain_failure(self, predicate: Predicate[Any]) -> dict[str, Any]:
+    def explain_failure(self, predicate: Predicate[Any]) -> Explanation:
         return {"reason": f"{predicate} doesn't imply {self.predicate}"}
 
 

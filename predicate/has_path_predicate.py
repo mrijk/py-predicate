@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from typing import Any, override
 
 from predicate.helpers import predicates_repr
-from predicate.predicate import Predicate
+from predicate.predicate import Explanation, Predicate
 
 
 @dataclass
@@ -21,7 +21,7 @@ class HasPathPredicate[T](Predicate[T]):
         return f"has_path_p({predicates_repr(self.path)})"
 
     @override
-    def explain_failure(self, x: Any) -> dict[str, Any]:
+    def explain_failure(self, x: Any) -> Explanation:
         if not isinstance(x, Mapping):
             return {"reason": f"Value {x} is not a Mapping"}
         current = x

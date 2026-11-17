@@ -2,7 +2,7 @@ import re
 from dataclasses import dataclass
 from typing import Any, Final, override
 
-from predicate.predicate import Predicate
+from predicate.predicate import Explanation, Predicate
 
 
 @dataclass
@@ -22,7 +22,7 @@ class IsRegexPredicate[T](Predicate[T]):
         return "is_regex_p"
 
     @override
-    def explain_failure(self, x: Any) -> dict[str, Any]:
+    def explain_failure(self, x: Any) -> Explanation:
         if not isinstance(x, str):
             return {"reason": f"{x} is not a string"}
         try:

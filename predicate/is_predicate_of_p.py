@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import Any, override
 
-from predicate.predicate import Predicate
+from predicate.predicate import Explanation, Predicate
 
 
 @dataclass
@@ -22,7 +22,7 @@ class IsPredicateOfPredicate[T](Predicate[T]):
         return f"is_predicate_of_p({name!r})"
 
     @override
-    def explain_failure(self, x: T) -> dict[str, Any]:
+    def explain_failure(self, x: T) -> Explanation:
         match x:
             case Predicate():
                 return {"reason": f"{x} is not a predicate of type {self.predicate_klass.__name__!r}"}

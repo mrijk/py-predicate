@@ -9,7 +9,7 @@ from uuid import UUID
 
 from predicate import always_false_p
 from predicate.helpers import join_with_or
-from predicate.predicate import Predicate
+from predicate.predicate import Explanation, Predicate
 
 
 @dataclass
@@ -36,7 +36,7 @@ class IsInstancePredicate[T](Predicate[T]):
         return self.instance_klass  # type: ignore
 
     @override
-    def explain_failure(self, x: T) -> dict[str, Any]:
+    def explain_failure(self, x: T) -> Explanation:
         klasses = join_with_or([klass.__name__ for klass in self.instance_klass])
 
         return {"reason": f"{x} is not an instance of type {klasses}"}

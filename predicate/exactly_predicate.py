@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import Any, Iterable, override
 
-from predicate.predicate import Predicate
+from predicate.predicate import Explanation, Predicate
 
 
 @dataclass
@@ -29,7 +29,7 @@ class ExactlyPredicate[T](Predicate[T]):
     @override
     def explain_failure(
         self, iterable: Iterable[T], *, predicates: list[Predicate[Any]], full_match: bool
-    ) -> dict[str, Any]:
+    ) -> Explanation:
         from predicate.match_predicate import reason
 
         head, rest = self._split(iterable)

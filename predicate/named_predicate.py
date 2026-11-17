@@ -5,7 +5,7 @@ from predicate.and_predicate import AndPredicate
 from predicate.implies import Implies
 from predicate.not_predicate import NotPredicate
 from predicate.or_predicate import OrPredicate
-from predicate.predicate import Predicate
+from predicate.predicate import Explanation, Predicate
 from predicate.xor_predicate import XorPredicate
 
 
@@ -25,7 +25,7 @@ class NamedPredicate[T](Predicate[T]):
         return self.name
 
     @override
-    def explain_failure(self, x: T) -> dict[str, Any]:
+    def explain_failure(self, x: T) -> Explanation:
         return {"reason": f"{self.name} is False for {x}"}
 
 

@@ -3,7 +3,7 @@ from typing import Any, TypeGuard, override
 
 from more_itertools import first
 
-from predicate.predicate import Predicate, resolve_predicate
+from predicate.predicate import Explanation, Predicate, resolve_predicate
 
 
 @dataclass
@@ -34,7 +34,7 @@ class ListOfPredicate[T](Predicate[T]):
         return Predicate[self.predicate.klass]  # type: ignore[name-defined]
 
     @override
-    def explain_failure(self, x: Any, *args: Any, **kwargs: Any) -> dict[str, Any]:
+    def explain_failure(self, x: Any, *args: Any, **kwargs: Any) -> Explanation:
         match x:
             case list(l):
                 index, item = first((i, v) for i, v in enumerate(l) if not self.predicate(v))

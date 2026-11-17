@@ -18,7 +18,7 @@ from predicate.lt_predicate import LtPredicate
 from predicate.ne_predicate import NePredicate
 from predicate.not_in_predicate import NotInPredicate
 from predicate.or_predicate import OrPredicate
-from predicate.predicate import Predicate, SupportsComparison
+from predicate.predicate import Explanation, Predicate, SupportsComparison
 from predicate.set_of_predicate import SetOfPredicate
 from predicate.set_predicates import (
     IntersectsPredicate,
@@ -226,7 +226,7 @@ class Implies[T](Predicate[T]):
         return f"{self.left} => {self.right}"
 
     @override
-    def explain_failure(self, x: Any) -> dict[str, Any]:
+    def explain_failure(self, x: Any) -> Explanation:
         return {"reason": f"{self.left} doesn't imply {self.right}"}
 
 

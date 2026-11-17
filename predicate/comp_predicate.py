@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import Any, Callable, override
 
-from predicate.predicate import Predicate
+from predicate.predicate import Explanation, Predicate
 
 
 @dataclass
@@ -22,7 +22,7 @@ class CompPredicate[S, T](Predicate[T]):
         return predicate in self.predicate
 
     @override
-    def explain_failure(self, x: S) -> dict[str, Any]:
+    def explain_failure(self, x: S) -> Explanation:
         return {"reason": self.predicate.explain(x)}
 
 

@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from typing import Any, Iterable, override
 
 from predicate import always_true_p
-from predicate.predicate import Predicate
+from predicate.predicate import Explanation, Predicate
 
 
 @dataclass
@@ -33,7 +33,7 @@ class StarPredicate[T](Predicate[T]):
     @override
     def explain_failure(
         self, iterable: Iterable[T], *, predicates: list[Predicate[Any]], full_match: bool
-    ) -> dict[str, Any]:
+    ) -> Explanation:
         return {"reason": f"tbd {self.predicate!r}"}
 
 

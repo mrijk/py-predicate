@@ -5,7 +5,7 @@ from typing import Any, override
 from more_itertools import first
 
 from predicate.helpers import dict_predicates_repr
-from predicate.predicate import Predicate
+from predicate.predicate import Explanation, Predicate
 
 
 @dataclass
@@ -21,7 +21,7 @@ class StructPredicate[T](Predicate[T]):
 
         return not any(self._failures(x))
 
-    def _failures(self, x: Mapping[Any, Any]) -> Iterator[dict[str, Any]]:
+    def _failures(self, x: Mapping[Any, Any]) -> Iterator[Explanation]:
         if additional := set(x) - set(self.required) - set(self.optional):
             yield {"reason": f"Field `{first(additional)}` is unknown"}
 
@@ -41,14 +41,14 @@ class StructPredicate[T](Predicate[T]):
         )
 
     @override
-    def explain_failure(self, x: Any, *args: Any, **kwargs: Any) -> dict[str, Any]:
+    def explain_failure(self, x: Any, *args: Any, **kwargs: Any) -> Explanation:
         if not isinstance(x, Mapping):
             return {"reason": f"{x} is not an instance of a Mapping"}
 
         return first(self._failures(x), {"reason": "Unknown"})
 
 
-def value_failure(key: str, value: Any, predicate: Predicate[Any]) -> dict[str, Any]:
+def value_failure(key: str, value: Any, predicate: Predicate[Any]) -> Explanation:
     return {
         "key": key,
         "value": value,

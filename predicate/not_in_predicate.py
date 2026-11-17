@@ -3,7 +3,7 @@ from typing import Any, Container, Iterable, override
 
 from predicate.helpers import join_as_str
 from predicate.in_predicate import class_from_set
-from predicate.predicate import Predicate
+from predicate.predicate import Explanation, Predicate
 
 
 @dataclass
@@ -24,7 +24,7 @@ class NotInPredicate[T](Predicate[T]):
         return f"not_in_p({self.v.__class__.__name__}())"
 
     @override
-    def explain_failure(self, x: Any) -> dict[str, Any]:
+    def explain_failure(self, x: Any) -> Explanation:
         return {"reason": f"{x} is in {self!r}"}
 
     @override

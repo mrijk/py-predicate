@@ -4,7 +4,7 @@ from functools import partial
 from inspect import signature
 from typing import Any, Final, override
 
-from predicate.predicate import Predicate
+from predicate.predicate import Explanation, Predicate
 
 
 def func_is_partial(func: Callable[..., Any]) -> bool:
@@ -35,7 +35,7 @@ class IsPartialPredicate[T](Predicate[T]):
         )
 
     @override
-    def explain_failure(self, x: Any) -> dict[str, Any]:
+    def explain_failure(self, x: Any) -> Explanation:
         match x:
             case func if callable(func) and func_is_partial(func):
                 sig = signature(func)

@@ -8,7 +8,7 @@ else:
     from typing import TypeGuard as TypeIs  # type: ignore[assignment,unused-ignore]  # approximation for Python < 3.13
 
 from predicate.and_predicate import and_p
-from predicate.predicate import Predicate, predicate_partial
+from predicate.predicate import Explanation, Predicate, predicate_partial
 
 
 @dataclass
@@ -22,7 +22,7 @@ class IsNotNonePredicate[T](Predicate[T]):
         return "is_not_none_p"
 
     @override
-    def explain_failure(self, _x: T) -> dict[str, Any]:
+    def explain_failure(self, _x: T) -> Explanation:
         return {"reason": "Value is None"}
 
 

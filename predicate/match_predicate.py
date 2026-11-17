@@ -6,7 +6,7 @@ from predicate.consumes import consumes
 from predicate.exactly_predicate import ExactlyPredicate
 from predicate.optional_predicate import OptionalPredicate
 from predicate.plus_predicate import PlusPredicate
-from predicate.predicate import Predicate
+from predicate.predicate import Explanation, Predicate
 from predicate.repeat_predicate import RepeatPredicate
 from predicate.star_predicate import StarPredicate
 
@@ -26,7 +26,7 @@ class MatchPredicate[T](Predicate[T]):
         return f"match_p({param})"
 
     @override
-    def explain_failure(self, iterable: Iterable[T]) -> dict[str, Any]:
+    def explain_failure(self, iterable: Iterable[T]) -> Explanation:
         return {"reason": reason(iterable, predicates=self.predicates, full_match=self.full_match)}
 
 
@@ -35,7 +35,7 @@ def match_p[T](*predicates: Predicate[Any], full_match: bool = False) -> MatchPr
     return MatchPredicate(predicates=list(predicates), full_match=full_match)
 
 
-def reason(iterable: Iterable[Any], *, predicates: list[Predicate[Any]], full_match: bool) -> dict[str, Any]:
+def reason(iterable: Iterable[Any], *, predicates: list[Predicate[Any]], full_match: bool) -> Explanation:
     if not predicates:
         return {"reason": "Iterable has more items than predicates to match", "result": False}
     predicate, *rest_predicates = predicates
