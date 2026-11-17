@@ -16,6 +16,7 @@ from predicate.exactly_predicate import exactly_n
 from predicate.exception_predicate import exception_p
 from predicate.compile_predicate import compile_predicate, try_compile_predicate
 from predicate.explain import explain
+from predicate.float_predicates import is_integer_valued_p, is_probability_p, is_within_p
 from predicate.function_predicate import as_predicate, fn_p
 from predicate.fn_predicate import (
     is_even_p,
@@ -144,6 +145,9 @@ from predicate.tuple_of_predicate import is_tuple_of_p
 
 __all__ = [
     "accepts_p",
+    "is_integer_valued_p",
+    "is_probability_p",
+    "is_within_p",
     "are_equivalent",
     "as_predicate",
     "is_satisfiable",
