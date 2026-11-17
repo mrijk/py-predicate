@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Any, override
+from typing import Any, Final, override
 
 from predicate.predicate import Predicate, SupportsComparison
 
@@ -29,3 +29,7 @@ class GePredicate[T: SupportsComparison](Predicate[T]):
 def ge_p[T: SupportsComparison](v: T) -> GePredicate[T]:
     """Return True if the value is greater or equal than the constant, otherwise False."""
     return GePredicate(v=v)
+
+
+non_neg_p: Final[GePredicate[Any]] = ge_p(0)
+"""Return True if the value is nonnegative, including zero, otherwise False."""

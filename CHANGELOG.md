@@ -5,6 +5,8 @@
 
 Features:
 
+- non_neg_p and non_pos_p comparison shortcuts include zero
+
 - new type check predicate is_frozendict_p (Python 3.15+, always False on older versions)
 - generator support for frozenset, frozendict, sentinel and template
 - new type check predicate is_template_p (Python 3.14+, always False on older versions)

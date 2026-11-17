@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Any, override
+from typing import Any, Final, override
 
 from predicate.predicate import Predicate, SupportsComparison
 
@@ -29,3 +29,7 @@ class LePredicate[T: SupportsComparison](Predicate[T]):
 def le_p[T: SupportsComparison](v: T) -> LePredicate[T]:
     """Return True if the value is less than or equal to the constant, otherwise False."""
     return LePredicate(v=v)
+
+
+non_pos_p: Final[LePredicate[Any]] = le_p(0)
+"""Return True if the value is nonpositive, including zero, otherwise False."""

@@ -57,7 +57,9 @@ Predicates compose with standard Python operators:
 
 **Logic:** `always_p`, `never_p`, `implies_p`, `fn_p`
 
-**Numeric:** `is_even_p`, `is_odd_p`, `is_nan_p`, `is_inf_p`, `is_finite_p`, `pos_p`, `neg_p`, `zero_p`
+`non_neg_p` and `non_pos_p` include zero and compose the existing `ge_p(0)` and `le_p(0)` comparisons.
+
+**Numeric:** `is_even_p`, `is_odd_p`, `is_nan_p`, `is_inf_p`, `is_finite_p`, `pos_p`, `neg_p`, `non_neg_p`, `non_pos_p`, `zero_p`
 
 ## Failure explanation
 
