@@ -1,13 +1,24 @@
+import pytest
+from generator.generate_false.helpers import assert_generated_false
+from generator.generate_true.helpers import assert_generated_true
+
 from predicate import (
     ends_with_p,
     is_alnum_p,
     is_alpha_p,
+    is_blank_p,
+    is_camel_case_p,
+    is_capitalized_p,
     is_decimal_p,
     is_digit_p,
+    is_kebab_case_p,
     is_lower_p,
     is_numeric_p,
     is_printable_p,
+    is_single_line_p,
+    is_snake_case_p,
     is_space_p,
+    is_stripped_p,
     is_title_p,
     is_upper_p,
     starts_with_p,
@@ -86,3 +97,76 @@ def test_create_is_str_p():
     pred = create_is_str_p(str.isupper)
     assert pred("ABC")
     assert not pred("abc")
+
+
+def test_is_stripped_p():
+    assert is_stripped_p("")
+    assert is_stripped_p("a b")
+    assert not is_stripped_p(" a")
+    assert not is_stripped_p("a\n")
+
+
+def test_is_blank_p():
+    assert is_blank_p("")
+    assert is_blank_p(" \t\n")
+    assert not is_blank_p(" a ")
+
+
+def test_is_single_line_p():
+    assert is_single_line_p("")
+    assert is_single_line_p("a b")
+    assert not is_single_line_p("a\nb")
+
+
+def test_is_capitalized_p():
+    assert is_capitalized_p("Hello world")
+    assert is_capitalized_p("H")
+    assert not is_capitalized_p("")
+    assert not is_capitalized_p("hello")
+    assert not is_capitalized_p("Hello World")
+    assert not is_capitalized_p("HELLO")
+    assert not is_capitalized_p("1abc")
+
+
+def test_is_snake_case_p():
+    assert is_snake_case_p("foo")
+    assert is_snake_case_p("foo_bar2")
+    assert not is_snake_case_p("")
+    assert not is_snake_case_p("Foo_bar")
+    assert not is_snake_case_p("foo__bar")
+    assert not is_snake_case_p("_foo")
+    assert not is_snake_case_p("foo-bar")
+
+
+def test_is_kebab_case_p():
+    assert is_kebab_case_p("foo")
+    assert is_kebab_case_p("foo-bar2")
+    assert not is_kebab_case_p("")
+    assert not is_kebab_case_p("Foo-bar")
+    assert not is_kebab_case_p("foo--bar")
+    assert not is_kebab_case_p("foo_bar")
+
+
+def test_is_camel_case_p():
+    assert is_camel_case_p("foo")
+    assert is_camel_case_p("fooBar2")
+    assert not is_camel_case_p("")
+    assert not is_camel_case_p("FooBar")
+    assert not is_camel_case_p("foo_bar")
+
+
+@pytest.mark.parametrize(
+    "predicate",
+    [
+        is_stripped_p,
+        is_blank_p,
+        is_single_line_p,
+        is_capitalized_p,
+        is_snake_case_p,
+        is_kebab_case_p,
+        is_camel_case_p,
+    ],
+)
+def test_generators(predicate):
+    assert_generated_true(predicate)
+    assert_generated_false(predicate)

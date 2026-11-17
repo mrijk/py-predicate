@@ -55,6 +55,45 @@ Return True if the string is empty or all characters in the string are ASCII, Fa
     assert is_ascii_p("")
     assert not is_ascii_p("héllo")
 
+is_blank_p
+~~~~~~~~~~
+
+Return True if the string is empty or only contains whitespace, False otherwise.
+
+.. code-block:: python
+
+    from predicate import is_blank_p
+
+    assert is_blank_p("")
+    assert is_blank_p(" \t\n")
+    assert not is_blank_p(" a ")
+
+is_camel_case_p
+~~~~~~~~~~~~~~~
+
+Return True if the string is camelCase (starts lowercase, no separators), False otherwise.
+
+.. code-block:: python
+
+    from predicate import is_camel_case_p
+
+    assert is_camel_case_p("fooBar")
+    assert not is_camel_case_p("FooBar")
+    assert not is_camel_case_p("foo_bar")
+
+is_capitalized_p
+~~~~~~~~~~~~~~~~
+
+Return True if the first character is uppercase and the rest is lowercase, False otherwise. Unlike ``is_title_p``, only the first word counts.
+
+.. code-block:: python
+
+    from predicate import is_capitalized_p
+
+    assert is_capitalized_p("Hello world")
+    assert not is_capitalized_p("Hello World")
+    assert not is_capitalized_p("hello")
+
 is_decimal_p
 ~~~~~~~~~~~~
 
@@ -93,6 +132,19 @@ Return True if the string is a valid Python identifier, False otherwise.
     assert is_identifier_p("_private")
     assert not is_identifier_p("123abc")
     assert not is_identifier_p("my-var")
+
+is_kebab_case_p
+~~~~~~~~~~~~~~~
+
+Return True if the string is kebab-case, False otherwise.
+
+.. code-block:: python
+
+    from predicate import is_kebab_case_p
+
+    assert is_kebab_case_p("foo-bar")
+    assert not is_kebab_case_p("foo_bar")
+    assert not is_kebab_case_p("Foo-bar")
 
 is_lower_p
 ~~~~~~~~~~
@@ -145,6 +197,31 @@ Return True if the value is a string that compiles as a valid regular expression
     assert not is_regex_p("(")
     assert not is_regex_p(42)
 
+is_single_line_p
+~~~~~~~~~~~~~~~~
+
+Return True if the string contains no newline, False otherwise.
+
+.. code-block:: python
+
+    from predicate import is_single_line_p
+
+    assert is_single_line_p("hello world")
+    assert not is_single_line_p("hello\nworld")
+
+is_snake_case_p
+~~~~~~~~~~~~~~~
+
+Return True if the string is snake_case, False otherwise.
+
+.. code-block:: python
+
+    from predicate import is_snake_case_p
+
+    assert is_snake_case_p("foo_bar")
+    assert not is_snake_case_p("foo-bar")
+    assert not is_snake_case_p("Foo_bar")
+
 is_space_p
 ~~~~~~~~~~
 
@@ -158,6 +235,19 @@ Return True if there are only whitespace characters in the string and there is a
     assert is_space_p("\t\n")
     assert not is_space_p("")
     assert not is_space_p("hello")
+
+is_stripped_p
+~~~~~~~~~~~~~
+
+Return True if the string has no leading or trailing whitespace, False otherwise.
+
+.. code-block:: python
+
+    from predicate import is_stripped_p
+
+    assert is_stripped_p("hello world")
+    assert not is_stripped_p(" hello")
+    assert not is_stripped_p("hello\n")
 
 is_title_p
 ~~~~~~~~~~
