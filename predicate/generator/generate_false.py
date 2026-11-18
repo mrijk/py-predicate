@@ -103,6 +103,7 @@ from predicate.star_predicate import StarPredicate
 from predicate.struct_predicate import StructPredicate
 from predicate.tee_predicate import TeePredicate
 from predicate.tuple_of_predicate import TupleOfPredicate
+from predicate.unique_predicate import UniquePredicate
 from predicate.xor_predicate import XorPredicate
 
 default_at_least_one_length_p: Final = ge_le_p(lower=1, upper=10)
@@ -187,6 +188,16 @@ def generate_has_key(predicate: HasKeyPredicate[Any]) -> Iterator[Any]:
 @generate_false.register(HasLengthPredicate)
 def generate_has_length(predicate: HasLengthPredicate[Any], *, value_p: Predicate[Any] = is_int_p) -> Iterator[Any]:
     yield from random_iterables(length_p=~predicate.length_p, value_p=value_p)
+
+
+@generate_false.register(UniquePredicate)
+def generate_unique(predicate: UniquePredicate[Any], *, value_p: Predicate[Any] = is_int_p) -> Iterator[Any]:  # type: ignore[misc]
+    from predicate import generate_true
+
+    for value in generate_true(value_p):
+        pair = [value, value]
+        if not predicate(pair):
+            yield pair
 
 
 @generate_false.register(HasPathPredicate)

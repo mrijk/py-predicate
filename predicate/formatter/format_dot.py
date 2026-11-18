@@ -70,6 +70,7 @@ from predicate.star_predicate import StarPredicate
 from predicate.tee_predicate import TeePredicate
 from predicate.this_predicate import ThisPredicate, find_this_predicate
 from predicate.tuple_of_predicate import TupleOfPredicate
+from predicate.unique_predicate import UniquePredicate
 from predicate.xor_predicate import XorPredicate
 
 
@@ -154,6 +155,10 @@ def render(dot: Digraph, predicate: Predicate[Any], node_nr: "count[Any]") -> No
             case FnPredicate(predicate_fn):
                 name = predicate_fn.__code__.co_name
                 return add_node("fn", label=f"fn: {name}")
+            case UniquePredicate(key=None):
+                return add_node("unique", label="unique")
+            case UniquePredicate() as unique:
+                return add_node("unique_by", label=f"unique by: {unique.key_name}")
             case HasKeyPredicate(key_p):
                 return add_node_with_child("has_key", label="has_key", child=key_p)
             case HasLengthPredicate(length_p):

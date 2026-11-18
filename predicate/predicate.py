@@ -135,6 +135,9 @@ class Predicate[T]:
 
     @final
     def explain(self, x: Any, *args: Any, **kwargs: Any) -> Explanation:
+        return self._explain(x, *args, **kwargs)
+
+    def _explain(self, x: Any, *args: Any, **kwargs: Any) -> Explanation:
         if self(x, *args, **kwargs):
             return {"result": True}
         return {

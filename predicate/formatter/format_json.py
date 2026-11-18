@@ -57,6 +57,7 @@ from predicate.set_predicates import (
 from predicate.struct_predicate import StructPredicate
 from predicate.tee_predicate import TeePredicate
 from predicate.tuple_of_predicate import TupleOfPredicate
+from predicate.unique_predicate import UniquePredicate
 from predicate.xor_predicate import XorPredicate
 
 
@@ -105,6 +106,10 @@ def _to_value(predicate: Predicate[Any]) -> tuple[str, Any]:  # noqa: C901
             fn_info: dict[str, Any] = {"name": name}
             fn_info.update(get_fn_source(predicate_fn))
             return "fn", fn_info
+        case UniquePredicate(key=None):
+            return "unique", None
+        case UniquePredicate() as unique:
+            return "unique_by", {"key": unique.key_name}
         case HasKeyPredicate(key_p):
             return "has_key", {"key_p": to_json(key_p)}
         case HasLengthPredicate(length_p):

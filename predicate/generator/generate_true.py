@@ -212,6 +212,7 @@ from predicate.struct_predicate import StructPredicate
 from predicate.tee_predicate import TeePredicate
 from predicate.tuple_of_predicate import TupleOfPredicate
 from predicate.type_var_predicate import ConstrainedTypeVarPredicate, FreeTypeVarPredicate
+from predicate.unique_predicate import UniquePredicate
 from predicate.xor_predicate import XorPredicate
 
 
@@ -465,6 +466,14 @@ def generate_has_key(predicate: HasKeyPredicate[Any]) -> Iterator[Any]:
 @generate_true.register(HasLengthPredicate)
 def generate_has_length(predicate: HasLengthPredicate[Any], *, value_p: Predicate[Any] = is_int_p) -> Iterator[Any]:
     yield from random_iterables(length_p=predicate.length_p, value_p=value_p)
+
+
+@generate_true.register(UniquePredicate)
+def generate_unique(predicate: UniquePredicate[Any], *, value_p: Predicate[Any] = is_int_p) -> Iterator[Any]:  # type: ignore[misc]
+    yield []
+    for value in generate_true(value_p):
+        if predicate([value]):
+            yield [value]
 
 
 def _create_value_predicate(path: list[Predicate[Any]]) -> Predicate[Any]:
