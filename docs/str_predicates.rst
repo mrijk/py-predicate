@@ -6,7 +6,7 @@ A collection of predicates that act on strings.
 contains_p
 ~~~~~~~~~~
 
-Return True if the input contains the given substring. Matching is case-sensitive.
+Use ``contains_p`` for case-sensitive substring matching in a string.
 An empty substring matches every string, so there are no non-matching examples to generate.
 
 .. code-block:: python

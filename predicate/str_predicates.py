@@ -4,7 +4,6 @@ import string
 from typing import Any, Callable, Iterator
 
 from predicate import fn_p
-from predicate.contains_predicate import contains_p as contains_p
 from predicate.predicate import Predicate
 
 

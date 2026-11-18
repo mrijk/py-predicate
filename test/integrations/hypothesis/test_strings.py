@@ -4,12 +4,12 @@ import pytest
 from hypothesis import given, settings
 
 from predicate import all_p, fn_p, is_dict_of_p, is_even_p, is_int_p, is_list_of_p, is_str_p
+from predicate.contains_predicate import contains_p
 from predicate.hypothesis import from_predicate
 from predicate.integrations.hypothesis import strings
 from predicate.is_regex_predicate import is_regex_p
 from predicate.regex_predicate import RegexPredicate, regex_p
 from predicate.str_predicates import (
-    contains_p,
     ends_with_p,
     is_alnum_p,
     is_alpha_p,
