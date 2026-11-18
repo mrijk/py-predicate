@@ -133,6 +133,31 @@ Return True if the string is a valid Python identifier, False otherwise.
     assert not is_identifier_p("123abc")
     assert not is_identifier_p("my-var")
 
+is_int_str_p
+~~~~~~~~~~~~
+
+Return True for strings (including subclasses) accepted by Python's ``int(value)``
+with its default base of 10. Non-string values return False without conversion.
+Signs, surrounding whitespace accepted by ``int``, underscores between digits,
+and Unicode decimal digits are supported. Empty strings, decimal points,
+exponents and base prefixes are rejected. Python's active integer-string length
+limit applies; a conversion rejected by that limit returns False. No whitespace
+preprocessing or global limit changes are performed.
+
+.. code-block:: python
+
+    from predicate import is_int_str_p
+
+    assert is_int_str_p("0")
+    assert is_int_str_p("-5")
+    assert is_int_str_p(" 1_000 ")
+    assert not is_int_str_p("1.0")
+    assert not is_int_str_p(5)
+
+Both true and false string generators are provided. Like other ``fn_p``-based
+predicates, this predicate uses the original callable via
+``try_compile_predicate`` fallback rather than direct compilation.
+
 is_kebab_case_p
 ~~~~~~~~~~~~~~~
 
