@@ -74,6 +74,7 @@ from predicate.always_false_predicate import AlwaysFalsePredicate, always_false_
 from predicate.always_true_predicate import AlwaysTruePredicate, always_true_p
 from predicate.and_predicate import AndPredicate
 from predicate.any_predicate import AnyPredicate
+from predicate.compile_predicate import CompiledPredicate
 from predicate.contains_predicate import ContainsPredicate
 from predicate.count_predicate import CountPredicate
 from predicate.dict_of_predicate import DictOfPredicate, is_dict_of_p
@@ -163,6 +164,7 @@ from predicate.has_key_predicate import HasKeyPredicate
 from predicate.has_length_predicate import HasLengthPredicate
 from predicate.has_path_predicate import HasPathPredicate
 from predicate.implements_protocol_predicate import ImplementsProtocolPredicate, protocol_members
+from predicate.implies import Implies
 from predicate.in_predicate import InPredicate
 from predicate.is_async_predicate import IsAsyncPredicate
 from predicate.is_callable_predicate import IsCallablePredicate
@@ -677,9 +679,20 @@ def generate_not_none(predicate: IsNotNonePredicate[Any]) -> Iterator[Any]:
     yield from generate_anys(predicate)
 
 
+@generate_true.register(CompiledPredicate)
+def generate_compiled(predicate: CompiledPredicate[Any], **kwargs: Any) -> Iterator[Any]:
+    yield from generate_true(predicate.predicate, **kwargs)
+
+
 @generate_true.register(OrPredicate)
 def generate_or(predicate: OrPredicate[Any]) -> Iterator[Any]:
     yield from random_first_from_iterables(generate_true(predicate.left), generate_true(predicate.right))
+
+
+@generate_true.register(Implies)
+def generate_implies(predicate: Implies[Any]) -> Iterator[Any]:
+    # p => q is ~p | q
+    yield from generate_true(~predicate.left | predicate.right)
 
 
 @generate_true.register(ReducePredicate)
