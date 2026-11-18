@@ -17,6 +17,7 @@ from predicate.always_false_predicate import AlwaysFalsePredicate, always_false_
 from predicate.always_true_predicate import AlwaysTruePredicate, always_true_p
 from predicate.and_predicate import AndPredicate
 from predicate.any_predicate import AnyPredicate
+from predicate.compile_predicate import CompiledPredicate
 from predicate.count_predicate import CountPredicate
 from predicate.dict_of_predicate import DictOfPredicate
 from predicate.eq_predicate import EqPredicate
@@ -512,6 +513,13 @@ def generate_implies(predicate: Implies[Any]) -> Iterator[Any]:
 
     # p => q is false when p holds and q doesn't, i.e. when p & ~q holds
     yield from generate_true(predicate.left & ~predicate.right)
+
+
+@generate_false.register(CompiledPredicate)
+def generate_compiled(predicate: CompiledPredicate[Any], **kwargs: Any) -> Iterator[Any]:
+    from predicate import generate_false
+
+    yield from generate_false(predicate.predicate, **kwargs)
 
 
 @generate_false.register(OrPredicate)

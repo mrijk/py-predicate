@@ -74,6 +74,7 @@ from predicate.always_false_predicate import AlwaysFalsePredicate, always_false_
 from predicate.always_true_predicate import AlwaysTruePredicate, always_true_p
 from predicate.and_predicate import AndPredicate
 from predicate.any_predicate import AnyPredicate
+from predicate.compile_predicate import CompiledPredicate
 from predicate.count_predicate import CountPredicate
 from predicate.dict_of_predicate import DictOfPredicate, is_dict_of_p
 from predicate.eq_predicate import EqPredicate, eq_p
@@ -669,6 +670,11 @@ def generate_not_in(predicate: NotInPredicate[Any]) -> Iterator[Any]:
 @generate_true.register(IsNotNonePredicate)
 def generate_not_none(predicate: IsNotNonePredicate[Any]) -> Iterator[Any]:
     yield from generate_anys(predicate)
+
+
+@generate_true.register(CompiledPredicate)
+def generate_compiled(predicate: CompiledPredicate[Any], **kwargs: Any) -> Iterator[Any]:
+    yield from generate_true(predicate.predicate, **kwargs)
 
 
 @generate_true.register(OrPredicate)
