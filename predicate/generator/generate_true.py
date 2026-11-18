@@ -162,6 +162,7 @@ from predicate.has_key_predicate import HasKeyPredicate
 from predicate.has_length_predicate import HasLengthPredicate
 from predicate.has_path_predicate import HasPathPredicate
 from predicate.implements_protocol_predicate import ImplementsProtocolPredicate, protocol_members
+from predicate.implies import Implies
 from predicate.in_predicate import InPredicate
 from predicate.is_async_predicate import IsAsyncPredicate
 from predicate.is_callable_predicate import IsCallablePredicate
@@ -673,6 +674,12 @@ def generate_not_none(predicate: IsNotNonePredicate[Any]) -> Iterator[Any]:
 @generate_true.register(OrPredicate)
 def generate_or(predicate: OrPredicate[Any]) -> Iterator[Any]:
     yield from random_first_from_iterables(generate_true(predicate.left), generate_true(predicate.right))
+
+
+@generate_true.register(Implies)
+def generate_implies(predicate: Implies[Any]) -> Iterator[Any]:
+    # p => q is ~p | q
+    yield from generate_true(~predicate.left | predicate.right)
 
 
 @generate_true.register(ReducePredicate)
