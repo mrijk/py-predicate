@@ -388,7 +388,14 @@ def random_constrained_pairs_of_type(klass: type) -> Iterator[tuple[Any, Any]]:
 
 def sample_optional_fields(optional: dict[str, Any], generators: dict[str, Iterator[Any]]) -> dict[str, Any]:
     optional_keys = random.sample(list(optional), k=random.randint(0, len(optional)))
-    return {key: next(generators[key]) for key in optional_keys}
+    result = {}
+    for key in optional_keys:
+        try:
+            result[key] = next(generators[key])
+        except StopIteration:
+            # An optional field with no more satisfying values may be omitted.
+            continue
+    return result
 
 
 def generate_datetimes(predicate: Predicate[datetime]) -> Iterator[datetime]:
