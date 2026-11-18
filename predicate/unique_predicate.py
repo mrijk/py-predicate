@@ -19,7 +19,7 @@ class UniquePredicate[T](Predicate[Iterable[T]]):
 
     @property
     def key_name(self) -> str:
-        return getattr(self.key, "__name__", str(self.key))
+        return getattr(self.key, "__name__", type(self.key).__name__)
 
     def _failure_reason(self, values: Iterable[T]) -> str | None:
         seen: dict[object, int] = {}
@@ -48,5 +48,8 @@ unique_p: Final[UniquePredicate[Any]] = UniquePredicate()
 
 
 def unique_by_p[T](key: Callable[[T], object]) -> UniquePredicate[T]:
-    """Return a predicate that checks for distinct hashable keys."""
+    """Return a predicate that checks for distinct hashable keys.
+
+    Unhashable return values fail the predicate. Exceptions raised by the key function propagate.
+    """
     return UniquePredicate(key)

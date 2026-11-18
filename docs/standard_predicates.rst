@@ -29,6 +29,32 @@ The equivalent code without using predicates could be something like:
         return all(isinstance(ele, int) for ele in iter)
 
 
+unique_p and unique_by_p
+------------------------
+
+``unique_p`` checks that the elements of an iterable are distinct. Use
+``unique_by_p(key)`` to compare the results of applying a key function:
+
+.. code-block:: python
+
+    from predicate import unique_by_p, unique_p
+
+    assert unique_p([1, 2, 3])
+    assert not unique_p([1, 2, 1])
+    assert not unique_by_p(str.casefold)(["Alice", "ALICE"])
+
+Duplicate keys and unhashable values or keys make the predicate false.
+Exceptions raised by the key function propagate to the caller.
+``explain`` traverses the iterable once and reports the duplicate key and both
+indices, or the unhashable key and its index.
+
+Both forms support JSON, YAML and DOT output. ``unique_p`` round-trips through
+``from_json``. The keyed form's output includes a display name for the callable
+and cannot reconstruct it. LaTeX output is unsupported for both forms.
+Uniqueness is an atomic predicate. Containment tests predicate equality and
+the optimizer leaves the predicate unchanged.
+
+
 always_false_p
 --------------
 

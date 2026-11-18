@@ -471,9 +471,20 @@ def generate_has_length(predicate: HasLengthPredicate[Any], *, value_p: Predicat
 @generate_true.register(UniquePredicate)
 def generate_unique(predicate: UniquePredicate[Any], *, value_p: Predicate[Any] = is_int_p) -> Iterator[Any]:  # type: ignore[misc]
     yield []
-    for value in generate_true(value_p):
-        if predicate([value]):
-            yield [value]
+    candidates = generate_true(value_p)
+    for size in cycle((1, 2, 3, 4)):
+        batch = take(size, candidates)
+        if not batch:
+            return
+        # A bounded batch also makes progress if the source repeats the same key.
+        values_by_key: dict[object, Any] = {}
+        for value in batch:
+            key = value if predicate.key is None else predicate.key(value)
+            try:
+                values_by_key.setdefault(key, value)
+            except TypeError:
+                continue
+        yield list(values_by_key.values())
 
 
 def _create_value_predicate(path: list[Predicate[Any]]) -> Predicate[Any]:
