@@ -87,6 +87,20 @@ def _str_p(fn: Callable[[str], bool], true: Callable[[], str], false: Callable[[
     return fn_p(fn=fn, generate_true_fn=_forever(true), generate_false_fn=_forever(false))
 
 
+def _is_int_str(value: object) -> bool:
+    if not isinstance(value, str):
+        return False
+    try:
+        int(value)
+    except ValueError:
+        return False
+    return True
+
+
+is_int_str_p = _str_p(_is_int_str, lambda: str(random.randint(-1000, 1000)), _word)
+"""Return True for strings (including subclasses) accepted by int(value), using its default base and runtime limits."""
+
+
 def _matches(pattern: str) -> Callable[[str], bool]:
     regex = re.compile(pattern)
     return lambda x: regex.fullmatch(x) is not None
