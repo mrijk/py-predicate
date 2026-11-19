@@ -13,6 +13,7 @@ from predicate.spec.exercise_helpers import (
     callable_name,
     check_ret_name,
     get_return_predicate,
+    is_context_manager_function,
     param_predicate,
     ret_name,
     type_var_failure,
@@ -219,7 +220,7 @@ def instrument_function(
 ) -> Callable[..., Any]:
     if is_instrumented(func):
         return func
-    func = unwrap(func)
+    func = unwrap(func, stop=is_context_manager_function)
     func_name = callable_name(func)
     # resolved once, on first call, so forward references (e.g. the enclosing class) exist by then
     resolved_signature = cache(lambda: signature(func))
