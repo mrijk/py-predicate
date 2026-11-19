@@ -9,6 +9,7 @@ from predicate.always_true_predicate import always_p, always_true_p
 from predicate.analysis import are_equivalent, is_satisfiable, is_tautology
 from predicate.any_predicate import any_p
 from predicate.comp_predicate import comp_p
+from predicate.contains_predicate import contains_p
 from predicate.count_predicate import count_p, exactly_one_p, exactly_zero_p
 from predicate.dict_of_predicate import is_dict_of_p
 from predicate.eq_predicate import eq_false_p, eq_p, eq_true_p, zero_p
@@ -162,6 +163,7 @@ __all__ = [
     "can_optimize",
     "compile_predicate",
     "comp_p",
+    "contains_p",
     "count_p",
     "eq_false_p",
     "eq_p",

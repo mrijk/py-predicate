@@ -7,6 +7,7 @@
 
 Features:
 
+- new string predicate contains_p with matching and non-matching generators
 - is_int_str_p checks strings using Python int conversion, with true/false generators
 - non_neg_p and non_pos_p comparison shortcuts include zero
 - float conveniences: is_integer_valued_p, is_within_p and is_probability_p

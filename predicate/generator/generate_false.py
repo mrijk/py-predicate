@@ -18,6 +18,7 @@ from predicate.always_true_predicate import AlwaysTruePredicate, always_true_p
 from predicate.and_predicate import AndPredicate
 from predicate.any_predicate import AnyPredicate
 from predicate.compile_predicate import CompiledPredicate
+from predicate.contains_predicate import ContainsPredicate
 from predicate.count_predicate import CountPredicate
 from predicate.dict_of_predicate import DictOfPredicate
 from predicate.eq_predicate import EqPredicate
@@ -355,6 +356,14 @@ def generate_falsy(_predicate: IsFalsyPredicate[Any]) -> Iterator[Any]:
 @generate_false.register(FnPredicate)
 def generate_fn_p(predicate: FnPredicate[Any]) -> Iterator[Any]:
     yield from predicate.generate_false_fn()
+
+
+@generate_false.register(ContainsPredicate)
+def generate_contains(predicate: ContainsPredicate) -> Iterator[str]:  # type: ignore[misc]
+    if predicate.substring:
+        # Removing its first character guarantees that the substring cannot occur.
+        first_character = predicate.substring[0]
+        yield from (text.replace(first_character, "") for text in random_strings())
 
 
 @generate_false.register(InPredicate)

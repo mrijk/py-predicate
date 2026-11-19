@@ -1,10 +1,11 @@
-"""Strategies for the string predicates: str methods, starts_with_p/ends_with_p and regular expressions."""
+"""Strategies for string methods, substrings, prefixes, suffixes and regular expressions."""
 
 from typing import Any
 
 from hypothesis import strategies as st
 from hypothesis.strategies import SearchStrategy
 
+from predicate.contains_predicate import ContainsPredicate
 from predicate.function_predicate import FnPredicate
 from predicate.is_regex_predicate import IsRegexPredicate
 from predicate.predicate import Predicate
@@ -35,6 +36,8 @@ def from_text(predicate: Predicate[Any]) -> SearchStrategy[str] | None:
             strategy: SearchStrategy[str] | None = st.from_regex(predicate.regex, fullmatch=True)
         case IsRegexPredicate():
             strategy = st.text()
+        case ContainsPredicate(substring):
+            strategy = st.builds(lambda prefix, suffix: prefix + substring + suffix, st.text(), st.text())
         case FnPredicate(fn):
             strategy = _from_fn(fn)
         case _:

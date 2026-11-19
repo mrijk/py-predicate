@@ -4,6 +4,7 @@ import pytest
 from hypothesis import given, settings
 
 from predicate import all_p, fn_p, is_dict_of_p, is_even_p, is_int_p, is_list_of_p, is_str_p
+from predicate.contains_predicate import contains_p
 from predicate.hypothesis import from_predicate
 from predicate.integrations.hypothesis import strings
 from predicate.is_regex_predicate import is_regex_p
@@ -39,6 +40,8 @@ predicates = {
     "is_title_p": is_title_p,
     "is_upper_p": is_upper_p,
     "fn_p(str.isalpha)": fn_p(str.isalpha),
+    "contains_p": contains_p("un café noir"),
+    "contains_p empty": contains_p(""),
     "starts_with_p": starts_with_p("ab"),
     "starts_with_p empty": starts_with_p(""),
     "ends_with_p": ends_with_p("yz"),

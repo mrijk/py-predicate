@@ -75,6 +75,7 @@ from predicate.always_true_predicate import AlwaysTruePredicate, always_true_p
 from predicate.and_predicate import AndPredicate
 from predicate.any_predicate import AnyPredicate
 from predicate.compile_predicate import CompiledPredicate
+from predicate.contains_predicate import ContainsPredicate
 from predicate.count_predicate import CountPredicate
 from predicate.dict_of_predicate import DictOfPredicate, is_dict_of_p
 from predicate.eq_predicate import EqPredicate, eq_p
@@ -569,6 +570,12 @@ def generate_intersects(predicate: IntersectsPredicate[Any]) -> Iterator[Any]:
 @generate_true.register(FnPredicate)
 def generate_fn_p(predicate: FnPredicate[Any]) -> Iterator[Any]:
     yield from predicate.generate_true_fn()
+
+
+@generate_true.register(ContainsPredicate)
+def generate_contains(predicate: ContainsPredicate) -> Iterator[str]:  # type: ignore[misc]
+    for prefix, suffix in zip(random_strings(), random_strings(), strict=True):
+        yield prefix + predicate.substring + suffix
 
 
 @generate_true.register(InPredicate)
