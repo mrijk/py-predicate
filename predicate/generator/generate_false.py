@@ -604,6 +604,11 @@ def generate_tuple_of_p(tuple_of_predicate: TupleOfPredicate[Any]) -> Iterator[A
     predicates = tuple_of_predicate.predicates
 
     length = len(predicates)
+    if length == 0:
+        # only () is true, so any non-empty tuple is false
+        yield from (tuple(take(random.randint(1, 3), random_anys())) for _ in repeat(None))
+        return
+
     max_number = 2**length - 1
     generators = [(generate_false(predicate), generate_true(predicate)) for predicate in predicates]
 
