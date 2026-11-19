@@ -215,6 +215,7 @@ from predicate.struct_predicate import StructPredicate
 from predicate.tee_predicate import TeePredicate
 from predicate.tuple_of_predicate import TupleOfPredicate
 from predicate.type_var_predicate import ConstrainedTypeVarPredicate, FreeTypeVarPredicate
+from predicate.unique_predicate import UniquePredicate
 from predicate.xor_predicate import XorPredicate
 
 
@@ -468,6 +469,25 @@ def generate_has_key(predicate: HasKeyPredicate[Any]) -> Iterator[Any]:
 @generate_true.register(HasLengthPredicate)
 def generate_has_length(predicate: HasLengthPredicate[Any], *, value_p: Predicate[Any] = is_int_p) -> Iterator[Any]:
     yield from random_iterables(length_p=predicate.length_p, value_p=value_p)
+
+
+@generate_true.register(UniquePredicate)
+def generate_unique(predicate: UniquePredicate[Any], *, value_p: Predicate[Any] = is_int_p) -> Iterator[Any]:  # type: ignore[misc]
+    yield []
+    candidates = generate_true(value_p)
+    for size in cycle((1, 2, 3, 4)):
+        batch = take(size, candidates)
+        if not batch:
+            return
+        # A bounded batch also makes progress if the source repeats the same key.
+        values_by_key: dict[object, Any] = {}
+        for value in batch:
+            key = value if predicate.key is None else predicate.key(value)
+            try:
+                values_by_key.setdefault(key, value)
+            except TypeError:
+                continue
+        yield list(values_by_key.values())
 
 
 def _create_value_predicate(path: list[Predicate[Any]]) -> Predicate[Any]:

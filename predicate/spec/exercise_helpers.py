@@ -4,8 +4,9 @@ import io
 import sys
 import types
 import warnings
+from contextlib import AbstractAsyncContextManager, AbstractContextManager
 from functools import partial, reduce
-from inspect import Parameter, Signature, isroutine, signature
+from inspect import Parameter, Signature, isasyncgenfunction, isgeneratorfunction, isroutine, signature
 from itertools import islice, repeat, takewhile
 from operator import and_
 from typing import (
@@ -179,6 +180,14 @@ def callable_name(f: Callable[..., Any]) -> str:
     return getattr(f, "__name__", type(f).__name__)
 
 
+def is_context_manager_function(f: Any) -> bool:
+    # contextlib doesn't mark the function, but __wrapped__ is the (async) generator function it decorated
+    wrapped = getattr(f, "__wrapped__", None)
+    return (isgeneratorfunction(wrapped) or isasyncgenfunction(wrapped)) and not (
+        isgeneratorfunction(f) or isasyncgenfunction(f)
+    )
+
+
 def resolved_signature(f: Callable[..., Any]) -> Signature:
     # get_type_hints also resolves nested string annotations, e.g. x: "str" under `from __future__ import annotations`
     sig = _signature(f)
@@ -197,7 +206,12 @@ def resolved_signature(f: Callable[..., Any]) -> Signature:
         # e.g. classmethod[Any, Any, Any]: only subscriptable for type checkers before 3.14
         hints = _hints_or_any(owner, imported_namespace(owner))
     parameters = [p.replace(annotation=hints.get(name, p.annotation)) for name, p in sig.parameters.items()]
-    return sig.replace(parameters=parameters, return_annotation=hints.get("return", sig.return_annotation))
+    ret = hints.get("return", sig.return_annotation)
+    if is_context_manager_function(f):
+        # The annotation describes the undecorated generator; the decorated function returns a context manager (#326)
+        is_async = isasyncgenfunction(getattr(f, "__wrapped__"))  # noqa: B009
+        ret = AbstractAsyncContextManager if is_async else AbstractContextManager
+    return sig.replace(parameters=parameters, return_annotation=ret)
 
 
 def _resolve_or_any(ref: str | ForwardRef, module_name: str, owner: str) -> Any:

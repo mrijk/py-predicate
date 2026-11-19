@@ -135,6 +135,11 @@ class Predicate[T]:
 
     @final
     def explain(self, x: Any, *args: Any, **kwargs: Any) -> Explanation:
+        """Return the result and, when false, the details of the failure."""
+        return self._explain(x, *args, **kwargs)
+
+    def _explain(self, x: Any, *args: Any, **kwargs: Any) -> Explanation:
+        """Build a complete explanation; override when evaluation must happen only once."""
         if self(x, *args, **kwargs):
             return {"result": True}
         return {

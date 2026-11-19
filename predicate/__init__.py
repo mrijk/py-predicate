@@ -143,6 +143,7 @@ from predicate.star_predicate import star
 from predicate.struct_predicate import is_struct_p
 from predicate.tee_predicate import tee_p
 from predicate.tuple_of_predicate import is_tuple_of_p
+from predicate.unique_predicate import unique_by_p, unique_p
 
 __all__ = [
     "accepts_p",
@@ -232,6 +233,7 @@ __all__ = [
     "is_instance_p",
     "is_int_enum_p",
     "is_int_p",
+    "is_int_str_p",
     "is_iterable_of_p",
     "is_iterable_p",
     "is_lambda_p",
@@ -329,6 +331,8 @@ __all__ = [
     "to_json",
     "to_latex",
     "to_yaml",
+    "unique_by_p",
+    "unique_p",
     "xor_p",
     "zero_p",
     "Predicate",
@@ -349,6 +353,7 @@ from predicate.str_predicates import (
     is_decimal_p,
     is_digit_p,
     is_identifier_p,
+    is_int_str_p,
     is_lower_p,
     is_numeric_p,
     is_printable_p,

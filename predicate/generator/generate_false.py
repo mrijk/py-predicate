@@ -106,6 +106,7 @@ from predicate.star_predicate import StarPredicate
 from predicate.struct_predicate import StructPredicate
 from predicate.tee_predicate import TeePredicate
 from predicate.tuple_of_predicate import TupleOfPredicate
+from predicate.unique_predicate import UniquePredicate
 from predicate.xor_predicate import XorPredicate
 
 default_at_least_one_length_p: Final = ge_le_p(lower=1, upper=10)
@@ -190,6 +191,16 @@ def generate_has_key(predicate: HasKeyPredicate[Any]) -> Iterator[Any]:
 @generate_false.register(HasLengthPredicate)
 def generate_has_length(predicate: HasLengthPredicate[Any], *, value_p: Predicate[Any] = is_int_p) -> Iterator[Any]:
     yield from random_iterables(length_p=~predicate.length_p, value_p=value_p)
+
+
+@generate_false.register(UniquePredicate)
+def generate_unique(predicate: UniquePredicate[Any], *, value_p: Predicate[Any] = is_int_p) -> Iterator[Any]:  # type: ignore[misc]
+    from predicate import generate_true
+
+    for value in generate_true(value_p):
+        pair = [value, value]
+        if not predicate(pair):
+            yield pair
 
 
 @generate_false.register(HasPathPredicate)
@@ -613,6 +624,11 @@ def generate_tuple_of_p(tuple_of_predicate: TupleOfPredicate[Any]) -> Iterator[A
     predicates = tuple_of_predicate.predicates
 
     length = len(predicates)
+    if length == 0:
+        # only () is true, so any non-empty tuple is false
+        yield from (tuple(take(random.randint(1, 3), random_anys())) for _ in repeat(None))
+        return
+
     max_number = 2**length - 1
     generators = [(generate_false(predicate), generate_true(predicate)) for predicate in predicates]
 

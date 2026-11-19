@@ -53,7 +53,7 @@ Predicates compose with standard Python operators:
 
 **Typed collections:** `is_list_of_p`, `is_set_of_p`, `is_dict_of_p`, `is_tuple_of_p`
 
-**Strings:** `regex_p`, `starts_with_p`, `ends_with_p`, `is_alpha_p`, `is_digit_p`, `is_upper_p`, `is_lower_p`, and more
+**Strings:** `regex_p`, `starts_with_p`, `ends_with_p`, `is_alpha_p`, `is_digit_p`, `is_int_str_p`, `is_upper_p`, `is_lower_p`, and more
 
 **Logic:** `always_p`, `never_p`, `implies_p`, `fn_p`
 
