@@ -154,9 +154,7 @@ preprocessing or global limit changes are performed.
     assert not is_int_str_p("1.0")
     assert not is_int_str_p(5)
 
-Both true and false string generators are provided. Like other ``fn_p``-based
-predicates, this predicate uses the original callable via
-``try_compile_predicate`` fallback rather than direct compilation.
+Both true and false string generators are provided.
 
 is_kebab_case_p
 ~~~~~~~~~~~~~~~
