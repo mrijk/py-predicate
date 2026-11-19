@@ -142,6 +142,7 @@ from predicate.star_predicate import star
 from predicate.struct_predicate import is_struct_p
 from predicate.tee_predicate import tee_p
 from predicate.tuple_of_predicate import is_tuple_of_p
+from predicate.unique_predicate import unique_by_p, unique_p
 
 __all__ = [
     "accepts_p",
@@ -328,6 +329,8 @@ __all__ = [
     "to_json",
     "to_latex",
     "to_yaml",
+    "unique_by_p",
+    "unique_p",
     "xor_p",
     "zero_p",
     "Predicate",

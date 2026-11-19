@@ -41,6 +41,7 @@ from predicate.set_of_predicate import is_set_of_p
 from predicate.set_predicates import intersects_p, is_real_subset_p, is_real_superset_p, is_subset_p, is_superset_p
 from predicate.struct_predicate import is_struct_p
 from predicate.tuple_of_predicate import is_tuple_of_p
+from predicate.unique_predicate import unique_p
 
 
 def from_json(data: dict[str, Any]) -> Predicate[Any]:  # noqa: C901
@@ -152,6 +153,10 @@ def from_json(data: dict[str, Any]) -> Predicate[Any]:  # noqa: C901
             return _struct_p_from_json(value)
         case "tuple_of":
             return is_tuple_of_p(*[from_json(p) for p in value["predicates"]])
+        case "unique":
+            return unique_p
+        case "unique_by":
+            raise ValueError("unique_by_p cannot be deserialized from JSON: key function required")
         case "variable":
             return NamedPredicate(name=value)
         case "xor":
