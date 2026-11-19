@@ -12,6 +12,7 @@ import sys
 import types
 from collections import namedtuple
 from collections.abc import Callable, Iterable
+from contextlib import suppress
 from datetime import date, datetime, time, timedelta, timezone, tzinfo
 from decimal import Decimal
 from enum import Enum, Flag
@@ -390,11 +391,8 @@ def sample_optional_fields(optional: dict[str, Any], generators: dict[str, Itera
     optional_keys = random.sample(list(optional), k=random.randint(0, len(optional)))
     result = {}
     for key in optional_keys:
-        try:
+        with suppress(StopIteration):
             result[key] = next(generators[key])
-        except StopIteration:
-            # An optional field with no more satisfying values may be omitted.
-            continue
     return result
 
 

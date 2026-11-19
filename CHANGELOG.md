@@ -4,7 +4,6 @@
 ## Unreleased
 
 - omit exhausted optional fields during struct generation instead of raising StopIteration
-
 - fix is_normal_p false-value generation getting stuck on infinities before reaching NaN and subnormal values
 
 Features:
