@@ -2,14 +2,15 @@ import os
 import sys
 from collections.abc import Iterator
 from functools import cache, wraps
-from inspect import Signature, signature, unwrap
-from typing import Any, Callable, TypeAlias
+from inspect import Signature, isasyncgenfunction, isgeneratorfunction, signature, unwrap
+from typing import Any, Callable, TypeAlias, get_args
 
 from more_itertools import first, first_true, only
 
 from predicate.explain import explain
 from predicate.predicate import Predicate
 from predicate.spec.exercise_helpers import (
+    annotation_to_predicate,
     callable_name,
     check_ret_name,
     get_return_predicate,
@@ -163,6 +164,26 @@ def _check_constraints(
     yield from _check_fn_p_constraints(spec, func_name, arguments, result, old)
 
 
+def _item_predicate(sig: Signature) -> Predicate[Any] | None:
+    # Iterator[T], Generator[T, ...], AsyncIterator[T], ...: T is always the first argument
+    args = get_args(sig.return_annotation)
+    return annotation_to_predicate(args[0]) if args else None
+
+
+def _checked_items(items: Iterator[Any], item_p: Predicate[Any], func_name: str, on_error: OnError) -> Iterator[Any]:
+    for item in items:
+        if reason := _get_reason(item_p, item):
+            on_error(f"Yield predicate for function {func_name} failed. Reason: {reason}")
+        yield item
+
+
+async def _checked_async_items(items: Any, item_p: Predicate[Any], func_name: str, on_error: OnError) -> Any:
+    async for item in items:
+        if reason := _get_reason(item_p, item):
+            on_error(f"Yield predicate for function {func_name} failed. Reason: {reason}")
+        yield item
+
+
 def _replace_in_module(func: Callable[..., Any], wrapped: Callable[..., Any]) -> None:
     # A partial or a callable instance has no __name__: it isn't a module-level function to replace (#362)
     name = getattr(func, "__name__", None)
@@ -248,6 +269,11 @@ def instrument_function(
         _report(on_error, _check_return_value(resolved_spec(), func_name, result))
         _report(on_error, _check_type_vars(typed_signature(), func_name, arguments, result))
         _report(on_error, only(_check_constraints(resolved_spec(), func_name, arguments, result, old)))
+        if (item_p := _item_predicate(typed_signature())) is not None:
+            if isgeneratorfunction(func):
+                return _checked_items(result, item_p, func_name, on_error)
+            if isasyncgenfunction(func):
+                return _checked_async_items(result, item_p, func_name, on_error)
         return result
 
     wrapped = _make_wrapper(func, _before, _on_exception, _after)
