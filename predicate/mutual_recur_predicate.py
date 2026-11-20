@@ -12,7 +12,7 @@ from predicate.predicate import Predicate
 class MutualRecurPredicate[T](Predicate[T]):
     """A predicate class that models the 'mutually recursive' predicate."""
 
-    predicate_0: Predicate[T]
+    empty: bool
     predicate_1: Predicate[T]
     predicate_n: Callable[[T], tuple[Any, ...]]
 
@@ -21,7 +21,7 @@ class MutualRecurPredicate[T](Predicate[T]):
 
         match head:
             case []:
-                return self.predicate_0()
+                return self.empty
             case [x]:
                 return self.predicate_1(x)
             case _:
@@ -36,8 +36,8 @@ class MutualRecurPredicate[T](Predicate[T]):
 
 def mutual_recur_p[T](
     predicate_n: Callable[[T], tuple[Any, ...]],
-    predicate_0: Predicate[T] = always_true_p,
+    empty: bool = True,
     predicate_1: Predicate[T] = always_true_p,
 ) -> Predicate[T]:
     """Return True if the mutually recursive evaluated predicate is True, otherwise False."""
-    return MutualRecurPredicate(predicate_0=predicate_0, predicate_1=predicate_1, predicate_n=predicate_n)
+    return MutualRecurPredicate(empty=empty, predicate_1=predicate_1, predicate_n=predicate_n)

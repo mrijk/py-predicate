@@ -1359,6 +1359,58 @@ Both synchronous and async callables are supported.
 
     assert raises_exception_p(ValueError)(async_value_error)
 
+recur_p
+-------
+
+This predicate checks a sequence by comparing each element with the one before it. The ``predicate_n`` argument is
+a function that takes an element and returns the predicate its successor must satisfy; the sequence matches if
+this holds for every adjacent pair.
+
+For example, a sequence is sorted if every element is greater than or equal to the previous one. Since ``ge_p(a)``
+is satisfied by values greater than or equal to ``a``, ``ge_p`` itself can be used as ``predicate_n``:
+
+.. code-block:: python
+
+    from predicate import ge_p, gt_p, eq_p, recur_p
+
+    is_sorted = recur_p(ge_p)
+    assert is_sorted([1, 2, 2, 5])
+    assert not is_sorted([3, 1])
+
+    strictly_increasing = recur_p(gt_p)
+    assert strictly_increasing([1, 2, 3])
+    assert not strictly_increasing([1, 2, 2])
+
+    all_equal = recur_p(eq_p)
+    assert all_equal([4, 4, 4])
+    assert not all_equal([4, 4, 5])
+
+``predicate_n`` can be any function from an element to a predicate:
+
+.. code-block:: python
+
+    from predicate import eq_p, recur_p
+
+    doubling = recur_p(lambda a: eq_p(a * 2))
+    assert doubling([1, 2, 4, 8])
+    assert not doubling([1, 2, 5])
+
+Sequences without pairs are handled separately. The empty sequence matches if ``empty`` is ``True`` (the default),
+and a sequence with one element matches if it satisfies ``predicate_1`` (by default ``always_true_p``):
+
+.. code-block:: python
+
+    from predicate import ge_p, is_int_p, recur_p
+
+    assert recur_p(ge_p)([])
+    assert not recur_p(ge_p, empty=False)([])
+
+    assert recur_p(ge_p, predicate_1=is_int_p)([1])
+    assert not recur_p(ge_p, predicate_1=is_int_p)(["a"])
+
+``recur_p`` also works with ``generate_true``, which generates sequences where every element satisfies the predicate
+built from its predecessor. For predicates that alternate between different conditions, see ``mutual_recur_p``.
+
 reduce_p
 --------
 

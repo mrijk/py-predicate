@@ -203,6 +203,18 @@ str_or_nested(["a", ["b", "c"]])  # True
 str_or_nested(["a", 1])  # False
 ```
 
+Use `recur_p` for predicates over a sequence, where each element is checked against the one before it:
+
+```python
+from predicate import ge_p, recur_p
+
+is_sorted = recur_p(ge_p)  # each element >= the previous one
+
+is_sorted([1, 2, 2, 5])  # True
+is_sorted([3, 1])  # False
+is_sorted([])  # True, use empty=False to reject empty input
+```
+
 For mutually recursive predicates, use `mutual_recur_p`.
 
 ## Runtime instrumentation (Spec)

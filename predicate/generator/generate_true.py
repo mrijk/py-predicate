@@ -145,6 +145,8 @@ from predicate.generator.helpers import (
     random_sized,
     random_slices,
     random_strings,
+    random_strings_greater,
+    random_strings_lower,
     random_struct_times,
     random_supports,
     random_text_ios,
@@ -198,6 +200,7 @@ from predicate.predicate import ConstrainedT, Predicate, SupportsComparison
 from predicate.property_predicate import PropertyPredicate
 from predicate.raises_predicate import RaisesPredicate
 from predicate.range_predicate import GeLePredicate, GeLtPredicate, GtLePredicate, GtLtPredicate, ge_le_p
+from predicate.recur_predicate import RecurPredicate
 from predicate.reduce_predicate import ReducePredicate
 from predicate.regex_predicate import RegexPredicate
 from predicate.repeat_predicate import RepeatPredicate
@@ -221,7 +224,7 @@ from predicate.xor_predicate import XorPredicate
 
 @ignore_unknown_kwargs
 @singledispatch
-def generate_true[T](predicate: Predicate[T], **_kwargs: Any) -> Iterator[T]:
+def generate_true(predicate: Predicate[Any], **_kwargs: Any) -> Iterator[Any]:
     """Generate values that satisfy this predicate."""
     raise ValueError(f"Please register generator for correct predicate type: {predicate}")
 
@@ -430,7 +433,7 @@ def generate_ge(predicate: GePredicate[Any], **_kwargs: Any) -> Iterator[Any]:
             yield from random_ints(lower=predicate.v)
         case str():
             yield v
-            yield from generate_strings(predicate)
+            yield from random_strings_greater(v)
         case UUID():
             yield from generate_uuids(predicate)
         case _:
@@ -448,7 +451,7 @@ def generate_gt(predicate: GtPredicate[Any]) -> Iterator[Any]:
             yield v + 1
             yield from random_ints(lower=predicate.v + 1)
         case str():
-            yield from generate_strings(predicate)
+            yield from random_strings_greater(v)
         case UUID():
             yield from generate_uuids(predicate)
         case _:
@@ -472,7 +475,7 @@ def generate_has_length(predicate: HasLengthPredicate[Any], *, value_p: Predicat
 
 
 @generate_true.register(UniquePredicate)
-def generate_unique(predicate: UniquePredicate[Any], *, value_p: Predicate[Any] = is_int_p) -> Iterator[Any]:  # type: ignore[misc]
+def generate_unique(predicate: UniquePredicate[Any], *, value_p: Predicate[Any] = is_int_p) -> Iterator[Any]:
     yield []
     candidates = generate_true(value_p)
     for size in cycle((1, 2, 3, 4)):
@@ -532,7 +535,8 @@ def generate_le(predicate: LePredicate[Any]) -> Iterator[Any]:
             yield v
             yield from random_ints(upper=predicate.v)
         case str():
-            yield from generate_strings(predicate)
+            yield v
+            yield from random_strings_lower(v)
         case UUID():
             yield from generate_uuids(predicate)
         case _:
@@ -573,7 +577,7 @@ def generate_fn_p(predicate: FnPredicate[Any]) -> Iterator[Any]:
 
 
 @generate_true.register(ContainsPredicate)
-def generate_contains(predicate: ContainsPredicate) -> Iterator[str]:  # type: ignore[misc]
+def generate_contains(predicate: ContainsPredicate) -> Iterator[str]:
     for prefix, suffix in zip(random_strings(), random_strings(), strict=True):
         yield prefix + predicate.substring + suffix
 
@@ -597,7 +601,7 @@ def generate_lt(predicate: LtPredicate[Any]) -> Iterator[Any]:
             yield v - 1
             yield from random_ints(upper=predicate.v - 1)
         case str():
-            yield from generate_strings(predicate)
+            yield from random_strings_lower(v)
         case UUID():
             yield from generate_uuids(predicate)
         case _:
@@ -638,6 +642,31 @@ def generate_implements_protocol(predicate: ImplementsProtocolPredicate[Any]) ->
     while True:
         attributes = {name: next(methods[name]) if name in methods else None for name in members}
         yield type(f"{protocol.__name__}Implementation", (), attributes)
+
+
+@generate_true.register(RecurPredicate)
+def generate_recur(predicate: RecurPredicate[Any], *, length_p: Predicate[Any] = default_length_p) -> Iterator[Any]:
+    # One stream of start values, so every sequence can start with a different value (and type)
+    starts = generate_true(predicate.predicate_1)
+
+    for length in random_lengths(length_p):
+        yield from (
+            [_recur_values(predicate, length, next(starts)) if length else []] if length or predicate.empty else []
+        )
+
+
+def _recur_values(predicate: RecurPredicate[Any], length: int, start: Any) -> list[Any]:
+    def chain_values(x: Any) -> Iterator[Any]:
+        while True:
+            yield x
+            # Each next value must satisfy the predicate built from its predecessor; when there is none (e.g. nothing
+            # is lower than the empty string) the sequence ends here, which is shorter but still valid
+            successors = take(1, generate_true(predicate.predicate_n(x)))
+            if not successors:
+                return
+            [x] = successors
+
+    return take(length, chain_values(start))
 
 
 @generate_true.register(SameSignaturePredicate)
