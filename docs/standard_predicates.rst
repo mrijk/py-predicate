@@ -1409,7 +1409,8 @@ and a sequence with one element matches if it satisfies ``predicate_1`` (by defa
     assert not recur_p(ge_p, predicate_1=is_int_p)(["a"])
 
 ``recur_p`` also works with ``generate_true``, which generates sequences where every element satisfies the predicate
-built from its predecessor. For predicates that alternate between different conditions, see ``mutual_recur_p``.
+built from its predecessor, and with ``generate_false``, which generates sequences with a pair that breaks it (or the
+empty or one-element cases that don't match). For predicates that alternate between different conditions, see ``mutual_recur_p``.
 
 reduce_p
 --------

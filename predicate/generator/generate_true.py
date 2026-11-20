@@ -651,11 +651,11 @@ def generate_recur(predicate: RecurPredicate[Any], *, length_p: Predicate[Any] =
 
     for length in random_lengths(length_p):
         yield from (
-            [_recur_values(predicate, length, next(starts)) if length else []] if length or predicate.empty else []
+            [recur_values(predicate, length, next(starts)) if length else []] if length or predicate.empty else []
         )
 
 
-def _recur_values(predicate: RecurPredicate[Any], length: int, start: Any) -> list[Any]:
+def recur_values(predicate: RecurPredicate[Any], length: int, start: Any) -> list[Any]:
     def chain_values(x: Any) -> Iterator[Any]:
         while True:
             yield x

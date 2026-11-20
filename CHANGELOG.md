@@ -5,7 +5,7 @@
 
 - fix is_normal_p false-value generation getting stuck on infinities before reaching NaN and subnormal values
 - recur_p and mutual_recur_p: the `predicate_0` argument is replaced by a plain `empty: bool = True` (the result for empty input; a predicate could never be applied to a missing element)
-- generate_true support for recur_p
+- generate_true and generate_false support for recur_p
 
 Features:
 
