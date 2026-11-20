@@ -54,6 +54,8 @@ from predicate.generator.helpers import (
     random_lists,
     random_sets,
     random_strings,
+    random_strings_greater,
+    random_strings_lower,
     random_tuples,
     random_uuids,
     random_values_of_type,
@@ -406,3 +408,23 @@ def test_random_first_from_iterables_drops_exhausted():
     values = take(10, random_first_from_iterables(iter([1, 2]), iter([3])))
 
     assert sorted(values) == [1, 2, 3]
+
+
+@pytest.mark.parametrize("v", ["", "0", "abc", "Zz", "zzzzzzzzzz", "zzzzzzzzzzzz"])
+def test_random_strings_greater(v):
+    values = take(100, random_strings_greater(v))
+
+    assert len(values) == 100
+    assert all(value > v for value in values)
+
+
+@pytest.mark.parametrize("v", ["0", "a", "abc", "Zz", "zzzzzzzzzz"])
+def test_random_strings_lower(v):
+    values = take(100, random_strings_lower(v))
+
+    assert len(values) == 100
+    assert all(value < v for value in values)
+
+
+def test_random_strings_lower_empty():
+    assert list(random_strings_lower("")) == []

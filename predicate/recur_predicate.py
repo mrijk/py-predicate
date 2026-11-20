@@ -12,7 +12,7 @@ from predicate.predicate import Predicate
 class RecurPredicate[T](Predicate[Iterable[T]]):
     """A predicate class that models the 'recursive' predicate."""
 
-    predicate_0: Predicate[T]
+    empty: bool
     predicate_1: Predicate[T]
     predicate_n: Callable[[T], Predicate[T]]
 
@@ -21,7 +21,7 @@ class RecurPredicate[T](Predicate[Iterable[T]]):
 
         match head:
             case []:
-                return self.predicate_0()
+                return self.empty
             case [x]:
                 return self.predicate_1(x)
             case _:
@@ -44,8 +44,8 @@ class RecurPredicate[T](Predicate[Iterable[T]]):
 
 def recur_p[T](
     predicate_n: Callable[[T], Predicate[T]],
-    predicate_0: Predicate[T] = always_true_p,
+    empty: bool = True,
     predicate_1: Predicate[T] = always_true_p,
 ) -> Predicate[Iterable[T]]:
     """Return True if the recursively evaluated predicate is True, otherwise False."""
-    return RecurPredicate(predicate_0=predicate_0, predicate_1=predicate_1, predicate_n=predicate_n)
+    return RecurPredicate(empty=empty, predicate_1=predicate_1, predicate_n=predicate_n)

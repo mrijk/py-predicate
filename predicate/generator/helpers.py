@@ -248,6 +248,30 @@ def random_strings(min_size: int = 0, max_size: int = 10) -> Iterator[str]:
         yield "".join(choices(population, k=length))
 
 
+_CHARS = sorted(string.ascii_letters + string.digits)
+
+
+def _random_tail() -> str:
+    return "".join(choices(_CHARS, k=random.randint(0, 3)))
+
+
+def random_strings_greater(v: str) -> Iterator[str]:
+    """Return strings greater than v. They are built from v, not searched for, so this also works near the top."""
+    while True:
+        k = random.randint(0, len(v))  # keep v[:k], then continue with a character that makes the string greater
+        higher = [c for c in _CHARS if k == len(v) or c > v[k]]
+        yield from [v[:k] + random.choice(higher) + _random_tail()] if higher else []
+
+
+def random_strings_lower(v: str) -> Iterator[str]:
+    """Return strings lower than v. They are built from v, not searched for; there are none for the empty string."""
+    while v:
+        k = random.randint(0, len(v) - 1)
+        lower = [c for c in _CHARS if c < v[k]]
+        # A proper prefix of v is always lower than v, so is v[:k] followed by a lower character
+        yield v[:k] + (random.choice(lower) + _random_tail() if lower and random.random() < 0.5 else "")
+
+
 def random_floats(lower: float = -1e-6, upper: float = 1e6) -> Iterator[float]:
     if lower > upper:
         return  # an empty range, e.g. ge_lt_p(0.0, 0.0): no value fits, and the loop below would never yield

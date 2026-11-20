@@ -29,10 +29,10 @@ from predicate.frozenset_of_predicate import FrozenSetOfPredicate
 from predicate.function_predicate import FnPredicate
 from predicate.ge_predicate import GePredicate
 from predicate.generator.helpers import (
+    default_length_p,
     default_size_p,
     function_with_signature,
     generate_anys,
-    generate_strings,
     generate_uuids,
     ignore_unknown_kwargs,
     random_anys,
@@ -47,6 +47,8 @@ from predicate.generator.helpers import (
     random_non_hashables,
     random_sets,
     random_strings,
+    random_strings_greater,
+    random_strings_lower,
     random_tuples,
     random_values_of_type,
     sample_optional_fields,
@@ -90,6 +92,7 @@ from predicate.plus_predicate import PlusPredicate
 from predicate.predicate import Predicate
 from predicate.raises_predicate import RaisesPredicate
 from predicate.range_predicate import GeLePredicate, GeLtPredicate, GtLePredicate, GtLtPredicate, ge_le_p
+from predicate.recur_predicate import RecurPredicate
 from predicate.reduce_predicate import ReducePredicate
 from predicate.regex_predicate import RegexPredicate
 from predicate.repeat_predicate import RepeatPredicate
@@ -114,7 +117,7 @@ default_at_least_one_length_p: Final = ge_le_p(lower=1, upper=10)
 
 @ignore_unknown_kwargs
 @singledispatch
-def generate_false[T](predicate: Predicate[T], **kwargs: Any) -> Iterator[T]:
+def generate_false(predicate: Predicate[Any], **kwargs: Any) -> Iterator[Any]:
     """Generate values that don't satisfy this predicate."""
     raise ValueError(f"Please register generator for correct predicate type: {predicate!r}")
 
@@ -194,7 +197,7 @@ def generate_has_length(predicate: HasLengthPredicate[Any], *, value_p: Predicat
 
 
 @generate_false.register(UniquePredicate)
-def generate_unique(predicate: UniquePredicate[Any], *, value_p: Predicate[Any] = is_int_p) -> Iterator[Any]:  # type: ignore[misc]
+def generate_unique(predicate: UniquePredicate[Any], *, value_p: Predicate[Any] = is_int_p) -> Iterator[Any]:
     from predicate import generate_true
 
     for value in generate_true(value_p):
@@ -323,7 +326,7 @@ def generate_ge(predicate: GePredicate[Any]) -> Iterator[Any]:
             yield v - 1
             yield from random_ints(upper=v - 1)
         case str():
-            yield from generate_strings(~predicate)
+            yield from random_strings_lower(v)
         case UUID():
             yield from generate_uuids(~predicate)
         case _:
@@ -341,7 +344,8 @@ def generate_gt(predicate: GtPredicate[Any]) -> Iterator[Any]:
             yield v
             yield from random_ints(upper=v)
         case str():
-            yield from generate_strings(~predicate)
+            yield v
+            yield from random_strings_lower(v)
         case UUID():
             yield from generate_uuids(~predicate)
         case _:
@@ -359,7 +363,7 @@ def generate_fn_p(predicate: FnPredicate[Any]) -> Iterator[Any]:
 
 
 @generate_false.register(ContainsPredicate)
-def generate_contains(predicate: ContainsPredicate) -> Iterator[str]:  # type: ignore[misc]
+def generate_contains(predicate: ContainsPredicate) -> Iterator[str]:
     if predicate.substring:
         # Removing its first character guarantees that the substring cannot occur.
         first_character = predicate.substring[0]
@@ -384,7 +388,7 @@ def generate_le(predicate: LePredicate[Any]) -> Iterator[Any]:
             yield v + 1
             yield from random_ints(lower=predicate.v + 1)
         case str():
-            yield from generate_strings(~predicate)
+            yield from random_strings_greater(v)
         case UUID():
             yield from generate_uuids(~predicate)
         case _:
@@ -402,7 +406,8 @@ def generate_lt(predicate: LtPredicate[Any]) -> Iterator[Any]:
             yield v
             yield from random_ints(lower=v)
         case str():
-            yield from generate_strings(~predicate)
+            yield v
+            yield from random_strings_greater(v)
         case UUID():
             yield from generate_uuids(~predicate)
         case _:
@@ -843,6 +848,27 @@ def generate_is_callable(predicate: IsCallablePredicate[Any]) -> Iterator[Any]:
 @generate_false.register(IsPartialPredicate)
 def generate_is_partial(predicate: IsPartialPredicate[Any]) -> Iterator[Any]:
     yield from (item for item in random_anys() if not predicate(item))
+
+
+@generate_false.register(RecurPredicate)
+def generate_recur(predicate: RecurPredicate[Any], *, length_p: Predicate[Any] = default_length_p) -> Iterator[Any]:
+    from predicate import generate_true
+    from predicate.generator.generate_true import recur_values
+
+    starts = generate_true(predicate.predicate_1)
+    # Empty when predicate_1 can't be false (e.g. always_true_p)
+    singles = ([x] for x in generate_false(predicate.predicate_1))
+
+    yield from [] if predicate.empty else [[]]
+
+    # Bounded, so a predicate without any false values (e.g. a predicate_n that is always true) ends the stream
+    # instead of spinning forever
+    for length in islice(random_lengths(length_p), 1000):
+        # A valid chain, followed by an element that breaks predicate_n for the last pair
+        chain_values = recur_values(predicate, max(length, 1), next(starts))
+        broken = take(1, generate_false(predicate.predicate_n(chain_values[-1])))
+        yield from [chain_values + broken] if broken else []
+        yield from take(1, singles)
 
 
 @generate_false.register(RaisesPredicate)
