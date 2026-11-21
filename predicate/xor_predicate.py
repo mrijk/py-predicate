@@ -56,5 +56,5 @@ class XorPredicate[T](Predicate[T]):
         }
 
 
-def xor_p[T](left: Predicate[T], right: Predicate[T]) -> Predicate[T]:
+def xor_p[T](left: Predicate[T], right: Predicate[T]) -> XorPredicate[T]:
     return XorPredicate(left=left, right=right)
