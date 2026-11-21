@@ -1,6 +1,6 @@
 import pytest
 
-from predicate import eq_p
+from predicate import eq_p, explain
 from predicate.accepts_predicate import accepts_p
 
 
@@ -25,3 +25,9 @@ def test_accepts(predicate, accepted_types, rejected_types):
 
     for rejected in rejected_types:
         assert not accepts(rejected)
+
+
+def test_accepts_explain():
+    accepts = accepts_p(predicate=eq_p(2))
+
+    assert explain(accepts, str) == {"reason": "eq_p(2) does not accept type str", "result": False}

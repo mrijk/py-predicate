@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import Any, override
 
-from predicate.predicate import Predicate
+from predicate.predicate import Explanation, Predicate
 
 
 @dataclass
@@ -27,6 +27,10 @@ class AcceptsPredicate[T](Predicate[type]):
     @override
     def __repr__(self) -> str:
         return f"accepts_p({self.predicate!r})"
+
+    @override
+    def explain_failure(self, x: type) -> Explanation:
+        return {"reason": f"{self.predicate!r} does not accept type {x.__name__}"}
 
 
 def accepts_p[T](predicate: Predicate[T]) -> AcceptsPredicate[T]:
