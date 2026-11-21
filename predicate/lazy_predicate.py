@@ -2,9 +2,9 @@ import inspect
 from dataclasses import dataclass
 from functools import cached_property
 from types import FrameType
-from typing import Any, cast
+from typing import Any, cast, override
 
-from predicate.predicate import Predicate
+from predicate.predicate import Explanation, Predicate
 
 
 @dataclass
@@ -25,6 +25,11 @@ class LazyPredicate[T](Predicate[T]):
 
     def __repr__(self) -> str:
         return f'lazy_p("{self.ref}")'
+
+    @override
+    def explain_failure(self, x: T) -> Explanation:
+        # self.predicate is resolved by the call that preceded this explanation
+        return {"reason": cast(Predicate[Any], self.predicate).explain(x)}
 
 
 def find_predicate_by_ref(frame: FrameType | None, ref: str) -> Predicate[Any] | None:

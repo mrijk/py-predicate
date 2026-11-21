@@ -1,4 +1,4 @@
-from predicate import is_int_p, is_list_of_p, is_str_p, this_p
+from predicate import explain, is_int_p, is_list_of_p, is_str_p, this_p
 
 
 def test_this_predicate():
@@ -35,3 +35,23 @@ def test_this_predicate_with_different_root():
     assert predicate([])
     assert predicate(["foo"])
     assert predicate(["foo", ["foo", ["foo"], "bar"]])
+
+
+def test_this_predicate_explain():
+    predicate = is_str_p | is_list_of_p(this_p)
+
+    expected = {
+        "result": False,
+        "left": {"result": False, "reason": "[1] is not an instance of type str"},
+        "right": {
+            "result": False,
+            "index": 0,
+            "value": 1,
+            "reason": {
+                "result": False,
+                "left": {"result": False, "reason": "1 is not an instance of type str"},
+                "right": {"result": False, "reason": "1 is not an instance of a list"},
+            },
+        },
+    }
+    assert explain(predicate, [1]) == expected

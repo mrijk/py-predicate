@@ -1,6 +1,6 @@
 import pytest
 
-from predicate import eq_p, ge_p, gt_lt_p, recur_p
+from predicate import eq_p, explain, ge_p, gt_lt_p, recur_p
 from predicate.consumes import consumes
 
 
@@ -52,3 +52,27 @@ def test_all_consumes(iterable, expected_start, expected_end):
     expected_consumed = list(range(expected_start, expected_end + 1))
 
     assert consumed == expected_consumed
+
+
+def test_recur_explain_empty():
+    predicate = recur_p(predicate_n=ge_p, empty=False)
+
+    assert explain(predicate, []) == {"reason": "Empty iterable is not allowed", "result": False}
+
+
+def test_recur_explain_single():
+    predicate = recur_p(predicate_n=ge_p, predicate_1=eq_p(1))
+
+    expected = {"reason": {"reason": "2 is not equal to 1", "result": False}, "result": False}
+    assert explain(predicate, [2]) == expected
+
+
+def test_recur_explain_pair():
+    predicate = recur_p(predicate_n=ge_p)
+
+    expected = {
+        "reason": {"reason": "2 is not greater or equal to 3", "result": False},
+        "pair": (3, 2),
+        "result": False,
+    }
+    assert explain(predicate, [1, 3, 2]) == expected

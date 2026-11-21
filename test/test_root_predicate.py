@@ -45,3 +45,23 @@ def test_root_explain():
     }
 
     assert explain(str_or_list_of_str, 13) == expected
+
+
+def test_root_explain_nested():
+    predicate = is_str_p | is_list_of_p(root_p)
+
+    expected = {
+        "result": False,
+        "left": {"result": False, "reason": "[1] is not an instance of type str"},
+        "right": {
+            "result": False,
+            "index": 0,
+            "value": 1,
+            "reason": {
+                "result": False,
+                "left": {"result": False, "reason": "1 is not an instance of type str"},
+                "right": {"result": False, "reason": "1 is not an instance of a list"},
+            },
+        },
+    }
+    assert explain(predicate, [1]) == expected

@@ -2,9 +2,9 @@ import inspect
 from dataclasses import dataclass
 from functools import cached_property
 from types import FrameType
-from typing import Any, Iterator
+from typing import Any, Iterator, override
 
-from predicate.predicate import Predicate
+from predicate.predicate import Explanation, Predicate
 from predicate.this_predicate import find_in_locals
 
 
@@ -22,6 +22,10 @@ class RootPredicate[T](Predicate[T]):
 
     def __repr__(self) -> str:
         return "root_p"
+
+    @override
+    def explain_failure(self, x: T) -> Explanation:
+        return {"reason": self.root_predicate.explain(x)}
 
 
 def find_root_predicate(start_frame: FrameType | None, predicate: Predicate[Any]) -> Predicate[Any]:

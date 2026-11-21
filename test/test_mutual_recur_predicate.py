@@ -2,7 +2,7 @@ from itertools import repeat
 
 from more_itertools import interleave, take
 
-from predicate import eq_p, gt_p, lt_p, mutual_recur_p
+from predicate import eq_p, explain, gt_p, lt_p, mutual_recur_p
 
 
 def test_recur_zig_zag():
@@ -36,3 +36,24 @@ def test_traffic_light_cycle():
     assert predicate(["red", "green", "yellow"])
 
     assert not predicate(["green", "red", "yellow"])
+
+
+def test_mutual_recur_explain_empty():
+    predicate = mutual_recur_p(predicate_n=lambda x: (gt_p(x), predicate), empty=False)
+
+    assert explain(predicate, []) == {"reason": "Empty iterable is not allowed", "result": False}
+
+
+def test_mutual_recur_explain_single():
+    predicate = mutual_recur_p(predicate_n=lambda x: (gt_p(x), predicate), predicate_1=eq_p(1))
+
+    expected = {"reason": {"reason": "2 is not equal to 1", "result": False}, "result": False}
+    assert explain(predicate, [2]) == expected
+
+
+def test_mutual_recur_explain_pair():
+    predicate_up = mutual_recur_p(predicate_n=lambda x: (gt_p(x), predicate_down))
+    predicate_down = mutual_recur_p(predicate_n=lambda x: (lt_p(x), predicate_up))
+
+    expected = {"reason": {"reason": "3 is not less than 2", "result": False}, "pair": (2, 3), "result": False}
+    assert explain(predicate_up, [1, 2, 3]) == expected

@@ -5,7 +5,7 @@ from typing import Callable, Iterable, Iterator, override
 from more_itertools import ilen, spy
 
 from predicate import always_true_p
-from predicate.predicate import Predicate
+from predicate.predicate import Explanation, Predicate
 
 
 @dataclass
@@ -26,6 +26,19 @@ class RecurPredicate[T](Predicate[Iterable[T]]):
                 return self.predicate_1(x)
             case _:
                 return all(self.predicate_n(a)(b) for a, b in pairwise(iterable))
+
+    @override
+    def explain_failure(self, iterable: Iterable[T]) -> Explanation:
+        items = list(iterable)
+
+        match items:
+            case []:
+                return {"reason": "Empty iterable is not allowed"}
+            case [x]:
+                return {"reason": self.predicate_1.explain(x)}
+            case _:
+                a, b = next(pair for pair in pairwise(items) if not self.predicate_n(pair[0])(pair[1]))
+                return {"reason": self.predicate_n(a).explain(b), "pair": (a, b)}
 
     @override
     def consumes(self, iterable: Iterable[T]) -> Iterator[int]:
