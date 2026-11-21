@@ -443,6 +443,14 @@ def generate_anys(predicate: Predicate[Any]) -> Iterator[Any]:
     yield from (item for item in random_anys() if predicate(item))
 
 
+def evaluate_comp(predicate: Predicate[Any], x: Any) -> bool | None:
+    """Evaluate predicate on x, returning None if it raises (random input the function can't handle)."""
+    try:
+        return predicate(x)
+    except Exception:  # noqa: BLE001
+        return None
+
+
 def generate_even_numbers() -> Iterator[int]:
     yield from (value * 2 for value in random_ints())
 

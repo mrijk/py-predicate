@@ -17,6 +17,7 @@ from predicate.always_false_predicate import AlwaysFalsePredicate, always_false_
 from predicate.always_true_predicate import AlwaysTruePredicate, always_true_p
 from predicate.and_predicate import AndPredicate
 from predicate.any_predicate import AnyPredicate
+from predicate.comp_predicate import CompPredicate
 from predicate.compile_predicate import CompiledPredicate
 from predicate.contains_predicate import ContainsPredicate
 from predicate.count_predicate import CountPredicate
@@ -31,6 +32,7 @@ from predicate.ge_predicate import GePredicate
 from predicate.generator.helpers import (
     default_length_p,
     default_size_p,
+    evaluate_comp,
     function_with_signature,
     generate_anys,
     generate_uuids,
@@ -355,6 +357,12 @@ def generate_gt(predicate: GtPredicate[Any]) -> Iterator[Any]:
 @generate_false.register(IsFalsyPredicate)
 def generate_falsy(_predicate: IsFalsyPredicate[Any]) -> Iterator[Any]:
     yield from generate_anys(IsTruthyPredicate())
+
+
+@generate_false.register(CompPredicate)
+def generate_comp_p(predicate: CompPredicate[Any, Any]) -> Iterator[Any]:
+    # fn can't be inverted, so filter random values; inputs that make fn raise are skipped
+    yield from (value for value in random_anys() if evaluate_comp(predicate, value) is False)
 
 
 @generate_false.register(FnPredicate)
