@@ -1,16 +1,17 @@
 from dataclasses import dataclass
-from typing import Any
+from typing import Any, override
 
 from predicate.predicate import Predicate
 
 
 @dataclass
-class AcceptsPredicate[T](Predicate[T]):
+class AcceptsPredicate[T](Predicate[type]):
     """A predicate class that models the 'accept type' predicate."""
 
     predicate: Predicate[T]
 
-    def __call__(self, x: Any) -> bool:
+    @override
+    def __call__(self, x: type) -> bool:
         try:
             klass = self.predicate.klass
         except NotImplementedError:
@@ -23,6 +24,7 @@ class AcceptsPredicate[T](Predicate[T]):
             return False
         return issubclass(x, klass)
 
+    @override
     def __repr__(self) -> str:
         return f"accepts_p({self.predicate!r})"
 
