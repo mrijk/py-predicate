@@ -1,11 +1,11 @@
+from __future__ import annotations
+
 import inspect
 from functools import partial
 from itertools import count
 from types import UnionType
-from typing import Any, Iterable, get_args
+from typing import TYPE_CHECKING, Any, Iterable, get_args
 
-import graphviz  # type: ignore
-from graphviz import Digraph
 from more_itertools import first
 
 from predicate.all_predicate import AllPredicate
@@ -74,6 +74,9 @@ from predicate.tuple_of_predicate import TupleOfPredicate
 from predicate.unique_predicate import UniquePredicate
 from predicate.xor_predicate import XorPredicate
 
+if TYPE_CHECKING:
+    from graphviz import Digraph  # type: ignore
+
 
 def to_dot(predicate: Predicate[Any], predicate_string: str | None = None, show_optimized: bool = False) -> Digraph:
     """Format predicate as a .dot file."""
@@ -82,6 +85,8 @@ def to_dot(predicate: Predicate[Any], predicate_string: str | None = None, show_
     graph_attr = {"label": label, "labelloc": "t"}
 
     node_attr = {"shape": "rectangle", "style": "filled", "fillcolor": "#B7D7A8"}
+
+    import graphviz  # noqa: PLC0415 # optional dependency
 
     dot = graphviz.Digraph(graph_attr=graph_attr, node_attr=node_attr, edge_attr={})
 

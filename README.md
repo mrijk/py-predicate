@@ -270,7 +270,7 @@ p = ge_p(2) & le_p(5)
 
 to_json(p)  # JSON string
 to_yaml(p)  # YAML string
-to_dot(p)  # Graphviz DOT for visualization
+to_dot(p)  # Graphviz DOT for visualization (requires `pip install py-predicate[graphviz]`)
 to_latex(p)  # LaTeX expression
 ```
 

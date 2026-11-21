@@ -20,7 +20,7 @@ Outputting a predicate as a json structure makes it easy to use tools such as
 
 Dotty
 -----
-Predicates can also be rendered in a visual way, using `Graphviz <https://graphviz.org/>`_
+Predicates can also be rendered in a visual way, using `Graphviz <https://graphviz.org/>`_. This requires the optional extra: ``pip install py-predicate[graphviz]``
 
 .. code-block:: python
 
