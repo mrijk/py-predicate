@@ -37,6 +37,7 @@ class RaisesPredicate(Predicate[Callable[..., Any]]):
 
     @override
     def explain_failure(self, x: Callable[..., Any]) -> Explanation:
+        """Explain why x did not raise; note that this calls x again, so side effects happen twice."""
         try:
             _call(x)
             return {"reason": "callable did not raise an exception"}
