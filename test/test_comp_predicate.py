@@ -30,5 +30,12 @@ def test_comp_explain():
 
     predicate = comp_p(fn=lambda x: 2 * x, predicate=ge_2)
 
-    expected = {"reason": {"reason": "0 is not greater or equal to 2", "result": False}, "result": False}
+    expected = {"reason": {"reason": "0 is not greater or equal to 2", "result": False}, "value": 0, "result": False}
     assert explain(predicate, 0) == expected
+
+
+def test_comp_explain_uses_transformed_value():
+    predicate = comp_p(fn=len, predicate=ge_p(2))
+
+    expected = {"reason": {"reason": "1 is not greater or equal to 2", "result": False}, "value": 1, "result": False}
+    assert explain(predicate, "a") == expected

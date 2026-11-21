@@ -26,7 +26,8 @@ class CompPredicate[S, T](Predicate[S]):
 
     @override
     def explain_failure(self, x: S) -> Explanation:
-        return {"reason": self.predicate.explain(x)}
+        value = self.fn(x)
+        return {"reason": self.predicate.explain(value), "value": value}
 
 
 def comp_p[S, T](fn: Callable[[S], T], predicate: Predicate[T]) -> CompPredicate[S, T]:
