@@ -7,14 +7,16 @@ from predicate.truth_table import get_named_predicates, truth_table
 
 
 @dataclass
-class IsSamePredicate[T](Predicate[T]):
+class IsSamePredicate[T](Predicate[Predicate[T]]):
     """A predicate class that checks if two predicates are equivalent by comparing the truth tables."""
 
     predicate: Predicate[T]
 
-    def __call__(self, predicate: Predicate[Any]) -> bool:
+    @override
+    def __call__(self, predicate: Predicate[T]) -> bool:
         return is_same(self.predicate, predicate)
 
+    @override
     def __repr__(self) -> str:
         return f"is_same_p({self.predicate!r})"
 
