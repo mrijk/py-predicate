@@ -23,7 +23,7 @@ class EqPredicate[T](Predicate[T]):
 
     @override
     def explain_failure(self, x: T) -> Explanation:
-        return {"reason": f"{x} is not equal to {self.v!r}"}
+        return {"reason": f"{x!r} is not equal to {self.v!r}"}
 
 
 def eq_p[T](v: T) -> EqPredicate[T]:
@@ -32,7 +32,7 @@ def eq_p[T](v: T) -> EqPredicate[T]:
 
 
 zero_p: Final[EqPredicate[Any]] = eq_p(0)
-"""Returns True of the value is zero, otherwise False."""
+"""Returns True if the value is zero, otherwise False."""
 
 eq_true_p: Final[EqPredicate[Any]] = eq_p(True)
 """Returns True if the value is True, otherwise False."""

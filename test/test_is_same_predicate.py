@@ -51,8 +51,7 @@ def test_is_same_p_values_fail(p, q):
 
     assert not predicate(p | q)
 
-    expected = {"reason": "Predicates have different truth tables.", "result": False}
-    assert explain(predicate, p | q) == expected
+    assert explain(predicate, p | q)["reason"] == "Predicates have different truth tables."
 
 
 def test_is_same_p_predicates_after_rename():
@@ -80,3 +79,27 @@ def test_is_same_p_predicates_fail_after_rename():
     predicate = is_same_p(p & q)
 
     assert not predicate(q | p)
+
+
+def test_is_same_p_values_fail_differences(p, q):
+    predicate = is_same_p(p & q)
+
+    expected = {
+        "reason": "Predicates have different truth tables.",
+        "differences": [
+            {"values": (False, True), "expected": False, "actual": True},
+            {"values": (True, False), "expected": False, "actual": True},
+        ],
+        "result": False,
+    }
+    assert explain(predicate, p | q) == expected
+
+
+def test_is_same_p_explain_unnamed_predicates():
+    p = eq_p(2)
+    q = eq_p(3)
+
+    predicate = is_same_p(p & q)
+
+    assert explain(predicate, p | q)["reason"] == "Predicates have different truth tables."
+    assert explain(predicate, p)["reason"] == "Predicates are not equivalent."

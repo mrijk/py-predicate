@@ -77,6 +77,7 @@ from predicate.is_partial_predicate import IsPartialPredicate
 from predicate.is_predicate import IsPredicate
 from predicate.is_protocol_predicate import IsProtocolPredicate
 from predicate.is_regex_predicate import IsRegexPredicate
+from predicate.is_same_predicate import IsSamePredicate
 from predicate.is_subclass_predicate import IsSubclassPredicate
 from predicate.is_truthy_predicate import IsTruthyPredicate
 from predicate.juxt_predicate import JuxtPredicate
@@ -778,6 +779,11 @@ def _subclasses(klass: type) -> set[Any]:
     with warnings.catch_warnings():
         warnings.simplefilter("ignore", DeprecationWarning)
         return set(klass.__subclasses__())
+
+
+@generate_false.register(IsSamePredicate)
+def generate_is_same(is_same_predicate: IsSamePredicate[Any]) -> Iterator[Any]:
+    yield from repeat(~is_same_predicate.predicate)
 
 
 @generate_false.register(IsSubclassPredicate)

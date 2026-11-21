@@ -23,7 +23,7 @@ class NePredicate[T](Predicate[T]):
 
     @override
     def explain_failure(self, x: T) -> Explanation:
-        return {"reason": f"{x} is equal to {self.v!r}"}
+        return {"reason": f"{x!r} is equal to {self.v!r}"}
 
 
 def ne_p[T](v: T) -> NePredicate[T]:
