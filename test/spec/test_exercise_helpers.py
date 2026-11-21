@@ -323,7 +323,7 @@ def test_exercise_type_of_type_var():
 @pytest.mark.parametrize(
     "annotation, accepted, rejected",
     [
-        (IO[bytes], [io.BytesIO(), tempfile.SpooledTemporaryFile()], [io.StringIO(), b"x"]),
+        (IO[bytes], [io.BytesIO(), tempfile.SpooledTemporaryFile()], [io.StringIO(), b"x"]),  # noqa: SIM115
         (BinaryIO, [io.BytesIO()], [io.StringIO()]),
         (IO[str], [io.StringIO()], [io.BytesIO(), "x"]),
         (TextIO, [io.StringIO()], [io.BytesIO()]),

@@ -1,7 +1,8 @@
 from collections.abc import Set as AbstractSet
 from dataclasses import dataclass
+from typing import override
 
-from predicate.predicate import Predicate
+from predicate.predicate import Explanation, Predicate
 
 
 @dataclass
@@ -16,6 +17,10 @@ class IsSubsetPredicate[T](Predicate[T]):
     def __repr__(self) -> str:
         return f"is_subset_p({self.v})"
 
+    @override
+    def explain_failure(self, v: AbstractSet[T]) -> Explanation:
+        return {"reason": f"{v} is not a subset of {self.v}"}
+
 
 @dataclass
 class IsRealSubsetPredicate[T](Predicate[T]):
@@ -28,6 +33,10 @@ class IsRealSubsetPredicate[T](Predicate[T]):
 
     def __repr__(self) -> str:
         return f"is_real_subset_p({self.v})"
+
+    @override
+    def explain_failure(self, v: AbstractSet[T]) -> Explanation:
+        return {"reason": f"{v} is not a real subset of {self.v}"}
 
 
 @dataclass
@@ -42,6 +51,10 @@ class IsSupersetPredicate[T](Predicate[T]):
     def __repr__(self) -> str:
         return f"is_superset_p({self.v})"
 
+    @override
+    def explain_failure(self, v: AbstractSet[T]) -> Explanation:
+        return {"reason": f"{v} is not a superset of {self.v}"}
+
 
 @dataclass
 class IsRealSupersetPredicate[T](Predicate[T]):
@@ -55,6 +68,10 @@ class IsRealSupersetPredicate[T](Predicate[T]):
     def __repr__(self) -> str:
         return f"is_real_superset_p({self.v})"
 
+    @override
+    def explain_failure(self, v: AbstractSet[T]) -> Explanation:
+        return {"reason": f"{v} is not a real superset of {self.v}"}
+
 
 @dataclass
 class IntersectsPredicate[T](Predicate[T]):
@@ -67,6 +84,10 @@ class IntersectsPredicate[T](Predicate[T]):
 
     def __repr__(self) -> str:
         return f"intersects_p({self.v})"
+
+    @override
+    def explain_failure(self, v: AbstractSet[T]) -> Explanation:
+        return {"reason": f"{v} does not intersect with {self.v}"}
 
 
 def intersects_p[T](v: AbstractSet[T]) -> IntersectsPredicate[T]:

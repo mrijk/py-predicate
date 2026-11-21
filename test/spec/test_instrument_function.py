@@ -90,7 +90,7 @@ def test_instrument_optional_ret():
 def test_instrument_fn_constraint_ok():
     @instrument({"args": {}, "fn": lambda x, y, ret: ret >= x and ret >= y})
     def max_int(x: int, y: int) -> int:
-        return x if x >= y else y
+        return max(x, y)
 
     assert max_int(3, 7) == 7
 

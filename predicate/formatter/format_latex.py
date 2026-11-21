@@ -11,7 +11,7 @@ from predicate.eq_predicate import EqPredicate
 from predicate.ge_predicate import GePredicate
 from predicate.gt_predicate import GtPredicate
 from predicate.has_length_predicate import HasLengthPredicate
-from predicate.helpers import join_as_str
+from predicate.helpers import fn_name, join_as_str
 from predicate.implies_predicate import ImpliesPredicate
 from predicate.in_predicate import InPredicate
 from predicate.le_predicate import LePredicate
@@ -99,7 +99,7 @@ def to_latex(predicate: Predicate[Any], parameter: str = "x") -> str:  # noqa: C
         case XorPredicate(left, right):
             return f"{to_latex(left)} \\oplus {to_latex(right)}"
         case ReducePredicate(fn, initial):
-            name = getattr(fn, "__name__", str(fn))
+            name = fn_name(fn)
             return rf"\text{{reduce}}({name}, {initial!r})"
         case _:
             raise ValueError(f"Unknown predicate type {predicate}")

@@ -74,6 +74,7 @@ from predicate.always_false_predicate import AlwaysFalsePredicate, always_false_
 from predicate.always_true_predicate import AlwaysTruePredicate, always_true_p
 from predicate.and_predicate import AndPredicate
 from predicate.any_predicate import AnyPredicate
+from predicate.comp_predicate import CompPredicate
 from predicate.compile_predicate import CompiledPredicate
 from predicate.contains_predicate import ContainsPredicate
 from predicate.count_predicate import CountPredicate
@@ -89,6 +90,7 @@ from predicate.generator.generate_predicate import generate_predicate, predicate
 from predicate.generator.helpers import (
     accepted_kwargs,
     default_length_p,
+    evaluate_comp,
     function_with_signature,
     generate_anys,
     generate_datetimes,
@@ -569,6 +571,12 @@ def generate_intersects(predicate: IntersectsPredicate[Any]) -> Iterator[Any]:
         return
     elements = list(predicate.v)
     yield from (extra | {random.choice(elements)} for extra in random_sets())
+
+
+@generate_true.register(CompPredicate)
+def generate_comp_p(predicate: CompPredicate[Any, Any]) -> Iterator[Any]:
+    # fn can't be inverted, so filter random values; inputs that make fn raise are skipped
+    yield from (value for value in random_anys() if evaluate_comp(predicate, value) is True)
 
 
 @generate_true.register(FnPredicate)
@@ -1399,7 +1407,7 @@ def generate_juxt_p(predicate: JuxtPredicate[Any]) -> Iterator[Any]:
 
 
 @generate_true.register(RaisesPredicate)
-def generate_raises(predicate: RaisesPredicate[Any]) -> Iterator[Any]:
+def generate_raises(predicate: RaisesPredicate) -> Iterator[Any]:
     exc_type = predicate.exception_type
     while True:
         yield lambda: (_ for _ in ()).throw(exc_type())

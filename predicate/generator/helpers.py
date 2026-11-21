@@ -179,8 +179,8 @@ if sys.version_info >= (3, 14):
 
 
 def random_datetimes(lower: datetime | None = None, upper: datetime | None = None) -> Iterator[datetime]:
-    start = lower if lower else datetime(year=1980, month=1, day=1)
-    end = upper if upper else datetime(year=2050, month=1, day=1)
+    start = lower or datetime(year=1980, month=1, day=1)
+    end = upper or datetime(year=2050, month=1, day=1)
     if start > end:
         return  # an empty range, e.g. ge_lt_p(d, d): no value fits
 
@@ -280,7 +280,7 @@ def random_floats(lower: float = -1e-6, upper: float = 1e6) -> Iterator[float]:
         low = max(-limit, lower)
         high = min(limit, upper)
         if high >= low:
-            yield from (random.uniform(low, high) for _ in range(0, int(limit)))
+            yield from (random.uniform(low, high) for _ in range(int(limit)))
 
     while True:
         yield from between(1.0)
@@ -296,7 +296,7 @@ def random_ints(lower: int = -sys.maxsize, upper: int = sys.maxsize, **_kwargs: 
         low = max(-limit, lower)
         high = min(limit, upper)
         if high >= low:
-            yield from (random.randint(low, high) for _ in range(0, limit))
+            yield from (random.randint(low, high) for _ in range(limit))
 
     if lower <= 0 <= upper:
         yield 0
@@ -441,6 +441,14 @@ def generate_uuids(predicate: Predicate[UUID]) -> Iterator[UUID]:
 
 def generate_anys(predicate: Predicate[Any]) -> Iterator[Any]:
     yield from (item for item in random_anys() if predicate(item))
+
+
+def evaluate_comp(predicate: Predicate[Any], x: Any) -> bool | None:
+    """Evaluate predicate on x, returning None if it raises (random input the function can't handle)."""
+    try:
+        return predicate(x)
+    except Exception:  # noqa: BLE001
+        return None
 
 
 def generate_even_numbers() -> Iterator[int]:

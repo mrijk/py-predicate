@@ -9,7 +9,7 @@ def test_generate_is_lambda():
     assert_generated_true(predicate)
 
 
-@pytest.mark.parametrize("nr_of_parameters", list(range(0, 5)))
+@pytest.mark.parametrize("nr_of_parameters", list(range(5)))
 def test_generate_is_lambda_with_signature(nr_of_parameters):
     predicate = is_lambda_with_signature_p(nr_of_parameters=nr_of_parameters)
     assert_generated_true(predicate)

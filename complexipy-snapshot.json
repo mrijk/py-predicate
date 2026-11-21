@@ -1,0 +1,52 @@
+[
+  {
+    "path": "predicate/generator/generate_true.py",
+    "file_name": "generate_true.py",
+    "functions": [
+      {
+        "name": "generate_unique",
+        "complexity": 11
+      }
+    ]
+  },
+  {
+    "path": "predicate/optimizer/and_optimizer.py",
+    "file_name": "and_optimizer.py",
+    "functions": [
+      {
+        "name": "optimize_and_predicate",
+        "complexity": 14
+      }
+    ]
+  },
+  {
+    "path": "predicate/optimizer/or_optimizer.py",
+    "file_name": "or_optimizer.py",
+    "functions": [
+      {
+        "name": "optimize_or_predicate",
+        "complexity": 14
+      }
+    ]
+  },
+  {
+    "path": "predicate/optimizer/xor_optimizer.py",
+    "file_name": "xor_optimizer.py",
+    "functions": [
+      {
+        "name": "optimize_xor_predicate",
+        "complexity": 11
+      }
+    ]
+  },
+  {
+    "path": "predicate/spec/instrument_function.py",
+    "file_name": "instrument_function.py",
+    "functions": [
+      {
+        "name": "_make_wrapper",
+        "complexity": 11
+      }
+    ]
+  }
+]

@@ -40,7 +40,7 @@ class AllPredicate[T](Predicate[T]):
     @override
     def consumes(self, iterable: Iterable[Any]) -> Iterator[int]:
         consumed = takewhile(self.predicate, iterable)
-        yield from range(0, ilen(consumed) + 1)
+        yield from range(ilen(consumed) + 1)
 
 
 def all_p[T](predicate: Predicate[T]) -> AllPredicate[T]:

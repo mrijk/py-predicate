@@ -1,4 +1,4 @@
-from abc import abstractmethod
+from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from datetime import date, datetime
 from decimal import Decimal
@@ -14,7 +14,7 @@ type Explanation = dict[str, Any]
 
 
 @dataclass
-class Predicate[T]:
+class Predicate[T](ABC):
     """An abstract class to represent a predicate."""
 
     # Python operator precedence, used by repr to add parentheses: | < ^ < & < ~ < atoms

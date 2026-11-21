@@ -207,9 +207,8 @@ def test_is_uuid_p():
 
 
 def test_base_predicate():
-    p = Predicate()
-    with pytest.raises(NotImplementedError):
-        p(1)
+    with pytest.raises(TypeError):
+        Predicate()
 
 
 def test_named_predicate():
@@ -255,9 +254,12 @@ def test_zero_p():
 
 
 def test_base_predicate_explain_failure():
-    p = Predicate()
+    class NoCall(Predicate):
+        def __call__(self, x):
+            return False
+
     with pytest.raises(NotImplementedError):
-        p.explain_failure(1)
+        NoCall().explain_failure(1)
 
 
 def test_not_predicate_contains():

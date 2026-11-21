@@ -21,6 +21,7 @@ from predicate.gt_predicate import GtPredicate
 from predicate.has_key_predicate import HasKeyPredicate
 from predicate.has_length_predicate import HasLengthPredicate
 from predicate.has_path_predicate import HasPathPredicate
+from predicate.helpers import fn_name
 from predicate.implies_predicate import ImpliesPredicate
 from predicate.in_predicate import InPredicate
 from predicate.is_close_predicate import IsClosePredicate
@@ -99,10 +100,10 @@ def _to_value(predicate: Predicate[Any]) -> tuple[str, Any]:  # noqa: C901
         case ExactlyPredicate(n, predicate):
             return "exactly", {"n": n, "predicate": to_json(predicate)}
         case ReducePredicate(fn, initial):
-            name = getattr(fn, "__name__", str(fn))
+            name = fn_name(fn)
             return "reduce", {"fn": name, "initial": initial}
         case FnPredicate(predicate_fn):
-            name = getattr(predicate_fn, "__name__", str(predicate_fn))
+            name = fn_name(predicate_fn)
             fn_info: dict[str, Any] = {"name": name}
             fn_info.update(get_fn_source(predicate_fn))
             return "fn", fn_info

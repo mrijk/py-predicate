@@ -5,6 +5,7 @@ import pytest
 from predicate import (
     all_p,
     comp_p,
+    explain,
     is_bool_p,
     is_dict_p,
     is_float_p,
@@ -58,3 +59,23 @@ def test_is_json():
     assert is_json_p({"one": False})
     assert is_json_p({"one": None})
     assert is_json_p({"one": {"two": {"three": 3}}})
+
+
+def test_lazy_explain():
+    predicate = is_str_p | is_list_of_p(lazy_p("predicate"))
+
+    expected = {
+        "result": False,
+        "left": {"result": False, "reason": "[1] is not an instance of type str"},
+        "right": {
+            "result": False,
+            "index": 0,
+            "value": 1,
+            "reason": {
+                "result": False,
+                "left": {"result": False, "reason": "1 is not an instance of type str"},
+                "right": {"result": False, "reason": "1 is not an instance of a list"},
+            },
+        },
+    }
+    assert explain(predicate, [1]) == expected

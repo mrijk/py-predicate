@@ -83,7 +83,7 @@ json_list_p = is_list_p & lazy_p("json_values")
 json_keys_p = all_p(is_str_p)
 
 json_values = all_p(is_str_p | is_int_p | is_float_p | json_list_p | _valid_json_p | is_none_p)
-json_values_p = comp_p(lambda x: x.values(), json_values)
+json_values_p = comp_p(lambda x: x.values(), json_values)  # type: ignore[var-annotated]
 
 is_json_p = (is_dict_p & json_keys_p & json_values_p) | json_list_p
 """Returns True if the value is a valid json structure, otherwise False."""

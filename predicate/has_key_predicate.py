@@ -12,7 +12,7 @@ class HasKeyPredicate[T](Predicate[T]):
     key_p: Predicate[T]
 
     def __call__(self, v: Mapping[Any, Any]) -> bool:
-        return any(self.key_p(k) for k in v.keys())
+        return any(self.key_p(k) for k in v)
 
     def __repr__(self) -> str:
         return f"has_key_p({self.key_p!r})"

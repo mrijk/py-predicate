@@ -21,5 +21,3 @@ class Optimized[T](MaybeOptimized[Any]):
 @dataclass
 class NotOptimized(MaybeOptimized[Any]):
     """Not optimized."""
-
-    pass

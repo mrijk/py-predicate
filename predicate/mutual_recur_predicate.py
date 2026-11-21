@@ -1,11 +1,11 @@
 from dataclasses import dataclass
 from itertools import pairwise
-from typing import Any, Callable, Iterable
+from typing import Any, Callable, Iterable, override
 
 from more_itertools import spy
 
 from predicate import always_true_p
-from predicate.predicate import Predicate
+from predicate.predicate import Explanation, Predicate
 
 
 @dataclass
@@ -32,6 +32,24 @@ class MutualRecurPredicate[T](Predicate[T]):
                         return False
                     predicate_n = recur_predicate.predicate_n
                 return True
+
+    @override
+    def explain_failure(self, iterable: Iterable[T]) -> Explanation:
+        items = list(iterable)
+
+        match items:
+            case []:
+                return {"reason": "Empty iterable is not allowed"}
+            case [x]:
+                return {"reason": self.predicate_1.explain(x)}
+            case _:
+                predicate_n = self.predicate_n
+                for a, b in pairwise(items):
+                    predicate, recur_predicate = predicate_n(a)
+                    if not predicate(b):
+                        return {"reason": predicate.explain(b), "pair": (a, b)}
+                    predicate_n = recur_predicate.predicate_n
+                return {}  # shouldn't reach here
 
 
 def mutual_recur_p[T](

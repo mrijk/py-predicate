@@ -1,3 +1,4 @@
+from predicate import explain
 from predicate.set_predicates import intersects_p
 
 
@@ -30,3 +31,9 @@ def test_intersects_with_set_input():
 
     assert predicate({3, 4, 5})
     assert not predicate({4, 5, 6})
+
+
+def test_intersects_explain():
+    predicate = intersects_p({1, 2, 3})
+
+    assert explain(predicate, {5}) == {"reason": "{5} does not intersect with {1, 2, 3}", "result": False}

@@ -2,11 +2,11 @@ import inspect
 from dataclasses import dataclass
 from functools import cached_property
 from types import FrameType
-from typing import Any, Iterable
+from typing import Any, Iterable, override
 
 from more_itertools import first_true
 
-from predicate.predicate import Predicate
+from predicate.predicate import Explanation, Predicate
 
 
 @dataclass
@@ -23,6 +23,10 @@ class ThisPredicate[T](Predicate[T]):
 
     def __repr__(self) -> str:
         return "this_p"
+
+    @override
+    def explain_failure(self, x: T) -> Explanation:
+        return {"reason": self.this_predicate.explain(x)}
 
 
 def find_in_locals(locals: Iterable[tuple[str, Any]], predicate: Predicate[Any]) -> Predicate[Any] | None:

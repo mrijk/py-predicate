@@ -84,20 +84,16 @@ lint.ignore = [
     "D203",
     "D213",
     "E501",
-    "S311",
 ]
 line-length = 120
-lint.select = ["B", "C", "D", "E", "F", "I", "N", "RET", "S", "T", "W"]
+lint.select = ["B", "C", "D", "E", "F", "FURB", "I", "N", "PIE", "RET", "RSE", "S", "SIM", "T", "TID", "W"]
 target-version = "py312"
-
-[lint.pycodestyle]
-#max-doc-length = 180
 
 [tool.ruff.lint.mccabe]
 max-complexity = 10
 
 [tool.complexipy]
-max-complexity-allowed = 14
+max-complexity-allowed = 10
 exclude = ["tests/**", "benchmarks/**"]
 
 [tool.ruff.lint.flake8-tidy-imports]
@@ -107,6 +103,11 @@ ban-relative-imports = "all"
 # compile_predicate must be imported after exception_predicate to avoid a circular import
 # (is_none_predicate imports exception_p from the predicate package at module level)
 "predicate/__init__.py" = ["I001"]
+# random is used for value generation, not for anything security related
+"predicate/generator/*" = ["S311"]
+"predicate/constructor/mutate.py" = ["S311"]
+"predicate/fn_predicate.py" = ["S311"]
+"predicate/str_predicates.py" = ["S311"]
 "test/*" = ["D101", "D400", "D415",  "S101"]
 "benchmarks/*" = ["D400", "D415", "S101"]
 

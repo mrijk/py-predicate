@@ -2,6 +2,7 @@ import asyncio
 from dataclasses import dataclass, field
 from typing import Any, Callable, Iterable, override
 
+from predicate.helpers import fn_name
 from predicate.is_async_predicate import is_async_p
 from predicate.predicate import Explanation, Predicate
 
@@ -29,7 +30,7 @@ class ReducePredicate[T](Predicate[T]):
         return True
 
     def __repr__(self) -> str:
-        name = getattr(self.fn, "__name__", str(self.fn))
+        name = fn_name(self.fn)
         return f"reduce_p({name}, {self.initial!r})"
 
     @override
