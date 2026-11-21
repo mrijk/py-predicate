@@ -149,7 +149,7 @@ def test_optimize_and_4(p, q):
 
 
 def test_optimize_xor_1(p, q):
-    # p ^ (^p & q) = ~(p | q)
+    # p ^ (~p & q) = p | q
 
     predicate = p ^ (~p & q)
 
@@ -157,11 +157,11 @@ def test_optimize_xor_1(p, q):
 
     optimized = optimize(predicate)
 
-    assert optimized == ~(p | q)
+    assert optimized == p | q
 
 
 def test_optimize_xor_2(p, q):
-    # p ^ (q & ~p) = ~(p | q)
+    # p ^ (q & ~p) = p | q
 
     predicate = p ^ (q & ~p)
 
@@ -169,11 +169,11 @@ def test_optimize_xor_2(p, q):
 
     optimized = optimize(predicate)
 
-    assert optimized == ~(p | q)
+    assert optimized == p | q
 
 
 def test_optimize_xor_3(p, q):
-    # (q & ~p) ^ p = ~(p | q)
+    # (q & ~p) ^ p = p | q
 
     predicate = (q & ~p) ^ p
 
@@ -181,11 +181,11 @@ def test_optimize_xor_3(p, q):
 
     optimized = optimize(predicate)
 
-    assert optimized == ~(p | q)
+    assert optimized == p | q
 
 
 def test_optimize_xor_4(p, q):
-    # (~p & q) ^ p = ~(p | q)
+    # (~p & q) ^ p = p | q
 
     predicate = (~p & q) ^ p
 
@@ -193,7 +193,7 @@ def test_optimize_xor_4(p, q):
 
     optimized = optimize(predicate)
 
-    assert optimized == ~(p | q)
+    assert optimized == p | q
 
 
 def test_optimize_xor_5(p, q):

@@ -6,6 +6,7 @@ from predicate import (
     ge_lt_p,
     ge_p,
     gt_le_p,
+    gt_p,
     in_p,
     le_p,
     lt_p,
@@ -335,3 +336,10 @@ def test_xor_and_right_different_left_not_optimized():
     # must not produce the wrong form is_int_p & ~ge_p(3)
     optimized = optimize(predicate)
     assert optimized != is_int_p & lt_p(3)
+
+
+def test_xor_optimize_p_xor_not_p_and_q_keeps_meaning():
+    p, q = lt_p(4), gt_p(-2)
+    for predicate in (p ^ (~p & q), p ^ (q & ~p)):
+        optimized = optimize(predicate)
+        assert all(predicate(x) == optimized(x) for x in range(-10, 11))
