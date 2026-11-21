@@ -14,7 +14,7 @@ class IsSamePredicate[T](Predicate[Predicate[T]]):
 
     @override
     def __call__(self, predicate: Predicate[T]) -> bool:
-        return is_same(self.predicate, predicate)
+        return _is_same(self.predicate, predicate)
 
     @override
     def __repr__(self) -> str:
@@ -28,7 +28,7 @@ class IsSamePredicate[T](Predicate[Predicate[T]]):
         return {"reason": "Predicates have different truth tables."}
 
 
-def is_same(p1: Predicate[Any], p2: Predicate[Any]) -> bool:
+def _is_same(p1: Predicate[Any], p2: Predicate[Any]) -> bool:
     named_p1 = to_named_predicate(p1)
     named_p2 = to_named_predicate(p2)
 
