@@ -22,10 +22,18 @@ class IsSamePredicate[T](Predicate[Predicate[T]]):
 
     @override
     def explain_failure(self, predicate: Predicate[T]) -> Explanation:
-        if get_named_predicates(self.predicate) != get_named_predicates(predicate):
+        named_p1 = to_named_predicate(self.predicate)
+        named_p2 = to_named_predicate(predicate)
+
+        if get_named_predicates(named_p1) != get_named_predicates(named_p2):
             return {"reason": "Predicates are not equivalent."}
 
-        return {"reason": "Predicates have different truth tables."}
+        differences = [
+            {"values": values, "expected": expected, "actual": actual}
+            for (values, expected), (_, actual) in zip(truth_table(named_p1), truth_table(named_p2), strict=True)
+            if expected != actual
+        ]
+        return {"reason": "Predicates have different truth tables.", "differences": differences}
 
 
 def _is_same(p1: Predicate[Any], p2: Predicate[Any]) -> bool:
