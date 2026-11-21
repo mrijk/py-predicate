@@ -1,6 +1,5 @@
 from dataclasses import dataclass
-from functools import partial
-from typing import Final, Iterable, override
+from typing import Iterable, override
 
 from more_itertools import ilen
 
@@ -15,25 +14,30 @@ class CountPredicate[T](Predicate[T]):
     predicate: Predicate[T]
     length_p: Predicate[int]
 
+    def _count(self, iterable: Iterable[T]) -> int:
+        return ilen(x for x in iterable if self.predicate(x))
+
     def __call__(self, iterable: Iterable[T]) -> bool:
-        return self.length_p(ilen(x for x in iterable if self.predicate(x)))
+        return self.length_p(self._count(iterable))
 
     def __repr__(self) -> str:
         return f"count_p({self.predicate!r}, {self.length_p!r})"
 
     @override
     def explain_failure(self, iterable: Iterable[T]) -> Explanation:
-        actual_length = ilen(x for x in iterable if self.predicate(x))
-        return {"reason": f"Expected count {self.length_p!r}, actual: {actual_length}"}
+        return {"reason": f"Expected count {self.length_p!r}, actual: {self._count(iterable)}"}
 
 
-def count_p[T](predicate: Predicate[T], length_p: Predicate[int]) -> Predicate[T]:
-    """Return True if length of iterable is equal to value, otherwise False."""
+def count_p[T](predicate: Predicate[T], length_p: Predicate[int]) -> CountPredicate[T]:
+    """Return True if the number of items matching predicate satisfies length_p, otherwise False."""
     return CountPredicate(predicate=predicate, length_p=length_p)
 
 
-exactly_zero_p: Final[Predicate] = partial(count_p, length_p=eq_p(0))  # type: ignore
-"""Predicate that returns True if the iterable doesn't match the predicate, otherwise False."""
+def exactly_zero_p[T](predicate: Predicate[T]) -> CountPredicate[T]:
+    """Return True if no item of the iterable matches the predicate, otherwise False."""
+    return count_p(predicate, eq_p(0))
 
-exactly_one_p: Final[Predicate] = partial(count_p, length_p=eq_p(1))  # type: ignore
-"""Predicate that returns True if the iterable matches the predicate exactly once, otherwise False."""
+
+def exactly_one_p[T](predicate: Predicate[T]) -> CountPredicate[T]:
+    """Return True if exactly one item of the iterable matches the predicate, otherwise False."""
+    return count_p(predicate, eq_p(1))

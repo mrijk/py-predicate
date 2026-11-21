@@ -141,6 +141,17 @@ iterable that are greater or equal 1, is exactly 1.
     assert predicate([1])
     assert not predicate([1, 3])
 
+For the common cases ``exactly_zero_p`` and ``exactly_one_p`` are shortcuts for ``count_p`` with
+``length_p=eq_p(0)`` and ``length_p=eq_p(1)``:
+
+.. code-block:: python
+
+    from predicate import exactly_one_p, exactly_zero_p, ge_p
+
+    assert exactly_zero_p(ge_p(1))([0, -1])
+    assert exactly_one_p(ge_p(1))([0, 1])
+    assert not exactly_one_p(ge_p(1))([1, 1])
+
 
 eq_false_p
 ----------
