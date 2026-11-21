@@ -1,4 +1,4 @@
-from abc import abstractmethod
+from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import override
 
@@ -6,8 +6,8 @@ from predicate.predicate import Explanation, Predicate, SupportsComparison
 
 
 @dataclass
-class RangePredicate[T: SupportsComparison](Predicate[T]):
-    """Abstract base class."""
+class RangePredicate[T: SupportsComparison](Predicate[T], ABC):
+    """Abstract base class for RangePredicate."""
 
     @abstractmethod
     def __call__(self, x: T) -> bool: ...

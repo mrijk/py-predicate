@@ -28,6 +28,7 @@ from predicate.gt_predicate import GtPredicate
 from predicate.has_key_predicate import HasKeyPredicate
 from predicate.has_length_predicate import HasLengthPredicate
 from predicate.has_path_predicate import HasPathPredicate
+from predicate.helpers import fn_name
 from predicate.implies import Implies
 from predicate.in_predicate import InPredicate
 from predicate.is_close_predicate import IsClosePredicate
@@ -261,7 +262,7 @@ def render(dot: Digraph, predicate: Predicate[Any], node_nr: "count[Any]") -> No
             case OrPredicate(left, right):
                 return add_node_left_right("or", label="∨", left=left, right=right)
             case ReducePredicate(fn, initial):
-                name = getattr(fn, "__name__", str(fn))
+                name = fn_name(fn)
                 return add_node("reduce", label=f"reduce({name}, {initial!r})")
             case RegexPredicate() as r:
                 return add_node("regex", label=f"~/{r.pattern}/")
