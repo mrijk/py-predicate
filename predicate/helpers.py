@@ -37,3 +37,8 @@ def join_with_or(s: list[str]) -> str:
     if len(s) < 2:
         return "".join(s)
     return f"{', '.join(s[:-1])} or {s[-1]}"
+
+
+def fn_name(fn: Callable[..., Any]) -> str:
+    """Return the name of a callable, falling back to its repr (e.g. for a lambda-less callable object)."""
+    return getattr(fn, "__name__", repr(fn))

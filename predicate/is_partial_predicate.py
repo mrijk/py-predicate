@@ -4,6 +4,7 @@ from functools import partial
 from inspect import signature
 from typing import Any, Final, override
 
+from predicate.helpers import fn_name
 from predicate.predicate import Explanation, Predicate
 
 
@@ -43,7 +44,7 @@ class IsPartialPredicate[T](Predicate[T]):
                     "reason": f"Partial has {len(sig.parameters)} parameters, expected: {self.nr_of_parameters}",
                 }
             case func if callable(func):
-                name = getattr(func, "__name__", repr(func))
+                name = fn_name(func)
                 return {"reason": f"Function {name} is not a partial"}
             case _:
                 return {"reason": f"Value {x} is not a partial"}
