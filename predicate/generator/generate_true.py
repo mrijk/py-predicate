@@ -1407,7 +1407,7 @@ def generate_juxt_p(predicate: JuxtPredicate[Any]) -> Iterator[Any]:
 
 
 @generate_true.register(RaisesPredicate)
-def generate_raises(predicate: RaisesPredicate[Any]) -> Iterator[Any]:
+def generate_raises(predicate: RaisesPredicate) -> Iterator[Any]:
     exc_type = predicate.exception_type
     while True:
         yield lambda: (_ for _ in ()).throw(exc_type())

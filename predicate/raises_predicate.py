@@ -1,6 +1,6 @@
 import asyncio
 from dataclasses import dataclass, field
-from typing import Any, Final, override
+from typing import Any, Callable, Final, override
 
 from predicate.is_async_predicate import is_async_p
 from predicate.predicate import Explanation, Predicate
@@ -14,12 +14,13 @@ def _call(x: Any) -> None:
 
 
 @dataclass
-class RaisesPredicate[T](Predicate[T]):
+class RaisesPredicate(Predicate[Callable[..., Any]]):
     """A predicate that returns True if a callable raises an exception."""
 
     exception_type: type[Exception] = field(default=Exception)
 
-    def __call__(self, x: Any) -> bool:
+    @override
+    def __call__(self, x: Callable[..., Any]) -> bool:
         try:
             _call(x)
             return False
@@ -28,13 +29,14 @@ class RaisesPredicate[T](Predicate[T]):
         except Exception:
             return False  # raised a different exception type
 
+    @override
     def __repr__(self) -> str:
         if self.exception_type is Exception:
             return "raises_p"
         return f"raises_exception_p({self.exception_type.__name__})"
 
     @override
-    def explain_failure(self, x: Any) -> Explanation:
+    def explain_failure(self, x: Callable[..., Any]) -> Explanation:
         try:
             _call(x)
             return {"reason": "callable did not raise an exception"}
@@ -44,10 +46,10 @@ class RaisesPredicate[T](Predicate[T]):
             return {"reason": f"raised {type(e).__name__}, expected {self.exception_type.__name__}"}
 
 
-raises_p: Final[RaisesPredicate[Any]] = RaisesPredicate()
+raises_p: Final = RaisesPredicate()
 """Return True if the callable raises any exception."""
 
 
-def raises_exception_p(exception_type: type[Exception]) -> RaisesPredicate[Any]:
+def raises_exception_p(exception_type: type[Exception]) -> RaisesPredicate:
     """Return True if the callable raises the specified exception type."""
     return RaisesPredicate(exception_type=exception_type)

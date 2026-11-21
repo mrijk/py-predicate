@@ -880,7 +880,7 @@ def generate_recur(predicate: RecurPredicate[Any], *, length_p: Predicate[Any] =
 
 
 @generate_false.register(RaisesPredicate)
-def generate_raises(predicate: RaisesPredicate[Any]) -> Iterator[Any]:
+def generate_raises(predicate: RaisesPredicate) -> Iterator[Any]:
     yield from repeat(lambda: None)
 
 
