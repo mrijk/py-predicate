@@ -87,7 +87,7 @@ lint.ignore = [
     "S311",
 ]
 line-length = 120
-lint.select = ["B", "C", "D", "E", "F", "I", "N", "RET", "S", "T", "W"]
+lint.select = ["B", "C", "D", "E", "F", "FURB", "I", "N", "PIE", "RET", "RSE", "S", "SIM", "T", "TID", "W"]
 target-version = "py312"
 
 [lint.pycodestyle]

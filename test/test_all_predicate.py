@@ -44,7 +44,7 @@ def test_all_consumes(iterable, expected_end):
     predicate = all_p(is_int_p)
 
     consumed = list(consumes(predicate, iterable))
-    expected_consumed = list(range(0, expected_end + 1))
+    expected_consumed = list(range(expected_end + 1))
 
     assert consumed == expected_consumed
 

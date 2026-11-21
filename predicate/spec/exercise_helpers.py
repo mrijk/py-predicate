@@ -677,9 +677,8 @@ def verify_result(
     if sig is not None and (reason := type_var_failure(sig, value, result)):
         raise SpecViolationError(f"Not conform spec: {reason}")
 
-    if fn := spec.get("fn"):
-        if not fn(**value, **{ret_name(spec): result}):
-            raise SpecViolationError(f"Not conform spec: fn constraint failed for inputs {value} -> {result}")
+    if (fn := spec.get("fn")) and not fn(**value, **{ret_name(spec): result}):
+        raise SpecViolationError(f"Not conform spec: fn constraint failed for inputs {value} -> {result}")
 
     if fn_p := spec.get("fn_p"):
         fn_p_result = fn_p(**value)

@@ -45,7 +45,7 @@ def _to_named_predicate(predicate: Predicate[Any], names_map: dict[str, NamedPre
             return NotPredicate(predicate=_to_named_predicate(not_predicate, names_map))
         case _:
             key = str(predicate)
-            if named_predicate := names_map.get(key, None):
+            if named_predicate := names_map.get(key):
                 return named_predicate
             named_predicate = NamedPredicate(name=next_name())
             names_map[key] = named_predicate

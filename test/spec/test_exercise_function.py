@@ -73,7 +73,7 @@ def test_exercise_partial_uses_wrapped_annotations():
 
 def test_exercise_with_fn_happy():
     def max_int(x, y):
-        return x if x >= y else y
+        return max(x, y)
 
     spec: Spec = {
         "args": {"x": is_int_p, "y": is_int_p},
@@ -101,7 +101,7 @@ def test_exercise_with_fn_fail():
 
 def test_exercise_with_fn_p_happy():
     def max_int(x, y):
-        return x if x >= y else y
+        return max(x, y)
 
     spec: Spec = {"args": {"x": is_int_p, "y": is_int_p}, "ret": is_int_p, "fn_p": lambda x, y: ge_p(x) & ge_p(y)}
 
@@ -430,7 +430,7 @@ async def test_exercise_async_function_no_annotation():
 @pytest.mark.asyncio
 async def test_exercise_async_function_with_fn():
     async def max_int(x: int, y: int) -> int:
-        return x if x >= y else y
+        return max(x, y)
 
     spec: Spec = {
         "args": {"x": is_int_p, "y": is_int_p},
@@ -461,7 +461,7 @@ async def test_exercise_async_function_with_fn_fail():
 @pytest.mark.asyncio
 async def test_exercise_async_function_with_fn_p():
     async def max_int(x: int, y: int) -> int:
-        return x if x >= y else y
+        return max(x, y)
 
     spec: Spec = {"args": {"x": is_int_p, "y": is_int_p}, "ret": is_int_p, "fn_p": lambda x, y: ge_p(x) & ge_p(y)}
 

@@ -102,9 +102,8 @@ def _check_args(spec: Spec, func_name: str, arguments: dict[str, Any]) -> str | 
 
 
 def _check_return_value(spec: Spec, func_name: str, result: Any) -> str | None:
-    if return_p := spec.get("ret"):
-        if reason := _get_reason(return_p, value=result):
-            return f"Return predicate for function {func_name} failed. Reason: {reason}"
+    if (return_p := spec.get("ret")) and (reason := _get_reason(return_p, value=result)):
+        return f"Return predicate for function {func_name} failed. Reason: {reason}"
     return None
 
 

@@ -93,7 +93,7 @@ def test_starts_with_and_ends_with_use_the_given_text():
 
 
 def test_str_method_strategies_cover_all_str_predicates():
-    assert set(strings._STR_METHODS) == {f"is{name}" for name in "alnum alpha ascii decimal digit".split()} | {
+    assert set(strings._STR_METHODS) == {f"is{name}" for name in ["alnum", "alpha", "ascii", "decimal", "digit"]} | {
         "isidentifier",
         "islower",
         "isnumeric",

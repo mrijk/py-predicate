@@ -77,7 +77,7 @@ from predicate.xor_predicate import XorPredicate
 
 def to_dot(predicate: Predicate[Any], predicate_string: str | None = None, show_optimized: bool = False) -> Digraph:
     """Format predicate as a .dot file."""
-    label = predicate_string if predicate_string else repr(predicate)
+    label = predicate_string or repr(predicate)
 
     graph_attr = {"label": label, "labelloc": "t"}
 

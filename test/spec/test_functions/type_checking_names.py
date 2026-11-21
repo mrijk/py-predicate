@@ -5,7 +5,7 @@ if typing.TYPE_CHECKING:
     import collections.abc
     from fractions import Fraction
 
-    from . import sample_module  # noqa: F401  only resolved by type_checking_namespace
+    from . import sample_module  # noqa: F401, TID252  only resolved by type_checking_namespace
 
 
 def ratio(x: "Fraction") -> str:

@@ -27,7 +27,7 @@ class HasLengthPredicate[T](Predicate[T]):
 
     @override
     def consumes(self, iterable: Iterable[Any]) -> Iterator[int]:
-        for end in range(0, ilen(iterable) + 1):
+        for end in range(ilen(iterable) + 1):
             rest = islice(iterable, 0, end)
             if self(rest):
                 yield end
