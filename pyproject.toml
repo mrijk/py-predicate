@@ -29,7 +29,6 @@ classifiers = [
 ]
 dependencies = [
     "exrex",
-    "graphviz",
     "lark",
     "more-itertools",
     "pyyaml",
@@ -45,9 +44,11 @@ Documentation = "https://mrijk.github.io/py-predicate/"
 
 [project.optional-dependencies]
 rx = ["reactivex"]
+graphviz = ["graphviz"]
 hypothesis = ["hypothesis"]
 pydantic = ["pydantic>=2"]
 test = [
+    "graphviz",
     "beartype",
     "hypothesis",
     "pandera[pandas]",
