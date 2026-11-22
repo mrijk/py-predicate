@@ -765,14 +765,15 @@ def generate_count(count_predicate: CountPredicate[Any]) -> Iterator[Any]:
 
     while True:
         count = next(invalid_counts)
-        true_values = list(take(count, generate_true(predicate)))
+        true_values = take(count, generate_true(predicate))
 
-        yield list(random_permutation(true_values))
+        # lists and tuples keep duplicates, so the count is preserved (sets would not)
+        make = random.choice((list, tuple))
+        yield make(random_permutation(true_values))
 
         nr_false = random.randint(1, 5)
-        false_values = list(take(nr_false, generate_false(predicate)))
-        if false_values:
-            yield list(random_permutation(true_values + false_values))
+        if false_values := take(nr_false, generate_false(predicate)):
+            yield make(random_permutation(true_values + false_values))
 
 
 def _subclasses(klass: type) -> set[Any]:
