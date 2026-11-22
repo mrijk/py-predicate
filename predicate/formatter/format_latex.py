@@ -49,7 +49,7 @@ def to_latex(predicate: Predicate[Any], parameter: str = "x") -> str:  # noqa: C
         case AlwaysTruePredicate():
             return "True"
         case AndPredicate(left, right):
-            return f"{to_latex(left)} \\wedge {to_latex(right)}"
+            return f"{to_latex(left, parameter)} \\wedge {to_latex(right, parameter)}"
         case AnyPredicate(all_predicate):
             return f"\\exists {parameter} \\in S, {to_latex(all_predicate)}"
         case CountPredicate(predicate, length_p):
@@ -73,17 +73,17 @@ def to_latex(predicate: Predicate[Any], parameter: str = "x") -> str:  # noqa: C
         case ImpliesPredicate(p):
             return f"p \\implies {to_latex(p)}"
         case InPredicate(v) if isinstance(v, Iterable):
-            return f"x \\in {set_to_latex_set(v)}"
+            return f"{parameter} \\in {set_to_latex_set(v)}"
         case IntersectsPredicate(v):
-            return f"x \\cap {set_to_latex_set(v)} \\neq \\emptyset"
+            return f"{parameter} \\cap {set_to_latex_set(v)} \\neq \\emptyset"
         case IsRealSubsetPredicate(v):
-            return f"x \\subseteq {set_to_latex_set(v)}"
+            return f"{parameter} \\subseteq {set_to_latex_set(v)}"
         case IsSubsetPredicate(v):
-            return f"x \\subset {set_to_latex_set(v)}"
+            return f"{parameter} \\subset {set_to_latex_set(v)}"
         case IsRealSupersetPredicate(v):
-            return f"x \\supseteq {set_to_latex_set(v)}"
+            return f"{parameter} \\supseteq {set_to_latex_set(v)}"
         case IsSupersetPredicate(v):
-            return f"x \\supset {set_to_latex_set(v)}"
+            return f"{parameter} \\supset {set_to_latex_set(v)}"
         case LePredicate(v):
             return f"{parameter} \\le {v}"
         case LtPredicate(v):
@@ -91,13 +91,13 @@ def to_latex(predicate: Predicate[Any], parameter: str = "x") -> str:  # noqa: C
         case NePredicate(v):
             return f"{parameter} \\neq {v}"
         case NotInPredicate(v) if isinstance(v, Iterable):
-            return f"x \\notin {set_to_latex_set(v)}"
+            return f"{parameter} \\notin {set_to_latex_set(v)}"
         case NotPredicate(child):
-            return f"\\neg {to_latex(child)}"
+            return f"\\neg {to_latex(child, parameter)}"
         case OrPredicate(left, right):
-            return f"{to_latex(left)} \\vee {to_latex(right)}"
+            return f"{to_latex(left, parameter)} \\vee {to_latex(right, parameter)}"
         case XorPredicate(left, right):
-            return f"{to_latex(left)} \\oplus {to_latex(right)}"
+            return f"{to_latex(left, parameter)} \\oplus {to_latex(right, parameter)}"
         case ReducePredicate(fn, initial):
             name = fn_name(fn)
             return rf"\text{{reduce}}({name}, {initial!r})"

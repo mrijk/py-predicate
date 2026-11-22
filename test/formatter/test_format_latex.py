@@ -59,6 +59,15 @@ from predicate.implies_predicate import implies_p
         (le_p(2), "x \\le 2"),
         (lt_p(2), "x \\lt 2"),
         (has_length_p(length_p=eq_p(2)), "\\left| x \\right| = 2"),
+        (
+            has_length_p(length_p=ge_p(1) & le_p(3)),
+            "\\left| x \\right| \\ge 1 \\wedge \\left| x \\right| \\le 3",
+        ),
+        (count_p(predicate=ge_p(1), length_p=in_p({1, 2})), "\\left| \\{x \\mid x \\ge 1\\} \\right| \\in \\{1, 2\\}"),
+        (
+            count_p(predicate=ge_p(1), length_p=ge_p(1) | eq_p(0)),
+            "\\left| \\{x \\mid x \\ge 1\\} \\right| \\ge 1 \\vee \\left| \\{x \\mid x \\ge 1\\} \\right| = 0",
+        ),
         (ne_p(2), "x \\neq 2"),
         (neg_p, "x \\lt 0"),
         (pos_p, "x \\gt 0"),
