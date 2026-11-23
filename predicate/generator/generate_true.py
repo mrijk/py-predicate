@@ -216,6 +216,7 @@ from predicate.set_predicates import (
     IsSubsetPredicate,
     IsSupersetPredicate,
 )
+from predicate.spec.is_valid_spec_predicate import IsValidSpecPredicate
 from predicate.star_predicate import StarPredicate
 from predicate.struct_predicate import StructPredicate
 from predicate.tee_predicate import TeePredicate
@@ -676,6 +677,23 @@ def recur_values(predicate: RecurPredicate[Any], length: int, start: Any) -> lis
             [x] = successors
 
     return take(length, chain_values(start))
+
+
+@generate_true.register(IsValidSpecPredicate)
+def generate_is_valid_spec(predicate: IsValidSpecPredicate) -> Iterator[Any]:
+    from predicate.spec.exercise_helpers import needs_spec_predicate, param_predicate, resolved_signature
+
+    sig = resolved_signature(predicate.function)
+    params = list(sig.parameters.values())
+
+    def spec(params: list[Parameter], ret: bool) -> dict[str, Any]:
+        args = {p.name: always_true_p if needs_spec_predicate(p) else param_predicate(p) for p in params}
+        return {"args": args} | ({"ret": always_true_p} if ret else {})
+
+    # Annotated parameters and the return type may be left out of the spec, or named with their own annotation
+    named = spec(params, ret=True)
+    required = spec([p for p in params if needs_spec_predicate(p)], ret=sig.return_annotation is sig.empty)
+    yield from cycle([named, required])
 
 
 @generate_true.register(SameSignaturePredicate)

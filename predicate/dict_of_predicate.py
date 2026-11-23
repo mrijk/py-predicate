@@ -4,7 +4,7 @@ from typing import Any, override
 
 from more_itertools import first
 
-from predicate.eq_predicate import EqPredicate
+from predicate.eq_predicate import EqPredicate, eq_p
 from predicate.helpers import key_value_pairs_repr
 from predicate.predicate import Explanation, Predicate
 
@@ -57,8 +57,6 @@ class DictOfPredicate(Predicate[Any]):
 
 
 def to_key_p(key_p: Predicate[Any] | str) -> Predicate[Any]:
-    from predicate import eq_p
-
     match key_p:
         case str(s):
             return eq_p(s)

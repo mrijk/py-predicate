@@ -108,6 +108,8 @@ from predicate.set_predicates import (
     IsSubsetPredicate,
     IsSupersetPredicate,
 )
+from predicate.spec.is_valid_spec_predicate import IsValidSpecPredicate
+from predicate.spec.spec import Spec
 from predicate.star_predicate import StarPredicate
 from predicate.struct_predicate import StructPredicate
 from predicate.tee_predicate import TeePredicate
@@ -477,6 +479,29 @@ def generate_same_signature(predicate: SameSignaturePredicate[Any]) -> Iterator[
         signatures.append(sig.replace(parameters=parameters[1:]))
 
     yield from cycle([*(function_with_signature(s) for s in signatures), None])
+
+
+@generate_false.register(IsValidSpecPredicate)
+def generate_is_valid_spec(predicate: IsValidSpecPredicate) -> Iterator[Any]:
+    from predicate import generate_true
+    from predicate.spec.exercise_helpers import param_predicate, resolved_signature
+
+    sig = resolved_signature(predicate.function)
+    valid: Spec = first(generate_true(predicate))
+    args = valid["args"]
+
+    def with_args(new_args: dict[str, Predicate[Any]]) -> Spec:
+        return {**valid, "args": new_args}
+
+    params = sig.parameters.values()
+    candidates: list[Spec] = [
+        with_args(args | {unused_name(sig): always_true_p}),  # parameter not in the signature
+        *(with_args({k: v for k, v in args.items() if k != p.name}) for p in params),  # parameter left out
+        {"args": args},  # no ret, as `valid` has one
+        *(with_args(args | {p.name: ~param_predicate(p)}) for p in params),  # not implied by the annotation
+    ]
+    # Not every mutation is invalid, e.g. an annotated parameter may be left out
+    yield from cycle([c for c in candidates if not predicate(c)])
 
 
 @generate_false.register(NotPredicate)
