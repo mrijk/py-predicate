@@ -52,7 +52,7 @@ def _compatible_klasses(left: Predicate[Any], right: Predicate[Any]) -> bool:
             klass = p.klass
         except NotImplementedError:
             return None
-        if klass is type(Any):
+        if klass in (Any, type(Any)):
             return None
         return set(klass) if isinstance(klass, tuple) else {klass}
 

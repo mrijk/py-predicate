@@ -12,6 +12,7 @@ from uuid import UUID
 
 from more_itertools import first, flatten, interleave, random_permutation, take
 
+from predicate.accepts_predicate import AcceptsPredicate
 from predicate.all_predicate import AllPredicate
 from predicate.always_false_predicate import AlwaysFalsePredicate, always_false_p
 from predicate.always_true_predicate import AlwaysTruePredicate, always_true_p
@@ -30,6 +31,7 @@ from predicate.frozenset_of_predicate import FrozenSetOfPredicate
 from predicate.function_predicate import FnPredicate
 from predicate.ge_predicate import GePredicate
 from predicate.generator.helpers import (
+    accepts_candidate_types,
     default_length_p,
     default_size_p,
     evaluate_comp,
@@ -125,6 +127,11 @@ default_at_least_one_length_p: Final = ge_le_p(lower=1, upper=10)
 def generate_false(predicate: Predicate[Any], **kwargs: Any) -> Iterator[Any]:
     """Generate values that don't satisfy this predicate."""
     raise ValueError(f"Please register generator for correct predicate type: {predicate!r}")
+
+
+@generate_false.register(AcceptsPredicate)
+def generate_accepts(predicate: AcceptsPredicate[Any]) -> Iterator[Any]:
+    yield from cycle([t for t in accepts_candidate_types(predicate.predicate) if not predicate(t)])
 
 
 @generate_false.register(AllPredicate)

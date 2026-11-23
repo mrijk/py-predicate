@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import ClassVar, override
+from typing import Any, ClassVar, override
 
 from predicate.predicate import Explanation, Predicate, repr_operand
 
@@ -41,7 +41,8 @@ class OrPredicate[T](Predicate[T]):
     @override
     @property
     def klass(self) -> type:
-        return self.left.klass
+        left, right = self.left.klass, self.right.klass
+        return left if left == right else Any
 
     @override
     @property

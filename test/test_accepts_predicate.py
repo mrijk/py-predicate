@@ -1,6 +1,6 @@
 import pytest
 
-from predicate import eq_p, explain
+from predicate import always_true_p, eq_p, explain, in_p
 from predicate.accepts_predicate import accepts_p
 
 
@@ -15,6 +15,10 @@ from predicate.accepts_predicate import accepts_p
             (int,),
             (bool, str, float),
         ),
+        (eq_p(2) | eq_p("a"), (int, str), ()),
+        (eq_p(2) ^ eq_p("a"), (int, str), ()),
+        (in_p(5), (int, str), ()),
+        (always_true_p, (int, str), ()),
     ],
 )
 def test_accepts(predicate, accepted_types, rejected_types):
