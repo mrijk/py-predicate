@@ -741,3 +741,18 @@ def random_fractions() -> Iterator[Fraction]:
     yield from (Fraction(0), Fraction(1, 3), Fraction(-7, 2))
     while True:
         yield Fraction(random.randint(-1000, 1000), random.randint(1, 1000))
+
+
+BASIC_TYPES: Final = (int, str, float, bool, bytes, complex, list, tuple, dict, set, frozenset, type(None))
+
+
+def accepts_candidate_types(predicate: Predicate[Any]) -> list[type]:
+    """Return the types to try for accepts_p: the predicate's own class, if it has one, and the basic types."""
+    klass: Any  # a tuple too, for e.g. issubclass_p((int, str))
+    try:
+        klass = predicate.klass
+    except NotImplementedError:
+        klass = ()
+    klasses = klass if isinstance(klass, tuple) else (klass,)
+    own = (k for k in klasses if isinstance(k, type) and k not in (Any, type(Any)))
+    return list(dict.fromkeys([*own, *BASIC_TYPES]))

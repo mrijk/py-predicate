@@ -69,6 +69,7 @@ from more_itertools import (
 )
 
 from predicate import generate_false
+from predicate.accepts_predicate import AcceptsPredicate
 from predicate.all_predicate import AllPredicate
 from predicate.always_false_predicate import AlwaysFalsePredicate, always_false_p
 from predicate.always_true_predicate import AlwaysTruePredicate, always_true_p
@@ -89,6 +90,7 @@ from predicate.ge_predicate import GePredicate, ge_p
 from predicate.generator.generate_predicate import generate_predicate, predicate_type_registry
 from predicate.generator.helpers import (
     accepted_kwargs,
+    accepts_candidate_types,
     default_length_p,
     evaluate_comp,
     function_with_signature,
@@ -230,6 +232,11 @@ from predicate.xor_predicate import XorPredicate
 def generate_true(predicate: Predicate[Any], **_kwargs: Any) -> Iterator[Any]:
     """Generate values that satisfy this predicate."""
     raise ValueError(f"Please register generator for correct predicate type: {predicate}")
+
+
+@generate_true.register(AcceptsPredicate)
+def generate_accepts(predicate: AcceptsPredicate[Any]) -> Iterator[Any]:
+    yield from cycle([t for t in accepts_candidate_types(predicate.predicate) if predicate(t)])
 
 
 @generate_true.register(AllPredicate)
