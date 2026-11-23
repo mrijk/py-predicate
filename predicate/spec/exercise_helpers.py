@@ -512,9 +512,14 @@ def check_signature_against_spec(f: Callable[..., Any], spec: Spec) -> Spec:
     return spec
 
 
-def _check_parameter(key: str, parameter: Parameter, parameters: dict[str, Predicate[Any]]) -> None:
+def needs_spec_predicate(parameter: Parameter) -> bool:
+    """Return True if the annotation doesn't constrain the parameter, so a spec has to name it."""
     annotation = parameter.annotation
-    if annotation == parameter.empty or type(annotation) is TypeVar:
+    return annotation == parameter.empty or type(annotation) is TypeVar
+
+
+def _check_parameter(key: str, parameter: Parameter, parameters: dict[str, Predicate[Any]]) -> None:
+    if needs_spec_predicate(parameter):
         if key not in parameters:
             raise InvalidSpecError(f"Unannotated parameter '{key}' not in spec")
     else:
