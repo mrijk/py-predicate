@@ -16,7 +16,7 @@ class AcceptsPredicate[T](Predicate[type]):
             klass = self.predicate.klass
         except NotImplementedError:
             return True
-        if klass is type(Any):
+        if klass in (Any, type(Any)):
             return True
         if isinstance(klass, tuple):
             return True
