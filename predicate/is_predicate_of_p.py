@@ -13,7 +13,7 @@ class IsPredicateOfPredicate[T](Predicate[T]):
     def __call__(self, x: Any) -> bool:
         match x:
             case Predicate() as predicate:
-                return predicate.klass == self.predicate_klass or predicate.klass == Any
+                return self.predicate_klass is Any or predicate.klass in (self.predicate_klass, Any)
             case _:
                 return False
 
