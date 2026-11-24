@@ -1,6 +1,7 @@
 from collections.abc import Iterable
+from datetime import datetime
 from itertools import repeat
-from typing import Any, Iterator
+from typing import Any, Iterator, Literal
 
 from predicate.all_predicate import AllPredicate
 from predicate.always_false_predicate import always_false_p
@@ -31,8 +32,15 @@ from predicate.range_predicate import GeLePredicate, GeLtPredicate, GtLePredicat
 from predicate.set_of_predicate import SetOfPredicate
 from predicate.xor_predicate import XorPredicate
 
+# The classes whose values random_values_of_type can build, so the only ones the typed generators below support.
+# Literal and not type[int] | ...: those also allow subclasses such as IntEnum, which have no generator. mypy only
+# allows literals in a Literal, but at runtime it is what makes exercise generate exactly these classes.
+type PredicateKlass = Literal[bool, datetime, float, int, str]  # type: ignore[valid-type]
 
-def generate_predicate(predicate_type: type[Predicate[Any]], max_depth: int, klass: type) -> Iterator[Predicate[Any]]:
+
+def generate_predicate(
+    predicate_type: type[Predicate[Any]], max_depth: int, klass: PredicateKlass
+) -> Iterator[Predicate[Any]]:
     if generator := predicate_type_registry().get(predicate_type):
         yield from generator(max_depth=max_depth, klass=klass)
     else:
@@ -89,7 +97,7 @@ def _constant_predicates(predicate: Predicate[Any]) -> Any:
     return lambda max_depth, klass: repeat(predicate)
 
 
-def generate_random_predicate_pairs(max_depth: int, klass: type) -> Iterator[Any]:
+def generate_random_predicate_pairs(max_depth: int, klass: PredicateKlass) -> Iterator[Any]:
     from predicate.generator.helpers import random_predicates
 
     left_predicates = random_predicates(max_depth=max_depth - 1, klass=klass)
@@ -103,7 +111,7 @@ def _is_iterable_class(klass: type) -> bool:
     return isinstance(klass, type) and issubclass(klass, Iterable)
 
 
-def generate_all_predicates(max_depth: int, klass: type) -> Iterator[Any]:
+def generate_all_predicates(max_depth: int, klass: PredicateKlass) -> Iterator[Any]:
     if not max_depth or not _is_iterable_class(klass):
         return
 
@@ -114,7 +122,7 @@ def generate_all_predicates(max_depth: int, klass: type) -> Iterator[Any]:
     yield from (AllPredicate(predicate) for predicate in predicates)
 
 
-def generate_any_predicates(max_depth: int, klass: type) -> Iterator[Any]:
+def generate_any_predicates(max_depth: int, klass: PredicateKlass) -> Iterator[Any]:
     if not max_depth or not _is_iterable_class(klass):
         return
 
@@ -125,7 +133,7 @@ def generate_any_predicates(max_depth: int, klass: type) -> Iterator[Any]:
     yield from (AnyPredicate(predicate) for predicate in predicates)
 
 
-def generate_set_of_predicates(max_depth: int, klass: type) -> Iterator[Any]:
+def generate_set_of_predicates(max_depth: int, klass: PredicateKlass) -> Iterator[Any]:
     if not max_depth:
         return
 
@@ -136,87 +144,87 @@ def generate_set_of_predicates(max_depth: int, klass: type) -> Iterator[Any]:
     yield from (SetOfPredicate(predicate) for predicate in predicates)
 
 
-def generate_and_predicates(max_depth: int, klass: type) -> Iterator[Any]:
+def generate_and_predicates(max_depth: int, klass: PredicateKlass) -> Iterator[Any]:
     if not max_depth:
         return
 
     yield from (left & right for left, right in generate_random_predicate_pairs(max_depth=max_depth, klass=klass))
 
 
-def generate_eq_predicates(max_depth: int, klass: type) -> Iterator[Any]:
+def generate_eq_predicates(max_depth: int, klass: PredicateKlass) -> Iterator[Any]:
     from predicate.generator.helpers import random_values_of_type
 
     yield from (EqPredicate(value) for value in random_values_of_type(klass))
 
 
-def generate_ge_le_predicates(max_depth: int, klass: type) -> Iterator[Any]:
+def generate_ge_le_predicates(max_depth: int, klass: PredicateKlass) -> Iterator[Any]:
     from predicate.generator.helpers import random_constrained_pairs_of_type
 
     yield from (GeLePredicate(lower=lower, upper=upper) for lower, upper in random_constrained_pairs_of_type(klass))
 
 
-def generate_ge_lt_predicates(max_depth: int, klass: type) -> Iterator[Any]:
+def generate_ge_lt_predicates(max_depth: int, klass: PredicateKlass) -> Iterator[Any]:
     from predicate.generator.helpers import random_constrained_pairs_of_type
 
     yield from (GeLtPredicate(lower=lower, upper=upper) for lower, upper in random_constrained_pairs_of_type(klass))
 
 
-def generate_gt_le_predicates(max_depth: int, klass: type) -> Iterator[Any]:
+def generate_gt_le_predicates(max_depth: int, klass: PredicateKlass) -> Iterator[Any]:
     from predicate.generator.helpers import random_constrained_pairs_of_type
 
     yield from (GtLePredicate(lower=lower, upper=upper) for lower, upper in random_constrained_pairs_of_type(klass))
 
 
-def generate_gt_lt_predicates(max_depth: int, klass: type) -> Iterator[Any]:
+def generate_gt_lt_predicates(max_depth: int, klass: PredicateKlass) -> Iterator[Any]:
     from predicate.generator.helpers import random_constrained_pairs_of_type
 
     yield from (GtLtPredicate(lower=lower, upper=upper) for lower, upper in random_constrained_pairs_of_type(klass))
 
 
-def generate_ge_predicates(max_depth: int, klass: type) -> Iterator[Any]:
+def generate_ge_predicates(max_depth: int, klass: PredicateKlass) -> Iterator[Any]:
     from predicate.generator.helpers import random_constrained_values_of_type
 
     yield from (GePredicate(value) for value in random_constrained_values_of_type(klass))
 
 
-def generate_gt_predicates(max_depth: int, klass: type) -> Iterator[Any]:
+def generate_gt_predicates(max_depth: int, klass: PredicateKlass) -> Iterator[Any]:
     from predicate.generator.helpers import random_constrained_values_of_type
 
     yield from (GtPredicate(value) for value in random_constrained_values_of_type(klass))
 
 
-def generate_in_predicates(max_depth: int, klass: type) -> Iterator[Any]:
+def generate_in_predicates(max_depth: int, klass: PredicateKlass) -> Iterator[Any]:
     from predicate.generator.helpers import random_iterables
 
     yield from (InPredicate(set(iterable)) for iterable in random_iterables(value_p=is_instance_p(klass)))
 
 
-def generate_not_in_predicates(max_depth: int, klass: type) -> Iterator[Any]:
+def generate_not_in_predicates(max_depth: int, klass: PredicateKlass) -> Iterator[Any]:
     from predicate import is_instance_p
     from predicate.generator.helpers import random_iterables
 
     yield from (NotInPredicate(set(iterable)) for iterable in random_iterables(value_p=is_instance_p(klass)))
 
 
-def generate_le_predicates(max_depth: int, klass: type) -> Iterator[Any]:
+def generate_le_predicates(max_depth: int, klass: PredicateKlass) -> Iterator[Any]:
     from predicate.generator.helpers import random_constrained_values_of_type
 
     yield from (LePredicate(value) for value in random_constrained_values_of_type(klass))
 
 
-def generate_lt_predicates(max_depth: int, klass: type) -> Iterator[Any]:
+def generate_lt_predicates(max_depth: int, klass: PredicateKlass) -> Iterator[Any]:
     from predicate.generator.helpers import random_constrained_values_of_type
 
     yield from (LtPredicate(value) for value in random_constrained_values_of_type(klass))
 
 
-def generate_ne_predicates(max_depth: int, klass: type) -> Iterator[Any]:
+def generate_ne_predicates(max_depth: int, klass: PredicateKlass) -> Iterator[Any]:
     from predicate.generator.helpers import random_values_of_type
 
     yield from (NePredicate(value) for value in random_values_of_type(klass))
 
 
-def generate_not_predicates(max_depth: int, klass: type) -> Iterator[Any]:
+def generate_not_predicates(max_depth: int, klass: PredicateKlass) -> Iterator[Any]:
     if not max_depth:
         return
 
@@ -226,14 +234,14 @@ def generate_not_predicates(max_depth: int, klass: type) -> Iterator[Any]:
     yield from (~predicate for predicate in predicates)
 
 
-def generate_or_predicates(max_depth: int, klass: type) -> Iterator[Any]:
+def generate_or_predicates(max_depth: int, klass: PredicateKlass) -> Iterator[Any]:
     if not max_depth:
         return
 
     yield from (left | right for left, right in generate_random_predicate_pairs(max_depth=max_depth, klass=klass))
 
 
-def generate_xor_predicates(max_depth: int, klass: type) -> Iterator[Any]:
+def generate_xor_predicates(max_depth: int, klass: PredicateKlass) -> Iterator[Any]:
     if not max_depth:
         return
 

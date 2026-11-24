@@ -29,7 +29,7 @@ from uuid import UUID, uuid4
 from more_itertools import interleave, random_permutation, repeatfunc, take, unique_everseen
 
 from predicate.eq_predicate import eq_p
-from predicate.generator.generate_predicate import generate_predicate, typed_predicate_type_registry
+from predicate.generator.generate_predicate import PredicateKlass, generate_predicate, typed_predicate_type_registry
 from predicate.is_instance_predicate import is_int_p, is_str_p
 from predicate.predicate import Predicate
 from predicate.range_predicate import ge_le_p
@@ -196,7 +196,7 @@ def random_datetimes(lower: datetime | None = None, upper: datetime | None = Non
         yield start + timedelta(seconds=random_second)
 
 
-def random_predicates(*, max_depth: int = 10, klass: type = int) -> Iterator[Predicate[Any]]:
+def random_predicates(*, max_depth: int = 10, klass: PredicateKlass = int) -> Iterator[Predicate[Any]]:
     subclasses = [subclass for subclass in Predicate.__subclasses__() if subclass in typed_predicate_type_registry()]
 
     iterables = [generate_predicate(subclass, max_depth=max_depth, klass=klass) for subclass in subclasses]

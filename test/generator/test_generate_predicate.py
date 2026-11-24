@@ -21,11 +21,14 @@ from predicate.eq_predicate import EqPredicate
 from predicate.ge_predicate import GePredicate
 from predicate.generator.generate_predicate import (
     generate_all_predicates,
+    generate_and_predicates,
     generate_any_predicates,
+    generate_eq_predicates,
     generate_ge_le_predicates,
     generate_ge_lt_predicates,
     generate_gt_le_predicates,
     generate_gt_lt_predicates,
+    generate_not_predicates,
     generate_predicate,
     generate_set_of_predicates,
 )
@@ -39,6 +42,7 @@ from predicate.not_predicate import NotPredicate
 from predicate.or_predicate import OrPredicate
 from predicate.range_predicate import GeLePredicate, GeLtPredicate, GtLePredicate, GtLtPredicate
 from predicate.set_of_predicate import SetOfPredicate
+from predicate.spec.exercise import exercise
 from predicate.tee_predicate import TeePredicate
 from predicate.xor_predicate import XorPredicate
 
@@ -198,3 +202,20 @@ def test_generate_any_predicate_via_registry():
 def test_generate_unknown_predicate():
     with pytest.raises(ValueError, match="No generator found for <class 'predicate.tee_predicate.TeePredicate'>"):
         take(1, generate_predicate(TeePredicate, max_depth=1, klass=int))
+
+
+@pytest.mark.parametrize(
+    "generate_func",
+    (
+        generate_all_predicates,
+        generate_any_predicates,
+        generate_set_of_predicates,
+        generate_eq_predicates,
+        generate_and_predicates,
+        generate_not_predicates,
+    ),
+)
+def test_generators_can_be_exercised_from_their_annotation(generate_func):
+    # klass is annotated with the classes the generators support, so exercise draws no unsupported class
+    for _ in range(5):
+        assert len(list(exercise(generate_func, None, 10))) == 10
