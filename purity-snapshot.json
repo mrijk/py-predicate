@@ -1,211 +1,5 @@
 [
   {
-    "path": "predicate/__init__.py",
-    "file_name": "__init__.py",
-    "functions": []
-  },
-  {
-    "path": "predicate/accepts_predicate.py",
-    "file_name": "accepts_predicate.py",
-    "functions": [
-      {
-        "name": "accepts_p",
-        "line": 36,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      }
-    ]
-  },
-  {
-    "path": "predicate/all_predicate.py",
-    "file_name": "all_predicate.py",
-    "functions": [
-      {
-        "name": "all_p",
-        "line": 46,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      }
-    ]
-  },
-  {
-    "path": "predicate/always_false_predicate.py",
-    "file_name": "always_false_predicate.py",
-    "functions": []
-  },
-  {
-    "path": "predicate/always_true_predicate.py",
-    "file_name": "always_true_predicate.py",
-    "functions": []
-  },
-  {
-    "path": "predicate/analysis.py",
-    "file_name": "analysis.py",
-    "functions": [
-      {
-        "name": "is_tautology",
-        "line": 6,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "is_satisfiable",
-        "line": 14,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "are_equivalent",
-        "line": 22,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      }
-    ]
-  },
-  {
-    "path": "predicate/and_predicate.py",
-    "file_name": "and_predicate.py",
-    "functions": [
-      {
-        "name": "and_p",
-        "line": 77,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      }
-    ]
-  },
-  {
-    "path": "predicate/any_predicate.py",
-    "file_name": "any_predicate.py",
-    "functions": [
-      {
-        "name": "any_p",
-        "line": 54,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      }
-    ]
-  },
-  {
-    "path": "predicate/comp_predicate.py",
-    "file_name": "comp_predicate.py",
-    "functions": [
-      {
-        "name": "comp_p",
-        "line": 33,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      }
-    ]
-  },
-  {
-    "path": "predicate/compile_predicate.py",
-    "file_name": "compile_predicate.py",
-    "functions": [
-      {
-        "name": "compile_predicate",
-        "line": 430,
-        "pure": false,
-        "category": "dynamic-code",
-        "reason": "calls eval (compile_predicate.py:453)",
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "try_compile_predicate",
-        "line": 457,
-        "pure": false,
-        "category": "dynamic-code",
-        "reason": "calls compile_predicate (compile_predicate.py:460) -> calls eval (compile_predicate.py:453)",
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      }
-    ]
-  },
-  {
-    "path": "predicate/constructor/__init__.py",
-    "file_name": "__init__.py",
-    "functions": []
-  },
-  {
     "path": "predicate/constructor/construct.py",
     "file_name": "construct.py",
     "functions": [
@@ -223,110 +17,6 @@
             "ok": 1
           }
         }
-      },
-      {
-        "name": "create_mutations",
-        "line": 66,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "initial_predicates",
-        "line": 79,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      }
-    ]
-  },
-  {
-    "path": "predicate/constructor/helpers.py",
-    "file_name": "helpers.py",
-    "functions": [
-      {
-        "name": "safe_call_false",
-        "line": 7,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "safe_call_true",
-        "line": 15,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "predicate_match",
-        "line": 24,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "sort_by_match",
-        "line": 39,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "perfect_match",
-        "line": 48,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
       }
     ]
   },
@@ -340,7 +30,7 @@
         "pure": true,
         "exercise": {
           "status": "failed",
-          "detail": "SpecViolationError: Not conform spec: {'result': False, 'reason': '<generator object mutations at 0x106460ee0> is not an instance of type AbstractContextManager'}",
+          "detail": "SpecViolationError: Not conform spec: {'result': False, 'reason': '<generator object mutations at 0x109154ee0> is not an instance of type AbstractContextManager'}",
           "runs": 3,
           "flaky": false,
           "statuses": {
@@ -364,85 +54,12 @@
           "runs": 3,
           "flaky": true,
           "statuses": {
-            "failed": 2,
-            "ok": 1
+            "ok": 2,
+            "failed": 1
           }
         }
       }
     ]
-  },
-  {
-    "path": "predicate/contains_predicate.py",
-    "file_name": "contains_predicate.py",
-    "functions": [
-      {
-        "name": "contains_p",
-        "line": 29,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      }
-    ]
-  },
-  {
-    "path": "predicate/count_predicate.py",
-    "file_name": "count_predicate.py",
-    "functions": [
-      {
-        "name": "count_p",
-        "line": 31,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "exactly_zero_p",
-        "line": 36,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "exactly_one_p",
-        "line": 41,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      }
-    ]
-  },
-  {
-    "path": "predicate/coverage/__init__.py",
-    "file_name": "__init__.py",
-    "functions": []
   },
   {
     "path": "predicate/coverage/__main__.py",
@@ -450,17 +67,18 @@
     "functions": [
       {
         "name": "purity",
-        "line": 12,
+        "line": 17,
         "pure": false,
         "category": "system",
-        "reason": "calls typer.echo (__main__.py:26) -> calls sys.getdefaultencoding (_compat.py:50)",
+        "reason": "calls typer.echo (__main__.py:36) -> calls sys.getdefaultencoding (_compat.py:50)",
         "exercise": {
-          "status": "failed",
-          "detail": "ValueError: max_workers must be greater than 0",
+          "status": "blocked",
+          "detail": "open d1oAV for writing",
           "runs": 3,
-          "flaky": false,
+          "flaky": true,
           "statuses": {
-            "failed": 3
+            "blocked": 2,
+            "failed": 1
           }
         }
       }
@@ -527,6 +145,20 @@
             "failed": 3
           }
         }
+      },
+      {
+        "name": "failed_only",
+        "line": 100,
+        "pure": true,
+        "exercise": {
+          "status": "failed",
+          "detail": "KeyError: 'functions'",
+          "runs": 3,
+          "flaky": false,
+          "statuses": {
+            "failed": 3
+          }
+        }
       }
     ]
   },
@@ -542,7 +174,7 @@
         "reason": "calls os.environ.get (sandbox.py:98)",
         "exercise": {
           "status": "blocked",
-          "detail": "open /tmp/fdlanqks for writing",
+          "detail": "open /tmp/thlxf4pm for writing",
           "runs": 3,
           "flaky": false,
           "statuses": {
@@ -551,99 +183,6 @@
         }
       }
     ]
-  },
-  {
-    "path": "predicate/dict_of_predicate.py",
-    "file_name": "dict_of_predicate.py",
-    "functions": [
-      {
-        "name": "to_key_p",
-        "line": 59,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "from_key_p",
-        "line": 67,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "is_dict_of_p",
-        "line": 75,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      }
-    ]
-  },
-  {
-    "path": "predicate/eq_predicate.py",
-    "file_name": "eq_predicate.py",
-    "functions": [
-      {
-        "name": "eq_p",
-        "line": 29,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      }
-    ]
-  },
-  {
-    "path": "predicate/exactly_predicate.py",
-    "file_name": "exactly_predicate.py",
-    "functions": [
-      {
-        "name": "exactly_n",
-        "line": 44,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      }
-    ]
-  },
-  {
-    "path": "predicate/exception_predicate.py",
-    "file_name": "exception_predicate.py",
-    "functions": []
   },
   {
     "path": "predicate/explain.py",
@@ -655,7 +194,7 @@
         "pure": true,
         "exercise": {
           "status": "failed",
-          "detail": "TypeError: '<=' not supported between instances of 'str' and 'int'",
+          "detail": "TypeError: 'int' object is not iterable",
           "runs": 3,
           "flaky": false,
           "statuses": {
@@ -666,164 +205,9 @@
     ]
   },
   {
-    "path": "predicate/float_predicates.py",
-    "file_name": "float_predicates.py",
-    "functions": [
-      {
-        "name": "is_within_p",
-        "line": 21,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      }
-    ]
-  },
-  {
-    "path": "predicate/fn_predicate.py",
-    "file_name": "fn_predicate.py",
-    "functions": [
-      {
-        "name": "generate_nan",
-        "line": 19,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "generate_inf",
-        "line": 23,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "isnormal",
-        "line": 45,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "issubnormal",
-        "line": 48,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "generate_subnormal",
-        "line": 52,
-        "pure": false,
-        "category": "randomness",
-        "reason": "calls random.choice (fn_predicate.py:54)",
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "generate_non_normal",
-        "line": 57,
-        "pure": false,
-        "category": "randomness",
-        "reason": "calls generate_subnormal (fn_predicate.py:63) -> calls random.choice (fn_predicate.py:54)",
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      }
-    ]
-  },
-  {
-    "path": "predicate/formatter/__init__.py",
-    "file_name": "__init__.py",
-    "functions": []
-  },
-  {
-    "path": "predicate/formatter/fn_source.py",
-    "file_name": "fn_source.py",
-    "functions": [
-      {
-        "name": "get_fn_source",
-        "line": 9,
-        "pure": false,
-        "category": "io",
-        "reason": "calls _get_lambda_source (fn_source.py:23) -> calls open (fn_source.py:29)",
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      }
-    ]
-  },
-  {
     "path": "predicate/formatter/format_dot.py",
     "file_name": "format_dot.py",
     "functions": [
-      {
-        "name": "to_dot",
-        "line": 81,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
       {
         "name": "render",
         "line": 103,
@@ -841,116 +225,6 @@
     ]
   },
   {
-    "path": "predicate/formatter/format_json.py",
-    "file_name": "format_json.py",
-    "functions": [
-      {
-        "name": "dict_to_json",
-        "line": 65,
-        "pure": false,
-        "category": "io",
-        "reason": "calls to_json (format_json.py:66) -> calls open (fn_source.py:29)",
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "list_to_json",
-        "line": 69,
-        "pure": false,
-        "category": "io",
-        "reason": "calls to_json (format_json.py:70) -> calls open (fn_source.py:29)",
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "to_json",
-        "line": 73,
-        "pure": false,
-        "category": "io",
-        "reason": "calls _to_value (format_json.py:75) -> calls open (fn_source.py:29)",
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      }
-    ]
-  },
-  {
-    "path": "predicate/formatter/format_latex.py",
-    "file_name": "format_latex.py",
-    "functions": [
-      {
-        "name": "set_to_latex_set",
-        "line": 36,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "to_latex",
-        "line": 40,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      }
-    ]
-  },
-  {
-    "path": "predicate/formatter/format_yaml.py",
-    "file_name": "format_yaml.py",
-    "functions": [
-      {
-        "name": "to_yaml",
-        "line": 9,
-        "pure": false,
-        "category": "io",
-        "reason": "calls to_json (format_yaml.py:11) -> calls open (fn_source.py:29)",
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      }
-    ]
-  },
-  {
     "path": "predicate/formatter/from_json.py",
     "file_name": "from_json.py",
     "functions": [
@@ -960,7 +234,7 @@
         "pure": true,
         "exercise": {
           "status": "failed",
-          "detail": "ValueError: Unknown predicate type: 'JVdl6zj'",
+          "detail": "ValueError: not enough values to unpack (expected 1, got 0)",
           "runs": 3,
           "flaky": false,
           "statuses": {
@@ -971,142 +245,9 @@
     ]
   },
   {
-    "path": "predicate/formatter/helpers.py",
-    "file_name": "helpers.py",
-    "functions": [
-      {
-        "name": "set_to_str",
-        "line": 6,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      }
-    ]
-  },
-  {
-    "path": "predicate/frozendict_of_predicate.py",
-    "file_name": "frozendict_of_predicate.py",
-    "functions": [
-      {
-        "name": "is_frozendict_of_p",
-        "line": 38,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      }
-    ]
-  },
-  {
-    "path": "predicate/frozenset_of_predicate.py",
-    "file_name": "frozenset_of_predicate.py",
-    "functions": [
-      {
-        "name": "is_frozenset_of_p",
-        "line": 41,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      }
-    ]
-  },
-  {
-    "path": "predicate/function_predicate.py",
-    "file_name": "function_predicate.py",
-    "functions": [
-      {
-        "name": "fn_p",
-        "line": 40,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "as_predicate",
-        "line": 62,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      }
-    ]
-  },
-  {
-    "path": "predicate/ge_predicate.py",
-    "file_name": "ge_predicate.py",
-    "functions": [
-      {
-        "name": "ge_p",
-        "line": 29,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      }
-    ]
-  },
-  {
-    "path": "predicate/generator/__init__.py",
-    "file_name": "__init__.py",
-    "functions": []
-  },
-  {
     "path": "predicate/generator/generate_false.py",
     "file_name": "generate_false.py",
     "functions": [
-      {
-        "name": "generate_accepts",
-        "line": 132,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
       {
         "name": "generate_all_p",
         "line": 137,
@@ -1115,7 +256,7 @@
         "reason": "calls _generate_at_least_one_false (generate_false.py:144) -> calls random.randint (generate_false.py:731)",
         "exercise": {
           "status": "failed",
-          "detail": "ValueError: first() was called on an empty iterable, and no default value was provided.",
+          "detail": "ValueError: Couldn't generate values that satisfy le_p(0) | ge_p(0)",
           "runs": 3,
           "flaky": false,
           "statuses": {
@@ -1129,11 +270,12 @@
         "pure": true,
         "exercise": {
           "status": "failed",
-          "detail": "TypeError: 'int' object is not iterable",
+          "detail": "TypeError: '>=' not supported between instances of 'tuple' and 'int'",
           "runs": 3,
-          "flaky": false,
+          "flaky": true,
           "statuses": {
-            "failed": 3
+            "failed": 2,
+            "timeout": 1
           }
         }
       },
@@ -1145,88 +287,11 @@
         "reason": "calls random_first_from_iterables (generate_false.py:161) -> calls random.choice (helpers.py:44)",
         "exercise": {
           "status": "failed",
-          "detail": "TypeError: '>=' not supported between instances of 'str' and 'int'",
-          "runs": 3,
-          "flaky": true,
-          "statuses": {
-            "failed": 2,
-            "timeout": 1
-          }
-        }
-      },
-      {
-        "name": "generate_always_true",
-        "line": 164,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
+          "detail": "TypeError: '<' not supported between instances of 'list' and 'int'",
           "runs": 3,
           "flaky": false,
           "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "generate_exception",
-        "line": 169,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "generate_eq",
-        "line": 174,
-        "pure": false,
-        "category": "randomness",
-        "reason": "calls random_anys (generate_false.py:180) -> calls random.randint (helpers.py:299)",
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "generate_always_false",
-        "line": 189,
-        "pure": false,
-        "category": "randomness",
-        "reason": "calls random_anys (generate_false.py:191) -> calls random.randint (helpers.py:299)",
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "generate_is_close_p",
-        "line": 194,
-        "pure": false,
-        "category": "randomness",
-        "reason": "calls random_floats (generate_false.py:196) -> calls random.uniform (helpers.py:283)",
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
+            "failed": 3
           }
         }
       },
@@ -1236,11 +301,12 @@
         "pure": true,
         "exercise": {
           "status": "failed",
-          "detail": "TypeError: '<' not supported between instances of 'str' and 'int'",
+          "detail": "TypeError: '<=' not supported between instances of 'str' and 'int'",
           "runs": 3,
-          "flaky": false,
+          "flaky": true,
           "statuses": {
-            "failed": 3
+            "failed": 2,
+            "timeout": 1
           }
         }
       },
@@ -1254,10 +320,9 @@
           "status": "failed",
           "detail": "TypeError: 'int' object is not iterable",
           "runs": 3,
-          "flaky": true,
+          "flaky": false,
           "statuses": {
-            "failed": 2,
-            "timeout": 1
+            "failed": 3
           }
         }
       },
@@ -1266,14 +331,13 @@
         "line": 211,
         "pure": true,
         "exercise": {
-          "status": "timeout",
-          "detail": "no result within 10.0s",
+          "status": "failed",
+          "detail": "TypeError: '>=' not supported between instances of 'str' and 'int'",
           "runs": 3,
           "flaky": true,
           "statuses": {
-            "ok": 1,
-            "timeout": 1,
-            "failed": 1
+            "failed": 2,
+            "ok": 1
           }
         }
       },
@@ -1288,118 +352,6 @@
           "flaky": false,
           "statuses": {
             "failed": 3
-          }
-        }
-      },
-      {
-        "name": "generate_ge_le",
-        "line": 242,
-        "pure": false,
-        "category": "time",
-        "reason": "calls random_datetimes (generate_false.py:247) -> calls datetime.now (helpers.py:187)",
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "generate_ge_lt",
-        "line": 264,
-        "pure": false,
-        "category": "time",
-        "reason": "calls random_datetimes (generate_false.py:269) -> calls datetime.now (helpers.py:187)",
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "generate_gt_le",
-        "line": 286,
-        "pure": false,
-        "category": "time",
-        "reason": "calls random_datetimes (generate_false.py:291) -> calls datetime.now (helpers.py:187)",
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "generate_gt_lt",
-        "line": 308,
-        "pure": false,
-        "category": "time",
-        "reason": "calls random_datetimes (generate_false.py:313) -> calls datetime.now (helpers.py:187)",
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "generate_ge",
-        "line": 330,
-        "pure": false,
-        "category": "time",
-        "reason": "calls random_datetimes (generate_false.py:334) -> calls datetime.now (helpers.py:187)",
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "generate_gt",
-        "line": 348,
-        "pure": false,
-        "category": "time",
-        "reason": "calls random_datetimes (generate_false.py:352) -> calls datetime.now (helpers.py:187)",
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "generate_falsy",
-        "line": 367,
-        "pure": false,
-        "category": "randomness",
-        "reason": "calls generate_anys (generate_false.py:369) -> calls random.randint (helpers.py:299)",
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
           }
         }
       },
@@ -1434,126 +386,6 @@
         }
       },
       {
-        "name": "generate_contains",
-        "line": 383,
-        "pure": false,
-        "category": "randomness",
-        "reason": "calls random_strings (generate_false.py:388) -> calls random.randint (helpers.py:247)",
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "generate_in",
-        "line": 391,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "generate_le",
-        "line": 398,
-        "pure": false,
-        "category": "time",
-        "reason": "calls random_datetimes (generate_false.py:402) -> calls datetime.now (helpers.py:187)",
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "generate_lt",
-        "line": 416,
-        "pure": false,
-        "category": "time",
-        "reason": "calls random_datetimes (generate_false.py:420) -> calls datetime.now (helpers.py:187)",
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "generate_ne",
-        "line": 435,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "generate_none",
-        "line": 440,
-        "pure": false,
-        "category": "randomness",
-        "reason": "calls generate_anys (generate_false.py:442) -> calls random.randint (helpers.py:299)",
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "generate_is_regex",
-        "line": 445,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "generate_is_protocol",
-        "line": 450,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
         "name": "generate_implements_protocol",
         "line": 455,
         "pure": true,
@@ -1568,34 +400,6 @@
         }
       },
       {
-        "name": "generate_same_signature",
-        "line": 478,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "generate_is_valid_spec",
-        "line": 491,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
         "name": "generate_not",
         "line": 514,
         "pure": true,
@@ -1606,7 +410,8 @@
           "flaky": true,
           "statuses": {
             "timeout": 1,
-            "failed": 2
+            "ok": 1,
+            "failed": 1
           }
         }
       },
@@ -1625,48 +430,6 @@
         }
       },
       {
-        "name": "generate_not_in",
-        "line": 521,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "generate_not_none",
-        "line": 528,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "generate_truthy",
-        "line": 533,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
         "name": "generate_is_instance_p",
         "line": 538,
         "pure": false,
@@ -1674,57 +437,11 @@
         "reason": "calls generate_anys (generate_false.py:544) -> calls random.randint (helpers.py:299)",
         "exercise": {
           "status": "failed",
-          "detail": "IndexError: tuple index out of range",
+          "detail": "TypeError: isinstance() arg 2 must be a type, a tuple of types, or a union",
           "runs": 3,
           "flaky": false,
           "statuses": {
             "failed": 3
-          }
-        }
-      },
-      {
-        "name": "generate_is_async_p",
-        "line": 547,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "generate_is_named_tuple_p",
-        "line": 552,
-        "pure": false,
-        "category": "randomness",
-        "reason": "calls generate_anys (generate_false.py:555) -> calls random.randint (helpers.py:299)",
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "generate_is_lambda_p",
-        "line": 558,
-        "pure": false,
-        "category": "randomness",
-        "reason": "calls generate_anys (generate_false.py:562) -> calls random.randint (helpers.py:299)",
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
           }
         }
       },
@@ -1734,7 +451,7 @@
         "pure": true,
         "exercise": {
           "status": "failed",
-          "detail": "TypeError: 'int' object is not iterable",
+          "detail": "TypeError: 'bool' object is not iterable",
           "runs": 3,
           "flaky": false,
           "statuses": {
@@ -1763,12 +480,13 @@
         "category": "randomness",
         "reason": "calls random_first_from_iterables (generate_false.py:608) -> calls random.choice (helpers.py:44)",
         "exercise": {
-          "status": "failed",
-          "detail": "ValueError: Couldn't generate values that satisfy eq_p(0) | ne_p(0)",
+          "status": "timeout",
+          "detail": "no result within 10.0s",
           "runs": 3,
-          "flaky": false,
+          "flaky": true,
           "statuses": {
-            "failed": 3
+            "timeout": 1,
+            "failed": 2
           }
         }
       },
@@ -1780,7 +498,7 @@
         "reason": "calls random.randint (generate_false.py:624)",
         "exercise": {
           "status": "failed",
-          "detail": "TypeError: unhashable type: 'list'",
+          "detail": "ValueError: empty range in randrange(1, 1)",
           "runs": 3,
           "flaky": false,
           "statuses": {
@@ -1796,7 +514,7 @@
         "reason": "calls generate_dict_of_p (generate_false.py:641) -> calls random.randint (generate_false.py:624)",
         "exercise": {
           "status": "failed",
-          "detail": "TypeError: 'int' object is not iterable",
+          "detail": "TypeError: unhashable type: 'list'",
           "runs": 3,
           "flaky": true,
           "statuses": {
@@ -1822,48 +540,19 @@
         }
       },
       {
-        "name": "bool_array_from_int",
-        "line": 658,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "generate_tuple_of_p",
-        "line": 666,
-        "pure": false,
-        "category": "randomness",
-        "reason": "calls random.randint (generate_false.py:675)",
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
         "name": "generate_set_of_p",
         "line": 687,
         "pure": false,
         "category": "randomness",
         "reason": "calls _generate_at_least_one_false (generate_false.py:694) -> calls random.randint (generate_false.py:731)",
         "exercise": {
-          "status": "failed",
-          "detail": "TypeError: 'int' object is not iterable",
+          "status": "timeout",
+          "detail": "no result within 10.0s",
           "runs": 3,
-          "flaky": false,
+          "flaky": true,
           "statuses": {
-            "failed": 3
+            "timeout": 2,
+            "failed": 1
           }
         }
       },
@@ -1891,12 +580,12 @@
         "reason": "calls random_first_from_iterables (generate_false.py:721) -> calls random.choice (helpers.py:44)",
         "exercise": {
           "status": "failed",
-          "detail": "ValueError: Couldn't generate values that satisfy in_p() | not_in_p()",
+          "detail": "ValueError: Couldn't generate values that satisfy in_p() ^ lt_p(0) | not_in_p()",
           "runs": 3,
           "flaky": true,
           "statuses": {
-            "failed": 2,
-            "timeout": 1
+            "failed": 1,
+            "timeout": 2
           }
         }
       },
@@ -1907,26 +596,12 @@
         "category": "randomness",
         "reason": "calls random_anys (generate_false.py:744) -> calls random.randint (helpers.py:299)",
         "exercise": {
-          "status": "timeout",
-          "detail": "no result within 10.0s",
+          "status": "failed",
+          "detail": "TypeError: '<' not supported between instances of 'generator' and 'int'",
           "runs": 3,
           "flaky": false,
           "statuses": {
-            "timeout": 3
-          }
-        }
-      },
-      {
-        "name": "generate_tee",
-        "line": 747,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
+            "failed": 3
           }
         }
       },
@@ -1950,7 +625,7 @@
         "pure": true,
         "exercise": {
           "status": "failed",
-          "detail": "ValueError: Couldn't generate values that satisfy gt_p(0) | lt_p(0) | eq_p(0)",
+          "detail": "TypeError: 'int' object is not iterable",
           "runs": 3,
           "flaky": false,
           "statuses": {
@@ -1968,23 +643,10 @@
           "status": "failed",
           "detail": "TypeError: 'int' object is not iterable",
           "runs": 3,
-          "flaky": false,
+          "flaky": true,
           "statuses": {
-            "failed": 3
-          }
-        }
-      },
-      {
-        "name": "generate_is_same",
-        "line": 817,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
+            "failed": 2,
+            "timeout": 1
           }
         }
       },
@@ -1994,53 +656,11 @@
         "pure": true,
         "exercise": {
           "status": "failed",
-          "detail": "AttributeError: 'int' object has no attribute '__subclasses__'",
+          "detail": "AttributeError: 'bool' object has no attribute '__subclasses__'",
           "runs": 3,
           "flaky": false,
           "statuses": {
             "failed": 3
-          }
-        }
-      },
-      {
-        "name": "generate_is",
-        "line": 840,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "generate_is_subset",
-        "line": 848,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "generate_is_real_subset",
-        "line": 853,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
           }
         }
       },
@@ -2080,72 +700,9 @@
           "status": "timeout",
           "detail": "no result within 10.0s",
           "runs": 3,
-          "flaky": true,
-          "statuses": {
-            "timeout": 2,
-            "ok": 1
-          }
-        }
-      },
-      {
-        "name": "generate_reduce_p",
-        "line": 876,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
           "flaky": false,
           "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "generate_regex",
-        "line": 882,
-        "pure": false,
-        "category": "randomness",
-        "reason": "calls random_strings (generate_false.py:884) -> calls random.randint (helpers.py:247)",
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "generate_is_callable",
-        "line": 890,
-        "pure": false,
-        "category": "randomness",
-        "reason": "calls random_anys (generate_false.py:892) -> calls random.randint (helpers.py:299)",
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "generate_is_partial",
-        "line": 895,
-        "pure": false,
-        "category": "randomness",
-        "reason": "calls random_anys (generate_false.py:897) -> calls random.randint (helpers.py:299)",
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
+            "timeout": 3
           }
         }
       },
@@ -2154,27 +711,13 @@
         "line": 900,
         "pure": true,
         "exercise": {
-          "status": "failed",
-          "detail": "ValueError: Couldn't generate values that satisfy ~in_p() | le_p(0)",
+          "status": "timeout",
+          "detail": "no result within 10.0s",
           "runs": 3,
           "flaky": true,
           "statuses": {
-            "failed": 2,
-            "timeout": 1
-          }
-        }
-      },
-      {
-        "name": "generate_raises",
-        "line": 921,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
+            "timeout": 1,
+            "failed": 2
           }
         }
       },
@@ -2186,12 +729,11 @@
         "reason": "calls _false_struct_required_fields (generate_false.py:955) -> calls random.sample (helpers.py:417)",
         "exercise": {
           "status": "failed",
-          "detail": "RuntimeError: generator raised StopIteration",
+          "detail": "ValueError: empty range in randrange(1, 1)",
           "runs": 3,
-          "flaky": true,
+          "flaky": false,
           "statuses": {
-            "failed": 2,
-            "timeout": 1
+            "failed": 3
           }
         }
       }
@@ -2212,48 +754,6 @@
           "flaky": false,
           "statuses": {
             "failed": 3
-          }
-        }
-      },
-      {
-        "name": "predicate_type_registry",
-        "line": 41,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "typed_predicate_type_registry",
-        "line": 47,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "generate_random_predicate_pairs",
-        "line": 91,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
           }
         }
       },
@@ -2291,7 +791,7 @@
         "pure": true,
         "exercise": {
           "status": "failed",
-          "detail": "ValueError: No generator found for <class 'type'>",
+          "detail": "ValueError: No generator found for <class 'async_generator'>",
           "runs": 3,
           "flaky": false,
           "statuses": {
@@ -2328,90 +828,6 @@
         }
       },
       {
-        "name": "generate_ge_le_predicates",
-        "line": 146,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "generate_ge_lt_predicates",
-        "line": 152,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "generate_gt_le_predicates",
-        "line": 158,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "generate_gt_lt_predicates",
-        "line": 164,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "generate_ge_predicates",
-        "line": 170,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "generate_gt_predicates",
-        "line": 176,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
         "name": "generate_in_predicates",
         "line": 182,
         "pure": true,
@@ -2440,34 +856,6 @@
         }
       },
       {
-        "name": "generate_le_predicates",
-        "line": 195,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "generate_lt_predicates",
-        "line": 201,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
         "name": "generate_ne_predicates",
         "line": 207,
         "pure": true,
@@ -2487,7 +875,7 @@
         "pure": true,
         "exercise": {
           "status": "failed",
-          "detail": "ValueError: No generator found for <class 'type'>",
+          "detail": "ValueError: No generator found for <class 'async_generator'>",
           "runs": 3,
           "flaky": false,
           "statuses": {
@@ -2530,31 +918,17 @@
     "file_name": "generate_true.py",
     "functions": [
       {
-        "name": "generate_accepts",
-        "line": 238,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
         "name": "generate_all_p",
         "line": 243,
         "pure": true,
         "exercise": {
-          "status": "timeout",
-          "detail": "no result within 10.0s",
+          "status": "failed",
+          "detail": "TypeError: 'int' object is not iterable",
           "runs": 3,
           "flaky": true,
           "statuses": {
-            "timeout": 1,
-            "failed": 2
+            "failed": 2,
+            "timeout": 1
           }
         }
       },
@@ -2623,20 +997,6 @@
         }
       },
       {
-        "name": "generate_exception",
-        "line": 324,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
         "name": "generate_and",
         "line": 345,
         "pure": false,
@@ -2667,84 +1027,6 @@
         }
       },
       {
-        "name": "generate_always_false",
-        "line": 378,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "generate_ge_le",
-        "line": 383,
-        "pure": false,
-        "category": "time",
-        "reason": "calls random_datetimes (generate_true.py:387) -> calls datetime.now (helpers.py:187)",
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "generate_ge_lt",
-        "line": 396,
-        "pure": false,
-        "category": "time",
-        "reason": "calls random_datetimes (generate_true.py:400) -> calls datetime.now (helpers.py:187)",
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "generate_gt_le",
-        "line": 409,
-        "pure": false,
-        "category": "time",
-        "reason": "calls random_datetimes (generate_true.py:413) -> calls datetime.now (helpers.py:187)",
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "generate_gt_lt",
-        "line": 422,
-        "pure": false,
-        "category": "time",
-        "reason": "calls random_datetimes (generate_true.py:426) -> calls datetime.now (helpers.py:187)",
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
         "name": "generate_ge",
         "line": 435,
         "pure": false,
@@ -2761,36 +1043,6 @@
         }
       },
       {
-        "name": "generate_gt",
-        "line": 454,
-        "pure": false,
-        "category": "time",
-        "reason": "calls random_datetimes (generate_true.py:458) -> calls datetime.now (helpers.py:187)",
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "generate_is_close_p",
-        "line": 472,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
         "name": "generate_has_key",
         "line": 477,
         "pure": false,
@@ -2800,9 +1052,10 @@
           "status": "failed",
           "detail": "TypeError: 'int' object is not iterable",
           "runs": 3,
-          "flaky": false,
+          "flaky": true,
           "statuses": {
-            "failed": 3
+            "failed": 2,
+            "ok": 1
           }
         }
       },
@@ -2814,12 +1067,11 @@
         "reason": "calls random_iterables (generate_true.py:485) -> calls random.choice (helpers.py:318)",
         "exercise": {
           "status": "failed",
-          "detail": "TypeError: 'int' object is not iterable",
+          "detail": "TypeError: '<' not supported between instances of 'list' and 'int'",
           "runs": 3,
-          "flaky": true,
+          "flaky": false,
           "statuses": {
-            "failed": 2,
-            "timeout": 1
+            "failed": 3
           }
         }
       },
@@ -2829,12 +1081,12 @@
         "pure": true,
         "exercise": {
           "status": "failed",
-          "detail": "TypeError: 'int' object is not iterable",
+          "detail": "TypeError: '<=' not supported between instances of 'tuple' and 'int'",
           "runs": 3,
           "flaky": true,
           "statuses": {
-            "ok": 1,
-            "failed": 2
+            "failed": 1,
+            "ok": 2
           }
         }
       },
@@ -2867,94 +1119,6 @@
         }
       },
       {
-        "name": "generate_le",
-        "line": 538,
-        "pure": false,
-        "category": "time",
-        "reason": "calls random_datetimes (generate_true.py:542) -> calls datetime.now (helpers.py:187)",
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "generate_subset",
-        "line": 557,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "generate_real_subset",
-        "line": 562,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "generate_superset",
-        "line": 567,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "generate_real_superset",
-        "line": 572,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "generate_intersects",
-        "line": 577,
-        "pure": false,
-        "category": "randomness",
-        "reason": "calls random.choice (generate_true.py:582)",
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
         "name": "generate_comp_p",
         "line": 585,
         "pure": false,
@@ -2981,112 +1145,6 @@
           "flaky": false,
           "statuses": {
             "failed": 3
-          }
-        }
-      },
-      {
-        "name": "generate_contains",
-        "line": 596,
-        "pure": false,
-        "category": "randomness",
-        "reason": "calls random_strings (generate_true.py:598) -> calls random.randint (helpers.py:247)",
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "generate_in",
-        "line": 602,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "generate_lt",
-        "line": 610,
-        "pure": false,
-        "category": "time",
-        "reason": "calls random_datetimes (generate_true.py:614) -> calls datetime.now (helpers.py:187)",
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "generate_ne",
-        "line": 628,
-        "pure": false,
-        "category": "randomness",
-        "reason": "calls random_values_of_type (generate_true.py:631) -> calls random.randint (helpers.py:299)",
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "generate_none",
-        "line": 634,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "generate_is_regex",
-        "line": 639,
-        "pure": false,
-        "category": "randomness",
-        "reason": "calls generate_strings (generate_true.py:641) -> calls random.randint (helpers.py:247)",
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "generate_is_protocol",
-        "line": 644,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
           }
         }
       },
@@ -3134,34 +1192,6 @@
         }
       },
       {
-        "name": "generate_is_valid_spec",
-        "line": 689,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "generate_same_signature",
-        "line": 706,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
         "name": "generate_not",
         "line": 726,
         "pure": true,
@@ -3171,41 +1201,8 @@
           "runs": 3,
           "flaky": true,
           "statuses": {
-            "ok": 1,
             "timeout": 1,
-            "failed": 1
-          }
-        }
-      },
-      {
-        "name": "generate_not_in",
-        "line": 749,
-        "pure": false,
-        "category": "time",
-        "reason": "calls _generator_for_item (generate_true.py:752) -> calls datetime.now (helpers.py:187)",
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "generate_not_none",
-        "line": 760,
-        "pure": false,
-        "category": "randomness",
-        "reason": "calls generate_anys (generate_true.py:762) -> calls random.randint (helpers.py:299)",
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
+            "failed": 2
           }
         }
       },
@@ -3231,11 +1228,12 @@
         "reason": "calls random_first_from_iterables (generate_true.py:772) -> calls random.choice (helpers.py:44)",
         "exercise": {
           "status": "failed",
-          "detail": "TypeError: 'bool' object is not iterable",
+          "detail": "TypeError: '>' not supported between instances of 'tuple' and 'int'",
           "runs": 3,
-          "flaky": false,
+          "flaky": true,
           "statuses": {
-            "failed": 3
+            "ok": 2,
+            "failed": 1
           }
         }
       },
@@ -3244,71 +1242,13 @@
         "line": 775,
         "pure": true,
         "exercise": {
-          "status": "timeout",
-          "detail": "no result within 10.0s",
+          "status": "failed",
+          "detail": "TypeError: 'int' object is not iterable",
           "runs": 3,
           "flaky": true,
           "statuses": {
-            "timeout": 1,
-            "failed": 2
-          }
-        }
-      },
-      {
-        "name": "generate_reduce_p",
-        "line": 781,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "generate_regex",
-        "line": 786,
-        "pure": false,
-        "category": "io",
-        "reason": "calls exrex.generate (generate_true.py:788) -> calls print (exrex.py:239)",
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "generate_falsy",
-        "line": 791,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "generate_truthy",
-        "line": 796,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
+            "failed": 2,
+            "timeout": 1
           }
         }
       },
@@ -3341,80 +1281,6 @@
           "flaky": false,
           "statuses": {
             "failed": 3
-          }
-        }
-      },
-      {
-        "name": "generate_is_callable_p",
-        "line": 1174,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "generate_is_partial_p",
-        "line": 1184,
-        "pure": false,
-        "category": "randomness",
-        "reason": "calls random.randint (generate_true.py:1187)",
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "generate_is_async_p",
-        "line": 1193,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "generate_is_named_tuple_p",
-        "line": 1202,
-        "pure": false,
-        "category": "randomness",
-        "reason": "calls random_named_tuples (generate_true.py:1204) -> calls random.randint (helpers.py:299)",
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "generate_is_lambda_p",
-        "line": 1207,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
           }
         }
       },
@@ -3454,57 +1320,16 @@
           "status": "failed",
           "detail": "TypeError: 'int' object is not iterable",
           "runs": 3,
-          "flaky": false,
+          "flaky": true,
           "statuses": {
-            "failed": 3
-          }
-        }
-      },
-      {
-        "name": "generate_tuple_of_p",
-        "line": 1243,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "generate_property_p",
-        "line": 1253,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
+            "failed": 2,
+            "timeout": 1
           }
         }
       },
       {
         "name": "generate_set_of_p",
         "line": 1263,
-        "pure": true,
-        "exercise": {
-          "status": "failed",
-          "detail": "TypeError: 'int' object is not iterable",
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "failed": 3
-          }
-        }
-      },
-      {
-        "name": "generate_frozenset_of_p",
-        "line": 1275,
         "pure": true,
         "exercise": {
           "status": "timeout",
@@ -3514,6 +1339,21 @@
           "statuses": {
             "timeout": 1,
             "failed": 2
+          }
+        }
+      },
+      {
+        "name": "generate_frozenset_of_p",
+        "line": 1275,
+        "pure": true,
+        "exercise": {
+          "status": "failed",
+          "detail": "TypeError: '>' not supported between instances of 'str' and 'int'",
+          "runs": 3,
+          "flaky": true,
+          "statuses": {
+            "failed": 2,
+            "timeout": 1
           }
         }
       },
@@ -3529,24 +1369,8 @@
           "runs": 3,
           "flaky": true,
           "statuses": {
-            "failed": 2,
-            "timeout": 1
-          }
-        }
-      },
-      {
-        "name": "generate_tee",
-        "line": 1293,
-        "pure": false,
-        "category": "randomness",
-        "reason": "calls random_anys (generate_true.py:1295) -> calls random.randint (helpers.py:299)",
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
+            "failed": 1,
+            "timeout": 2
           }
         }
       },
@@ -3570,17 +1394,33 @@
         "pure": true,
         "exercise": {
           "status": "failed",
-          "detail": "TypeError: 'int' object is not iterable",
+          "detail": "TypeError: '>' not supported between instances of 'list' and 'int'",
           "runs": 3,
-          "flaky": false,
+          "flaky": true,
           "statuses": {
-            "failed": 3
+            "failed": 2,
+            "timeout": 1
           }
         }
       },
       {
         "name": "generate_repeat",
         "line": 1335,
+        "pure": true,
+        "exercise": {
+          "status": "timeout",
+          "detail": "no result within 10.0s",
+          "runs": 3,
+          "flaky": true,
+          "statuses": {
+            "timeout": 2,
+            "failed": 1
+          }
+        }
+      },
+      {
+        "name": "generate_star",
+        "line": 1354,
         "pure": true,
         "exercise": {
           "status": "failed",
@@ -3593,27 +1433,12 @@
         }
       },
       {
-        "name": "generate_star",
-        "line": 1354,
-        "pure": true,
-        "exercise": {
-          "status": "failed",
-          "detail": "TypeError: 'int' object is not iterable",
-          "runs": 3,
-          "flaky": true,
-          "statuses": {
-            "failed": 2,
-            "timeout": 1
-          }
-        }
-      },
-      {
         "name": "generate_plus",
         "line": 1364,
         "pure": true,
         "exercise": {
           "status": "failed",
-          "detail": "TypeError: '>' not supported between instances of 'str' and 'int'",
+          "detail": "TypeError: 'int' object is not iterable",
           "runs": 3,
           "flaky": false,
           "statuses": {
@@ -3627,12 +1452,11 @@
         "pure": true,
         "exercise": {
           "status": "failed",
-          "detail": "TypeError: '>=' not supported between instances of 'list' and 'int'",
+          "detail": "TypeError: '>' not supported between instances of 'tuple' and 'int'",
           "runs": 3,
-          "flaky": true,
+          "flaky": false,
           "statuses": {
-            "failed": 2,
-            "timeout": 1
+            "failed": 3
           }
         }
       },
@@ -3644,25 +1468,11 @@
         "reason": "calls random.choice (generate_true.py:1396)",
         "exercise": {
           "status": "failed",
-          "detail": "ValueError: Stop argument for islice() must be None or an integer: 0 <= x <= sys.maxsize.",
+          "detail": "RuntimeError: generator raised StopIteration",
           "runs": 3,
           "flaky": false,
           "statuses": {
             "failed": 3
-          }
-        }
-      },
-      {
-        "name": "generate_is_same",
-        "line": 1411,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
           }
         }
       },
@@ -3671,54 +1481,13 @@
         "line": 1416,
         "pure": true,
         "exercise": {
-          "status": "failed",
-          "detail": "AttributeError: 'bool' object has no attribute '__subclasses__'",
+          "status": "timeout",
+          "detail": "no result within 10.0s",
           "runs": 3,
-          "flaky": false,
+          "flaky": true,
           "statuses": {
-            "failed": 3
-          }
-        }
-      },
-      {
-        "name": "generate_is",
-        "line": 1427,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "generate_juxt_p",
-        "line": 1432,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "generate_raises",
-        "line": 1441,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
+            "timeout": 2,
+            "failed": 1
           }
         }
       },
@@ -3729,12 +1498,14 @@
         "category": "randomness",
         "reason": "calls sample_optional_fields (generate_true.py:1458) -> calls random.sample (helpers.py:417)",
         "exercise": {
-          "status": "failed",
-          "detail": "TypeError: 'bool' object is not iterable",
+          "status": "timeout",
+          "detail": "no result within 10.0s",
           "runs": 3,
-          "flaky": false,
+          "flaky": true,
           "statuses": {
-            "failed": 3
+            "timeout": 1,
+            "failed": 1,
+            "ok": 1
           }
         }
       }
@@ -3745,93 +1516,17 @@
     "file_name": "helpers.py",
     "functions": [
       {
-        "name": "random_first_from_iterables",
-        "line": 39,
-        "pure": false,
-        "category": "randomness",
-        "reason": "calls random.choice (helpers.py:44)",
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "set_from_list",
-        "line": 51,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "random_complex_numbers",
-        "line": 60,
-        "pure": false,
-        "category": "randomness",
-        "reason": "calls random_floats (helpers.py:61) -> calls random.uniform (helpers.py:283)",
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "random_callables",
-        "line": 70,
-        "pure": false,
-        "category": "randomness",
-        "reason": "calls random_first_from_iterables (helpers.py:71) -> calls random.choice (helpers.py:44)",
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "generate_lambda",
-        "line": 74,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
         "name": "random_lambdas",
         "line": 88,
         "pure": true,
         "exercise": {
-          "status": "failed",
-          "detail": "TypeError: '>=' not supported between instances of 'list' and 'int'",
+          "status": "timeout",
+          "detail": "no result within 10.0s",
           "runs": 3,
           "flaky": true,
           "statuses": {
-            "failed": 2,
-            "timeout": 1
+            "timeout": 2,
+            "failed": 1
           }
         }
       },
@@ -3850,28 +1545,12 @@
         }
       },
       {
-        "name": "random_parameters",
-        "line": 107,
-        "pure": false,
-        "category": "randomness",
-        "reason": "calls random.choice (helpers.py:118)",
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
         "name": "random_functions",
         "line": 124,
         "pure": true,
         "exercise": {
           "status": "failed",
-          "detail": "TypeError: 'int' object is not iterable",
+          "detail": "ValueError: 'as' is not a valid parameter name",
           "runs": 3,
           "flaky": false,
           "statuses": {
@@ -3885,7 +1564,7 @@
         "pure": true,
         "exercise": {
           "status": "failed",
-          "detail": "TypeError: '>=' not supported between instances of 'str' and 'int'",
+          "detail": "TypeError: 'int' object is not iterable",
           "runs": 3,
           "flaky": true,
           "statuses": {
@@ -3900,11 +1579,12 @@
         "pure": true,
         "exercise": {
           "status": "failed",
-          "detail": "TypeError: '>' not supported between instances of 'str' and 'int'",
+          "detail": "TypeError: 'int' object is not iterable",
           "runs": 3,
-          "flaky": false,
+          "flaky": true,
           "statuses": {
-            "failed": 3
+            "failed": 1,
+            "timeout": 2
           }
         }
       },
@@ -3916,26 +1596,9 @@
           "status": "failed",
           "detail": "TypeError: 'int' object is not iterable",
           "runs": 3,
-          "flaky": true,
-          "statuses": {
-            "failed": 1,
-            "timeout": 2
-          }
-        }
-      },
-      {
-        "name": "random_datetimes",
-        "line": 181,
-        "pure": false,
-        "category": "time",
-        "reason": "calls datetime.now (helpers.py:187)",
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
           "flaky": false,
           "statuses": {
-            "ok": 3
+            "failed": 3
           }
         }
       },
@@ -3974,70 +1637,13 @@
         "line": 219,
         "pure": true,
         "exercise": {
-          "status": "failed",
-          "detail": "TypeError: '<=' not supported between instances of 'str' and 'int'",
+          "status": "timeout",
+          "detail": "no result within 10.0s",
           "runs": 3,
-          "flaky": false,
+          "flaky": true,
           "statuses": {
-            "failed": 3
-          }
-        }
-      },
-      {
-        "name": "random_bools",
-        "line": 225,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "random_containers",
-        "line": 230,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "random_hashables",
-        "line": 234,
-        "pure": false,
-        "category": "randomness",
-        "reason": "calls random_ints (helpers.py:236) -> calls random.randint (helpers.py:299)",
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "random_non_hashables",
-        "line": 240,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
+            "timeout": 1,
+            "failed": 2
           }
         }
       },
@@ -4049,59 +1655,11 @@
         "reason": "calls random.randint (helpers.py:247)",
         "exercise": {
           "status": "failed",
-          "detail": "ValueError: empty range in randrange(9, 9)",
+          "detail": "ValueError: empty range in randrange(1, 0)",
           "runs": 3,
           "flaky": false,
           "statuses": {
             "failed": 3
-          }
-        }
-      },
-      {
-        "name": "random_strings_greater",
-        "line": 258,
-        "pure": false,
-        "category": "randomness",
-        "reason": "calls random.randint (helpers.py:261)",
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "random_strings_lower",
-        "line": 266,
-        "pure": false,
-        "category": "randomness",
-        "reason": "calls random.randint (helpers.py:269)",
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "random_floats",
-        "line": 275,
-        "pure": false,
-        "category": "randomness",
-        "reason": "calls random.uniform (helpers.py:283)",
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
           }
         }
       },
@@ -4128,34 +1686,18 @@
         "category": "randomness",
         "reason": "calls random.choice (helpers.py:318)",
         "exercise": {
-          "status": "timeout",
-          "detail": "no result within 10.0s",
+          "status": "failed",
+          "detail": "TypeError: '>' not supported between instances of 'str' and 'int'",
           "runs": 3,
-          "flaky": true,
+          "flaky": false,
           "statuses": {
-            "timeout": 1,
-            "failed": 2
+            "failed": 3
           }
         }
       },
       {
         "name": "random_lists",
         "line": 323,
-        "pure": true,
-        "exercise": {
-          "status": "failed",
-          "detail": "TypeError: 'int' object is not iterable",
-          "runs": 3,
-          "flaky": true,
-          "statuses": {
-            "failed": 2,
-            "timeout": 1
-          }
-        }
-      },
-      {
-        "name": "random_tuples",
-        "line": 331,
         "pure": true,
         "exercise": {
           "status": "failed",
@@ -4168,64 +1710,17 @@
         }
       },
       {
-        "name": "random_modules",
-        "line": 337,
-        "pure": false,
-        "category": "system",
-        "reason": "calls sys.modules.values (helpers.py:339)",
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "random_uuids",
-        "line": 344,
+        "name": "random_tuples",
+        "line": 331,
         "pure": true,
         "exercise": {
-          "status": "ok",
-          "calls": 10,
+          "status": "timeout",
+          "detail": "no result within 10.0s",
           "runs": 3,
-          "flaky": false,
+          "flaky": true,
           "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "random_anys",
-        "line": 348,
-        "pure": false,
-        "category": "randomness",
-        "reason": "calls random_ints (helpers.py:349) -> calls random.randint (helpers.py:299)",
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "random_named_tuples",
-        "line": 352,
-        "pure": false,
-        "category": "randomness",
-        "reason": "calls random_anys (helpers.py:357) -> calls random.randint (helpers.py:299)",
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
+            "timeout": 1,
+            "failed": 2
           }
         }
       },
@@ -4260,34 +1755,6 @@
         }
       },
       {
-        "name": "random_constrained_values_of_type",
-        "line": 388,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "random_constrained_pairs_of_type",
-        "line": 402,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
         "name": "sample_optional_fields",
         "line": 416,
         "pure": false,
@@ -4295,7 +1762,7 @@
         "reason": "calls random.sample (helpers.py:417)",
         "exercise": {
           "status": "failed",
-          "detail": "KeyError: ''",
+          "detail": "KeyError: 'KmtI2n4R'",
           "runs": 3,
           "flaky": false,
           "statuses": {
@@ -4310,13 +1777,12 @@
         "category": "time",
         "reason": "calls random_datetimes (helpers.py:423) -> calls datetime.now (helpers.py:187)",
         "exercise": {
-          "status": "timeout",
-          "detail": "no result within 10.0s",
+          "status": "failed",
+          "detail": "TypeError: 'datetime.datetime' object is not iterable",
           "runs": 3,
-          "flaky": true,
+          "flaky": false,
           "statuses": {
-            "timeout": 1,
-            "failed": 2
+            "failed": 3
           }
         }
       },
@@ -4330,9 +1796,10 @@
           "status": "timeout",
           "detail": "no result within 10.0s",
           "runs": 3,
-          "flaky": false,
+          "flaky": true,
           "statuses": {
-            "timeout": 3
+            "timeout": 2,
+            "failed": 1
           }
         }
       },
@@ -4344,7 +1811,7 @@
         "reason": "calls random_strings (helpers.py:431) -> calls random.randint (helpers.py:247)",
         "exercise": {
           "status": "failed",
-          "detail": "TypeError: '>' not supported between instances of 'str' and 'int'",
+          "detail": "TypeError: '<' not supported between instances of 'str' and 'int'",
           "runs": 3,
           "flaky": false,
           "statuses": {
@@ -4362,10 +1829,9 @@
           "status": "failed",
           "detail": "TypeError: 'int' object is not iterable",
           "runs": 3,
-          "flaky": true,
+          "flaky": false,
           "statuses": {
-            "failed": 2,
-            "timeout": 1
+            "failed": 3
           }
         }
       },
@@ -4374,13 +1840,13 @@
         "line": 438,
         "pure": true,
         "exercise": {
-          "status": "timeout",
-          "detail": "no result within 10.0s",
+          "status": "failed",
+          "detail": "TypeError: '>=' not supported between instances of 'UUID' and 'int'",
           "runs": 3,
           "flaky": true,
           "statuses": {
-            "timeout": 1,
-            "failed": 2
+            "failed": 1,
+            "timeout": 2
           }
         }
       },
@@ -4391,86 +1857,13 @@
         "category": "randomness",
         "reason": "calls random_anys (helpers.py:443) -> calls random.randint (helpers.py:299)",
         "exercise": {
-          "status": "failed",
-          "detail": "TypeError: 'bool' object is not iterable",
+          "status": "timeout",
+          "detail": "no result within 10.0s",
           "runs": 3,
-          "flaky": false,
+          "flaky": true,
           "statuses": {
-            "failed": 3
-          }
-        }
-      },
-      {
-        "name": "evaluate_comp",
-        "line": 446,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "generate_even_numbers",
-        "line": 454,
-        "pure": false,
-        "category": "randomness",
-        "reason": "calls random_ints (helpers.py:455) -> calls random.randint (helpers.py:299)",
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "generate_odd_numbers",
-        "line": 458,
-        "pure": false,
-        "category": "randomness",
-        "reason": "calls generate_even_numbers (helpers.py:459) -> calls random.randint (helpers.py:299)",
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "function_with_signature",
-        "line": 462,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "callable_object_with_signature",
-        "line": 481,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
+            "timeout": 1,
+            "failed": 2
           }
         }
       },
@@ -4485,34 +1878,6 @@
           "flaky": false,
           "statuses": {
             "failed": 3
-          }
-        }
-      },
-      {
-        "name": "unused_name",
-        "line": 493,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "accepted_kwargs",
-        "line": 505,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
           }
         }
       },
@@ -4554,107 +1919,11 @@
         "reason": "calls random.randbytes (helpers.py:538)",
         "exercise": {
           "status": "failed",
-          "detail": "ValueError: empty range in randrange(1, 0)",
+          "detail": "ValueError: empty range in randrange(1, 1)",
           "runs": 3,
           "flaky": false,
           "statuses": {
             "failed": 3
-          }
-        }
-      },
-      {
-        "name": "random_bytearrays",
-        "line": 541,
-        "pure": false,
-        "category": "randomness",
-        "reason": "calls random_bytes (helpers.py:542) -> calls random.randbytes (helpers.py:538)",
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "random_dates",
-        "line": 545,
-        "pure": false,
-        "category": "time",
-        "reason": "calls random_datetimes (helpers.py:546) -> calls datetime.now (helpers.py:187)",
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "random_times",
-        "line": 549,
-        "pure": false,
-        "category": "time",
-        "reason": "calls random_datetimes (helpers.py:550) -> calls datetime.now (helpers.py:187)",
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "random_timedeltas",
-        "line": 553,
-        "pure": false,
-        "category": "randomness",
-        "reason": "calls random.uniform (helpers.py:556)",
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "random_paths",
-        "line": 559,
-        "pure": false,
-        "category": "randomness",
-        "reason": "calls random.randint (helpers.py:562)",
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "random_decimals",
-        "line": 565,
-        "pure": false,
-        "category": "randomness",
-        "reason": "calls random_ints (helpers.py:568) -> calls random.randint (helpers.py:299)",
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
           }
         }
       },
@@ -4673,450 +1942,6 @@
             "timeout": 3
           }
         }
-      },
-      {
-        "name": "random_sized",
-        "line": 577,
-        "pure": false,
-        "category": "randomness",
-        "reason": "calls random_strings (helpers.py:578) -> calls random.randint (helpers.py:247)",
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "random_patterns",
-        "line": 584,
-        "pure": false,
-        "category": "randomness",
-        "reason": "calls random.choice (helpers.py:586)",
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "random_slices",
-        "line": 589,
-        "pure": false,
-        "category": "randomness",
-        "reason": "calls random.choice (helpers.py:593)",
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "random_ranges",
-        "line": 596,
-        "pure": false,
-        "category": "randomness",
-        "reason": "calls random.randint (helpers.py:598)",
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "random_struct_times",
-        "line": 601,
-        "pure": false,
-        "category": "randomness",
-        "reason": "calls random.randint (helpers.py:604)",
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "random_tzinfos",
-        "line": 607,
-        "pure": false,
-        "category": "randomness",
-        "reason": "calls random.randint (helpers.py:610)",
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "random_exceptions",
-        "line": 613,
-        "pure": false,
-        "category": "randomness",
-        "reason": "calls random.choice (helpers.py:615)",
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "random_forward_refs",
-        "line": 618,
-        "pure": false,
-        "category": "randomness",
-        "reason": "calls random.choice (helpers.py:621)",
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "random_code_objects",
-        "line": 624,
-        "pure": false,
-        "category": "dynamic-code",
-        "reason": "calls compile (helpers.py:627)",
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "random_text_ios",
-        "line": 630,
-        "pure": false,
-        "category": "randomness",
-        "reason": "calls random_strings (helpers.py:631) -> calls random.randint (helpers.py:247)",
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "random_ios",
-        "line": 634,
-        "pure": false,
-        "category": "randomness",
-        "reason": "calls random_bytes (helpers.py:635) -> calls random.randbytes (helpers.py:538)",
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "random_named_tuple_classes",
-        "line": 638,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "random_typed_dict_classes",
-        "line": 643,
-        "pure": false,
-        "category": "randomness",
-        "reason": "calls random.choice (helpers.py:649)",
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "random_ast_nodes",
-        "line": 670,
-        "pure": false,
-        "category": "randomness",
-        "reason": "calls random.choice (helpers.py:688)",
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "random_log_records",
-        "line": 691,
-        "pure": false,
-        "category": "randomness",
-        "reason": "calls random.choice (helpers.py:697)",
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "random_loggers",
-        "line": 701,
-        "pure": false,
-        "category": "io",
-        "reason": "calls logging.getLogger (helpers.py:703)",
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "random_event_loops",
-        "line": 709,
-        "pure": false,
-        "category": "randomness",
-        "reason": "calls random.choice (helpers.py:715)",
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "random_ipv4_addresses",
-        "line": 718,
-        "pure": false,
-        "category": "randomness",
-        "reason": "calls random.getrandbits (helpers.py:721)",
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "random_ipv6_addresses",
-        "line": 724,
-        "pure": false,
-        "category": "randomness",
-        "reason": "calls random.getrandbits (helpers.py:727)",
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "random_ipv4_networks",
-        "line": 730,
-        "pure": false,
-        "category": "randomness",
-        "reason": "calls random.getrandbits (helpers.py:732)",
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "random_ipv6_networks",
-        "line": 735,
-        "pure": false,
-        "category": "randomness",
-        "reason": "calls random.getrandbits (helpers.py:737)",
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "random_fractions",
-        "line": 740,
-        "pure": false,
-        "category": "randomness",
-        "reason": "calls random.randint (helpers.py:743)",
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "accepts_candidate_types",
-        "line": 749,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      }
-    ]
-  },
-  {
-    "path": "predicate/gt_predicate.py",
-    "file_name": "gt_predicate.py",
-    "functions": [
-      {
-        "name": "gt_p",
-        "line": 29,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      }
-    ]
-  },
-  {
-    "path": "predicate/has_key_predicate.py",
-    "file_name": "has_key_predicate.py",
-    "functions": [
-      {
-        "name": "has_key_p",
-        "line": 25,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      }
-    ]
-  },
-  {
-    "path": "predicate/has_length_predicate.py",
-    "file_name": "has_length_predicate.py",
-    "functions": [
-      {
-        "name": "has_length_p",
-        "line": 36,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      }
-    ]
-  },
-  {
-    "path": "predicate/has_path_predicate.py",
-    "file_name": "has_path_predicate.py",
-    "functions": [
-      {
-        "name": "has_path_p",
-        "line": 58,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
       }
     ]
   },
@@ -5130,7 +1955,7 @@
         "pure": true,
         "exercise": {
           "status": "failed",
-          "detail": "TypeError: '>=' not supported between instances of 'str' and 'int'",
+          "detail": "TypeError: 'bool' object is not iterable",
           "runs": 3,
           "flaky": false,
           "statuses": {
@@ -5144,104 +1969,15 @@
         "pure": true,
         "exercise": {
           "status": "failed",
-          "detail": "TypeError: 'datetime.datetime' object is not iterable",
+          "detail": "TypeError: '<' not supported between instances of 'str' and 'int'",
           "runs": 3,
           "flaky": false,
           "statuses": {
             "failed": 3
           }
         }
-      },
-      {
-        "name": "predicates_repr",
-        "line": 17,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "dict_predicates_repr",
-        "line": 21,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "key_value_pairs_repr",
-        "line": 26,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "join_as_str",
-        "line": 32,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "join_with_or",
-        "line": 36,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "fn_name",
-        "line": 42,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
       }
     ]
-  },
-  {
-    "path": "predicate/hypothesis.py",
-    "file_name": "hypothesis.py",
-    "functions": []
   },
   {
     "path": "predicate/implements_protocol_predicate.py",
@@ -5260,140 +1996,8 @@
             "failed": 3
           }
         }
-      },
-      {
-        "name": "implements_protocol_p",
-        "line": 51,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
       }
     ]
-  },
-  {
-    "path": "predicate/implies.py",
-    "file_name": "implies.py",
-    "functions": [
-      {
-        "name": "implies_p_p",
-        "line": 233,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "implies",
-        "line": 930,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      }
-    ]
-  },
-  {
-    "path": "predicate/implies_predicate.py",
-    "file_name": "implies_predicate.py",
-    "functions": [
-      {
-        "name": "implies_p",
-        "line": 25,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      }
-    ]
-  },
-  {
-    "path": "predicate/in_predicate.py",
-    "file_name": "in_predicate.py",
-    "functions": [
-      {
-        "name": "class_from_set",
-        "line": 9,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "in_p",
-        "line": 54,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      }
-    ]
-  },
-  {
-    "path": "predicate/in_predicate_predicate.py",
-    "file_name": "in_predicate_predicate.py",
-    "functions": [
-      {
-        "name": "in_predicate_p",
-        "line": 24,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      }
-    ]
-  },
-  {
-    "path": "predicate/integrations/__init__.py",
-    "file_name": "__init__.py",
-    "functions": []
-  },
-  {
-    "path": "predicate/integrations/hypothesis/__init__.py",
-    "file_name": "__init__.py",
-    "functions": []
   },
   {
     "path": "predicate/integrations/hypothesis/from_spec.py",
@@ -5407,7 +2011,7 @@
         "reason": "calls _arguments (from_spec.py:30) -> calls exec (reflection.py:371)",
         "exercise": {
           "status": "failed",
-          "detail": "InvalidSpecError: Parameter 'MofZQYz7bx' not in function signature",
+          "detail": "InvalidSpecError: Parameter 'HlMYF5' not in function signature",
           "runs": 3,
           "flaky": false,
           "statuses": {
@@ -5423,7 +2027,7 @@
         "reason": "calls _check_supported (from_spec.py:39) -> calls sys.modules.get (type_checking.py:182)",
         "exercise": {
           "status": "failed",
-          "detail": "InvalidSpecError: Cannot derive spec for '<lambda>': missing return annotation; pass a Spec or annotate it",
+          "detail": "NotImplementedError: given_spec only supports functions for now, not classes or callable objects",
           "runs": 3,
           "flaky": false,
           "statuses": {
@@ -5434,125 +2038,9 @@
     ]
   },
   {
-    "path": "predicate/integrations/hypothesis/helpers.py",
-    "file_name": "helpers.py",
-    "functions": [
-      {
-        "name": "sampled_from",
-        "line": 8,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      }
-    ]
-  },
-  {
-    "path": "predicate/integrations/hypothesis/predicates.py",
-    "file_name": "predicates.py",
-    "functions": [
-      {
-        "name": "predicates",
-        "line": 33,
-        "pure": false,
-        "category": "system",
-        "reason": "calls st.builds (predicates.py:43) -> calls sys.modules.get (core.py:1234)",
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      }
-    ]
-  },
-  {
-    "path": "predicate/integrations/hypothesis/recur.py",
-    "file_name": "recur.py",
-    "functions": [
-      {
-        "name": "from_recur",
-        "line": 18,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      }
-    ]
-  },
-  {
-    "path": "predicate/integrations/hypothesis/sets.py",
-    "file_name": "sets.py",
-    "functions": [
-      {
-        "name": "from_set",
-        "line": 20,
-        "pure": false,
-        "category": "dynamic-code",
-        "reason": "calls _supersets (sets.py:28) -> calls exec (reflection.py:371)",
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      }
-    ]
-  },
-  {
     "path": "predicate/integrations/hypothesis/strategies.py",
     "file_name": "strategies.py",
     "functions": [
-      {
-        "name": "from_predicate",
-        "line": 63,
-        "pure": false,
-        "category": "dynamic-code",
-        "reason": "calls _base (strategies.py:76) -> calls exec (reflection.py:371)",
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "from_predicate_false",
-        "line": 80,
-        "pure": false,
-        "category": "dynamic-code",
-        "reason": "calls from_predicate (strategies.py:82) -> calls exec (reflection.py:371)",
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
       {
         "name": "given_predicate",
         "line": 99,
@@ -5566,379 +2054,6 @@
           "flaky": false,
           "statuses": {
             "failed": 3
-          }
-        }
-      }
-    ]
-  },
-  {
-    "path": "predicate/integrations/hypothesis/strings.py",
-    "file_name": "strings.py",
-    "functions": [
-      {
-        "name": "from_text",
-        "line": 31,
-        "pure": false,
-        "category": "system",
-        "reason": "calls st.builds (strings.py:40) -> calls sys.modules.get (core.py:1234)",
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      }
-    ]
-  },
-  {
-    "path": "predicate/integrations/pydantic/__init__.py",
-    "file_name": "__init__.py",
-    "functions": []
-  },
-  {
-    "path": "predicate/integrations/pydantic/json_schema.py",
-    "file_name": "json_schema.py",
-    "functions": [
-      {
-        "name": "predicate_to_json_schema",
-        "line": 105,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      }
-    ]
-  },
-  {
-    "path": "predicate/integrations/pydantic/validator.py",
-    "file_name": "validator.py",
-    "functions": []
-  },
-  {
-    "path": "predicate/ip_address_predicates.py",
-    "file_name": "ip_address_predicates.py",
-    "functions": [
-      {
-        "name": "subnet_of_p",
-        "line": 42,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "supernet_of_p",
-        "line": 46,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      }
-    ]
-  },
-  {
-    "path": "predicate/is_async_predicate.py",
-    "file_name": "is_async_predicate.py",
-    "functions": []
-  },
-  {
-    "path": "predicate/is_callable_predicate.py",
-    "file_name": "is_callable_predicate.py",
-    "functions": [
-      {
-        "name": "is_callable_p",
-        "line": 52,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      }
-    ]
-  },
-  {
-    "path": "predicate/is_close_predicate.py",
-    "file_name": "is_close_predicate.py",
-    "functions": [
-      {
-        "name": "is_close_p",
-        "line": 32,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      }
-    ]
-  },
-  {
-    "path": "predicate/is_falsy_predicate.py",
-    "file_name": "is_falsy_predicate.py",
-    "functions": []
-  },
-  {
-    "path": "predicate/is_instance_predicate.py",
-    "file_name": "is_instance_predicate.py",
-    "functions": [
-      {
-        "name": "is_instance_p",
-        "line": 45,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      }
-    ]
-  },
-  {
-    "path": "predicate/is_lambda_predicate.py",
-    "file_name": "is_lambda_predicate.py",
-    "functions": [
-      {
-        "name": "func_is_lambda",
-        "line": 9,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "is_lambda_with_signature_p",
-        "line": 54,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      }
-    ]
-  },
-  {
-    "path": "predicate/is_named_tuple_predicate.py",
-    "file_name": "is_named_tuple_predicate.py",
-    "functions": [
-      {
-        "name": "is_named_tuple_class",
-        "line": 7,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      }
-    ]
-  },
-  {
-    "path": "predicate/is_none_predicate.py",
-    "file_name": "is_none_predicate.py",
-    "functions": []
-  },
-  {
-    "path": "predicate/is_not_none_predicate.py",
-    "file_name": "is_not_none_predicate.py",
-    "functions": []
-  },
-  {
-    "path": "predicate/is_partial_predicate.py",
-    "file_name": "is_partial_predicate.py",
-    "functions": [
-      {
-        "name": "func_is_partial",
-        "line": 11,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "is_partial_with_signature_p",
-        "line": 56,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      }
-    ]
-  },
-  {
-    "path": "predicate/is_predicate.py",
-    "file_name": "is_predicate.py",
-    "functions": [
-      {
-        "name": "is_p",
-        "line": 29,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      }
-    ]
-  },
-  {
-    "path": "predicate/is_predicate_of_p.py",
-    "file_name": "is_predicate_of_p.py",
-    "functions": [
-      {
-        "name": "is_predicate_of_p",
-        "line": 33,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      }
-    ]
-  },
-  {
-    "path": "predicate/is_protocol_predicate.py",
-    "file_name": "is_protocol_predicate.py",
-    "functions": [
-      {
-        "name": "is_protocol_p",
-        "line": 22,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      }
-    ]
-  },
-  {
-    "path": "predicate/is_pure_predicate.py",
-    "file_name": "is_pure_predicate.py",
-    "functions": [
-      {
-        "name": "clear_purity_cache",
-        "line": 131,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "find_impurity",
-        "line": 135,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      }
-    ]
-  },
-  {
-    "path": "predicate/is_regex_predicate.py",
-    "file_name": "is_regex_predicate.py",
-    "functions": []
-  },
-  {
-    "path": "predicate/is_same_predicate.py",
-    "file_name": "is_same_predicate.py",
-    "functions": [
-      {
-        "name": "is_same_p",
-        "line": 52,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
           }
         }
       }
@@ -5965,31 +2080,6 @@
     ]
   },
   {
-    "path": "predicate/is_truthy_predicate.py",
-    "file_name": "is_truthy_predicate.py",
-    "functions": []
-  },
-  {
-    "path": "predicate/juxt_predicate.py",
-    "file_name": "juxt_predicate.py",
-    "functions": [
-      {
-        "name": "juxt_p",
-        "line": 31,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      }
-    ]
-  },
-  {
     "path": "predicate/lazy_predicate.py",
     "file_name": "lazy_predicate.py",
     "functions": [
@@ -6006,94 +2096,6 @@
             "failed": 3
           }
         }
-      },
-      {
-        "name": "lazy_p",
-        "line": 44,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      }
-    ]
-  },
-  {
-    "path": "predicate/le_predicate.py",
-    "file_name": "le_predicate.py",
-    "functions": [
-      {
-        "name": "le_p",
-        "line": 29,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      }
-    ]
-  },
-  {
-    "path": "predicate/list_of_predicate.py",
-    "file_name": "list_of_predicate.py",
-    "functions": [
-      {
-        "name": "is_list_of_p",
-        "line": 46,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "is_single_or_list_of_p",
-        "line": 51,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      }
-    ]
-  },
-  {
-    "path": "predicate/lt_predicate.py",
-    "file_name": "lt_predicate.py",
-    "functions": [
-      {
-        "name": "lt_p",
-        "line": 29,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
       }
     ]
   },
@@ -6102,26 +2104,12 @@
     "file_name": "match_predicate.py",
     "functions": [
       {
-        "name": "match_p",
-        "line": 33,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
         "name": "reason",
         "line": 38,
         "pure": true,
         "exercise": {
           "status": "failed",
-          "detail": "TypeError: 'bool' object is not iterable",
+          "detail": "TypeError: 'int' object is not iterable",
           "runs": 3,
           "flaky": false,
           "statuses": {
@@ -6135,638 +2123,12 @@
         "pure": true,
         "exercise": {
           "status": "failed",
-          "detail": "TypeError: '<' not supported between instances of 'str' and 'int'",
+          "detail": "TypeError: 'bool' object is not iterable",
           "runs": 3,
-          "flaky": false,
+          "flaky": true,
           "statuses": {
-            "failed": 3
-          }
-        }
-      }
-    ]
-  },
-  {
-    "path": "predicate/mutual_recur_predicate.py",
-    "file_name": "mutual_recur_predicate.py",
-    "functions": [
-      {
-        "name": "mutual_recur_p",
-        "line": 55,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      }
-    ]
-  },
-  {
-    "path": "predicate/named_predicate.py",
-    "file_name": "named_predicate.py",
-    "functions": [
-      {
-        "name": "to_named_predicate",
-        "line": 55,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      }
-    ]
-  },
-  {
-    "path": "predicate/ne_predicate.py",
-    "file_name": "ne_predicate.py",
-    "functions": [
-      {
-        "name": "ne_p",
-        "line": 29,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      }
-    ]
-  },
-  {
-    "path": "predicate/negate.py",
-    "file_name": "negate.py",
-    "functions": [
-      {
-        "name": "negate_is_not",
-        "line": 37,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "negate_is_false",
-        "line": 42,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "negate_is_true",
-        "line": 47,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "negate_is_falsy",
-        "line": 52,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "negate_is_truthy",
-        "line": 57,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "negate_eq",
-        "line": 62,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "negate_ne",
-        "line": 67,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "negate_gt",
-        "line": 72,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "negate_ge",
-        "line": 77,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "negate_in",
-        "line": 82,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "negate_not_in",
-        "line": 87,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "negate_lt",
-        "line": 92,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "negate_le",
-        "line": 97,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "negate_is_none",
-        "line": 102,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "negate_is_not_none",
-        "line": 107,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "negate_has_length",
-        "line": 112,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "negate",
-        "line": 930,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      }
-    ]
-  },
-  {
-    "path": "predicate/not_in_predicate.py",
-    "file_name": "not_in_predicate.py",
-    "functions": [
-      {
-        "name": "not_in_p",
-        "line": 38,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      }
-    ]
-  },
-  {
-    "path": "predicate/not_predicate.py",
-    "file_name": "not_predicate.py",
-    "functions": []
-  },
-  {
-    "path": "predicate/optimizer/__init__.py",
-    "file_name": "__init__.py",
-    "functions": []
-  },
-  {
-    "path": "predicate/optimizer/all_optimizer.py",
-    "file_name": "all_optimizer.py",
-    "functions": [
-      {
-        "name": "optimize_all_predicate",
-        "line": 12,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      }
-    ]
-  },
-  {
-    "path": "predicate/optimizer/and_optimizer.py",
-    "file_name": "and_optimizer.py",
-    "functions": [
-      {
-        "name": "optimize_and_predicate",
-        "line": 26,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      }
-    ]
-  },
-  {
-    "path": "predicate/optimizer/any_optimizer.py",
-    "file_name": "any_optimizer.py",
-    "functions": [
-      {
-        "name": "optimize_any_predicate",
-        "line": 10,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      }
-    ]
-  },
-  {
-    "path": "predicate/optimizer/helpers.py",
-    "file_name": "helpers.py",
-    "functions": []
-  },
-  {
-    "path": "predicate/optimizer/in_optimizer.py",
-    "file_name": "in_optimizer.py",
-    "functions": [
-      {
-        "name": "optimize_in_predicate",
-        "line": 11,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      }
-    ]
-  },
-  {
-    "path": "predicate/optimizer/intersects_optimizer.py",
-    "file_name": "intersects_optimizer.py",
-    "functions": [
-      {
-        "name": "optimize_intersects_predicate",
-        "line": 6,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      }
-    ]
-  },
-  {
-    "path": "predicate/optimizer/list_of_optimizer.py",
-    "file_name": "list_of_optimizer.py",
-    "functions": [
-      {
-        "name": "optimize_list_of_predicate",
-        "line": 13,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      }
-    ]
-  },
-  {
-    "path": "predicate/optimizer/not_in_optimizer.py",
-    "file_name": "not_in_optimizer.py",
-    "functions": [
-      {
-        "name": "optimize_not_in_predicate",
-        "line": 11,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      }
-    ]
-  },
-  {
-    "path": "predicate/optimizer/not_optimizer.py",
-    "file_name": "not_optimizer.py",
-    "functions": [
-      {
-        "name": "optimize_not_predicate",
-        "line": 11,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      }
-    ]
-  },
-  {
-    "path": "predicate/optimizer/or_optimizer.py",
-    "file_name": "or_optimizer.py",
-    "functions": [
-      {
-        "name": "optimize_or_predicate",
-        "line": 23,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      }
-    ]
-  },
-  {
-    "path": "predicate/optimizer/predicate_optimizer.py",
-    "file_name": "predicate_optimizer.py",
-    "functions": [
-      {
-        "name": "optimizations",
-        "line": 25,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "optimize",
-        "line": 52,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "can_optimize",
-        "line": 60,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      }
-    ]
-  },
-  {
-    "path": "predicate/optimizer/xor_optimizer.py",
-    "file_name": "xor_optimizer.py",
-    "functions": [
-      {
-        "name": "optimize_xor_predicate",
-        "line": 16,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      }
-    ]
-  },
-  {
-    "path": "predicate/optional_predicate.py",
-    "file_name": "optional_predicate.py",
-    "functions": [
-      {
-        "name": "optional",
-        "line": 45,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      }
-    ]
-  },
-  {
-    "path": "predicate/or_predicate.py",
-    "file_name": "or_predicate.py",
-    "functions": [
-      {
-        "name": "or_p",
-        "line": 60,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
+            "ok": 1,
+            "failed": 2
           }
         }
       }
@@ -6782,31 +2144,11 @@
         "pure": true,
         "exercise": {
           "status": "failed",
-          "detail": "UnexpectedCharacters: No terminal matches '3' in the current parser context, at line 1 col 2\n\nk3OXUQf9\n ^\nExpected one of: \n\t* CIRCUMFLEX\n\t* __ANON_0\n\t* AMPERSAND\n\t* VBAR\n",
+          "detail": "UnexpectedCharacters: No terminal matches '6' in the current parser context, at line 1 col 3\n\nJv6\n  ^\nExpected one of: \n\t* AMPERSAND\n\t* CIRCUMFLEX\n\t* __ANON_0\n\t* VBAR\n",
           "runs": 3,
           "flaky": false,
           "statuses": {
             "failed": 3
-          }
-        }
-      }
-    ]
-  },
-  {
-    "path": "predicate/plus_predicate.py",
-    "file_name": "plus_predicate.py",
-    "functions": [
-      {
-        "name": "plus",
-        "line": 39,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
           }
         }
       }
@@ -6822,7 +2164,7 @@
         "pure": true,
         "exercise": {
           "status": "failed",
-          "detail": "ValueError: No generator found for <class '_purity_2431120143346172170.Predicate'>",
+          "detail": "ValueError: No generator found for <class '_purity_8864937845388145195.Predicate'>",
           "runs": 3,
           "flaky": false,
           "statuses": {
@@ -6836,7 +2178,7 @@
         "pure": true,
         "exercise": {
           "status": "failed",
-          "detail": "ValueError: No generator found for <class '_purity_5497097868245330072.Predicate'>",
+          "detail": "ValueError: No generator found for <class '_purity_5480933487579053888.Predicate'>",
           "runs": 3,
           "flaky": false,
           "statuses": {
@@ -6855,198 +2197,6 @@
           "flaky": false,
           "statuses": {
             "failed": 3
-          }
-        }
-      }
-    ]
-  },
-  {
-    "path": "predicate/predicate_factory.py",
-    "file_name": "predicate_factory.py",
-    "functions": []
-  },
-  {
-    "path": "predicate/property_predicate.py",
-    "file_name": "property_predicate.py",
-    "functions": [
-      {
-        "name": "property_p",
-        "line": 37,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      }
-    ]
-  },
-  {
-    "path": "predicate/pydantic.py",
-    "file_name": "pydantic.py",
-    "functions": []
-  },
-  {
-    "path": "predicate/raises_predicate.py",
-    "file_name": "raises_predicate.py",
-    "functions": [
-      {
-        "name": "raises_exception_p",
-        "line": 54,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      }
-    ]
-  },
-  {
-    "path": "predicate/range_predicate.py",
-    "file_name": "range_predicate.py",
-    "functions": [
-      {
-        "name": "ge_le_p",
-        "line": 86,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "ge_lt_p",
-        "line": 91,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "gt_le_p",
-        "line": 96,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "gt_lt_p",
-        "line": 101,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      }
-    ]
-  },
-  {
-    "path": "predicate/recur_predicate.py",
-    "file_name": "recur_predicate.py",
-    "functions": [
-      {
-        "name": "recur_p",
-        "line": 58,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      }
-    ]
-  },
-  {
-    "path": "predicate/reduce_predicate.py",
-    "file_name": "reduce_predicate.py",
-    "functions": [
-      {
-        "name": "reduce_p",
-        "line": 46,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      }
-    ]
-  },
-  {
-    "path": "predicate/regex_predicate.py",
-    "file_name": "regex_predicate.py",
-    "functions": [
-      {
-        "name": "regex_p",
-        "line": 35,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      }
-    ]
-  },
-  {
-    "path": "predicate/repeat_predicate.py",
-    "file_name": "repeat_predicate.py",
-    "functions": [
-      {
-        "name": "repeat",
-        "line": 34,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
           }
         }
       }
@@ -7073,441 +2223,6 @@
     ]
   },
   {
-    "path": "predicate/rx.py",
-    "file_name": "rx.py",
-    "functions": [
-      {
-        "name": "filter_p",
-        "line": 9,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "take_while_p",
-        "line": 14,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "skip_while_p",
-        "line": 19,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "partition_p",
-        "line": 24,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "all_p",
-        "line": 29,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "some_p",
-        "line": 34,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "count_p",
-        "line": 39,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "first_p",
-        "line": 44,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "last_p",
-        "line": 49,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "single_p",
-        "line": 54,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "first_or_default_p",
-        "line": 59,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "last_or_default_p",
-        "line": 66,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "single_or_default_p",
-        "line": 73,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "find_p",
-        "line": 83,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "find_index_p",
-        "line": 88,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      }
-    ]
-  },
-  {
-    "path": "predicate/same_signature_predicate.py",
-    "file_name": "same_signature_predicate.py",
-    "functions": [
-      {
-        "name": "is_subtype",
-        "line": 13,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "erase_generic",
-        "line": 21,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "remove_default_args",
-        "line": 28,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "ordered",
-        "line": 45,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "same_signature_p",
-        "line": 127,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      }
-    ]
-  },
-  {
-    "path": "predicate/set_of_predicate.py",
-    "file_name": "set_of_predicate.py",
-    "functions": [
-      {
-        "name": "is_set_of_p",
-        "line": 41,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      }
-    ]
-  },
-  {
-    "path": "predicate/set_predicates.py",
-    "file_name": "set_predicates.py",
-    "functions": [
-      {
-        "name": "intersects_p",
-        "line": 93,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "is_subset_p",
-        "line": 98,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "is_real_subset_p",
-        "line": 103,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "is_superset_p",
-        "line": 108,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "is_real_superset_p",
-        "line": 113,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      }
-    ]
-  },
-  {
-    "path": "predicate/spec/__init__.py",
-    "file_name": "__init__.py",
-    "functions": []
-  },
-  {
-    "path": "predicate/spec/annotated_constraints.py",
-    "file_name": "annotated_constraints.py",
-    "functions": [
-      {
-        "name": "constraint_predicates",
-        "line": 33,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      }
-    ]
-  },
-  {
-    "path": "predicate/spec/exercise.py",
-    "file_name": "exercise.py",
-    "functions": [
-      {
-        "name": "exercise",
-        "line": 12,
-        "pure": false,
-        "category": "system",
-        "reason": "calls async_exercise_function (exercise.py:21) -> calls sys.modules.get (type_checking.py:182)",
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      }
-    ]
-  },
-  {
     "path": "predicate/spec/exercise_class.py",
     "file_name": "exercise_class.py",
     "functions": [
@@ -7519,7 +2234,7 @@
         "reason": "calls _resolve_class_spec (exercise_class.py:73) -> calls sys.modules.get (type_checking.py:182)",
         "exercise": {
           "status": "failed",
-          "detail": "InvalidSpecError: Cannot derive spec for 'function': missing return annotation; pass a Spec or annotate it",
+          "detail": "InvalidSpecError: Unannotated parameter 'aa' not in spec",
           "runs": 3,
           "flaky": false,
           "statuses": {
@@ -7535,7 +2250,7 @@
         "reason": "calls _resolve_class_spec (exercise_class.py:95) -> calls sys.modules.get (type_checking.py:182)",
         "exercise": {
           "status": "failed",
-          "detail": "InvalidSpecError: Parameter 'XSLRrLoHzt' not in function signature",
+          "detail": "InvalidSpecError: Parameter 'LTu6Bng' not in function signature",
           "runs": 3,
           "flaky": false,
           "statuses": {
@@ -7557,7 +2272,7 @@
         "reason": "calls resolved_signature (exercise_function.py:32) -> calls sys.modules.get (type_checking.py:182)",
         "exercise": {
           "status": "failed",
-          "detail": "InvalidSpecError: Cannot derive spec for 'function': parameter 'aa' has no annotation; pass a Spec or annotate it",
+          "detail": "InvalidSpecError: Cannot derive spec for 'callable_object': parameter 'aa' has no annotation; pass a Spec or annotate it",
           "runs": 3,
           "flaky": false,
           "statuses": {
@@ -7573,7 +2288,7 @@
         "reason": "calls _resolve_function_spec (exercise_function.py:54) -> calls sys.modules.get (type_checking.py:182)",
         "exercise": {
           "status": "failed",
-          "detail": "InvalidSpecError: Parameter 'Do8V4oSFE' not in function signature",
+          "detail": "InvalidSpecError: Cannot derive spec for '<lambda>': missing return annotation; pass a Spec or annotate it",
           "runs": 3,
           "flaky": false,
           "statuses": {
@@ -7589,7 +2304,7 @@
         "reason": "calls _resolve_function_spec (exercise_function.py:76) -> calls sys.modules.get (type_checking.py:182)",
         "exercise": {
           "status": "failed",
-          "detail": "InvalidSpecError: Return annotation not in spec",
+          "detail": "InvalidSpecError: Cannot derive spec for '<lambda>': missing return annotation; pass a Spec or annotate it",
           "runs": 3,
           "flaky": false,
           "statuses": {
@@ -7604,138 +2319,19 @@
     "file_name": "exercise_helpers.py",
     "functions": [
       {
-        "name": "callable_name",
-        "line": 176,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "is_context_manager_function",
-        "line": 183,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "resolved_signature",
-        "line": 191,
-        "pure": false,
-        "category": "system",
-        "reason": "calls imported_namespace (exercise_helpers.py:202) -> calls sys.modules.get (type_checking.py:182)",
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
         "name": "type_arg_predicate",
         "line": 289,
         "pure": false,
         "category": "dynamic-code",
         "reason": "calls _type_arg_classes (exercise_helpers.py:291) -> calls eval (type_checking.py:189)",
         "exercise": {
-          "status": "ok",
-          "calls": 10,
+          "status": "failed",
+          "detail": "SyntaxError: invalid syntax (<string>, line 0)",
           "runs": 3,
-          "flaky": false,
+          "flaky": true,
           "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "class_hints",
-        "line": 332,
-        "pure": false,
-        "category": "system",
-        "reason": "calls sys.modules.get (exercise_helpers.py:338)",
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "annotation_to_predicate",
-        "line": 394,
-        "pure": false,
-        "category": "system",
-        "reason": "calls _typed_dict_predicate (exercise_helpers.py:404) -> calls sys.modules.get (exercise_helpers.py:338)",
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "get_return_predicate",
-        "line": 466,
-        "pure": false,
-        "category": "system",
-        "reason": "calls annotation_to_predicate (exercise_helpers.py:467) -> calls sys.modules.get (exercise_helpers.py:338)",
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "ret_name",
-        "line": 470,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "check_ret_name",
-        "line": 474,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
+            "failed": 2,
+            "ok": 1
           }
         }
       },
@@ -7764,71 +2360,11 @@
         "reason": "calls resolved_signature (exercise_helpers.py:502) -> calls sys.modules.get (type_checking.py:182)",
         "exercise": {
           "status": "failed",
-          "detail": "InvalidSpecError: Unannotated parameter 'aa' not in spec",
+          "detail": "InvalidSpecError: Parameter 'vZp2' not in function signature",
           "runs": 3,
           "flaky": false,
           "statuses": {
             "failed": 3
-          }
-        }
-      },
-      {
-        "name": "needs_spec_predicate",
-        "line": 515,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "exercise_param_predicate",
-        "line": 532,
-        "pure": false,
-        "category": "system",
-        "reason": "calls param_predicate (exercise_helpers.py:541) -> calls sys.modules.get (exercise_helpers.py:338)",
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "param_predicate",
-        "line": 544,
-        "pure": false,
-        "category": "system",
-        "reason": "calls annotation_to_predicate (exercise_helpers.py:547) -> calls sys.modules.get (exercise_helpers.py:338)",
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "call_args",
-        "line": 569,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
           }
         }
       },
@@ -7847,22 +2383,6 @@
         }
       },
       {
-        "name": "type_var_failure",
-        "line": 642,
-        "pure": false,
-        "category": "system",
-        "reason": "calls _conforms (exercise_helpers.py:653) -> calls sys.modules.get (exercise_helpers.py:338)",
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
         "name": "verify_result",
         "line": 676,
         "pure": false,
@@ -7870,27 +2390,11 @@
         "reason": "calls type_var_failure (exercise_helpers.py:682) -> calls sys.modules.get (exercise_helpers.py:338)",
         "exercise": {
           "status": "failed",
-          "detail": "SpecViolationError: Not conform spec: {'result': False, 'left': {'result': False, 'explanation': {'result': False, 'predicate': {'result': True}, 'reason': 'not eq_p(0)'}}}",
+          "detail": "TypeError: 'bool' object is not iterable",
           "runs": 3,
           "flaky": false,
           "statuses": {
             "failed": 3
-          }
-        }
-      },
-      {
-        "name": "yield_predicate",
-        "line": 699,
-        "pure": false,
-        "category": "system",
-        "reason": "calls resolved_signature (exercise_helpers.py:706) -> calls sys.modules.get (type_checking.py:182)",
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
           }
         }
       },
@@ -7914,7 +2418,7 @@
         "pure": true,
         "exercise": {
           "status": "failed",
-          "detail": "SpecViolationError: Not conform spec: yielded {'result': False, 'index': 0, 'value': 0.8514155258230286, 'reason': '0.8514155258230286 is not in in_p()'} for inputs {'a5Ec': 0}",
+          "detail": "SpecViolationError: Not conform spec: yielded {'result': False, 'index': 0, 'value': 0.9775337310724667, 'reason': '0.9775337310724667 is not less than 0'} for inputs {'FI': 0}",
           "runs": 3,
           "flaky": false,
           "statuses": {
@@ -7928,127 +2432,11 @@
         "pure": true,
         "exercise": {
           "status": "failed",
-          "detail": "OSError: HCBaBsF2vh",
+          "detail": "ValueError: ApSJVawe",
           "runs": 3,
           "flaky": false,
           "statuses": {
             "failed": 3
-          }
-        }
-      },
-      {
-        "name": "is_unannotated_var_param",
-        "line": 738,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "is_private_default_param",
-        "line": 746,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "is_skipped_param",
-        "line": 751,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "no_spec_error",
-        "line": 756,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      }
-    ]
-  },
-  {
-    "path": "predicate/spec/instrument.py",
-    "file_name": "instrument.py",
-    "functions": [
-      {
-        "name": "instrument",
-        "line": 19,
-        "pure": false,
-        "category": "system",
-        "reason": "calls instrument_class (instrument.py:25) -> calls sys.modules.get (type_checking.py:182)",
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "instrument_module",
-        "line": 46,
-        "pure": false,
-        "category": "system",
-        "reason": "calls instrument_function (instrument.py:48) -> calls sys.modules.get (type_checking.py:182)",
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      }
-    ]
-  },
-  {
-    "path": "predicate/spec/instrument_class.py",
-    "file_name": "instrument_class.py",
-    "functions": [
-      {
-        "name": "instrument_class",
-        "line": 15,
-        "pure": false,
-        "category": "system",
-        "reason": "calls instrument_function (instrument_class.py:20) -> calls sys.modules.get (type_checking.py:182)",
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
           }
         }
       }
@@ -8059,36 +2447,6 @@
     "file_name": "instrument_function.py",
     "functions": [
       {
-        "name": "set_instrumentation",
-        "line": 35,
-        "pure": false,
-        "category": "global-state",
-        "reason": "global statement (instrument_function.py:37)",
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "is_instrumentation_enabled",
-        "line": 41,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
         "name": "enrich_spec",
         "line": 45,
         "pure": false,
@@ -8096,7 +2454,7 @@
         "reason": "calls resolve_signature (instrument_function.py:46) -> calls sys.modules.get (type_checking.py:182)",
         "exercise": {
           "status": "failed",
-          "detail": "InvalidSpecError: Snapshot parameter 'hCp8bFeUU' not in function signature",
+          "detail": "InvalidSpecError: Snapshot parameter '2Y4y' not in function signature",
           "runs": 3,
           "flaky": false,
           "statuses": {
@@ -8110,121 +2468,20 @@
         "pure": true,
         "exercise": {
           "status": "failed",
-          "detail": "SpecViolationError: k",
+          "detail": "SpecViolationError: fq",
           "runs": 3,
           "flaky": false,
           "statuses": {
             "failed": 3
           }
         }
-      },
-      {
-        "name": "is_instrumented",
-        "line": 77,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "instrument_function",
-        "line": 238,
-        "pure": false,
-        "category": "system",
-        "reason": "calls enrich_spec (instrument_function.py:247) -> calls sys.modules.get (type_checking.py:182)",
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
       }
     ]
-  },
-  {
-    "path": "predicate/spec/is_valid_spec_predicate.py",
-    "file_name": "is_valid_spec_predicate.py",
-    "functions": [
-      {
-        "name": "is_valid_spec_p",
-        "line": 47,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      }
-    ]
-  },
-  {
-    "path": "predicate/spec/spec.py",
-    "file_name": "spec.py",
-    "functions": []
   },
   {
     "path": "predicate/spec/type_checking.py",
     "file_name": "type_checking.py",
     "functions": [
-      {
-        "name": "type_checking_namespace",
-        "line": 149,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "imported_namespace",
-        "line": 163,
-        "pure": false,
-        "category": "system",
-        "reason": "calls imported_namespace_for_module (type_checking.py:171) -> calls sys.modules.get (type_checking.py:182)",
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "imported_namespace_for_module",
-        "line": 174,
-        "pure": false,
-        "category": "system",
-        "reason": "calls _module_namespace (type_checking.py:176) -> calls sys.modules.get (type_checking.py:182)",
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
       {
         "name": "resolve_forward_ref",
         "line": 186,
@@ -8233,197 +2490,11 @@
         "reason": "calls eval (type_checking.py:189)",
         "exercise": {
           "status": "failed",
-          "detail": "NameError: name 'EnbzNUKc' is not defined",
+          "detail": "NameError: name 'klkB8' is not defined",
           "runs": 3,
           "flaky": false,
           "statuses": {
             "failed": 3
-          }
-        }
-      }
-    ]
-  },
-  {
-    "path": "predicate/standard_predicates.py",
-    "file_name": "standard_predicates.py",
-    "functions": [
-      {
-        "name": "is_iterable_of_p",
-        "line": 32,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "is_single_or_iterable_of_p",
-        "line": 37,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "dict_depth",
-        "line": 46,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "depth_op_p",
-        "line": 56,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      }
-    ]
-  },
-  {
-    "path": "predicate/star_predicate.py",
-    "file_name": "star_predicate.py",
-    "functions": [
-      {
-        "name": "star",
-        "line": 40,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      }
-    ]
-  },
-  {
-    "path": "predicate/str_predicates.py",
-    "file_name": "str_predicates.py",
-    "functions": [
-      {
-        "name": "create_is_str_p",
-        "line": 10,
-        "pure": false,
-        "category": "randomness",
-        "reason": "calls _random_strings_from (str_predicates.py:14) -> calls random.choices (str_predicates.py:20)",
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "starts_with_p",
-        "line": 60,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "ends_with_p",
-        "line": 65,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      }
-    ]
-  },
-  {
-    "path": "predicate/struct_predicate.py",
-    "file_name": "struct_predicate.py",
-    "functions": [
-      {
-        "name": "value_failure",
-        "line": 51,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
-      {
-        "name": "is_struct_p",
-        "line": 59,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      }
-    ]
-  },
-  {
-    "path": "predicate/tee_predicate.py",
-    "file_name": "tee_predicate.py",
-    "functions": [
-      {
-        "name": "tee_p",
-        "line": 33,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
           }
         }
       }
@@ -8433,20 +2504,6 @@
     "path": "predicate/this_predicate.py",
     "file_name": "this_predicate.py",
     "functions": [
-      {
-        "name": "find_in_locals",
-        "line": 32,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      },
       {
         "name": "find_this_predicate",
         "line": 41,
@@ -8473,7 +2530,7 @@
         "pure": true,
         "exercise": {
           "status": "failed",
-          "detail": "ValueError: Type not allowed: in_p()",
+          "detail": "ValueError: Type not allowed: all_p(ne_p(0))",
           "runs": 3,
           "flaky": false,
           "statuses": {
@@ -8487,7 +2544,7 @@
         "pure": true,
         "exercise": {
           "status": "failed",
-          "detail": "ValueError: Type not allowed: gt_p(0)",
+          "detail": "ValueError: Type not allowed: any_p(any_p(any_p(any_p(any_p(not_in_p()))) | in_p()))",
           "runs": 3,
           "flaky": false,
           "statuses": {
@@ -8501,76 +2558,11 @@
         "pure": true,
         "exercise": {
           "status": "failed",
-          "detail": "ValueError: Type not allowed: gt_p(0)",
+          "detail": "ValueError: Type not allowed: ge_p(0)",
           "runs": 3,
           "flaky": false,
           "statuses": {
             "failed": 3
-          }
-        }
-      }
-    ]
-  },
-  {
-    "path": "predicate/tuple_of_predicate.py",
-    "file_name": "tuple_of_predicate.py",
-    "functions": [
-      {
-        "name": "is_tuple_of_p",
-        "line": 33,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      }
-    ]
-  },
-  {
-    "path": "predicate/type_var_predicate.py",
-    "file_name": "type_var_predicate.py",
-    "functions": []
-  },
-  {
-    "path": "predicate/unique_predicate.py",
-    "file_name": "unique_predicate.py",
-    "functions": [
-      {
-        "name": "unique_by_p",
-        "line": 50,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
-          }
-        }
-      }
-    ]
-  },
-  {
-    "path": "predicate/xor_predicate.py",
-    "file_name": "xor_predicate.py",
-    "functions": [
-      {
-        "name": "xor_p",
-        "line": 60,
-        "pure": true,
-        "exercise": {
-          "status": "ok",
-          "calls": 10,
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "ok": 3
           }
         }
       }

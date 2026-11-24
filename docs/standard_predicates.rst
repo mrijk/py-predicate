@@ -1016,7 +1016,8 @@ the same information for a single function.
 
 With ``--exercise`` the CLI also calls each function with inputs generated from its annotations, each in a separate
 sandboxed subprocess (``--calls``, ``--timeout`` and ``--jobs`` tune this). Each function is exercised ``--runs`` times (default 3) with fresh
-random inputs; if the runs give different statuses the result is marked ``"flaky": true``, with the counts in ``statuses``. The sandbox runs in an empty temporary
+random inputs; if the runs give different statuses the result is marked ``"flaky": true``, with the counts in ``statuses``. Add ``--failed`` to list and snapshot only the functions whose exercise ended in
+``failed``, ``blocked``, ``timeout`` or ``crashed``, like ``complexipy --failed``. The sandbox runs in an empty temporary
 directory with a minimal environment, and blocks file writes and deletes, spawning processes and network access. The
 outcome per function is stored in the snapshot as ``exercise``, with status ``ok``, ``failed``, ``blocked``,
 ``not-exercisable``, ``timeout`` or ``crashed``. The sandbox is a guard against accidents, not a security boundary, and

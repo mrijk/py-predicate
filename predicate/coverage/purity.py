@@ -95,3 +95,10 @@ def summarize_exercise(modules: list[dict[str, Any]]) -> dict[str, int]:
 
 def count_flaky(modules: list[dict[str, Any]]) -> int:
     return sum(f.get("exercise", {}).get("flaky", False) for m in modules for f in m["functions"])
+
+
+def failed_only(modules: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Keep only the functions whose exercise went wrong, and only the modules that still have any."""
+    bad = {"failed", "blocked", "timeout", "crashed"}  # not-exercisable is a property of the signature, not a failure
+    kept = [m | {"functions": [f for f in m["functions"] if f["exercise"]["status"] in bad]} for m in modules]
+    return [m for m in kept if m["functions"]]

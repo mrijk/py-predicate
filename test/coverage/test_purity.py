@@ -146,3 +146,24 @@ def test_flaky(monkeypatch, tmp_path):
     assert g["flaky"] is False
     assert g["statuses"] == {"ok": 3}
     assert count_flaky(modules) == 1
+
+
+def test_cli_failed_only(tmp_path):
+    (tmp_path / "mod.py").write_text(EXERCISE_SOURCE.replace("PATH", str(tmp_path / "x")).split("def hangs")[0])
+    snapshot = tmp_path / "snapshot.json"
+
+    result = CliRunner().invoke(
+        app, [str(tmp_path / "mod.py"), "--exercise", "--failed", "--runs", "1", "-o", str(snapshot)]
+    )
+
+    assert result.exit_code == 0
+    names = [f["name"] for f in json.loads(snapshot.read_text())[0]["functions"]]
+    assert names == ["wrong_return", "raises", "writes_file", "deletes_file", "swallows_violation"]
+    assert "add:" not in result.output
+    assert "exercise: {" in result.output  # the totals still cover every function
+
+
+def test_cli_failed_needs_exercise(tmp_path):
+    (tmp_path / "mod.py").write_text("def f(x: int) -> int:\n    return x\n")
+
+    assert CliRunner().invoke(app, [str(tmp_path / "mod.py"), "--failed"]).exit_code != 0
