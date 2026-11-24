@@ -12,8 +12,24 @@ from predicate.coverage.sandbox import exercise_sandboxed
 from predicate.is_pure_predicate import find_impurity
 
 
+def _package_name(file: Path) -> tuple[Path, str] | None:
+    """Return (root directory, dotted module name) if file lives in a package, otherwise None."""
+    packages: list[str] = []
+    directory = file.resolve().parent
+    while (directory / "__init__.py").exists():
+        packages.insert(0, directory.name)
+        directory = directory.parent
+    if not packages:
+        return None
+    return directory, ".".join(packages if file.stem == "__init__" else [*packages, file.stem])
+
+
 def _load(file: Path) -> ModuleType:
-    # ponytail: loads by file location, so modules using relative imports end up as errors; add package-aware import if needed
+    if (package := _package_name(file)) is not None:  # imported by name, so relative imports work
+        root, name = package
+        if str(root) not in sys.path:
+            sys.path.insert(0, str(root))
+        return importlib.import_module(name)
     name = f"_purity_{abs(hash(file.resolve()))}"
     spec = importlib.util.spec_from_file_location(name, file)
     if spec is None or spec.loader is None:
@@ -99,6 +115,12 @@ def count_flaky(modules: list[dict[str, Any]]) -> int:
 
 def failed_only(modules: list[dict[str, Any]]) -> list[dict[str, Any]]:
     """Keep only the functions whose exercise went wrong, and only the modules that still have any."""
-    bad = {"failed", "blocked", "timeout", "crashed"}  # not-exercisable is a property of the signature, not a failure
+    bad = {
+        "failed",
+        "mutates-args",
+        "blocked",
+        "timeout",
+        "crashed",
+    }  # not-exercisable is a property of the signature, not a failure
     kept = [m | {"functions": [f for f in m["functions"] if f["exercise"]["status"] in bad]} for m in modules]
     return [m for m in kept if m["functions"]]

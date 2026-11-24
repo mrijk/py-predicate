@@ -38,6 +38,7 @@ from predicate.generator.helpers import (
     generate_odd_numbers,
     random_anys,
     random_bools,
+    random_bytes,
     random_callable_objects,
     random_complex_numbers,
     random_containers,
@@ -262,7 +263,7 @@ def test_random_strings():
 
 
 def test_random_strings_with_limits():
-    strings = take(10, random_strings(min_size=1, max_size=3))
+    strings = take(10, random_strings(length_p=ge_le_p(1, 3)))
 
     all_str = all_p(is_str_p & has_length_p(length_p=ge_le_p(lower=1, upper=3)))
 
@@ -428,3 +429,8 @@ def test_random_strings_lower(v):
 
 def test_random_strings_lower_empty():
     assert list(random_strings_lower("")) == []
+
+
+def test_random_strings_and_bytes_with_empty_length_range():
+    assert take(5, random_strings(length_p=ge_le_p(8, 7))) == []
+    assert take(5, random_bytes(length_p=ge_le_p(1, 0))) == []

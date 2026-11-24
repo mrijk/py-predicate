@@ -953,7 +953,7 @@ def _false_struct_extra_key_dicts(predicate: StructPredicate[Any]) -> Iterator[A
 
     required_true_generators = {key: generate_true(value_p) for key, value_p in required.items()}
     optional_true_generators = {key: generate_true(value_p) for key, value_p in optional.items()}
-    for extra_key in (key for key in random_strings(min_size=1) if key not in known_keys):
+    for extra_key in (key for key in random_strings(length_p=default_at_least_one_length_p) if key not in known_keys):
         required_fields = {key: next(required_true_generators[key]) for key in required}
         yield required_fields | sample_optional_fields(optional, optional_true_generators) | {extra_key: None}
 

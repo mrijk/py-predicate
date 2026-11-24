@@ -1,9 +1,10 @@
 import collections
 import collections.abc
+import inspect
 import io
 import sys
 import tempfile
-from collections.abc import Callable
+from collections.abc import Callable, Iterable
 from typing import (
     IO,
     AbstractSet,
@@ -22,6 +23,7 @@ from typing import (
     TypedDict,
     TypeVar,
     Unpack,
+    get_args,
 )
 
 import pytest
@@ -39,7 +41,8 @@ from predicate import (
     is_str_p,
     is_struct_p,
 )
-from predicate.spec.exercise_helpers import annotation_to_predicate
+from predicate.predicate import Predicate
+from predicate.spec.exercise_helpers import annotation_to_predicate, bind_shared_type_vars
 from predicate.spec.instrument import instrument
 from predicate.spec.spec import SpecViolationError
 from spec.test_functions.typed_dicts_postponed import Options
@@ -655,3 +658,21 @@ def test_generate_struct_without_required_keys():
 
     assert len(values) == 20
     assert all(predicate(value) for value in values)
+
+
+def test_bind_shared_type_vars_leaves_a_single_use_alone():
+    def f[T](xs: list[T], y: int) -> T: ...
+
+    parameters = dict(inspect.signature(f).parameters)
+
+    assert bind_shared_type_vars(parameters) == parameters
+
+
+def test_bind_shared_type_vars_replaces_a_shared_type_var():
+    def f[T](xs: Iterable[T], p: Predicate[T]) -> T: ...
+
+    bound = bind_shared_type_vars(dict(inspect.signature(f).parameters))
+
+    (item_type,) = get_args(bound["xs"].annotation)
+    assert item_type in (int, str, float)
+    assert get_args(bound["p"].annotation) == (item_type,)

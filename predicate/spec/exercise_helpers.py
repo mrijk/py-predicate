@@ -1,13 +1,15 @@
 import collections.abc
 import inspect
 import io
+import random
 import sys
 import types
 import warnings
+from collections import Counter
 from contextlib import AbstractAsyncContextManager, AbstractContextManager
 from functools import partial, reduce
 from inspect import Parameter, Signature, isasyncgenfunction, isgeneratorfunction, isroutine, signature
-from itertools import islice, repeat, takewhile
+from itertools import islice, product, repeat, takewhile
 from operator import and_
 from typing import (
     IO,
@@ -54,6 +56,7 @@ from predicate.in_predicate import in_p
 from predicate.is_instance_predicate import is_dict_p, is_str_p, is_tuple_p
 from predicate.is_named_tuple_predicate import is_named_tuple_class
 from predicate.is_none_predicate import is_none_p
+from predicate.is_predicate_of_p import IsPredicateOfPredicate, is_predicate_of_p
 from predicate.is_subclass_predicate import is_subclass_p
 from predicate.list_of_predicate import is_list_of_p
 from predicate.or_predicate import or_p
@@ -518,6 +521,24 @@ def needs_spec_predicate(parameter: Parameter) -> bool:
     return annotation == parameter.empty or type(annotation) is TypeVar
 
 
+def _bound_predicates(parameter: Parameter) -> Iterator[Predicate[Any]]:
+    """Yield the predicate of the parameter for every way bind_shared_type_vars can bind its free TypeVars.
+
+    A TypeVar the parameter shares with another one is bound, one it doesn't share stays free: None means unbound.
+    """
+    type_vars = [tv for tv in set(_type_vars(parameter.annotation)) if _is_free(tv)]
+    for types_ in product((None, *_SHARED_TYPE_VAR_CHOICES), repeat=len(type_vars)):
+        bindings = {tv: t for tv, t in zip(type_vars, types_, strict=True) if t is not None}
+        yield param_predicate(parameter.replace(annotation=_substitute(parameter.annotation, bindings)))
+
+
+def _narrows_annotation(spec_p: Predicate[Any], parameter: Parameter) -> bool:
+    if isinstance(spec_p, IsPredicateOfPredicate):  # the predicate for Predicate[X], see exercise_param_predicate
+        return get_origin(parameter.annotation) is Predicate
+    # implies() can't compare generic aliases such as Iterable[int] and Iterable[T], so also accept a bound annotation
+    return bool(implies(spec_p, param_predicate(parameter))) or spec_p in _bound_predicates(parameter)
+
+
 def _check_parameter(key: str, parameter: Parameter, parameters: dict[str, Predicate[Any]]) -> None:
     if needs_spec_predicate(parameter):
         if key not in parameters:
@@ -525,8 +546,48 @@ def _check_parameter(key: str, parameter: Parameter, parameters: dict[str, Predi
     else:
         if key not in parameters:
             parameters[key] = exercise_param_predicate(parameter)
-        elif not implies(parameters[key], param_predicate(parameter)):
+        elif not _narrows_annotation(parameters[key], parameter):
             raise InvalidSpecError("Spec predicate is not a constrained annotation")
+
+
+# ponytail: three candidate types; add more (e.g. bool, bytes) if the generators can build values and predicates for them
+_SHARED_TYPE_VAR_CHOICES: Final = (int, str, float)
+
+
+def _type_vars(annotation: Any) -> Iterator[TypeVar]:
+    if isinstance(annotation, TypeVar):
+        yield annotation
+    yield from (p for p in getattr(annotation, "__parameters__", ()) if isinstance(p, TypeVar))
+
+
+def _is_free(type_var: TypeVar) -> bool:
+    return not type_var.__constraints__ and type_var.__bound__ is None
+
+
+def _substitute(annotation: Any, bindings: collections.abc.Mapping[TypeVar, type]) -> Any:
+    if isinstance(annotation, TypeVar):
+        return bindings.get(annotation, annotation)
+    if parameters := getattr(annotation, "__parameters__", ()):
+        try:
+            return annotation[tuple(bindings.get(p, p) for p in parameters)]
+        except TypeError:  # e.g. a ParamSpec in an unusual position: keep the annotation as it is
+            return annotation
+    return annotation
+
+
+def bind_shared_type_vars(parameters: collections.abc.Mapping[str, Parameter]) -> dict[str, Parameter]:
+    """Replace each free TypeVar that more than one parameter uses by one concrete type, chosen per call.
+
+    Generating the parameters independently would pair e.g. a mixed list for Iterable[T] with a predicate for Predicate[T]
+    that can't evaluate its items. A TypeVar used by one parameter is left alone, it is already one kind of value (#375).
+    """
+    users = Counter(tv for p in parameters.values() for tv in set(_type_vars(p.annotation)) if _is_free(tv))
+    shared = [tv for tv, count in users.items() if count > 1]
+    bindings = {tv: random.choice(_SHARED_TYPE_VAR_CHOICES) for tv in shared}  # noqa: S311
+    return {
+        key: p.replace(annotation=_substitute(p.annotation, bindings)) if bindings else p
+        for key, p in parameters.items()
+    }
 
 
 def exercise_param_predicate(param: Parameter) -> Predicate[Any]:
@@ -538,6 +599,12 @@ def exercise_param_predicate(param: Parameter) -> Predicate[Any]:
     """
     if param.kind == Parameter.VAR_KEYWORD and get_origin(param.annotation) is not Unpack:
         return eq_p({})  # yields {} forever; is_dict_p & is_empty_p would run out after one
+    if (
+        get_origin(param.annotation) is Predicate
+        and isinstance(klass := first(get_args(param.annotation), None), type)
+        and klass is not Any
+    ):
+        return is_predicate_of_p(klass)  # generates predicates that can evaluate a klass, unlike is_Predicate_p
     return param_predicate(param)
 
 
@@ -673,8 +740,18 @@ def _get_bound_arguments(sig: Signature, arguments: dict[str, Any]) -> dict[Type
     return bound
 
 
+def capture_old(spec: Spec, value: dict[str, Any]) -> dict[str, Any]:
+    """Capture the spec's snapshots of the argument values, to be taken before the call (#238)."""
+    return {name: capture(value[name]) for name, capture in spec.get("snapshot", {}).items()}
+
+
 def verify_result(
-    spec: Spec, return_p: Predicate[Any], value: dict[str, Any], result: Any, sig: Signature | None = None
+    spec: Spec,
+    return_p: Predicate[Any],
+    value: dict[str, Any],
+    result: Any,
+    sig: Signature | None = None,
+    old: dict[str, Any] | None = None,
 ) -> None:
     if not return_p(result):
         raise SpecViolationError(f"Not conform spec: {explain(return_p, result)}")
@@ -682,11 +759,13 @@ def verify_result(
     if sig is not None and (reason := type_var_failure(sig, value, result)):
         raise SpecViolationError(f"Not conform spec: {reason}")
 
-    if (fn := spec.get("fn")) and not fn(**value, **{ret_name(spec): result}):
+    extra = {"old": old or {}} if spec.get("snapshot") else {}
+
+    if (fn := spec.get("fn")) and not fn(**value, **{ret_name(spec): result}, **extra):
         raise SpecViolationError(f"Not conform spec: fn constraint failed for inputs {value} -> {result}")
 
     if fn_p := spec.get("fn_p"):
-        fn_p_result = fn_p(**value)
+        fn_p_result = fn_p(**value, **extra)
         if not fn_p_result(result):
             raise SpecViolationError(f"Not conform spec: {explain(fn_p_result, result)}")
 

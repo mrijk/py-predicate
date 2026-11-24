@@ -1,3 +1,4 @@
+from collections.abc import Iterable
 from itertools import repeat
 from typing import Any, Iterator
 
@@ -97,8 +98,13 @@ def generate_random_predicate_pairs(max_depth: int, klass: type) -> Iterator[Any
     return zip(left_predicates, right_predicates, strict=False)
 
 
+def _is_iterable_class(klass: type) -> bool:
+    """all_p and any_p iterate their input, so they only apply to values of an iterable class."""
+    return isinstance(klass, type) and issubclass(klass, Iterable)
+
+
 def generate_all_predicates(max_depth: int, klass: type) -> Iterator[Any]:
-    if not max_depth:
+    if not max_depth or not _is_iterable_class(klass):
         return
 
     from predicate.generator.helpers import random_predicates
@@ -109,7 +115,7 @@ def generate_all_predicates(max_depth: int, klass: type) -> Iterator[Any]:
 
 
 def generate_any_predicates(max_depth: int, klass: type) -> Iterator[Any]:
-    if not max_depth:
+    if not max_depth or not _is_iterable_class(klass):
         return
 
     from predicate.generator.helpers import random_predicates

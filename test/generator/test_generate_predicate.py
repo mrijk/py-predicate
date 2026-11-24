@@ -112,7 +112,7 @@ def test_generate_basic_predicate(predicate_type, klass):
         (AnyPredicate, generate_any_predicates),
     ],
 )
-@pytest.mark.parametrize("klass", (int, str, float))
+@pytest.mark.parametrize("klass", (str,))
 def test_generate_all_predicate(predicate_type, generate_func, klass):
     generator = generate_func(max_depth=2, klass=klass)
 
@@ -156,6 +156,12 @@ def test_generate_range_predicates_are_callable(generate_func):
         assert isinstance(predicate(predicate.upper), bool)
 
 
+@pytest.mark.parametrize("generate_func", (generate_all_predicates, generate_any_predicates))
+@pytest.mark.parametrize("klass", (int, float, bool))
+def test_generate_all_any_predicates_need_an_iterable_class(generate_func, klass):
+    assert take(3, generate_func(max_depth=2, klass=klass)) == []
+
+
 def test_generate_any_predicates_depth_zero():
     assert list(take(3, generate_any_predicates(max_depth=0, klass=int))) == []
 
@@ -184,7 +190,7 @@ def test_generate_constant_predicate(predicate):
 
 
 def test_generate_any_predicate_via_registry():
-    predicates = take(5, generate_predicate(AnyPredicate, max_depth=2, klass=int))
+    predicates = take(5, generate_predicate(AnyPredicate, max_depth=2, klass=str))
     assert predicates
     assert all(isinstance(predicate, AnyPredicate) for predicate in predicates)
 

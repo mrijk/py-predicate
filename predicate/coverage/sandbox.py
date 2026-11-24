@@ -9,14 +9,19 @@ Add OS-level isolation (sandbox-exec, bwrap, a container) if untrusted code must
 """
 
 import asyncio
+import copy
 import io
 import json
 import os
+import re
 import subprocess
 import sys
 import tempfile
 from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
+
+if TYPE_CHECKING:  # the worker imports predicate only after installing the audit hook
+    from predicate.spec.spec import Spec
 
 _WRITE_FLAGS = os.O_WRONLY | os.O_RDWR | os.O_APPEND | os.O_CREAT | os.O_TRUNC
 _BLOCKED_EVENTS = {
@@ -54,6 +59,25 @@ def _install_audit_hook(violations: list[str]) -> None:
     sys.addaudithook(hook)
 
 
+def _same(before: Any, after: Any) -> bool:
+    # ponytail: == then repr without addresses, so a deep copy of an object without __eq__ counts as unchanged
+    return bool(before == after) or _without_addresses(before) == _without_addresses(after)
+
+
+def _without_addresses(value: Any) -> str:
+    return re.sub(r"0x[0-9a-f]+", "0x", repr(value))
+
+
+def _with_mutation_check(spec: "Spec", mutated: list[str]) -> "Spec":
+    """Add a snapshot of deep-copied arguments (#238) and a `fn` that records the arguments the call changed."""
+
+    def unchanged(old: dict[str, Any] | None = None, **current: Any) -> bool:  # no arguments: no snapshot, no old
+        mutated.extend(k for k, v in (old or {}).items() if not _same(v, current[k]))
+        return True
+
+    return spec | {"snapshot": dict.fromkeys(spec["args"], copy.deepcopy), "fn": unchanged}
+
+
 async def _consume_async(results: Any) -> int:
     return len([item async for item in results])
 
@@ -69,8 +93,11 @@ def _exercise(file: str, name: str, calls: int) -> dict[str, Any]:
         spec = get_spec_from_function_annotation(fn)
     except InvalidSpecError as e:
         return {"status": "not-exercisable", "detail": str(e)}
-    results = exercise(fn, spec, calls)
+    mutated: list[str] = []
+    results = exercise(fn, _with_mutation_check(spec, mutated), calls)
     count = asyncio.run(_consume_async(results)) if hasattr(results, "__aiter__") else len(list(results))
+    if mutated:
+        return {"status": "mutates-args", "detail": f"mutates {', '.join(sorted(set(mutated)))}"}
     return {"status": "ok", "calls": count}
 
 
@@ -92,7 +119,7 @@ def _worker(file: str, name: str, calls: int) -> None:
 def exercise_sandboxed(file: Path, name: str, calls: int = 10, timeout: float = 10.0) -> dict[str, Any]:
     """Exercise file's function `name` with `calls` generated inputs. Returns a dict with status and detail/calls.
 
-    Status is one of: ok, failed, blocked (tried a forbidden side effect), not-exercisable, timeout or crashed.
+    Status is one of: ok, failed, mutates-args (changed an argument), blocked (tried a forbidden side effect), not-exercisable, timeout or crashed.
     """
     with tempfile.TemporaryDirectory() as cwd:
         env = {"PATH": os.environ.get("PATH", ""), "HOME": cwd, "LANG": "C.UTF-8"}
