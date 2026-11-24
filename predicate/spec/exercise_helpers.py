@@ -420,6 +420,8 @@ def annotation_to_predicate(annotation: Any) -> Predicate[Any]:  # noqa: C901 # 
     if (io_predicate := _io_predicate(annotation)) is not None:
         return io_predicate
     origin = get_origin(annotation)
+    if origin is Predicate and get_args(annotation) == (Any,):
+        return is_predicate_of_p(Any)  # generates predicates that can be applied to a value of any type
     if origin in _type_narrowing_origins:
         return always_true_p  # TypeGuard/TypeIs is bool at runtime
     if origin in _union_origins:

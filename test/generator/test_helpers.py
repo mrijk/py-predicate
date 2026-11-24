@@ -53,6 +53,7 @@ from predicate.generator.helpers import (
     random_iterables,
     random_lengths,
     random_lists,
+    random_predicates,
     random_sets,
     random_strings,
     random_strings_greater,
@@ -434,3 +435,10 @@ def test_random_strings_lower_empty():
 def test_random_strings_and_bytes_with_empty_length_range():
     assert take(5, random_strings(length_p=ge_le_p(8, 7))) == []
     assert take(5, random_bytes(length_p=ge_le_p(1, 0))) == []
+
+
+def test_random_predicates_of_any_accept_any_value():
+    values = [0, "a", None, 1.5, [1], datetime(2020, 1, 1)]
+    for predicate in take(200, random_predicates(klass=Any)):
+        for value in values:
+            assert predicate(value) in (True, False)

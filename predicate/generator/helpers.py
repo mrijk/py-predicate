@@ -28,12 +28,17 @@ from uuid import UUID, uuid4
 
 from more_itertools import interleave, random_permutation, repeatfunc, take, unique_everseen
 
-from predicate.eq_predicate import eq_p
+from predicate.and_predicate import AndPredicate
+from predicate.eq_predicate import EqPredicate, eq_p
 from predicate.generator.generate_predicate import PredicateKlass, generate_predicate, typed_predicate_type_registry
 from predicate.is_instance_predicate import is_int_p, is_str_p
+from predicate.ne_predicate import NePredicate
+from predicate.not_predicate import NotPredicate
+from predicate.or_predicate import OrPredicate
 from predicate.predicate import Predicate
 from predicate.range_predicate import ge_le_p
 from predicate.regex_predicate import regex_p
+from predicate.xor_predicate import XorPredicate
 
 
 def random_first_from_iterables(*iterables: Iterable[Any]) -> Iterator[Any]:
@@ -196,8 +201,17 @@ def random_datetimes(lower: datetime | None = None, upper: datetime | None = Non
         yield start + timedelta(seconds=random_second)
 
 
+# The predicates that accept a value of any type: unlike gt_p(0) they don't raise a TypeError on a str
+_any_value_predicate_types: Final = (EqPredicate, NePredicate, AndPredicate, OrPredicate, XorPredicate, NotPredicate)
+
+
 def random_predicates(*, max_depth: int = 10, klass: PredicateKlass = int) -> Iterator[Predicate[Any]]:
-    subclasses = [subclass for subclass in Predicate.__subclasses__() if subclass in typed_predicate_type_registry()]
+    """Return predicates over values of klass; for Any only the ones that can be applied to a value of any type."""
+    subclasses = [
+        subclass
+        for subclass in Predicate.__subclasses__()
+        if subclass in typed_predicate_type_registry() and (klass is not Any or subclass in _any_value_predicate_types)
+    ]
 
     iterables = [generate_predicate(subclass, max_depth=max_depth, klass=klass) for subclass in subclasses]
 
