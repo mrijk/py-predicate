@@ -1403,9 +1403,9 @@ def generate_count(count_predicate: CountPredicate[Any]) -> Iterator[Any]:
 
 def _yield_subclasses(klasses: list[type]) -> Iterator[Any]:
     while True:
-        for klass in klasses:
-            yield klass
-            yield from klass.__subclasses__()
+        candidates = [candidate for klass in klasses for candidate in (klass, *klass.__subclasses__())]
+        # An abstract class (e.g. Predicate) can't be used as a concrete one; keep it if nothing else is left
+        yield from [candidate for candidate in candidates if not inspect.isabstract(candidate)] or candidates
 
 
 @generate_true.register(IsSamePredicate)

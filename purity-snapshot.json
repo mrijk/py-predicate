@@ -29,7 +29,7 @@
         "pure": true,
         "exercise": {
           "status": "failed",
-          "detail": "SpecViolationError: Not conform spec: {'result': False, 'reason': '<generator object _ at 0x106a3a040> is not an instance of type AbstractContextManager'}",
+          "detail": "SpecViolationError: Not conform spec: {'result': False, 'reason': '<generator object _ at 0x10859e240> is not an instance of type AbstractContextManager'}",
           "runs": 3,
           "flaky": false,
           "statuses": {
@@ -50,13 +50,13 @@
         "category": "system",
         "reason": "calls typer.echo (__main__.py:36) -> calls sys.getdefaultencoding (_compat.py:50)",
         "exercise": {
-          "status": "blocked",
-          "detail": "open a for writing",
+          "status": "failed",
+          "detail": "ValueError: max_workers must be greater than 0",
           "runs": 3,
           "flaky": true,
           "statuses": {
-            "blocked": 2,
-            "failed": 1
+            "failed": 2,
+            "blocked": 1
           }
         }
       }
@@ -152,7 +152,7 @@
         "reason": "calls os.environ.get (sandbox.py:125)",
         "exercise": {
           "status": "blocked",
-          "detail": "open /tmp/9af2ddlv for writing",
+          "detail": "open /tmp/jpx1s5j4 for writing",
           "runs": 3,
           "flaky": false,
           "statuses": {
@@ -172,7 +172,7 @@
         "pure": true,
         "exercise": {
           "status": "failed",
-          "detail": "TypeError: '<=' not supported between instances of 'str' and 'int'",
+          "detail": "TypeError: '<' not supported between instances of 'datetime.datetime' and 'int'",
           "runs": 3,
           "flaky": false,
           "statuses": {
@@ -249,12 +249,11 @@
         "pure": true,
         "exercise": {
           "status": "failed",
-          "detail": "TypeError: '>' not supported between instances of 'str' and 'int'",
+          "detail": "TypeError: '>=' not supported between instances of 'str' and 'int'",
           "runs": 3,
-          "flaky": true,
+          "flaky": false,
           "statuses": {
-            "failed": 2,
-            "timeout": 1
+            "failed": 3
           }
         }
       },
@@ -265,12 +264,12 @@
         "category": "randomness",
         "reason": "calls random_iterables (generate_false.py:209) -> calls random.choice (helpers.py:317)",
         "exercise": {
-          "status": "failed",
-          "detail": "TypeError: '>' not supported between instances of 'str' and 'int'",
+          "status": "timeout",
+          "detail": "no result within 10.0s",
           "runs": 3,
           "flaky": false,
           "statuses": {
-            "failed": 3
+            "timeout": 3
           }
         }
       },
@@ -284,8 +283,8 @@
           "runs": 3,
           "flaky": true,
           "statuses": {
-            "ok": 1,
-            "timeout": 2
+            "ok": 2,
+            "timeout": 1
           }
         }
       },
@@ -369,7 +368,7 @@
         "reason": "calls generate_anys (generate_false.py:545) -> calls random.randint (helpers.py:298)",
         "exercise": {
           "status": "failed",
-          "detail": "IndexError: tuple index out of range",
+          "detail": "TypeError: isinstance() arg 2 must be a type, a tuple of types, or a union",
           "runs": 3,
           "flaky": false,
           "statuses": {
@@ -382,13 +381,13 @@
         "line": 577,
         "pure": true,
         "exercise": {
-          "status": "failed",
-          "detail": "TypeError: '>=' not supported between instances of 'str' and 'int'",
+          "status": "timeout",
+          "detail": "no result within 10.0s",
           "runs": 3,
           "flaky": true,
           "statuses": {
-            "failed": 2,
-            "timeout": 1
+            "timeout": 1,
+            "ok": 2
           }
         }
       },
@@ -414,12 +413,11 @@
         "reason": "calls random_first_from_iterables (generate_false.py:609) -> calls random.choice (helpers.py:44)",
         "exercise": {
           "status": "failed",
-          "detail": "ValueError: Couldn't generate values that satisfy not_in_p() | le_p(0)",
+          "detail": "TypeError: '<' not supported between instances of 'str' and 'int'",
           "runs": 3,
-          "flaky": true,
+          "flaky": false,
           "statuses": {
-            "failed": 2,
-            "timeout": 1
+            "failed": 3
           }
         }
       },
@@ -430,13 +428,14 @@
         "category": "randomness",
         "reason": "calls random.randint (generate_false.py:620)",
         "exercise": {
-          "status": "failed",
-          "detail": "TypeError: '>=' not supported between instances of 'str' and 'int'",
+          "status": "timeout",
+          "detail": "no result within 10.0s",
           "runs": 3,
           "flaky": true,
           "statuses": {
-            "failed": 2,
-            "timeout": 1
+            "timeout": 1,
+            "ok": 1,
+            "failed": 1
           }
         }
       },
@@ -452,8 +451,8 @@
           "runs": 3,
           "flaky": true,
           "statuses": {
-            "timeout": 2,
-            "failed": 1
+            "timeout": 1,
+            "failed": 2
           }
         }
       },
@@ -465,23 +464,7 @@
         "reason": "calls _generate_at_least_one_false (generate_false.py:663) -> calls random.randint (generate_false.py:739)",
         "exercise": {
           "status": "failed",
-          "detail": "ValueError: first() was called on an empty iterable, and no default value was provided.",
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "failed": 3
-          }
-        }
-      },
-      {
-        "name": "generate_set_of_p",
-        "line": 695,
-        "pure": false,
-        "category": "randomness",
-        "reason": "calls _generate_at_least_one_false (generate_false.py:702) -> calls random.randint (generate_false.py:739)",
-        "exercise": {
-          "status": "failed",
-          "detail": "ValueError: first() was called on an empty iterable, and no default value was provided.",
+          "detail": "TypeError: '<=' not supported between instances of 'str' and 'int'",
           "runs": 3,
           "flaky": true,
           "statuses": {
@@ -491,11 +474,11 @@
         }
       },
       {
-        "name": "generate_frozenset_of_p",
-        "line": 708,
+        "name": "generate_set_of_p",
+        "line": 695,
         "pure": false,
         "category": "randomness",
-        "reason": "calls generate_set_of_p (generate_false.py:713) -> calls random.randint (generate_false.py:739)",
+        "reason": "calls _generate_at_least_one_false (generate_false.py:702) -> calls random.randint (generate_false.py:739)",
         "exercise": {
           "status": "timeout",
           "detail": "no result within 10.0s",
@@ -508,18 +491,35 @@
         }
       },
       {
+        "name": "generate_frozenset_of_p",
+        "line": 708,
+        "pure": false,
+        "category": "randomness",
+        "reason": "calls generate_set_of_p (generate_false.py:713) -> calls random.randint (generate_false.py:739)",
+        "exercise": {
+          "status": "failed",
+          "detail": "ValueError: Couldn't generate values that satisfy ne_p(0) ^ eq_p(0) | ~not_in_p()",
+          "runs": 3,
+          "flaky": false,
+          "statuses": {
+            "failed": 3
+          }
+        }
+      },
+      {
         "name": "generate_xor",
         "line": 716,
         "pure": false,
         "category": "randomness",
         "reason": "calls random_first_from_iterables (generate_false.py:729) -> calls random.choice (helpers.py:44)",
         "exercise": {
-          "status": "failed",
-          "detail": "TypeError: '<=' not supported between instances of 'str' and 'int'",
+          "status": "timeout",
+          "detail": "no result within 10.0s",
           "runs": 3,
-          "flaky": false,
+          "flaky": true,
           "statuses": {
-            "failed": 3
+            "timeout": 1,
+            "failed": 2
           }
         }
       },
@@ -535,8 +535,8 @@
           "runs": 3,
           "flaky": true,
           "statuses": {
-            "timeout": 1,
-            "failed": 2
+            "timeout": 2,
+            "failed": 1
           }
         }
       },
@@ -559,12 +559,13 @@
         "line": 779,
         "pure": true,
         "exercise": {
-          "status": "failed",
-          "detail": "ValueError: Couldn't generate values that satisfy lt_p(0) | (ge_p(0) | (lt_p(0) ^ not_in_p()) & ge_p(0))",
+          "status": "timeout",
+          "detail": "no result within 10.0s",
           "runs": 3,
-          "flaky": false,
+          "flaky": true,
           "statuses": {
-            "failed": 3
+            "timeout": 1,
+            "failed": 2
           }
         }
       },
@@ -576,12 +577,11 @@
         "reason": "calls random.choice (generate_false.py:811)",
         "exercise": {
           "status": "failed",
-          "detail": "ValueError: Couldn't generate values that satisfy le_p(0) | not_in_p()",
+          "detail": "TypeError: '>=' not supported between instances of 'str' and 'int'",
           "runs": 3,
-          "flaky": true,
+          "flaky": false,
           "statuses": {
-            "failed": 2,
-            "timeout": 1
+            "failed": 3
           }
         }
       },
@@ -635,10 +635,9 @@
           "status": "timeout",
           "detail": "no result within 10.0s",
           "runs": 3,
-          "flaky": true,
+          "flaky": false,
           "statuses": {
-            "timeout": 2,
-            "ok": 1
+            "timeout": 3
           }
         }
       },
@@ -647,12 +646,13 @@
         "line": 908,
         "pure": true,
         "exercise": {
-          "status": "failed",
-          "detail": "RuntimeError: generator raised StopIteration",
+          "status": "timeout",
+          "detail": "no result within 10.0s",
           "runs": 3,
-          "flaky": false,
+          "flaky": true,
           "statuses": {
-            "failed": 3
+            "timeout": 1,
+            "failed": 2
           }
         }
       },
@@ -666,10 +666,9 @@
           "status": "failed",
           "detail": "RuntimeError: generator raised StopIteration",
           "runs": 3,
-          "flaky": true,
+          "flaky": false,
           "statuses": {
-            "failed": 2,
-            "timeout": 1
+            "failed": 3
           }
         }
       }
@@ -685,7 +684,7 @@
         "pure": true,
         "exercise": {
           "status": "failed",
-          "detail": "ValueError: No generator found for <class 'predicate.predicate.Predicate'>",
+          "detail": "ValueError: No generator found for <class 'predicate.accepts_predicate.AcceptsPredicate'>",
           "runs": 3,
           "flaky": false,
           "statuses": {
@@ -727,7 +726,7 @@
         "pure": true,
         "exercise": {
           "status": "failed",
-          "detail": "ValueError: No generator found for <class 'async_generator'>",
+          "detail": "ValueError: No generator found for <class 'type'>",
           "runs": 3,
           "flaky": false,
           "statuses": {
@@ -825,7 +824,7 @@
         "pure": true,
         "exercise": {
           "status": "failed",
-          "detail": "ValueError: No generator found for <class 'async_generator'>",
+          "detail": "ValueError: No generator found for <class 'type'>",
           "runs": 3,
           "flaky": false,
           "statuses": {
@@ -839,7 +838,7 @@
         "pure": true,
         "exercise": {
           "status": "failed",
-          "detail": "ValueError: No generator found for <class 'type'>",
+          "detail": "ValueError: No generator found for <class 'async_generator'>",
           "runs": 3,
           "flaky": false,
           "statuses": {
@@ -908,13 +907,13 @@
         "category": "randomness",
         "reason": "calls random_first_from_iterables (generate_true.py:370) -> calls random.choice (helpers.py:44)",
         "exercise": {
-          "status": "timeout",
-          "detail": "no result within 10.0s",
+          "status": "failed",
+          "detail": "TypeError: '>' not supported between instances of 'str' and 'int'",
           "runs": 3,
           "flaky": true,
           "statuses": {
-            "timeout": 1,
-            "failed": 2
+            "failed": 2,
+            "timeout": 1
           }
         }
       },
@@ -949,37 +948,19 @@
         }
       },
       {
-        "name": "generate_has_key",
-        "line": 477,
-        "pure": false,
-        "category": "randomness",
-        "reason": "calls random_anys (generate_true.py:480) -> calls random.randint (helpers.py:298)",
-        "exercise": {
-          "status": "timeout",
-          "detail": "no result within 10.0s",
-          "runs": 3,
-          "flaky": true,
-          "statuses": {
-            "timeout": 1,
-            "ok": 2
-          }
-        }
-      },
-      {
         "name": "generate_has_length",
         "line": 483,
         "pure": false,
         "category": "randomness",
         "reason": "calls random_iterables (generate_true.py:485) -> calls random.choice (helpers.py:317)",
         "exercise": {
-          "status": "failed",
-          "detail": "TypeError: '>' not supported between instances of 'str' and 'int'",
+          "status": "timeout",
+          "detail": "no result within 10.0s",
           "runs": 3,
           "flaky": true,
           "statuses": {
-            "failed": 1,
-            "ok": 1,
-            "timeout": 1
+            "timeout": 2,
+            "failed": 1
           }
         }
       },
@@ -988,13 +969,13 @@
         "line": 488,
         "pure": true,
         "exercise": {
-          "status": "timeout",
-          "detail": "no result within 10.0s",
+          "status": "failed",
+          "detail": "TypeError: '<=' not supported between instances of 'str' and 'int'",
           "runs": 3,
           "flaky": true,
           "statuses": {
-            "ok": 2,
-            "timeout": 1
+            "failed": 2,
+            "ok": 1
           }
         }
       },
@@ -1075,13 +1056,13 @@
         "line": 664,
         "pure": true,
         "exercise": {
-          "status": "failed",
-          "detail": "RuntimeError: generator raised StopIteration",
+          "status": "timeout",
+          "detail": "no result within 10.0s",
           "runs": 3,
           "flaky": true,
           "statuses": {
-            "failed": 1,
-            "timeout": 2
+            "timeout": 2,
+            "failed": 1
           }
         }
       },
@@ -1091,7 +1072,7 @@
         "pure": true,
         "exercise": {
           "status": "failed",
-          "detail": "ValueError: Stop argument for islice() must be None or an integer: 0 <= x <= sys.maxsize.",
+          "detail": "ValueError: Indices for islice() must be None or an integer: 0 <= x <= sys.maxsize.",
           "runs": 3,
           "flaky": false,
           "statuses": {
@@ -1104,13 +1085,13 @@
         "line": 726,
         "pure": true,
         "exercise": {
-          "status": "timeout",
-          "detail": "no result within 10.0s",
+          "status": "failed",
+          "detail": "TypeError: '>=' not supported between instances of 'str' and 'int'",
           "runs": 3,
           "flaky": true,
           "statuses": {
-            "timeout": 2,
-            "ok": 1
+            "ok": 2,
+            "failed": 1
           }
         }
       },
@@ -1135,13 +1116,12 @@
         "category": "randomness",
         "reason": "calls random_first_from_iterables (generate_true.py:772) -> calls random.choice (helpers.py:44)",
         "exercise": {
-          "status": "failed",
-          "detail": "TypeError: '>' not supported between instances of 'str' and 'int'",
+          "status": "timeout",
+          "detail": "no result within 10.0s",
           "runs": 3,
           "flaky": true,
           "statuses": {
-            "failed": 1,
-            "timeout": 1,
+            "timeout": 2,
             "ok": 1
           }
         }
@@ -1156,8 +1136,8 @@
           "runs": 3,
           "flaky": true,
           "statuses": {
-            "timeout": 2,
-            "failed": 1
+            "timeout": 1,
+            "failed": 2
           }
         }
       },
@@ -1226,13 +1206,12 @@
         "line": 1234,
         "pure": true,
         "exercise": {
-          "status": "failed",
-          "detail": "TypeError: '>' not supported between instances of 'str' and 'int'",
+          "status": "timeout",
+          "detail": "no result within 10.0s",
           "runs": 3,
-          "flaky": true,
+          "flaky": false,
           "statuses": {
-            "failed": 2,
-            "timeout": 1
+            "timeout": 3
           }
         }
       },
@@ -1241,13 +1220,12 @@
         "line": 1263,
         "pure": true,
         "exercise": {
-          "status": "timeout",
-          "detail": "no result within 10.0s",
+          "status": "failed",
+          "detail": "ValueError: Couldn't generate values that satisfy not_in_p() | ge_p(0)",
           "runs": 3,
-          "flaky": true,
+          "flaky": false,
           "statuses": {
-            "timeout": 2,
-            "failed": 1
+            "failed": 3
           }
         }
       },
@@ -1261,8 +1239,8 @@
           "runs": 3,
           "flaky": true,
           "statuses": {
-            "failed": 2,
-            "timeout": 1
+            "failed": 1,
+            "timeout": 2
           }
         }
       },
@@ -1301,13 +1279,12 @@
         "line": 1317,
         "pure": true,
         "exercise": {
-          "status": "timeout",
-          "detail": "no result within 10.0s",
+          "status": "failed",
+          "detail": "RuntimeError: generator raised StopIteration",
           "runs": 3,
-          "flaky": true,
+          "flaky": false,
           "statuses": {
-            "timeout": 2,
-            "failed": 1
+            "failed": 3
           }
         }
       },
@@ -1336,8 +1313,8 @@
           "runs": 3,
           "flaky": true,
           "statuses": {
-            "failed": 1,
-            "timeout": 2
+            "failed": 2,
+            "timeout": 1
           }
         }
       },
@@ -1347,11 +1324,12 @@
         "pure": true,
         "exercise": {
           "status": "failed",
-          "detail": "RuntimeError: generator raised StopIteration",
+          "detail": "TypeError: '>' not supported between instances of 'str' and 'int'",
           "runs": 3,
-          "flaky": false,
+          "flaky": true,
           "statuses": {
-            "failed": 3
+            "failed": 2,
+            "timeout": 1
           }
         }
       },
@@ -1360,13 +1338,13 @@
         "line": 1374,
         "pure": true,
         "exercise": {
-          "status": "timeout",
-          "detail": "no result within 10.0s",
+          "status": "failed",
+          "detail": "RuntimeError: generator raised StopIteration",
           "runs": 3,
           "flaky": true,
           "statuses": {
-            "timeout": 2,
-            "failed": 1
+            "failed": 2,
+            "timeout": 1
           }
         }
       },
@@ -1378,7 +1356,7 @@
         "reason": "calls random.choice (generate_true.py:1396)",
         "exercise": {
           "status": "failed",
-          "detail": "RuntimeError: generator raised StopIteration",
+          "detail": "ValueError: Stop argument for islice() must be None or an integer: 0 <= x <= sys.maxsize.",
           "runs": 3,
           "flaky": false,
           "statuses": {
@@ -1429,48 +1407,19 @@
         "line": 88,
         "pure": true,
         "exercise": {
-          "status": "failed",
-          "detail": "TypeError: '>' not supported between instances of 'str' and 'int'",
+          "status": "timeout",
+          "detail": "no result within 10.0s",
           "runs": 3,
           "flaky": true,
           "statuses": {
-            "failed": 2,
-            "timeout": 1
+            "timeout": 2,
+            "failed": 1
           }
         }
       },
       {
         "name": "random_signatures",
         "line": 97,
-        "pure": true,
-        "exercise": {
-          "status": "failed",
-          "detail": "TypeError: '>=' not supported between instances of 'str' and 'int'",
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "failed": 3
-          }
-        }
-      },
-      {
-        "name": "random_functions",
-        "line": 124,
-        "pure": true,
-        "exercise": {
-          "status": "timeout",
-          "detail": "no result within 10.0s",
-          "runs": 3,
-          "flaky": true,
-          "statuses": {
-            "timeout": 1,
-            "failed": 2
-          }
-        }
-      },
-      {
-        "name": "random_callable_objects",
-        "line": 128,
         "pure": true,
         "exercise": {
           "status": "failed",
@@ -1484,8 +1433,23 @@
         }
       },
       {
-        "name": "random_lengths",
-        "line": 132,
+        "name": "random_functions",
+        "line": 124,
+        "pure": true,
+        "exercise": {
+          "status": "failed",
+          "detail": "TypeError: '<=' not supported between instances of 'str' and 'int'",
+          "runs": 3,
+          "flaky": true,
+          "statuses": {
+            "failed": 2,
+            "timeout": 1
+          }
+        }
+      },
+      {
+        "name": "random_callable_objects",
+        "line": 128,
         "pure": true,
         "exercise": {
           "status": "timeout",
@@ -1493,8 +1457,22 @@
           "runs": 3,
           "flaky": true,
           "statuses": {
-            "timeout": 2,
-            "failed": 1
+            "timeout": 1,
+            "failed": 2
+          }
+        }
+      },
+      {
+        "name": "random_lengths",
+        "line": 132,
+        "pure": true,
+        "exercise": {
+          "status": "timeout",
+          "detail": "no result within 10.0s",
+          "runs": 3,
+          "flaky": false,
+          "statuses": {
+            "timeout": 3
           }
         }
       },
@@ -1534,13 +1512,13 @@
         "line": 211,
         "pure": true,
         "exercise": {
-          "status": "failed",
-          "detail": "TypeError: '>' not supported between instances of 'str' and 'int'",
+          "status": "timeout",
+          "detail": "no result within 10.0s",
           "runs": 3,
           "flaky": true,
           "statuses": {
-            "failed": 1,
-            "timeout": 2
+            "timeout": 1,
+            "failed": 2
           }
         }
       },
@@ -1550,12 +1528,12 @@
         "pure": true,
         "exercise": {
           "status": "failed",
-          "detail": "TypeError: '<=' not supported between instances of 'str' and 'int'",
+          "detail": "TypeError: '>' not supported between instances of 'str' and 'int'",
           "runs": 3,
           "flaky": true,
           "statuses": {
-            "failed": 1,
-            "timeout": 2
+            "failed": 2,
+            "timeout": 1
           }
         }
       },
@@ -1564,12 +1542,12 @@
         "line": 245,
         "pure": true,
         "exercise": {
-          "status": "failed",
-          "detail": "TypeError: '>' not supported between instances of 'str' and 'int'",
+          "status": "timeout",
+          "detail": "no result within 10.0s",
           "runs": 3,
           "flaky": false,
           "statuses": {
-            "failed": 3
+            "timeout": 3
           }
         }
       },
@@ -1596,13 +1574,12 @@
         "category": "randomness",
         "reason": "calls random.choice (helpers.py:317)",
         "exercise": {
-          "status": "timeout",
-          "detail": "no result within 10.0s",
+          "status": "failed",
+          "detail": "TypeError: '>' not supported between instances of 'str' and 'int'",
           "runs": 3,
-          "flaky": true,
+          "flaky": false,
           "statuses": {
-            "timeout": 2,
-            "failed": 1
+            "failed": 3
           }
         }
       },
@@ -1625,13 +1602,13 @@
         "line": 330,
         "pure": true,
         "exercise": {
-          "status": "timeout",
-          "detail": "no result within 10.0s",
+          "status": "failed",
+          "detail": "TypeError: '<' not supported between instances of 'str' and 'int'",
           "runs": 3,
           "flaky": true,
           "statuses": {
-            "timeout": 2,
-            "failed": 1
+            "failed": 1,
+            "timeout": 2
           }
         }
       },
@@ -1737,9 +1714,10 @@
           "status": "timeout",
           "detail": "no result within 10.0s",
           "runs": 3,
-          "flaky": false,
+          "flaky": true,
           "statuses": {
-            "timeout": 3
+            "timeout": 2,
+            "ok": 1
           }
         }
       },
@@ -1765,11 +1743,12 @@
         "reason": "calls random_anys (helpers.py:442) -> calls random.randint (helpers.py:298)",
         "exercise": {
           "status": "failed",
-          "detail": "TypeError: '<' not supported between instances of 'str' and 'int'",
+          "detail": "TypeError: '>' not supported between instances of 'str' and 'int'",
           "runs": 3,
-          "flaky": false,
+          "flaky": true,
           "statuses": {
-            "failed": 3
+            "failed": 2,
+            "timeout": 1
           }
         }
       },
@@ -1793,7 +1772,7 @@
         "pure": true,
         "exercise": {
           "status": "failed",
-          "detail": "AttributeError: 'function' object has no attribute 'register'",
+          "detail": "AttributeError: 'CallableObject' object has no attribute 'register'",
           "runs": 3,
           "flaky": false,
           "statuses": {
@@ -1822,13 +1801,13 @@
         "line": 536,
         "pure": true,
         "exercise": {
-          "status": "timeout",
-          "detail": "no result within 10.0s",
+          "status": "failed",
+          "detail": "TypeError: '>' not supported between instances of 'str' and 'int'",
           "runs": 3,
           "flaky": true,
           "statuses": {
-            "timeout": 2,
-            "failed": 1
+            "failed": 2,
+            "timeout": 1
           }
         }
       },
@@ -1882,7 +1861,7 @@
         "reason": "calls _arguments (from_spec.py:30) -> calls exec (reflection.py:371)",
         "exercise": {
           "status": "failed",
-          "detail": "InvalidSpecError: Parameter '' not in function signature",
+          "detail": "InvalidSpecError: Cannot derive spec for '<lambda>': missing return annotation; pass a Spec or annotate it",
           "runs": 3,
           "flaky": false,
           "statuses": {
@@ -1899,28 +1878,6 @@
         "exercise": {
           "status": "failed",
           "detail": "NotImplementedError: given_spec only supports functions for now, not classes or callable objects",
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "failed": 3
-          }
-        }
-      }
-    ]
-  },
-  {
-    "path": "predicate/integrations/hypothesis/predicates.py",
-    "file_name": "predicates.py",
-    "functions": [
-      {
-        "name": "predicates",
-        "line": 33,
-        "pure": false,
-        "category": "system",
-        "reason": "calls st.builds (predicates.py:43) -> calls sys.modules.get (core.py:1234)",
-        "exercise": {
-          "status": "failed",
-          "detail": "TypeError: cannot pickle '_thread._local' object",
           "runs": 3,
           "flaky": false,
           "statuses": {
@@ -2002,12 +1959,12 @@
         "pure": true,
         "exercise": {
           "status": "failed",
-          "detail": "TypeError: '<' not supported between instances of 'datetime.datetime' and 'int'",
+          "detail": "TypeError: '>' not supported between instances of 'str' and 'int'",
           "runs": 3,
           "flaky": true,
           "statuses": {
-            "failed": 2,
-            "ok": 1
+            "ok": 2,
+            "failed": 1
           }
         }
       },
@@ -2021,8 +1978,8 @@
           "runs": 3,
           "flaky": true,
           "statuses": {
-            "failed": 1,
-            "ok": 2
+            "ok": 2,
+            "failed": 1
           }
         }
       }
@@ -2038,7 +1995,7 @@
         "pure": true,
         "exercise": {
           "status": "failed",
-          "detail": "UnexpectedCharacters: No terminal matches '1' in the current parser context, at line 1 col 5\n\nQCpR1UW\n    ^\nExpected one of: \n\t* __ANON_0\n\t* VBAR\n\t* CIRCUMFLEX\n\t* AMPERSAND\n",
+          "detail": "UnexpectedCharacters: No terminal matches '9' in the current parser context, at line 1 col 2\n\nd9G\n ^\nExpected one of: \n\t* VBAR\n\t* CIRCUMFLEX\n\t* __ANON_0\n\t* AMPERSAND\n",
           "runs": 3,
           "flaky": false,
           "statuses": {
@@ -2100,7 +2057,7 @@
         "reason": "calls _resolve_class_spec (exercise_class.py:73) -> calls sys.modules.get (type_checking.py:182)",
         "exercise": {
           "status": "failed",
-          "detail": "InvalidSpecError: Parameter '' not in function signature",
+          "detail": "InvalidSpecError: Cannot derive spec for 'function': missing return annotation; pass a Spec or annotate it",
           "runs": 3,
           "flaky": false,
           "statuses": {
@@ -2154,7 +2111,7 @@
         "reason": "calls _resolve_function_spec (exercise_function.py:56) -> calls sys.modules.get (type_checking.py:182)",
         "exercise": {
           "status": "failed",
-          "detail": "InvalidSpecError: Cannot derive spec for '<lambda>': missing return annotation; pass a Spec or annotate it",
+          "detail": "InvalidSpecError: Parameter '' not in function signature",
           "runs": 3,
           "flaky": false,
           "statuses": {
@@ -2170,7 +2127,7 @@
         "reason": "calls _resolve_function_spec (exercise_function.py:79) -> calls sys.modules.get (type_checking.py:182)",
         "exercise": {
           "status": "failed",
-          "detail": "InvalidSpecError: Cannot derive spec for '<lambda>': missing return annotation; pass a Spec or annotate it",
+          "detail": "InvalidSpecError: Unannotated parameter 'aa' not in spec",
           "runs": 3,
           "flaky": false,
           "statuses": {
@@ -2224,7 +2181,7 @@
         "reason": "calls resolved_signature (exercise_helpers.py:505) -> calls sys.modules.get (type_checking.py:182)",
         "exercise": {
           "status": "failed",
-          "detail": "InvalidSpecError: Parameter '' not in function signature",
+          "detail": "InvalidSpecError: Return annotation not in spec",
           "runs": 3,
           "flaky": false,
           "statuses": {
@@ -2238,7 +2195,7 @@
         "pure": true,
         "exercise": {
           "status": "failed",
-          "detail": "ValueError: Indices for islice() must be None or an integer: 0 <= x <= sys.maxsize.",
+          "detail": "KeyError: 'ret'",
           "runs": 3,
           "flaky": false,
           "statuses": {
@@ -2252,7 +2209,7 @@
         "pure": true,
         "exercise": {
           "status": "failed",
-          "detail": "KeyError: 'P'",
+          "detail": "KeyError: ''",
           "runs": 3,
           "flaky": false,
           "statuses": {
@@ -2268,7 +2225,7 @@
         "reason": "calls type_var_failure (exercise_helpers.py:759) -> calls sys.modules.get (exercise_helpers.py:341)",
         "exercise": {
           "status": "failed",
-          "detail": "SpecViolationError: Not conform spec: {'result': False, 'reason': 'False is not less than 0'}",
+          "detail": "SpecViolationError: Not conform spec: {'result': False, 'predicate': {'result': True}, 'reason': 'not le_p(0)'}",
           "runs": 3,
           "flaky": false,
           "statuses": {
@@ -2296,7 +2253,7 @@
         "pure": true,
         "exercise": {
           "status": "failed",
-          "detail": "SpecViolationError: Not conform spec: yielded {'result': False, 'index': 0, 'value': 0, 'left': {'result': True}, 'right': {'result': True}} for inputs {'': 0, 'yy': -1, 'fVNRrvR0r': 4}",
+          "detail": "TypeError: '<=' not supported between instances of 'datetime.datetime' and 'int'",
           "runs": 3,
           "flaky": false,
           "statuses": {
@@ -2310,7 +2267,7 @@
         "pure": true,
         "exercise": {
           "status": "failed",
-          "detail": "ValueError: ",
+          "detail": "OSError: ",
           "runs": 3,
           "flaky": false,
           "statuses": {
@@ -2354,7 +2311,7 @@
         "reason": "calls resolve_signature (instrument_function.py:46) -> calls sys.modules.get (type_checking.py:182)",
         "exercise": {
           "status": "failed",
-          "detail": "InvalidSpecError: Snapshot parameter 'P' not in function signature",
+          "detail": "InvalidSpecError: Snapshot parameter 'p' not in function signature",
           "runs": 3,
           "flaky": false,
           "statuses": {
@@ -2430,7 +2387,7 @@
         "pure": true,
         "exercise": {
           "status": "failed",
-          "detail": "ValueError: Type not allowed: lt_p(0)",
+          "detail": "ValueError: Type not allowed: ne_p(0)",
           "runs": 3,
           "flaky": false,
           "statuses": {
@@ -2444,7 +2401,7 @@
         "pure": true,
         "exercise": {
           "status": "failed",
-          "detail": "ValueError: Type not allowed: not_in_p()",
+          "detail": "ValueError: Type not allowed: gt_p(0)",
           "runs": 3,
           "flaky": false,
           "statuses": {
@@ -2458,7 +2415,7 @@
         "pure": true,
         "exercise": {
           "status": "failed",
-          "detail": "ValueError: Type not allowed: not_in_p()",
+          "detail": "ValueError: Type not allowed: gt_p(0)",
           "runs": 3,
           "flaky": false,
           "statuses": {
