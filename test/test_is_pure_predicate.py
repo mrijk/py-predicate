@@ -1,10 +1,12 @@
+import inspect
 import os
 import random
 from datetime import datetime
 
+import purity_helper as helper_module
+
 from predicate import is_pure_p
 from predicate.is_pure_predicate import find_impurity
-from test import purity_helper as helper_module
 
 counter = 0
 
@@ -121,14 +123,26 @@ def test_transitive_via_closure():
     assert not is_pure_p(outer)
 
 
+def line_of(fn, text):
+    lines, start = inspect.getsourcelines(fn)
+    return start + next(i for i, line in enumerate(lines) if text in line)
+
+
 def test_find_impurity():
+    here = "test_is_pure_predicate.py"
     assert find_impurity(pure) is None
-    assert find_impurity(uses_global) == ("global-state", "global statement (test_is_pure_predicate.py:17)")
-    assert find_impurity(uses_random) == ("randomness", "calls random.random (test_is_pure_predicate.py:28)")
-    assert find_impurity(uses_os) == ("system", "calls os.getcwd (test_is_pure_predicate.py:36)")
+    assert find_impurity(uses_global) == (
+        "global-state",
+        f"global statement ({here}:{line_of(uses_global, 'global counter')})",
+    )
+    assert find_impurity(uses_random) == (
+        "randomness",
+        f"calls random.random ({here}:{line_of(uses_random, 'random.random')})",
+    )
+    assert find_impurity(uses_os) == ("system", f"calls os.getcwd ({here}:{line_of(uses_os, 'os.getcwd')})")
     assert find_impurity(calls_impure) == (
         "io",
-        "calls uses_print (test_is_pure_predicate.py:70) -> calls print (test_is_pure_predicate.py:23)",
+        f"calls uses_print ({here}:{line_of(calls_impure, 'return uses_print')}) -> calls print ({here}:{line_of(uses_print, '    print(')})",
     )
     assert find_impurity(len) == ("no-source", "no source available")
 
