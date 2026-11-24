@@ -167,3 +167,16 @@ def test_cli_failed_needs_exercise(tmp_path):
     (tmp_path / "mod.py").write_text("def f(x: int) -> int:\n    return x\n")
 
     assert CliRunner().invoke(app, [str(tmp_path / "mod.py"), "--failed"]).exit_code != 0
+
+
+def test_exercise_detects_mutated_arguments(tmp_path):
+    (tmp_path / "mod.py").write_text(
+        "def append(lst: list[int], x: int) -> None:\n    lst.append(x)\n\n\n"
+        "def concat(lst: list[int], x: int) -> list[int]:\n    return [*lst, x]\n"
+    )
+
+    modules = analyze(tmp_path / "mod.py", exercise=True, calls=5, timeout=5, runs=1)
+
+    exercise = {f["name"]: f["exercise"] for f in modules[0]["functions"]}
+    assert exercise["append"] == exercise["append"] | {"status": "mutates-args", "detail": "mutates lst"}
+    assert exercise["concat"]["status"] == "ok"

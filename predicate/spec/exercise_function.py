@@ -6,8 +6,10 @@ from more_itertools import take
 
 from predicate.spec.exercise_helpers import (
     GENERATOR_ITEMS,
+    bind_shared_type_vars,
     call_args,
     callable_name,
+    capture_old,
     check_exception,
     check_signature_against_spec,
     exercise_param_predicate,
@@ -36,7 +38,7 @@ def get_spec_from_function_annotation(f: Callable[..., Any]) -> Spec:
 
     spec: Spec = {"args": {}, "ret": get_return_predicate(sig)}
 
-    for key, parameter in _annotatable_parameters(sig.parameters):
+    for key, parameter in bind_shared_type_vars(dict(_annotatable_parameters(sig.parameters))).items():
         if parameter.annotation == parameter.empty:
             raise no_spec_error(callable_name(f), f"parameter '{key}' has no annotation")
         spec["args"][key] = exercise_param_predicate(parameter)
@@ -58,6 +60,7 @@ def exercise_function(f: Callable[..., Any], spec: Spec | None, n: int) -> Itera
 
     for value in values:
         args, kwargs = call_args(sig, value)
+        old = capture_old(spec, value)
         try:
             result = f(*args, **kwargs)
             # A generator's body only runs when it's iterated, so take its items here (#380)
@@ -65,7 +68,7 @@ def exercise_function(f: Callable[..., Any], spec: Spec | None, n: int) -> Itera
         except Exception as exc:
             yield tuple(value.values()), check_exception(spec, value, exc)
             continue
-        verify_result(spec, return_p, value, result, sig)
+        verify_result(spec, return_p, value, result, sig, old)
         if item_p is not None and items is not None:
             verify_items(item_p, value, items)
             result = items
@@ -80,6 +83,7 @@ async def async_exercise_function(f: Callable[..., Any], spec: Spec | None, n: i
 
     for value in values:
         args, kwargs = call_args(sig, value)
+        old = capture_old(spec, value)
         try:
             if item_p is None:
                 result = await f(*args, **kwargs)
@@ -91,7 +95,7 @@ async def async_exercise_function(f: Callable[..., Any], spec: Spec | None, n: i
         except Exception as exc:
             yield tuple(value.values()), check_exception(spec, value, exc)
             continue
-        verify_result(spec, return_p, value, result, sig)
+        verify_result(spec, return_p, value, result, sig, old)
         if item_p is not None and items is not None:
             verify_items(item_p, value, items)
             result = items

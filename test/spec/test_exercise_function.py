@@ -6,7 +6,16 @@ import logging
 import re
 import time
 import types
-from collections.abc import AsyncGenerator, AsyncIterable, AsyncIterator, Awaitable, Generator, Iterator
+from collections.abc import (
+    AsyncGenerator,
+    AsyncIterable,
+    AsyncIterator,
+    Awaitable,
+    Callable,
+    Generator,
+    Iterable,
+    Iterator,
+)
 from functools import partial
 from typing import Any, ForwardRef, TypeVar
 
@@ -25,7 +34,9 @@ from predicate import (
     is_str_p,
     pos_p,
 )
+from predicate.comp_predicate import comp_p
 from predicate.list_of_predicate import is_list_of_p
+from predicate.predicate import Predicate
 from predicate.spec.exercise import Spec, exercise
 from predicate.spec.exercise_function import get_spec_from_function_annotation
 from predicate.spec.exercise_helpers import GENERATOR_ITEMS, annotation_to_predicate
@@ -779,3 +790,52 @@ def test_exercise_generates_private_parameter_without_default():
         return _x
 
     assert all(args for args, _ in exercise(private, n=3))
+
+
+def test_exercise_passes_old_to_fn_with_snapshot():
+    def append(lst: list[int], x: int) -> None:
+        lst.append(x)
+
+    spec = {
+        "args": {"lst": is_list_of_p(is_int_p), "x": is_int_p},
+        "snapshot": {"lst": list.copy},
+        "fn": lambda lst, x, ret, old: len(lst) == len(old["lst"]) + 1,
+    }
+
+    assert len(list(exercise(append, spec, 5))) == 5
+
+
+def _first_false[T](iterable: Iterable[T], predicate: Predicate[T]) -> T | None:
+    return next((item for item in iterable if not predicate(item)), None)
+
+
+def test_exercise_binds_a_type_var_shared_by_parameters():
+    # without binding, the predicate may be one that can't evaluate the items of a mixed list
+    for _ in range(20):
+        assert len(list(exercise(_first_false, None, 10))) == 10
+
+
+def test_exercise_binds_a_shared_type_var_to_one_type():
+    seen = {type(item) for _run in range(20) for (items, _p), _r in exercise(_first_false, None, 10) for item in items}
+
+    assert seen <= {int, str, float, bool}
+
+
+def test_exercise_accepts_the_derived_spec_of_a_function_with_a_shared_type_var():
+    # the sandbox derives the spec first and passes it back in, so the derived spec has to validate against the signature
+    for _ in range(10):
+        spec = get_spec_from_function_annotation(_first_false)
+
+        assert len(list(exercise(_first_false, spec, 5))) == 5
+
+
+def _compose[S, T](fn: Callable[[S], T], predicate: Predicate[T]) -> Predicate[S]:
+    return comp_p(fn, predicate)
+
+
+def test_exercise_derived_spec_with_a_shared_and_a_single_use_type_var():
+    # T is shared by both parameters and gets bound, S is used once and stays free
+    for _ in range(10):
+        spec = get_spec_from_function_annotation(_compose)
+
+        assert len(list(exercise(_compose, spec, 3))) == 3

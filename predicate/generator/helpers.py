@@ -29,7 +29,7 @@ from uuid import UUID, uuid4
 from more_itertools import interleave, random_permutation, repeatfunc, take, unique_everseen
 
 from predicate.eq_predicate import eq_p
-from predicate.generator.generate_predicate import generate_predicate, typed_predicate_type_registry
+from predicate.generator.generate_predicate import PredicateKlass, generate_predicate, typed_predicate_type_registry
 from predicate.is_instance_predicate import is_int_p, is_str_p
 from predicate.predicate import Predicate
 from predicate.range_predicate import ge_le_p
@@ -168,7 +168,7 @@ if sys.version_info >= (3, 15):
         )
 
     def random_sentinels() -> Iterator[sentinel]:  # noqa: F821
-        yield from (sentinel(name) for name in random_strings(min_size=1))  # noqa: F821
+        yield from (sentinel(name) for name in random_strings(length_p=non_empty_length_p))  # noqa: F821
 
 
 if sys.version_info >= (3, 14):
@@ -196,7 +196,7 @@ def random_datetimes(lower: datetime | None = None, upper: datetime | None = Non
         yield start + timedelta(seconds=random_second)
 
 
-def random_predicates(*, max_depth: int = 10, klass: type = int) -> Iterator[Predicate[Any]]:
+def random_predicates(*, max_depth: int = 10, klass: PredicateKlass = int) -> Iterator[Predicate[Any]]:
     subclasses = [subclass for subclass in Predicate.__subclasses__() if subclass in typed_predicate_type_registry()]
 
     iterables = [generate_predicate(subclass, max_depth=max_depth, klass=klass) for subclass in subclasses]
@@ -205,6 +205,7 @@ def random_predicates(*, max_depth: int = 10, klass: type = int) -> Iterator[Pre
 
 
 default_length_p: Final = ge_le_p(lower=0, upper=10)
+non_empty_length_p: Final = ge_le_p(lower=1, upper=10)
 
 
 def random_sets(length_p: Predicate[Any] = default_length_p, value_p: Predicate[Any] = is_int_p) -> Iterator[set[Any]]:
@@ -241,11 +242,9 @@ def random_non_hashables() -> Iterator[Any]:
     yield from interleave(random_lists(), random_dicts())
 
 
-def random_strings(min_size: int = 0, max_size: int = 10) -> Iterator[str]:
+def random_strings(length_p: Predicate[Any] = default_length_p) -> Iterator[str]:
     population = string.ascii_letters + string.digits
-    while True:
-        length = random.randint(min_size, max_size)
-        yield "".join(choices(population, k=length))
+    yield from ("".join(choices(population, k=length)) for length in random_lengths(length_p))
 
 
 _CHARS = sorted(string.ascii_letters + string.digits)
@@ -534,8 +533,8 @@ def random_enum_members(klass: type[Enum]) -> Iterator[Enum]:
         yield from repeatfunc(random.choice, None, members)
 
 
-def random_bytes(min_size: int = 0, max_size: int = 10) -> Iterator[bytes]:
-    yield from repeatfunc(lambda: random.randbytes(random.randint(min_size, max_size)))
+def random_bytes(length_p: Predicate[Any] = default_length_p) -> Iterator[bytes]:
+    yield from map(random.randbytes, random_lengths(length_p))
 
 
 def random_bytearrays() -> Iterator[bytearray]:
@@ -557,7 +556,7 @@ def random_timedeltas() -> Iterator[timedelta]:
 
 
 def random_paths(klass: type[PurePath] = PurePath) -> Iterator[PurePath]:
-    segments = random_strings(min_size=1, max_size=8)
+    segments = random_strings(length_p=ge_le_p(lower=1, upper=8))
     while True:
         yield klass(*take(random.randint(0, 4), segments))
 
@@ -690,7 +689,7 @@ def random_ast_nodes(klass: type[ast.AST] = ast.AST) -> Iterator[ast.AST]:
 
 def random_log_records() -> Iterator[logging.LogRecord]:
     levels = [logging.DEBUG, logging.INFO, logging.WARNING, logging.ERROR, logging.CRITICAL]
-    names = random_strings(min_size=1)
+    names = random_strings(length_p=non_empty_length_p)
     # msg is used as a %-format string by getMessage(), so it must not contain a % without matching args
     messages = (message.replace("%", "%%") for message in random_strings())
     while True:
@@ -700,7 +699,9 @@ def random_log_records() -> Iterator[logging.LogRecord]:
 
 def random_loggers() -> Iterator[logging.Logger]:
     # ponytail: real loggers registered under a "predicate.generated" prefix; logging keeps them for the process
-    yield from (logging.getLogger(f"predicate.generated.{name}") for name in random_strings(min_size=1))
+    yield from (
+        logging.getLogger(f"predicate.generated.{name}") for name in random_strings(length_p=non_empty_length_p)
+    )
 
 
 _event_loops: list[asyncio.AbstractEventLoop] = []
