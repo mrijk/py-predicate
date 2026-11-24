@@ -1,9 +1,10 @@
 import json
+from pathlib import Path
 
 from typer.testing import CliRunner
 
 from predicate.coverage.__main__ import app
-from predicate.coverage.purity import analyze, summarize
+from predicate.coverage.purity import analyze, count_flaky, summarize, summarize_exercise
 
 SOURCE = """
 import random
@@ -49,3 +50,99 @@ def test_cli_summary_and_snapshot(tmp_path):
         "category": "randomness",
         "reason": "calls random.random (mod.py:8)",
     }
+
+
+EXERCISE_SOURCE = """
+import os
+
+def add(x: int, y: int) -> int:
+    return x + y
+
+def wrong_return(x: int) -> int:
+    return str(x)
+
+def unannotated(x):
+    return x
+
+def raises(x: int) -> int:
+    raise ValueError(x)
+
+def writes_file(x: int) -> int:
+    with open("sandbox_test_output.txt", "w") as f:
+        f.write("hello")
+    return x
+
+def deletes_file(x: int) -> int:
+    os.remove("PATH")
+    return x
+
+def swallows_violation(x: int) -> int:
+    try:
+        os.remove("PATH")
+    except BaseException:
+        pass
+    return x
+
+async def async_add(x: int) -> int:
+    return x
+
+def hangs(x: int) -> int:
+    while True:
+        pass
+
+def exits(x: int) -> int:
+    os._exit(3)
+"""
+
+
+def test_exercise_sandboxed(tmp_path):
+    victim = tmp_path / "victim.txt"
+    victim.write_text("precious")
+    (tmp_path / "mod.py").write_text(EXERCISE_SOURCE.replace("PATH", str(victim)))
+
+    modules = analyze(tmp_path / "mod.py", exercise=True, calls=3, timeout=5, runs=1)
+
+    status = {f["name"]: f["exercise"]["status"] for f in modules[0]["functions"]}
+    assert status == {
+        "add": "ok",
+        "wrong_return": "failed",
+        "unannotated": "not-exercisable",
+        "raises": "failed",
+        "writes_file": "blocked",
+        "deletes_file": "blocked",
+        "swallows_violation": "blocked",
+        "async_add": "ok",
+        "hangs": "timeout",
+        "exits": "crashed",
+    }
+    assert victim.read_text() == "precious"
+    assert not list(tmp_path.glob("sandbox_test_output.txt"))
+    assert not list(Path.cwd().glob("sandbox_test_output.txt"))
+    assert summarize_exercise(modules)["blocked"] == 3
+
+
+def test_cli_exercise(tmp_path):
+    (tmp_path / "mod.py").write_text(EXERCISE_SOURCE.split("def hangs")[0])
+
+    result = CliRunner().invoke(app, [str(tmp_path / "mod.py"), "--exercise", "-n", "2", "--runs", "1"])
+
+    assert result.exit_code == 0
+    assert "add: pure, exercise: ok" in result.output
+    assert "security boundary" in result.output
+
+
+def test_flaky(monkeypatch, tmp_path):
+    outcomes = iter(["ok", "failed", "ok", "ok", "ok", "ok"])
+    monkeypatch.setattr(
+        "predicate.coverage.purity.exercise_sandboxed",
+        lambda *args: {"status": next(outcomes), "detail": "boom"},
+    )
+    (tmp_path / "mod.py").write_text("def f(x: int) -> int:\n    return x\n\ndef g(x: int) -> int:\n    return x\n")
+
+    modules = analyze(tmp_path / "mod.py", exercise=True, jobs=1)
+
+    f, g = (fn["exercise"] for fn in modules[0]["functions"])
+    assert f == {"status": "failed", "detail": "boom", "runs": 3, "flaky": True, "statuses": {"ok": 2, "failed": 1}}
+    assert g["flaky"] is False
+    assert g["statuses"] == {"ok": 3}
+    assert count_flaky(modules) == 1

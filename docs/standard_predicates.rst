@@ -1014,6 +1014,14 @@ Each impure function in the snapshot has a ``reason`` (with ``file:line``) and a
 transitive impurity the category is that of the root cause. ``find_impurity`` in ``predicate.is_pure_predicate`` returns
 the same information for a single function.
 
+With ``--exercise`` the CLI also calls each function with inputs generated from its annotations, each in a separate
+sandboxed subprocess (``--calls``, ``--timeout`` and ``--jobs`` tune this). Each function is exercised ``--runs`` times (default 3) with fresh
+random inputs; if the runs give different statuses the result is marked ``"flaky": true``, with the counts in ``statuses``. The sandbox runs in an empty temporary
+directory with a minimal environment, and blocks file writes and deletes, spawning processes and network access. The
+outcome per function is stored in the snapshot as ``exercise``, with status ``ok``, ``failed``, ``blocked``,
+``not-exercisable``, ``timeout`` or ``crashed``. The sandbox is a guard against accidents, not a security boundary, and
+the modules are still imported (executed) by the analysis itself.
+
 Functions without retrievable source, such as builtins or C extensions, are not considered pure. The check doesn't
 detect mutation of arguments, and it has no generators.
 

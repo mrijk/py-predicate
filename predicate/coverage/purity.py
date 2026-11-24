@@ -1,11 +1,14 @@
 import importlib.util
 import inspect
 import sys
+from collections import Counter
 from collections.abc import Iterator
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from types import ModuleType
 from typing import Any
 
+from predicate.coverage.sandbox import exercise_sandboxed
 from predicate.is_pure_predicate import find_impurity
 
 
@@ -49,13 +52,46 @@ def _analyze_file(file: Path) -> dict[str, Any]:
     return {"path": str(file), "file_name": file.name, "functions": sorted(functions, key=lambda f: f["line"])}
 
 
-def analyze(path: Path) -> list[dict[str, Any]]:
-    """Report the purity of all public module-level functions found under path. Imports (executes) the modules."""
+def _exercise_repeated(file: Path, name: str, calls: int, timeout: float, runs: int) -> dict[str, Any]:
+    """Exercise a function `runs` times with fresh random inputs; differing statuses make the result flaky."""
+    results = []
+    for _ in range(runs):
+        results.append(exercise_sandboxed(file, name, calls, timeout))
+        if results[-1]["status"] == "not-exercisable":  # decided by the signature, repeating can't change it
+            break
+    statuses = Counter(r["status"] for r in results)
+    first_problem = next((r for r in results if r["status"] != "ok"), results[0])
+    return first_problem | {"runs": len(results), "flaky": len(statuses) > 1, "statuses": dict(statuses)}
+
+
+def analyze(
+    path: Path, *, exercise: bool = False, calls: int = 10, timeout: float = 10.0, jobs: int = 4, runs: int = 3
+) -> list[dict[str, Any]]:
+    """Report the purity of all public module-level functions found under path. Imports (executes) the modules.
+
+    With exercise=True each function is also exercised `runs` times in a sandboxed subprocess, see
+    predicate.coverage.sandbox.
+    """
     files = [path] if path.is_file() else sorted(path.rglob("*.py"))
-    return [_analyze_file(file) for file in files]
+    modules = [_analyze_file(file) for file in files]
+    if exercise:
+        targets = [(Path(m["path"]), f) for m in modules for f in m["functions"]]
+        with ThreadPoolExecutor(max_workers=jobs) as executor:
+            results = executor.map(lambda t: _exercise_repeated(t[0], t[1]["name"], calls, timeout, runs), targets)
+            for (_, function), result in zip(targets, results, strict=True):
+                function["exercise"] = result
+    return modules
 
 
 def summarize(modules: list[dict[str, Any]]) -> dict[str, int]:
     functions = [f for m in modules for f in m["functions"]]
     pure = sum(f["pure"] for f in functions)
     return {"total": len(functions), "pure": pure, "impure": len(functions) - pure}
+
+
+def summarize_exercise(modules: list[dict[str, Any]]) -> dict[str, int]:
+    return dict(Counter(f["exercise"]["status"] for m in modules for f in m["functions"] if "exercise" in f))
+
+
+def count_flaky(modules: list[dict[str, Any]]) -> int:
+    return sum(f.get("exercise", {}).get("flaky", False) for m in modules for f in m["functions"])
