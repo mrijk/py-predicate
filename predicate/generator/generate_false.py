@@ -44,6 +44,7 @@ from predicate.generator.helpers import (
     random_dicts,
     random_first_from_iterables,
     random_floats,
+    random_hashables,
     random_ints,
     random_iterables,
     random_lambdas,
@@ -614,6 +615,11 @@ def generate_dict_of_p(dict_of_predicate: DictOfPredicate) -> Iterator[Any]:
 
     key_value_predicates = dict_of_predicate.key_value_predicates
     length = len(key_value_predicates)
+    if length == 0:
+        # no key can match, so no dict is true
+        keys = (take(random.randint(0, 3), random_hashables()) for _ in repeat(None))
+        yield from (dict(zip(k, random_anys(), strict=False)) for k in keys)
+        return
     max_number = 2**length - 1
     generators = [
         ((generate_false(key_p), generate_false(value_p)), (generate_true(key_p), generate_true(value_p)))
@@ -641,8 +647,10 @@ def generate_frozendict_of_p(frozendict_of_predicate: FrozenDictOfPredicate) -> 
             (frozendict(d) for d in generate_dict_of_p(dict_of_predicate)),  # noqa: F821
             generate_true(dict_of_predicate),
         )
-    else:
+    elif dict_of_predicate.key_value_predicates:
         yield from generate_true(dict_of_predicate)
+    else:
+        yield from generate_dict_of_p(dict_of_predicate)  # not frozen, so false
 
 
 @generate_false.register(ListOfPredicate)
