@@ -980,6 +980,32 @@ This predicate tests if a type is a ``Protocol``.
     assert is_protocol_p()(SupportsClose)
     assert not is_protocol_p()(int)
 
+is_pure_p
+---------
+
+This predicate tests if a function is pure, using a heuristic on its source code. A function is rejected if it
+contains ``global`` or ``nonlocal``, calls ``open``, ``print``, ``input``, ``exec``, ``eval``, ``compile`` or
+``__import__``, or calls into ``os``, ``sys``, ``random``, ``time``, ``datetime``, ``subprocess``, ``logging``,
+``shutil`` or ``socket``.
+
+.. code-block:: python
+
+    import random
+    from predicate import is_pure_p
+
+    def add(x, y):
+        return x + y
+
+    def noisy(x):
+        return x + random.random()
+
+    assert is_pure_p(add)
+    assert is_pure_p(lambda x: x + 1)
+    assert not is_pure_p(noisy)
+
+Functions without retrievable source, such as builtins or C extensions, are not considered pure. The check doesn't
+detect mutation of arguments or impurity in called functions, and it has no generators.
+
 is_range_p
 ----------
 
