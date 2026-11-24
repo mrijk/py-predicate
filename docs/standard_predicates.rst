@@ -1003,8 +1003,19 @@ contains ``global`` or ``nonlocal``, calls ``open``, ``print``, ``input``, ``exe
     assert is_pure_p(lambda x: x + 1)
     assert not is_pure_p(noisy)
 
+Impurity is transitive: a function that calls an impure function is impure too. Calls are resolved through the
+function's globals, closure and builtins, and the callees' results are cached. Calls to the standard library are covered
+by the lists above and not followed, and calls that can't be resolved (parameters, dynamic attributes) are not
+considered impure. Recursion is assumed pure.
+
+The CLI ``python -m predicate.coverage PATH [-o snapshot.json]`` reports the purity of all public functions under a path.
+Each impure function in the snapshot has a ``reason`` (with ``file:line``) and a ``category``: ``io``, ``system``
+(``os``, ``sys``), ``randomness``, ``time``, ``dynamic-code`` (``exec``, ``eval``, ...) or ``global-state``. For a
+transitive impurity the category is that of the root cause. ``find_impurity`` in ``predicate.is_pure_predicate`` returns
+the same information for a single function.
+
 Functions without retrievable source, such as builtins or C extensions, are not considered pure. The check doesn't
-detect mutation of arguments or impurity in called functions, and it has no generators.
+detect mutation of arguments, and it has no generators.
 
 is_range_p
 ----------

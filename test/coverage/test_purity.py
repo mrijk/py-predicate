@@ -40,4 +40,12 @@ def test_cli_summary_and_snapshot(tmp_path):
     assert result.exit_code == 0
     assert "1/2 public functions pure (50%)" in result.output
     assert "impure: IMPURE" in result.output
-    assert json.loads(snapshot.read_text())[0]["functions"][0] == {"name": "pure", "line": 4, "pure": True}
+    functions = json.loads(snapshot.read_text())[0]["functions"]
+    assert functions[0] == {"name": "pure", "line": 4, "pure": True}
+    assert functions[1] == {
+        "name": "impure",
+        "line": 7,
+        "pure": False,
+        "category": "randomness",
+        "reason": "calls random.random (mod.py:8)",
+    }

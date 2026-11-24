@@ -97,12 +97,16 @@
       {
         "name": "compile_predicate",
         "line": 430,
-        "pure": false
+        "pure": false,
+        "category": "dynamic-code",
+        "reason": "calls eval (compile_predicate.py:453)"
       },
       {
         "name": "try_compile_predicate",
         "line": 457,
-        "pure": true
+        "pure": false,
+        "category": "dynamic-code",
+        "reason": "calls compile_predicate (compile_predicate.py:460) -> calls eval (compile_predicate.py:453)"
       }
     ]
   },
@@ -229,7 +233,9 @@
       {
         "name": "purity",
         "line": 12,
-        "pure": true
+        "pure": false,
+        "category": "system",
+        "reason": "calls typer.echo (__main__.py:26) -> calls sys.getdefaultencoding (_compat.py:50)"
       }
     ]
   },
@@ -239,12 +245,12 @@
     "functions": [
       {
         "name": "analyze",
-        "line": 49,
+        "line": 52,
         "pure": true
       },
       {
         "name": "summarize",
-        "line": 55,
+        "line": 58,
         "pure": true
       }
     ]
@@ -346,12 +352,16 @@
       {
         "name": "generate_subnormal",
         "line": 52,
-        "pure": false
+        "pure": false,
+        "category": "randomness",
+        "reason": "calls random.choice (fn_predicate.py:54)"
       },
       {
         "name": "generate_non_normal",
         "line": 57,
-        "pure": true
+        "pure": false,
+        "category": "randomness",
+        "reason": "calls generate_subnormal (fn_predicate.py:63) -> calls random.choice (fn_predicate.py:54)"
       }
     ]
   },
@@ -367,7 +377,9 @@
       {
         "name": "get_fn_source",
         "line": 9,
-        "pure": true
+        "pure": false,
+        "category": "io",
+        "reason": "calls _get_lambda_source (fn_source.py:23) -> calls open (fn_source.py:29)"
       }
     ]
   },
@@ -394,17 +406,23 @@
       {
         "name": "dict_to_json",
         "line": 65,
-        "pure": true
+        "pure": false,
+        "category": "io",
+        "reason": "calls to_json (format_json.py:66) -> calls open (fn_source.py:29)"
       },
       {
         "name": "list_to_json",
         "line": 69,
-        "pure": true
+        "pure": false,
+        "category": "io",
+        "reason": "calls to_json (format_json.py:70) -> calls open (fn_source.py:29)"
       },
       {
         "name": "to_json",
         "line": 73,
-        "pure": true
+        "pure": false,
+        "category": "io",
+        "reason": "calls _to_value (format_json.py:75) -> calls open (fn_source.py:29)"
       }
     ]
   },
@@ -431,7 +449,9 @@
       {
         "name": "to_yaml",
         "line": 9,
-        "pure": true
+        "pure": false,
+        "category": "io",
+        "reason": "calls to_json (format_yaml.py:11) -> calls open (fn_source.py:29)"
       }
     ]
   },
@@ -523,7 +543,9 @@
       {
         "name": "generate_all_p",
         "line": 137,
-        "pure": true
+        "pure": false,
+        "category": "randomness",
+        "reason": "calls _generate_at_least_one_false (generate_false.py:144) -> calls random.randint (generate_false.py:731)"
       },
       {
         "name": "generate_any_p",
@@ -533,7 +555,9 @@
       {
         "name": "generate_and",
         "line": 158,
-        "pure": true
+        "pure": false,
+        "category": "randomness",
+        "reason": "calls random_first_from_iterables (generate_false.py:161) -> calls random.choice (helpers.py:44)"
       },
       {
         "name": "generate_always_true",
@@ -548,17 +572,23 @@
       {
         "name": "generate_eq",
         "line": 174,
-        "pure": true
+        "pure": false,
+        "category": "randomness",
+        "reason": "calls random_anys (generate_false.py:180) -> calls random.randint (helpers.py:299)"
       },
       {
         "name": "generate_always_false",
         "line": 189,
-        "pure": true
+        "pure": false,
+        "category": "randomness",
+        "reason": "calls random_anys (generate_false.py:191) -> calls random.randint (helpers.py:299)"
       },
       {
         "name": "generate_is_close_p",
         "line": 194,
-        "pure": true
+        "pure": false,
+        "category": "randomness",
+        "reason": "calls random_floats (generate_false.py:196) -> calls random.uniform (helpers.py:283)"
       },
       {
         "name": "generate_has_key",
@@ -568,7 +598,9 @@
       {
         "name": "generate_has_length",
         "line": 206,
-        "pure": true
+        "pure": false,
+        "category": "randomness",
+        "reason": "calls random_iterables (generate_false.py:208) -> calls random.choice (helpers.py:318)"
       },
       {
         "name": "generate_unique",
@@ -583,42 +615,58 @@
       {
         "name": "generate_ge_le",
         "line": 242,
-        "pure": true
+        "pure": false,
+        "category": "time",
+        "reason": "calls random_datetimes (generate_false.py:247) -> calls datetime.now (helpers.py:187)"
       },
       {
         "name": "generate_ge_lt",
         "line": 264,
-        "pure": true
+        "pure": false,
+        "category": "time",
+        "reason": "calls random_datetimes (generate_false.py:269) -> calls datetime.now (helpers.py:187)"
       },
       {
         "name": "generate_gt_le",
         "line": 286,
-        "pure": true
+        "pure": false,
+        "category": "time",
+        "reason": "calls random_datetimes (generate_false.py:291) -> calls datetime.now (helpers.py:187)"
       },
       {
         "name": "generate_gt_lt",
         "line": 308,
-        "pure": true
+        "pure": false,
+        "category": "time",
+        "reason": "calls random_datetimes (generate_false.py:313) -> calls datetime.now (helpers.py:187)"
       },
       {
         "name": "generate_ge",
         "line": 330,
-        "pure": true
+        "pure": false,
+        "category": "time",
+        "reason": "calls random_datetimes (generate_false.py:334) -> calls datetime.now (helpers.py:187)"
       },
       {
         "name": "generate_gt",
         "line": 348,
-        "pure": true
+        "pure": false,
+        "category": "time",
+        "reason": "calls random_datetimes (generate_false.py:352) -> calls datetime.now (helpers.py:187)"
       },
       {
         "name": "generate_falsy",
         "line": 367,
-        "pure": true
+        "pure": false,
+        "category": "randomness",
+        "reason": "calls generate_anys (generate_false.py:369) -> calls random.randint (helpers.py:299)"
       },
       {
         "name": "generate_comp_p",
         "line": 372,
-        "pure": true
+        "pure": false,
+        "category": "randomness",
+        "reason": "calls random_anys (generate_false.py:375) -> calls random.randint (helpers.py:299)"
       },
       {
         "name": "generate_fn_p",
@@ -628,7 +676,9 @@
       {
         "name": "generate_contains",
         "line": 383,
-        "pure": true
+        "pure": false,
+        "category": "randomness",
+        "reason": "calls random_strings (generate_false.py:388) -> calls random.randint (helpers.py:247)"
       },
       {
         "name": "generate_in",
@@ -638,12 +688,16 @@
       {
         "name": "generate_le",
         "line": 398,
-        "pure": true
+        "pure": false,
+        "category": "time",
+        "reason": "calls random_datetimes (generate_false.py:402) -> calls datetime.now (helpers.py:187)"
       },
       {
         "name": "generate_lt",
         "line": 416,
-        "pure": true
+        "pure": false,
+        "category": "time",
+        "reason": "calls random_datetimes (generate_false.py:420) -> calls datetime.now (helpers.py:187)"
       },
       {
         "name": "generate_ne",
@@ -653,7 +707,9 @@
       {
         "name": "generate_none",
         "line": 440,
-        "pure": true
+        "pure": false,
+        "category": "randomness",
+        "reason": "calls generate_anys (generate_false.py:442) -> calls random.randint (helpers.py:299)"
       },
       {
         "name": "generate_is_regex",
@@ -708,7 +764,9 @@
       {
         "name": "generate_is_instance_p",
         "line": 538,
-        "pure": true
+        "pure": false,
+        "category": "randomness",
+        "reason": "calls generate_anys (generate_false.py:544) -> calls random.randint (helpers.py:299)"
       },
       {
         "name": "generate_is_async_p",
@@ -718,12 +776,16 @@
       {
         "name": "generate_is_named_tuple_p",
         "line": 552,
-        "pure": true
+        "pure": false,
+        "category": "randomness",
+        "reason": "calls generate_anys (generate_false.py:555) -> calls random.randint (helpers.py:299)"
       },
       {
         "name": "generate_is_lambda_p",
         "line": 558,
-        "pure": true
+        "pure": false,
+        "category": "randomness",
+        "reason": "calls generate_anys (generate_false.py:562) -> calls random.randint (helpers.py:299)"
       },
       {
         "name": "generate_implies",
@@ -738,22 +800,30 @@
       {
         "name": "generate_or",
         "line": 591,
-        "pure": true
+        "pure": false,
+        "category": "randomness",
+        "reason": "calls random_first_from_iterables (generate_false.py:608) -> calls random.choice (helpers.py:44)"
       },
       {
         "name": "generate_dict_of_p",
         "line": 611,
-        "pure": false
+        "pure": false,
+        "category": "randomness",
+        "reason": "calls random.randint (generate_false.py:624)"
       },
       {
         "name": "generate_frozendict_of_p",
         "line": 633,
-        "pure": true
+        "pure": false,
+        "category": "randomness",
+        "reason": "calls generate_dict_of_p (generate_false.py:641) -> calls random.randint (generate_false.py:624)"
       },
       {
         "name": "generate_list_of_p",
         "line": 648,
-        "pure": true
+        "pure": false,
+        "category": "randomness",
+        "reason": "calls _generate_at_least_one_false (generate_false.py:655) -> calls random.randint (generate_false.py:731)"
       },
       {
         "name": "bool_array_from_int",
@@ -763,27 +833,37 @@
       {
         "name": "generate_tuple_of_p",
         "line": 666,
-        "pure": false
+        "pure": false,
+        "category": "randomness",
+        "reason": "calls random.randint (generate_false.py:675)"
       },
       {
         "name": "generate_set_of_p",
         "line": 687,
-        "pure": true
+        "pure": false,
+        "category": "randomness",
+        "reason": "calls _generate_at_least_one_false (generate_false.py:694) -> calls random.randint (generate_false.py:731)"
       },
       {
         "name": "generate_frozenset_of_p",
         "line": 700,
-        "pure": true
+        "pure": false,
+        "category": "randomness",
+        "reason": "calls generate_set_of_p (generate_false.py:705) -> calls random.randint (generate_false.py:731)"
       },
       {
         "name": "generate_xor",
         "line": 708,
-        "pure": true
+        "pure": false,
+        "category": "randomness",
+        "reason": "calls random_first_from_iterables (generate_false.py:721) -> calls random.choice (helpers.py:44)"
       },
       {
         "name": "generate_juxt_p",
         "line": 742,
-        "pure": true
+        "pure": false,
+        "category": "randomness",
+        "reason": "calls random_anys (generate_false.py:744) -> calls random.randint (helpers.py:299)"
       },
       {
         "name": "generate_tee",
@@ -803,7 +883,9 @@
       {
         "name": "generate_count",
         "line": 789,
-        "pure": false
+        "pure": false,
+        "category": "randomness",
+        "reason": "calls random.choice (generate_false.py:803)"
       },
       {
         "name": "generate_is_same",
@@ -853,17 +935,23 @@
       {
         "name": "generate_regex",
         "line": 882,
-        "pure": true
+        "pure": false,
+        "category": "randomness",
+        "reason": "calls random_strings (generate_false.py:884) -> calls random.randint (helpers.py:247)"
       },
       {
         "name": "generate_is_callable",
         "line": 890,
-        "pure": true
+        "pure": false,
+        "category": "randomness",
+        "reason": "calls random_anys (generate_false.py:892) -> calls random.randint (helpers.py:299)"
       },
       {
         "name": "generate_is_partial",
         "line": 895,
-        "pure": true
+        "pure": false,
+        "category": "randomness",
+        "reason": "calls random_anys (generate_false.py:897) -> calls random.randint (helpers.py:299)"
       },
       {
         "name": "generate_recur",
@@ -878,7 +966,9 @@
       {
         "name": "generate_struct",
         "line": 953,
-        "pure": true
+        "pure": false,
+        "category": "randomness",
+        "reason": "calls _false_struct_required_fields (generate_false.py:955) -> calls random.sample (helpers.py:417)"
       }
     ]
   },
@@ -1020,22 +1110,30 @@
       {
         "name": "generate_any_p",
         "line": 280,
-        "pure": false
+        "pure": false,
+        "category": "randomness",
+        "reason": "calls random.randint (generate_true.py:291)"
       },
       {
         "name": "generate_free_type_var",
         "line": 305,
-        "pure": false
+        "pure": false,
+        "category": "randomness",
+        "reason": "calls random.choice (generate_true.py:309)"
       },
       {
         "name": "generate_constrained_type_var",
         "line": 312,
-        "pure": false
+        "pure": false,
+        "category": "randomness",
+        "reason": "calls random.choice (generate_true.py:316)"
       },
       {
         "name": "generate_always_true",
         "line": 319,
-        "pure": true
+        "pure": false,
+        "category": "randomness",
+        "reason": "calls random_anys (generate_true.py:321) -> calls random.randint (helpers.py:299)"
       },
       {
         "name": "generate_exception",
@@ -1045,7 +1143,9 @@
       {
         "name": "generate_and",
         "line": 345,
-        "pure": true
+        "pure": false,
+        "category": "randomness",
+        "reason": "calls random_first_from_iterables (generate_true.py:370) -> calls random.choice (helpers.py:44)"
       },
       {
         "name": "generate_eq",
@@ -1060,32 +1160,44 @@
       {
         "name": "generate_ge_le",
         "line": 383,
-        "pure": true
+        "pure": false,
+        "category": "time",
+        "reason": "calls random_datetimes (generate_true.py:387) -> calls datetime.now (helpers.py:187)"
       },
       {
         "name": "generate_ge_lt",
         "line": 396,
-        "pure": true
+        "pure": false,
+        "category": "time",
+        "reason": "calls random_datetimes (generate_true.py:400) -> calls datetime.now (helpers.py:187)"
       },
       {
         "name": "generate_gt_le",
         "line": 409,
-        "pure": true
+        "pure": false,
+        "category": "time",
+        "reason": "calls random_datetimes (generate_true.py:413) -> calls datetime.now (helpers.py:187)"
       },
       {
         "name": "generate_gt_lt",
         "line": 422,
-        "pure": true
+        "pure": false,
+        "category": "time",
+        "reason": "calls random_datetimes (generate_true.py:426) -> calls datetime.now (helpers.py:187)"
       },
       {
         "name": "generate_ge",
         "line": 435,
-        "pure": true
+        "pure": false,
+        "category": "time",
+        "reason": "calls random_datetimes (generate_true.py:439) -> calls datetime.now (helpers.py:187)"
       },
       {
         "name": "generate_gt",
         "line": 454,
-        "pure": true
+        "pure": false,
+        "category": "time",
+        "reason": "calls random_datetimes (generate_true.py:458) -> calls datetime.now (helpers.py:187)"
       },
       {
         "name": "generate_is_close_p",
@@ -1095,12 +1207,16 @@
       {
         "name": "generate_has_key",
         "line": 477,
-        "pure": true
+        "pure": false,
+        "category": "randomness",
+        "reason": "calls random_anys (generate_true.py:480) -> calls random.randint (helpers.py:299)"
       },
       {
         "name": "generate_has_length",
         "line": 483,
-        "pure": true
+        "pure": false,
+        "category": "randomness",
+        "reason": "calls random_iterables (generate_true.py:485) -> calls random.choice (helpers.py:318)"
       },
       {
         "name": "generate_unique",
@@ -1120,7 +1236,9 @@
       {
         "name": "generate_le",
         "line": 538,
-        "pure": true
+        "pure": false,
+        "category": "time",
+        "reason": "calls random_datetimes (generate_true.py:542) -> calls datetime.now (helpers.py:187)"
       },
       {
         "name": "generate_subset",
@@ -1145,12 +1263,16 @@
       {
         "name": "generate_intersects",
         "line": 577,
-        "pure": false
+        "pure": false,
+        "category": "randomness",
+        "reason": "calls random.choice (generate_true.py:582)"
       },
       {
         "name": "generate_comp_p",
         "line": 585,
-        "pure": true
+        "pure": false,
+        "category": "randomness",
+        "reason": "calls random_anys (generate_true.py:588) -> calls random.randint (helpers.py:299)"
       },
       {
         "name": "generate_fn_p",
@@ -1160,7 +1282,9 @@
       {
         "name": "generate_contains",
         "line": 596,
-        "pure": true
+        "pure": false,
+        "category": "randomness",
+        "reason": "calls random_strings (generate_true.py:598) -> calls random.randint (helpers.py:247)"
       },
       {
         "name": "generate_in",
@@ -1170,12 +1294,16 @@
       {
         "name": "generate_lt",
         "line": 610,
-        "pure": true
+        "pure": false,
+        "category": "time",
+        "reason": "calls random_datetimes (generate_true.py:614) -> calls datetime.now (helpers.py:187)"
       },
       {
         "name": "generate_ne",
         "line": 628,
-        "pure": true
+        "pure": false,
+        "category": "randomness",
+        "reason": "calls random_values_of_type (generate_true.py:631) -> calls random.randint (helpers.py:299)"
       },
       {
         "name": "generate_none",
@@ -1185,7 +1313,9 @@
       {
         "name": "generate_is_regex",
         "line": 639,
-        "pure": true
+        "pure": false,
+        "category": "randomness",
+        "reason": "calls generate_strings (generate_true.py:641) -> calls random.randint (helpers.py:247)"
       },
       {
         "name": "generate_is_protocol",
@@ -1225,12 +1355,16 @@
       {
         "name": "generate_not_in",
         "line": 749,
-        "pure": true
+        "pure": false,
+        "category": "time",
+        "reason": "calls _generator_for_item (generate_true.py:752) -> calls datetime.now (helpers.py:187)"
       },
       {
         "name": "generate_not_none",
         "line": 760,
-        "pure": true
+        "pure": false,
+        "category": "randomness",
+        "reason": "calls generate_anys (generate_true.py:762) -> calls random.randint (helpers.py:299)"
       },
       {
         "name": "generate_compiled",
@@ -1240,7 +1374,9 @@
       {
         "name": "generate_or",
         "line": 770,
-        "pure": true
+        "pure": false,
+        "category": "randomness",
+        "reason": "calls random_first_from_iterables (generate_true.py:772) -> calls random.choice (helpers.py:44)"
       },
       {
         "name": "generate_implies",
@@ -1255,7 +1391,9 @@
       {
         "name": "generate_regex",
         "line": 786,
-        "pure": true
+        "pure": false,
+        "category": "io",
+        "reason": "calls exrex.generate (generate_true.py:788) -> calls print (exrex.py:239)"
       },
       {
         "name": "generate_falsy",
@@ -1270,12 +1408,16 @@
       {
         "name": "generate_predicate_of",
         "line": 801,
-        "pure": true
+        "pure": false,
+        "category": "randomness",
+        "reason": "calls random_predicates (generate_true.py:803) -> calls random.choice (helpers.py:44)"
       },
       {
         "name": "generate_is_instance_p",
         "line": 1130,
-        "pure": true
+        "pure": false,
+        "category": "randomness",
+        "reason": "calls _family_generator (generate_true.py:1149) -> calls random.choice (generate_true.py:912)"
       },
       {
         "name": "generate_is_callable_p",
@@ -1285,7 +1427,9 @@
       {
         "name": "generate_is_partial_p",
         "line": 1184,
-        "pure": false
+        "pure": false,
+        "category": "randomness",
+        "reason": "calls random.randint (generate_true.py:1187)"
       },
       {
         "name": "generate_is_async_p",
@@ -1295,7 +1439,9 @@
       {
         "name": "generate_is_named_tuple_p",
         "line": 1202,
-        "pure": true
+        "pure": false,
+        "category": "randomness",
+        "reason": "calls random_named_tuples (generate_true.py:1204) -> calls random.randint (helpers.py:299)"
       },
       {
         "name": "generate_is_lambda_p",
@@ -1340,12 +1486,16 @@
       {
         "name": "generate_xor",
         "line": 1283,
-        "pure": true
+        "pure": false,
+        "category": "randomness",
+        "reason": "calls random_first_from_iterables (generate_true.py:1290) -> calls random.choice (helpers.py:44)"
       },
       {
         "name": "generate_tee",
         "line": 1293,
-        "pure": true
+        "pure": false,
+        "category": "randomness",
+        "reason": "calls random_anys (generate_true.py:1295) -> calls random.randint (helpers.py:299)"
       },
       {
         "name": "generate_match_p",
@@ -1380,7 +1530,9 @@
       {
         "name": "generate_count",
         "line": 1384,
-        "pure": false
+        "pure": false,
+        "category": "randomness",
+        "reason": "calls random.choice (generate_true.py:1396)"
       },
       {
         "name": "generate_is_same",
@@ -1410,7 +1562,9 @@
       {
         "name": "generate_struct",
         "line": 1448,
-        "pure": true
+        "pure": false,
+        "category": "randomness",
+        "reason": "calls sample_optional_fields (generate_true.py:1458) -> calls random.sample (helpers.py:417)"
       }
     ]
   },
@@ -1421,7 +1575,9 @@
       {
         "name": "random_first_from_iterables",
         "line": 39,
-        "pure": false
+        "pure": false,
+        "category": "randomness",
+        "reason": "calls random.choice (helpers.py:44)"
       },
       {
         "name": "set_from_list",
@@ -1431,12 +1587,16 @@
       {
         "name": "random_complex_numbers",
         "line": 60,
-        "pure": true
+        "pure": false,
+        "category": "randomness",
+        "reason": "calls random_floats (helpers.py:61) -> calls random.uniform (helpers.py:283)"
       },
       {
         "name": "random_callables",
         "line": 70,
-        "pure": true
+        "pure": false,
+        "category": "randomness",
+        "reason": "calls random_first_from_iterables (helpers.py:71) -> calls random.choice (helpers.py:44)"
       },
       {
         "name": "generate_lambda",
@@ -1456,7 +1616,9 @@
       {
         "name": "random_parameters",
         "line": 107,
-        "pure": false
+        "pure": false,
+        "category": "randomness",
+        "reason": "calls random.choice (helpers.py:118)"
       },
       {
         "name": "random_functions",
@@ -1481,12 +1643,16 @@
       {
         "name": "random_datetimes",
         "line": 181,
-        "pure": false
+        "pure": false,
+        "category": "time",
+        "reason": "calls datetime.now (helpers.py:187)"
       },
       {
         "name": "random_predicates",
         "line": 199,
-        "pure": true
+        "pure": false,
+        "category": "randomness",
+        "reason": "calls random_first_from_iterables (helpers.py:204) -> calls random.choice (helpers.py:44)"
       },
       {
         "name": "random_sets",
@@ -1511,7 +1677,9 @@
       {
         "name": "random_hashables",
         "line": 234,
-        "pure": true
+        "pure": false,
+        "category": "randomness",
+        "reason": "calls random_ints (helpers.py:236) -> calls random.randint (helpers.py:299)"
       },
       {
         "name": "random_non_hashables",
@@ -1521,32 +1689,44 @@
       {
         "name": "random_strings",
         "line": 244,
-        "pure": false
+        "pure": false,
+        "category": "randomness",
+        "reason": "calls random.randint (helpers.py:247)"
       },
       {
         "name": "random_strings_greater",
         "line": 258,
-        "pure": false
+        "pure": false,
+        "category": "randomness",
+        "reason": "calls random.randint (helpers.py:261)"
       },
       {
         "name": "random_strings_lower",
         "line": 266,
-        "pure": false
+        "pure": false,
+        "category": "randomness",
+        "reason": "calls random.randint (helpers.py:269)"
       },
       {
         "name": "random_floats",
         "line": 275,
-        "pure": false
+        "pure": false,
+        "category": "randomness",
+        "reason": "calls random.uniform (helpers.py:283)"
       },
       {
         "name": "random_ints",
         "line": 291,
-        "pure": false
+        "pure": false,
+        "category": "randomness",
+        "reason": "calls random.randint (helpers.py:299)"
       },
       {
         "name": "random_iterables",
         "line": 310,
-        "pure": false
+        "pure": false,
+        "category": "randomness",
+        "reason": "calls random.choice (helpers.py:318)"
       },
       {
         "name": "random_lists",
@@ -1561,7 +1741,9 @@
       {
         "name": "random_modules",
         "line": 337,
-        "pure": false
+        "pure": false,
+        "category": "system",
+        "reason": "calls sys.modules.values (helpers.py:339)"
       },
       {
         "name": "random_uuids",
@@ -1571,12 +1753,16 @@
       {
         "name": "random_anys",
         "line": 348,
-        "pure": true
+        "pure": false,
+        "category": "randomness",
+        "reason": "calls random_ints (helpers.py:349) -> calls random.randint (helpers.py:299)"
       },
       {
         "name": "random_named_tuples",
         "line": 352,
-        "pure": true
+        "pure": false,
+        "category": "randomness",
+        "reason": "calls random_anys (helpers.py:357) -> calls random.randint (helpers.py:299)"
       },
       {
         "name": "random_named_tuple_instances",
@@ -1586,7 +1772,9 @@
       {
         "name": "random_values_of_type",
         "line": 371,
-        "pure": true
+        "pure": false,
+        "category": "randomness",
+        "reason": "calls random_anys (helpers.py:383) -> calls random.randint (helpers.py:299)"
       },
       {
         "name": "random_constrained_values_of_type",
@@ -1601,27 +1789,37 @@
       {
         "name": "sample_optional_fields",
         "line": 416,
-        "pure": false
+        "pure": false,
+        "category": "randomness",
+        "reason": "calls random.sample (helpers.py:417)"
       },
       {
         "name": "generate_datetimes",
         "line": 422,
-        "pure": true
+        "pure": false,
+        "category": "time",
+        "reason": "calls random_datetimes (helpers.py:423) -> calls datetime.now (helpers.py:187)"
       },
       {
         "name": "generate_floats",
         "line": 426,
-        "pure": true
+        "pure": false,
+        "category": "randomness",
+        "reason": "calls random_floats (helpers.py:427) -> calls random.uniform (helpers.py:283)"
       },
       {
         "name": "generate_strings",
         "line": 430,
-        "pure": true
+        "pure": false,
+        "category": "randomness",
+        "reason": "calls random_strings (helpers.py:431) -> calls random.randint (helpers.py:247)"
       },
       {
         "name": "generate_ints",
         "line": 434,
-        "pure": true
+        "pure": false,
+        "category": "randomness",
+        "reason": "calls random_ints (helpers.py:435) -> calls random.randint (helpers.py:299)"
       },
       {
         "name": "generate_uuids",
@@ -1631,7 +1829,9 @@
       {
         "name": "generate_anys",
         "line": 442,
-        "pure": true
+        "pure": false,
+        "category": "randomness",
+        "reason": "calls random_anys (helpers.py:443) -> calls random.randint (helpers.py:299)"
       },
       {
         "name": "evaluate_comp",
@@ -1641,12 +1841,16 @@
       {
         "name": "generate_even_numbers",
         "line": 454,
-        "pure": true
+        "pure": false,
+        "category": "randomness",
+        "reason": "calls random_ints (helpers.py:455) -> calls random.randint (helpers.py:299)"
       },
       {
         "name": "generate_odd_numbers",
         "line": 458,
-        "pure": true
+        "pure": false,
+        "category": "randomness",
+        "reason": "calls generate_even_numbers (helpers.py:459) -> calls random.randint (helpers.py:299)"
       },
       {
         "name": "function_with_signature",
@@ -1681,102 +1885,142 @@
       {
         "name": "random_enum_members",
         "line": 526,
-        "pure": false
+        "pure": false,
+        "category": "randomness",
+        "reason": "calls random.sample (helpers.py:532)"
       },
       {
         "name": "random_bytes",
         "line": 537,
-        "pure": false
+        "pure": false,
+        "category": "randomness",
+        "reason": "calls random.randbytes (helpers.py:538)"
       },
       {
         "name": "random_bytearrays",
         "line": 541,
-        "pure": true
+        "pure": false,
+        "category": "randomness",
+        "reason": "calls random_bytes (helpers.py:542) -> calls random.randbytes (helpers.py:538)"
       },
       {
         "name": "random_dates",
         "line": 545,
-        "pure": true
+        "pure": false,
+        "category": "time",
+        "reason": "calls random_datetimes (helpers.py:546) -> calls datetime.now (helpers.py:187)"
       },
       {
         "name": "random_times",
         "line": 549,
-        "pure": true
+        "pure": false,
+        "category": "time",
+        "reason": "calls random_datetimes (helpers.py:550) -> calls datetime.now (helpers.py:187)"
       },
       {
         "name": "random_timedeltas",
         "line": 553,
-        "pure": false
+        "pure": false,
+        "category": "randomness",
+        "reason": "calls random.uniform (helpers.py:556)"
       },
       {
         "name": "random_paths",
         "line": 559,
-        "pure": false
+        "pure": false,
+        "category": "randomness",
+        "reason": "calls random.randint (helpers.py:562)"
       },
       {
         "name": "random_decimals",
         "line": 565,
-        "pure": true
+        "pure": false,
+        "category": "randomness",
+        "reason": "calls random_ints (helpers.py:568) -> calls random.randint (helpers.py:299)"
       },
       {
         "name": "random_supports",
         "line": 571,
-        "pure": true
+        "pure": false,
+        "category": "randomness",
+        "reason": "calls random_ints (helpers.py:573) -> calls random.randint (helpers.py:299)"
       },
       {
         "name": "random_sized",
         "line": 577,
-        "pure": true
+        "pure": false,
+        "category": "randomness",
+        "reason": "calls random_strings (helpers.py:578) -> calls random.randint (helpers.py:247)"
       },
       {
         "name": "random_patterns",
         "line": 584,
-        "pure": false
+        "pure": false,
+        "category": "randomness",
+        "reason": "calls random.choice (helpers.py:586)"
       },
       {
         "name": "random_slices",
         "line": 589,
-        "pure": false
+        "pure": false,
+        "category": "randomness",
+        "reason": "calls random.choice (helpers.py:593)"
       },
       {
         "name": "random_ranges",
         "line": 596,
-        "pure": false
+        "pure": false,
+        "category": "randomness",
+        "reason": "calls random.randint (helpers.py:598)"
       },
       {
         "name": "random_struct_times",
         "line": 601,
-        "pure": false
+        "pure": false,
+        "category": "randomness",
+        "reason": "calls random.randint (helpers.py:604)"
       },
       {
         "name": "random_tzinfos",
         "line": 607,
-        "pure": false
+        "pure": false,
+        "category": "randomness",
+        "reason": "calls random.randint (helpers.py:610)"
       },
       {
         "name": "random_exceptions",
         "line": 613,
-        "pure": false
+        "pure": false,
+        "category": "randomness",
+        "reason": "calls random.choice (helpers.py:615)"
       },
       {
         "name": "random_forward_refs",
         "line": 618,
-        "pure": false
+        "pure": false,
+        "category": "randomness",
+        "reason": "calls random.choice (helpers.py:621)"
       },
       {
         "name": "random_code_objects",
         "line": 624,
-        "pure": false
+        "pure": false,
+        "category": "dynamic-code",
+        "reason": "calls compile (helpers.py:627)"
       },
       {
         "name": "random_text_ios",
         "line": 630,
-        "pure": true
+        "pure": false,
+        "category": "randomness",
+        "reason": "calls random_strings (helpers.py:631) -> calls random.randint (helpers.py:247)"
       },
       {
         "name": "random_ios",
         "line": 634,
-        "pure": true
+        "pure": false,
+        "category": "randomness",
+        "reason": "calls random_bytes (helpers.py:635) -> calls random.randbytes (helpers.py:538)"
       },
       {
         "name": "random_named_tuple_classes",
@@ -1786,52 +2030,72 @@
       {
         "name": "random_typed_dict_classes",
         "line": 643,
-        "pure": false
+        "pure": false,
+        "category": "randomness",
+        "reason": "calls random.choice (helpers.py:649)"
       },
       {
         "name": "random_ast_nodes",
         "line": 670,
-        "pure": false
+        "pure": false,
+        "category": "randomness",
+        "reason": "calls random.choice (helpers.py:688)"
       },
       {
         "name": "random_log_records",
         "line": 691,
-        "pure": false
+        "pure": false,
+        "category": "randomness",
+        "reason": "calls random.choice (helpers.py:697)"
       },
       {
         "name": "random_loggers",
         "line": 701,
-        "pure": false
+        "pure": false,
+        "category": "io",
+        "reason": "calls logging.getLogger (helpers.py:703)"
       },
       {
         "name": "random_event_loops",
         "line": 709,
-        "pure": false
+        "pure": false,
+        "category": "randomness",
+        "reason": "calls random.choice (helpers.py:715)"
       },
       {
         "name": "random_ipv4_addresses",
         "line": 718,
-        "pure": false
+        "pure": false,
+        "category": "randomness",
+        "reason": "calls random.getrandbits (helpers.py:721)"
       },
       {
         "name": "random_ipv6_addresses",
         "line": 724,
-        "pure": false
+        "pure": false,
+        "category": "randomness",
+        "reason": "calls random.getrandbits (helpers.py:727)"
       },
       {
         "name": "random_ipv4_networks",
         "line": 730,
-        "pure": false
+        "pure": false,
+        "category": "randomness",
+        "reason": "calls random.getrandbits (helpers.py:732)"
       },
       {
         "name": "random_ipv6_networks",
         "line": 735,
-        "pure": false
+        "pure": false,
+        "category": "randomness",
+        "reason": "calls random.getrandbits (helpers.py:737)"
       },
       {
         "name": "random_fractions",
         "line": 740,
-        "pure": false
+        "pure": false,
+        "category": "randomness",
+        "reason": "calls random.randint (helpers.py:743)"
       },
       {
         "name": "accepts_candidate_types",
@@ -2022,12 +2286,16 @@
       {
         "name": "from_spec",
         "line": 28,
-        "pure": true
+        "pure": false,
+        "category": "dynamic-code",
+        "reason": "calls _arguments (from_spec.py:30) -> calls exec (reflection.py:371)"
       },
       {
         "name": "given_spec",
         "line": 33,
-        "pure": true
+        "pure": false,
+        "category": "system",
+        "reason": "calls _check_supported (from_spec.py:39) -> calls sys.modules.get (type_checking.py:182)"
       }
     ]
   },
@@ -2049,7 +2317,9 @@
       {
         "name": "predicates",
         "line": 33,
-        "pure": true
+        "pure": false,
+        "category": "system",
+        "reason": "calls st.builds (predicates.py:43) -> calls sys.modules.get (core.py:1234)"
       }
     ]
   },
@@ -2071,7 +2341,9 @@
       {
         "name": "from_set",
         "line": 20,
-        "pure": true
+        "pure": false,
+        "category": "dynamic-code",
+        "reason": "calls _supersets (sets.py:28) -> calls exec (reflection.py:371)"
       }
     ]
   },
@@ -2082,17 +2354,23 @@
       {
         "name": "from_predicate",
         "line": 63,
-        "pure": true
+        "pure": false,
+        "category": "dynamic-code",
+        "reason": "calls _base (strategies.py:76) -> calls exec (reflection.py:371)"
       },
       {
         "name": "from_predicate_false",
         "line": 80,
-        "pure": true
+        "pure": false,
+        "category": "dynamic-code",
+        "reason": "calls from_predicate (strategies.py:82) -> calls exec (reflection.py:371)"
       },
       {
         "name": "given_predicate",
         "line": 99,
-        "pure": true
+        "pure": false,
+        "category": "global-state",
+        "reason": "calls given (strategies.py:103) -> nonlocal statement (core.py:2158)"
       }
     ]
   },
@@ -2103,7 +2381,9 @@
       {
         "name": "from_text",
         "line": 31,
-        "pure": true
+        "pure": false,
+        "category": "system",
+        "reason": "calls st.builds (strings.py:40) -> calls sys.modules.get (core.py:1234)"
       }
     ]
   },
@@ -2276,7 +2556,18 @@
   {
     "path": "predicate/is_pure_predicate.py",
     "file_name": "is_pure_predicate.py",
-    "functions": []
+    "functions": [
+      {
+        "name": "clear_purity_cache",
+        "line": 131,
+        "pure": true
+      },
+      {
+        "name": "find_impurity",
+        "line": 135,
+        "pure": true
+      }
+    ]
   },
   {
     "path": "predicate/is_regex_predicate.py",
@@ -3032,7 +3323,9 @@
       {
         "name": "exercise",
         "line": 12,
-        "pure": true
+        "pure": false,
+        "category": "system",
+        "reason": "calls async_exercise_function (exercise.py:21) -> calls sys.modules.get (type_checking.py:182)"
       }
     ]
   },
@@ -3043,12 +3336,16 @@
       {
         "name": "exercise_class",
         "line": 72,
-        "pure": true
+        "pure": false,
+        "category": "system",
+        "reason": "calls _resolve_class_spec (exercise_class.py:73) -> calls sys.modules.get (type_checking.py:182)"
       },
       {
         "name": "async_exercise_class",
         "line": 94,
-        "pure": true
+        "pure": false,
+        "category": "system",
+        "reason": "calls _resolve_class_spec (exercise_class.py:95) -> calls sys.modules.get (type_checking.py:182)"
       }
     ]
   },
@@ -3059,17 +3356,23 @@
       {
         "name": "get_spec_from_function_annotation",
         "line": 31,
-        "pure": true
+        "pure": false,
+        "category": "system",
+        "reason": "calls resolved_signature (exercise_function.py:32) -> calls sys.modules.get (type_checking.py:182)"
       },
       {
         "name": "exercise_function",
         "line": 53,
-        "pure": true
+        "pure": false,
+        "category": "system",
+        "reason": "calls _resolve_function_spec (exercise_function.py:54) -> calls sys.modules.get (type_checking.py:182)"
       },
       {
         "name": "async_exercise_function",
         "line": 75,
-        "pure": true
+        "pure": false,
+        "category": "system",
+        "reason": "calls _resolve_function_spec (exercise_function.py:76) -> calls sys.modules.get (type_checking.py:182)"
       }
     ]
   },
@@ -3090,27 +3393,37 @@
       {
         "name": "resolved_signature",
         "line": 191,
-        "pure": true
+        "pure": false,
+        "category": "system",
+        "reason": "calls imported_namespace (exercise_helpers.py:202) -> calls sys.modules.get (type_checking.py:182)"
       },
       {
         "name": "type_arg_predicate",
         "line": 289,
-        "pure": true
+        "pure": false,
+        "category": "dynamic-code",
+        "reason": "calls _type_arg_classes (exercise_helpers.py:291) -> calls eval (type_checking.py:189)"
       },
       {
         "name": "class_hints",
         "line": 332,
-        "pure": false
+        "pure": false,
+        "category": "system",
+        "reason": "calls sys.modules.get (exercise_helpers.py:338)"
       },
       {
         "name": "annotation_to_predicate",
         "line": 394,
-        "pure": true
+        "pure": false,
+        "category": "system",
+        "reason": "calls _typed_dict_predicate (exercise_helpers.py:404) -> calls sys.modules.get (exercise_helpers.py:338)"
       },
       {
         "name": "get_return_predicate",
         "line": 466,
-        "pure": true
+        "pure": false,
+        "category": "system",
+        "reason": "calls annotation_to_predicate (exercise_helpers.py:467) -> calls sys.modules.get (exercise_helpers.py:338)"
       },
       {
         "name": "ret_name",
@@ -3125,12 +3438,16 @@
       {
         "name": "get_return_spec",
         "line": 491,
-        "pure": true
+        "pure": false,
+        "category": "system",
+        "reason": "calls resolved_signature (exercise_helpers.py:493) -> calls sys.modules.get (type_checking.py:182)"
       },
       {
         "name": "check_signature_against_spec",
         "line": 501,
-        "pure": true
+        "pure": false,
+        "category": "system",
+        "reason": "calls resolved_signature (exercise_helpers.py:502) -> calls sys.modules.get (type_checking.py:182)"
       },
       {
         "name": "needs_spec_predicate",
@@ -3140,12 +3457,16 @@
       {
         "name": "exercise_param_predicate",
         "line": 532,
-        "pure": true
+        "pure": false,
+        "category": "system",
+        "reason": "calls param_predicate (exercise_helpers.py:541) -> calls sys.modules.get (exercise_helpers.py:338)"
       },
       {
         "name": "param_predicate",
         "line": 544,
-        "pure": true
+        "pure": false,
+        "category": "system",
+        "reason": "calls annotation_to_predicate (exercise_helpers.py:547) -> calls sys.modules.get (exercise_helpers.py:338)"
       },
       {
         "name": "call_args",
@@ -3160,17 +3481,23 @@
       {
         "name": "type_var_failure",
         "line": 642,
-        "pure": true
+        "pure": false,
+        "category": "system",
+        "reason": "calls _conforms (exercise_helpers.py:653) -> calls sys.modules.get (exercise_helpers.py:338)"
       },
       {
         "name": "verify_result",
         "line": 676,
-        "pure": true
+        "pure": false,
+        "category": "system",
+        "reason": "calls type_var_failure (exercise_helpers.py:682) -> calls sys.modules.get (exercise_helpers.py:338)"
       },
       {
         "name": "yield_predicate",
         "line": 699,
-        "pure": true
+        "pure": false,
+        "category": "system",
+        "reason": "calls resolved_signature (exercise_helpers.py:706) -> calls sys.modules.get (type_checking.py:182)"
       },
       {
         "name": "take_async",
@@ -3216,12 +3543,16 @@
       {
         "name": "instrument",
         "line": 19,
-        "pure": true
+        "pure": false,
+        "category": "system",
+        "reason": "calls instrument_class (instrument.py:25) -> calls sys.modules.get (type_checking.py:182)"
       },
       {
         "name": "instrument_module",
         "line": 46,
-        "pure": true
+        "pure": false,
+        "category": "system",
+        "reason": "calls instrument_function (instrument.py:48) -> calls sys.modules.get (type_checking.py:182)"
       }
     ]
   },
@@ -3232,7 +3563,9 @@
       {
         "name": "instrument_class",
         "line": 15,
-        "pure": true
+        "pure": false,
+        "category": "system",
+        "reason": "calls instrument_function (instrument_class.py:20) -> calls sys.modules.get (type_checking.py:182)"
       }
     ]
   },
@@ -3243,7 +3576,9 @@
       {
         "name": "set_instrumentation",
         "line": 35,
-        "pure": false
+        "pure": false,
+        "category": "global-state",
+        "reason": "global statement (instrument_function.py:37)"
       },
       {
         "name": "is_instrumentation_enabled",
@@ -3253,7 +3588,9 @@
       {
         "name": "enrich_spec",
         "line": 45,
-        "pure": true
+        "pure": false,
+        "category": "system",
+        "reason": "calls resolve_signature (instrument_function.py:46) -> calls sys.modules.get (type_checking.py:182)"
       },
       {
         "name": "default_on_error",
@@ -3268,7 +3605,9 @@
       {
         "name": "instrument_function",
         "line": 238,
-        "pure": true
+        "pure": false,
+        "category": "system",
+        "reason": "calls enrich_spec (instrument_function.py:247) -> calls sys.modules.get (type_checking.py:182)"
       }
     ]
   },
@@ -3300,17 +3639,23 @@
       {
         "name": "imported_namespace",
         "line": 163,
-        "pure": true
+        "pure": false,
+        "category": "system",
+        "reason": "calls imported_namespace_for_module (type_checking.py:171) -> calls sys.modules.get (type_checking.py:182)"
       },
       {
         "name": "imported_namespace_for_module",
         "line": 174,
-        "pure": true
+        "pure": false,
+        "category": "system",
+        "reason": "calls _module_namespace (type_checking.py:176) -> calls sys.modules.get (type_checking.py:182)"
       },
       {
         "name": "resolve_forward_ref",
         "line": 186,
-        "pure": false
+        "pure": false,
+        "category": "dynamic-code",
+        "reason": "calls eval (type_checking.py:189)"
       }
     ]
   },
@@ -3358,7 +3703,9 @@
       {
         "name": "create_is_str_p",
         "line": 10,
-        "pure": true
+        "pure": false,
+        "category": "randomness",
+        "reason": "calls _random_strings_from (str_predicates.py:14) -> calls random.choices (str_predicates.py:20)"
       },
       {
         "name": "starts_with_p",

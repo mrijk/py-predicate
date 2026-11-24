@@ -6,7 +6,7 @@ from pathlib import Path
 from types import ModuleType
 from typing import Any
 
-from predicate.is_pure_predicate import is_pure_p
+from predicate.is_pure_predicate import find_impurity
 
 
 def _load(file: Path) -> ModuleType:
@@ -34,15 +34,18 @@ def _public_functions(module: ModuleType) -> Iterator[tuple[str, Any]]:
     )
 
 
+def _function_entry(name: str, fn: Any) -> dict[str, Any]:
+    impurity = find_impurity(fn)
+    entry = {"name": name, "line": fn.__code__.co_firstlineno, "pure": impurity is None}
+    return entry if impurity is None else entry | {"category": impurity.category, "reason": impurity.reason}
+
+
 def _analyze_file(file: Path) -> dict[str, Any]:
     try:
         module = _load(file)
     except BaseException as e:  # noqa: BLE001 - importing user code can fail in any way
         return {"path": str(file), "file_name": file.name, "error": f"{type(e).__name__}: {e}", "functions": []}
-    functions = [
-        {"name": name, "line": fn.__code__.co_firstlineno, "pure": is_pure_p(fn)}
-        for name, fn in _public_functions(module)
-    ]
+    functions = [_function_entry(name, fn) for name, fn in _public_functions(module)]
     return {"path": str(file), "file_name": file.name, "functions": sorted(functions, key=lambda f: f["line"])}
 
 
