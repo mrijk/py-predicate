@@ -980,6 +980,52 @@ This predicate tests if a type is a ``Protocol``.
     assert is_protocol_p()(SupportsClose)
     assert not is_protocol_p()(int)
 
+is_pure_p
+---------
+
+This predicate tests if a function is pure, using a heuristic on its source code. A function is rejected if it
+contains ``global`` or ``nonlocal``, calls ``open``, ``print``, ``input``, ``exec``, ``eval``, ``compile`` or
+``__import__``, or calls into ``os``, ``sys``, ``random``, ``time``, ``datetime``, ``subprocess``, ``logging``,
+``shutil`` or ``socket``.
+
+.. code-block:: python
+
+    import random
+    from predicate import is_pure_p
+
+    def add(x, y):
+        return x + y
+
+    def noisy(x):
+        return x + random.random()
+
+    assert is_pure_p(add)
+    assert is_pure_p(lambda x: x + 1)
+    assert not is_pure_p(noisy)
+
+Impurity is transitive: a function that calls an impure function is impure too. Calls are resolved through the
+function's globals, closure and builtins, and the callees' results are cached. Calls to the standard library are covered
+by the lists above and not followed, and calls that can't be resolved (parameters, dynamic attributes) are not
+considered impure. Recursion is assumed pure.
+
+The CLI ``python -m predicate.coverage PATH [-o snapshot.json]`` reports the purity of all public functions under a path.
+Each impure function in the snapshot has a ``reason`` (with ``file:line``) and a ``category``: ``io``, ``system``
+(``os``, ``sys``), ``randomness``, ``time``, ``dynamic-code`` (``exec``, ``eval``, ...) or ``global-state``. For a
+transitive impurity the category is that of the root cause. ``find_impurity`` in ``predicate.is_pure_predicate`` returns
+the same information for a single function.
+
+With ``--exercise`` the CLI also calls each function with inputs generated from its annotations, each in a separate
+sandboxed subprocess (``--calls``, ``--timeout`` and ``--jobs`` tune this). Each function is exercised ``--runs`` times (default 3) with fresh
+random inputs; if the runs give different statuses the result is marked ``"flaky": true``, with the counts in ``statuses``. Add ``--failed`` to list and snapshot only the functions whose exercise ended in
+``failed``, ``blocked``, ``timeout`` or ``crashed``, like ``complexipy --failed``. The sandbox runs in an empty temporary
+directory with a minimal environment, and blocks file writes and deletes, spawning processes and network access. The
+outcome per function is stored in the snapshot as ``exercise``, with status ``ok``, ``failed``, ``blocked``,
+``not-exercisable``, ``timeout`` or ``crashed``. The sandbox is a guard against accidents, not a security boundary, and
+the modules are still imported (executed) by the analysis itself.
+
+Functions without retrievable source, such as builtins or C extensions, are not considered pure. The check doesn't
+detect mutation of arguments, and it has no generators.
+
 is_range_p
 ----------
 

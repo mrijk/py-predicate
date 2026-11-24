@@ -354,6 +354,12 @@ def test_dict_of(key_value_predicates):
     assert_generated_false(predicate)
 
 
+def test_dict_of_without_key_value_predicates():
+    # nothing satisfies it, so any dict is false
+    assert_generated_false(is_dict_of_p())
+    assert_generated_false(is_frozendict_of_p())
+
+
 def test_frozendict_of():
     predicate = is_frozendict_of_p((is_str_p, is_int_p))
 
