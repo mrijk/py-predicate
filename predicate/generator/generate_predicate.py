@@ -194,16 +194,24 @@ def generate_gt_predicates(max_depth: int, klass: PredicateKlass) -> Iterator[An
 
 
 def generate_in_predicates(max_depth: int, klass: PredicateKlass) -> Iterator[Any]:
-    from predicate.generator.helpers import random_iterables
+    from predicate.generator.helpers import non_empty_length_p, random_iterables
 
-    yield from (InPredicate(set(iterable)) for iterable in random_iterables(value_p=is_instance_p(klass)))
+    # At least one member: an empty set has no type, so its false values would be of any type, not klass
+    yield from (
+        InPredicate(set(iterable))
+        for iterable in random_iterables(length_p=non_empty_length_p, value_p=is_instance_p(klass))
+    )
 
 
 def generate_not_in_predicates(max_depth: int, klass: PredicateKlass) -> Iterator[Any]:
     from predicate import is_instance_p
-    from predicate.generator.helpers import random_iterables
+    from predicate.generator.helpers import non_empty_length_p, random_iterables
 
-    yield from (NotInPredicate(set(iterable)) for iterable in random_iterables(value_p=is_instance_p(klass)))
+    # At least one member: an empty set has no type, so its false values would be of any type, not klass
+    yield from (
+        NotInPredicate(set(iterable))
+        for iterable in random_iterables(length_p=non_empty_length_p, value_p=is_instance_p(klass))
+    )
 
 
 def generate_le_predicates(max_depth: int, klass: PredicateKlass) -> Iterator[Any]:

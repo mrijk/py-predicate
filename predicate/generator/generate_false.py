@@ -591,6 +591,9 @@ def generate_compiled(predicate: CompiledPredicate[Any], **kwargs: Any) -> Itera
 
 @generate_false.register(OrPredicate)
 def generate_or(predicate: OrPredicate[Any]) -> Iterator[Any]:
+    if optimize(predicate) == always_true_p:
+        return
+
     left = predicate.left
     right = predicate.right
 
@@ -629,11 +632,15 @@ def generate_dict_of_p(dict_of_predicate: DictOfPredicate) -> Iterator[Any]:
     while True:
         n = random.randint(1, max_number)
         values = take(length, bool_array_from_int(n))
-        yield {
-            next(key_gen): next(val_gen)
-            for (false_gens, true_gens), use_true in zip(generators, values, strict=False)
-            for key_gen, val_gen in [true_gens if use_true else false_gens]
-        }
+        try:
+            item = {
+                next(key_gen): next(val_gen)
+                for (false_gens, true_gens), use_true in zip(generators, values, strict=False)
+                for key_gen, val_gen in [true_gens if use_true else false_gens]
+            }
+        except StopIteration:  # a key or value generator ran dry: nothing more to generate (PEP 479)
+            return
+        yield item
 
 
 @generate_false.register
@@ -803,8 +810,7 @@ def generate_count(count_predicate: CountPredicate[Any]) -> Iterator[Any]:
 
     invalid_counts = (c for c in generate_false(length_p) if c >= 0)
 
-    while True:
-        count = next(invalid_counts)
+    for count in invalid_counts:
         true_values = take(count, generate_true(predicate))
 
         # lists and tuples keep duplicates, so the count is preserved (sets would not)
@@ -819,7 +825,7 @@ def generate_count(count_predicate: CountPredicate[Any]) -> Iterator[Any]:
 def _subclasses(klass: type) -> set[Any]:
     with warnings.catch_warnings():
         warnings.simplefilter("ignore", DeprecationWarning)
-        return set(klass.__subclasses__())
+        return set(type.__subclasses__(klass))  # klass.__subclasses__() is unbound for type itself
 
 
 @generate_false.register(IsSamePredicate)

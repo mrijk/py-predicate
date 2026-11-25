@@ -145,9 +145,16 @@ def random_lengths(length_p: Predicate[Any]) -> Iterator[int]:
         yield 0
     lengths = generate_true(length_p)
     # ponytail: a length_p without a positive length in 100 draws (e.g. eq_p(0)) is taken to allow only 0
-    head = take(100, lengths)
+    # length_p may accept non-ints (e.g. Predicate[Any]); no int in 100 draws means there is no usable length
+    head = [n for n in take(100, lengths) if isinstance(n, int) and not isinstance(n, bool)]
+    if not head:
+        return
     positive = any(n > 0 for n in head)
-    yield from (n for n in chain(head, lengths) if (n > 0 if positive else n >= 0))
+    yield from (
+        n
+        for n in chain(head, lengths)
+        if isinstance(n, int) and not isinstance(n, bool) and (n > 0 if positive else n >= 0)
+    )
 
 
 def random_dicts(
@@ -539,7 +546,7 @@ def ignore_unknown_kwargs[F: Callable[..., Any]](dispatcher: F) -> F:
 def random_enum_members(klass: type[Enum]) -> Iterator[Enum]:
     members = list(klass)
     if not members:
-        raise ValueError(f"Can't generate values for {klass.__name__}: it has no members")
+        return
     if issubclass(klass, Flag):
         # Flags are meant to be combined, so also yield random combinations, including the empty flag
         yield from repeatfunc(lambda: reduce(or_, random.sample(members, random.randint(0, len(members))), klass(0)))

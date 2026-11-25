@@ -17,3 +17,8 @@ def test_generate_is_subclass_none():
     values = take(5, generate_false(predicate))
 
     assert not values
+
+
+def test_generate_false_is_subclass_of_type():
+    # The metaclass `type` is its own class: a bare type.__subclasses__() call is unbound
+    assert_generated_false(is_subclass_p(type))

@@ -518,6 +518,12 @@ def test_generate_false_xor_always_true():
     assert values == []
 
 
+def test_generate_false_or_always_true():
+    predicate = eq_p(False) | ~eq_p(False)
+
+    assert list(take(5, generate_false(predicate))) == []
+
+
 def test_generate_false_xor_overlapping():
     # XOR where AND doesn't optimize to always_false_p — covers the left_and_right path
     predicate = ge_p(2) ^ gt_p(5)

@@ -7,6 +7,7 @@ from more_itertools import first, take
 
 from predicate import (
     all_p,
+    always_true_p,
     eq_p,
     ge_le_p,
     ge_p,
@@ -33,6 +34,7 @@ from predicate import (
     is_tuple_p,
     is_uuid_p,
 )
+from predicate.generator.generate_predicate import generate_in_predicates, generate_not_in_predicates
 from predicate.generator.helpers import (
     generate_even_numbers,
     generate_odd_numbers,
@@ -393,6 +395,18 @@ def test_random_lengths_only_zero():
     assert take(5, random_lengths(eq_p(0))) == [0, 0, 0, 0, 0]
 
 
+def test_random_lengths_ignores_non_ints():
+    assert all(isinstance(length, int) for length in take(50, random_lengths(always_true_p)))
+
+
+def test_random_lengths_ignores_bools():
+    assert not any(isinstance(length, bool) for length in take(50, random_lengths(always_true_p)))
+
+
+def test_random_lengths_without_ints():
+    assert list(random_lengths(is_str_p)) == []
+
+
 @pytest.mark.parametrize("generator", [random_lists, random_sets, random_tuples, random_dicts, random_iterables])
 def test_random_collections_empty_once_and_first(generator):
     values = take(20, generator())
@@ -435,6 +449,12 @@ def test_random_strings_lower_empty():
 def test_random_strings_and_bytes_with_empty_length_range():
     assert take(5, random_strings(length_p=ge_le_p(8, 7))) == []
     assert take(5, random_bytes(length_p=ge_le_p(1, 0))) == []
+
+
+def test_random_in_predicates_are_not_empty():
+    # An empty in_p() has no type, so its false values were of any type and broke lt_p(0) & co
+    for generator in (generate_in_predicates, generate_not_in_predicates):
+        assert all(predicate.v for predicate in take(50, generator(max_depth=3, klass=int)))
 
 
 def test_random_predicates_of_any_accept_any_value():

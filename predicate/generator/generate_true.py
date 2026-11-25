@@ -666,10 +666,8 @@ def generate_recur(predicate: RecurPredicate[Any], *, length_p: Predicate[Any] =
     # One stream of start values, so every sequence can start with a different value (and type)
     starts = generate_true(predicate.predicate_1)
 
-    for length in random_lengths(length_p):
-        yield from (
-            [recur_values(predicate, length, next(starts)) if length else []] if length or predicate.empty else []
-        )
+    for length, start in zip(random_lengths(length_p), starts, strict=False):
+        yield from [recur_values(predicate, length, start) if length else []] if length or predicate.empty else []
 
 
 def recur_values(predicate: RecurPredicate[Any], length: int, start: Any) -> list[Any]:
@@ -969,7 +967,7 @@ def _constructible_classes(klass: Any) -> list[Any]:
 
 def _all_subclasses(klass: type) -> list[type]:
     # ponytail: only subclasses that are already imported, like random_modules
-    direct: list[type] = klass.__subclasses__()
+    direct: list[type] = type.__subclasses__(klass)  # not klass.__subclasses__(): that is unbound for type itself
     return list(dict.fromkeys(chain(direct, *(_all_subclasses(subclass) for subclass in direct))))
 
 
@@ -1308,8 +1306,8 @@ def generate_match_p(match_predicate: MatchPredicate[Any]) -> Iterator[Any]:
             if rest_predicates:
                 iter_first = generate_true(predicate)
                 iter_rest: Iterator[Any] = generate_true(MatchPredicate(predicates=rest_predicates))
-                while True:
-                    yield [next(iter_first)] + list(next(iter_rest))
+                for first, rest in zip(iter_first, iter_rest, strict=False):
+                    yield [first] + list(rest)
             else:
                 yield from zip(generate_true(predicate), strict=False)
 
@@ -1326,8 +1324,8 @@ def generate_exactly_n(exactly_predicate: ExactlyPredicate[Any], *, predicates: 
     if predicates:
         iter_first = generate_true(list_of_predicate, length_p=length_p)
         iter_rest: Iterator[Any] = generate_true(MatchPredicate(predicates=predicates))
-        while True:
-            yield list(next(iter_first)) + list(next(iter_rest))
+        for first, rest in zip(iter_first, iter_rest, strict=False):
+            yield list(first) + list(rest)
     else:
         yield from generate_true(list_of_predicate, length_p=length_p)
 
@@ -1345,8 +1343,8 @@ def generate_repeat(repeat_predicate: RepeatPredicate[Any], *, predicates: list[
     if predicates:
         iter_first = generate_true(list_of_predicate, length_p=length_p)
         iter_rest: Iterator[Any] = generate_true(MatchPredicate(predicates=predicates))
-        while True:
-            yield list(next(iter_first)) + list(next(iter_rest))
+        for first, rest in zip(iter_first, iter_rest, strict=False):
+            yield list(first) + list(rest)
     else:
         yield from generate_true(is_list_of_p(predicate=predicate), length_p=length_p)
 
@@ -1388,8 +1386,7 @@ def generate_count(count_predicate: CountPredicate[Any]) -> Iterator[Any]:
 
     valid_counts = generate_true(length_p)
 
-    while True:
-        count = next(valid_counts)
+    for count in valid_counts:
         true_values = take(count, generate_true(predicate))
 
         # lists and tuples keep duplicates, so the count is preserved (sets would not)
@@ -1403,7 +1400,9 @@ def generate_count(count_predicate: CountPredicate[Any]) -> Iterator[Any]:
 
 def _yield_subclasses(klasses: list[type]) -> Iterator[Any]:
     while True:
-        candidates = [candidate for klass in klasses for candidate in (klass, *klass.__subclasses__())]
+        candidates = [candidate for klass in klasses for candidate in (klass, *type.__subclasses__(klass))]
+        if not candidates:  # e.g. is_subclass_p(()): nothing is a subclass of no class
+            return
         # An abstract class (e.g. Predicate) can't be used as a concrete one; keep it if nothing else is left
         yield from [candidate for candidate in candidates if not inspect.isabstract(candidate)] or candidates
 

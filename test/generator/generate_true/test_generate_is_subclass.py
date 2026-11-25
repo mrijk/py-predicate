@@ -41,3 +41,13 @@ def test_generate_is_subclass_skips_abstract_classes():
 
 def test_generate_is_subclass_of_only_an_abstract_class_still_yields_it():
     assert take(3, generate_true(is_subclass_p(_Abstract))) == [_Abstract] * 3
+
+
+def test_generate_is_subclass_of_empty_tuple():
+    # Nothing is a subclass of no class: no values, instead of looping forever
+    assert take(5, generate_true(is_subclass_p(()))) == []
+
+
+def test_generate_is_subclass_of_type():
+    # The metaclass `type` is its own class: a bare type.__subclasses__() call is unbound
+    assert_generated_true(is_subclass_p(type))

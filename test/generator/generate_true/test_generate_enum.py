@@ -1,6 +1,5 @@
 from enum import Enum, IntFlag
 
-import pytest
 from more_itertools import take
 
 from generator.generate_true.helpers import assert_generated_true
@@ -36,5 +35,4 @@ def test_generate_flag_combinations():
 
 
 def test_generate_enum_without_members():
-    with pytest.raises(ValueError, match="NoMembers: it has no members"):
-        take(1, generate_true(is_instance_p(NoMembers)))
+    assert take(1, generate_true(is_instance_p(NoMembers))) == []
