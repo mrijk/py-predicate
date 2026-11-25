@@ -15,6 +15,7 @@ from typing import (
     IO,
     Annotated,
     Any,
+    AsyncIterable,
     BinaryIO,
     Callable,
     Final,
@@ -49,6 +50,7 @@ from predicate.explain import explain
 from predicate.frozendict_of_predicate import is_frozendict_of_p
 from predicate.frozenset_of_predicate import is_frozenset_of_p
 from predicate.function_predicate import fn_p
+from predicate.ge_predicate import ge_p
 from predicate.generator.helpers import random_named_tuple_classes, random_typed_dict_classes
 from predicate.has_length_predicate import is_empty_p
 from predicate.implies import implies
@@ -788,12 +790,14 @@ def yield_predicate(f: Callable[..., Any]) -> Predicate[Any] | None:
     return annotation_to_predicate(args[0]) if args else always_true_p
 
 
-async def take_async(values: Any, n: int) -> list[Any]:
-    """Return the first n items of an async iterator, like take()."""
-    items: list[Any] = []
-    async for item in values:
-        items.append(item)
-        if len(items) == n:
+async def take_async[T](values: AsyncIterable[T], n: Annotated[int, ge_p(0)]) -> list[T]:
+    """Return the first n items of an async iterable, like take()."""
+    items: list[T] = []
+    iterator = aiter(values)
+    while len(items) < n:  # checked before pulling an item, so n == 0 doesn't consume an endless iterable
+        try:
+            items.append(await anext(iterator))
+        except StopAsyncIteration:
             break
     return items
 

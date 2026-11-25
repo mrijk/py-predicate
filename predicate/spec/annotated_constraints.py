@@ -31,7 +31,10 @@ _known_functions: list[tuple[Callable[..., Any], Predicate[Any]]] = [
 
 
 def constraint_predicates(metadata: Any) -> Iterator[Predicate[Any]]:
-    """Yield the predicates for one Annotated metadata item; anything but an annotated-types constraint yields none."""
+    """Yield the predicates for one Annotated metadata item: a predicate itself or an annotated-types constraint."""
+    if isinstance(metadata, Predicate):  # e.g. Annotated[int, ge_p(0)]
+        yield metadata
+        return
     if type(metadata).__module__ != "annotated_types":
         return
     if getattr(metadata, "__is_annotated_types_grouped_metadata__", False):

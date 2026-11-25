@@ -180,3 +180,15 @@ def test_exercise_detects_mutated_arguments(tmp_path):
     exercise = {f["name"]: f["exercise"] for f in modules[0]["functions"]}
     assert exercise["append"] == exercise["append"] | {"status": "mutates-args", "detail": "mutates lst"}
     assert exercise["concat"]["status"] == "ok"
+
+
+def test_exercise_arguments_that_cannot_be_copied(tmp_path):
+    (tmp_path / "mod.py").write_text(
+        "from collections.abc import AsyncIterable\n\n\n"
+        "async def first(values: AsyncIterable[int]) -> int | None:\n"
+        "    async for value in values:\n        return value\n    return None\n"
+    )
+
+    modules = analyze(tmp_path / "mod.py", exercise=True, calls=5, timeout=5, runs=1)
+
+    assert modules[0]["functions"][0]["exercise"]["status"] == "ok"

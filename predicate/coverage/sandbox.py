@@ -68,6 +68,13 @@ def _without_addresses(value: Any) -> str:
     return re.sub(r"0x[0-9a-f]+", "0x", repr(value))
 
 
+def _snapshot(value: Any) -> Any:
+    try:
+        return copy.deepcopy(value)
+    except TypeError:  # generators, locks, modules...: can't be copied, so a mutation can't be detected either
+        return value
+
+
 def _with_mutation_check(spec: "Spec", mutated: list[str]) -> "Spec":
     """Add a snapshot of deep-copied arguments (#238) and a `fn` that records the arguments the call changed."""
 
@@ -75,7 +82,7 @@ def _with_mutation_check(spec: "Spec", mutated: list[str]) -> "Spec":
         mutated.extend(k for k, v in (old or {}).items() if not _same(v, current[k]))
         return True
 
-    return spec | {"snapshot": dict.fromkeys(spec["args"], copy.deepcopy), "fn": unchanged}
+    return spec | {"snapshot": dict.fromkeys(spec["args"], _snapshot), "fn": unchanged}
 
 
 async def _consume_async(results: Any) -> int:
