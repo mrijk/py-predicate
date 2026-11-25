@@ -37,7 +37,6 @@ from predicate.generator.helpers import (
     evaluate_comp,
     function_with_signature,
     generate_anys,
-    generate_uuids,
     ignore_unknown_kwargs,
     random_anys,
     random_datetimes,
@@ -55,6 +54,7 @@ from predicate.generator.helpers import (
     random_strings_greater,
     random_strings_lower,
     random_tuples,
+    random_uuids_between,
     random_values_of_type,
     sample_optional_fields,
     unused_name,
@@ -341,7 +341,7 @@ def generate_ge(predicate: GePredicate[Any]) -> Iterator[Any]:
         case str():
             yield from random_strings_lower(v)
         case UUID():
-            yield from generate_uuids(~predicate)
+            yield from random_uuids_between(upper=v.int - 1)
         case _:
             raise ValueError(f"Can't generate for type {type(v)}")
 
@@ -360,7 +360,7 @@ def generate_gt(predicate: GtPredicate[Any]) -> Iterator[Any]:
             yield v
             yield from random_strings_lower(v)
         case UUID():
-            yield from generate_uuids(~predicate)
+            yield from random_uuids_between(upper=v.int)
         case _:
             raise ValueError(f"Can't generate for type {type(v)}")
 
@@ -409,7 +409,7 @@ def generate_le(predicate: LePredicate[Any]) -> Iterator[Any]:
         case str():
             yield from random_strings_greater(v)
         case UUID():
-            yield from generate_uuids(~predicate)
+            yield from random_uuids_between(lower=v.int + 1)
         case _:
             raise ValueError(f"Can't generate for type {type(v)}")
 
@@ -428,7 +428,7 @@ def generate_lt(predicate: LtPredicate[Any]) -> Iterator[Any]:
             yield v
             yield from random_strings_greater(v)
         case UUID():
-            yield from generate_uuids(~predicate)
+            yield from random_uuids_between(lower=v.int)
         case _:
             raise ValueError(f"Can't generate for type {type(v)}")
 

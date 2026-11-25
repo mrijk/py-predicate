@@ -365,6 +365,16 @@ def random_uuids() -> Iterator[UUID]:
     yield from repeatfunc(uuid4)
 
 
+_MAX_UUID: Final = 2**128 - 1
+
+
+def random_uuids_between(lower: int = 0, upper: int = _MAX_UUID) -> Iterator[UUID]:
+    """Return uuids whose int lies in lower..upper (both inclusive), the order of uuids; none if the range is empty."""
+    lower, upper = max(lower, 0), min(upper, _MAX_UUID)  # a UUID's int is 0..2**128 - 1
+    if lower <= upper:
+        yield from repeatfunc(lambda: UUID(int=random.randint(lower, upper)))
+
+
 def random_anys() -> Iterator[Any]:
     yield from interleave(random_bools(), random_ints(), random_strings(), random_floats(), random_datetimes())
 
@@ -395,11 +405,12 @@ def random_values_of_type(klass: type) -> Iterator[Any]:
         int: random_ints,
         float: random_floats,
         str: random_strings,
+        UUID: random_uuids,
     }
 
     if generator := type_registry.get(klass):
         yield from generator()
-    elif klass == Any:
+    elif klass in (Any, object):  # every value is an object
         yield from random_anys()
     else:
         raise ValueError(f"No generator found for {klass}")
@@ -439,6 +450,26 @@ def sample_optional_fields(optional: dict[str, Any], generators: dict[str, Itera
     return {key: value for key, value in values.items() if value is not _MISSING}
 
 
+def satisfying(values: Iterator[Any], predicate: Predicate[Any], attempts: int) -> Iterator[Any]:
+    """Return the values that satisfy the predicate; stops after attempts misses in a row, so it can't hang.
+
+    E.g. is_tuple_p & is_empty_p: random tuples are only rarely empty.
+    """
+    misses = 0
+    for value in values:
+        if predicate(value):
+            misses = 0
+            yield value
+        else:
+            misses += 1
+            if misses == attempts:
+                return
+
+
+# Random ints, uuids and anys are cheap to draw, so a predicate gets many chances before it is given up on
+_FILTER_ATTEMPTS: Final = 1000
+
+
 def generate_datetimes(predicate: Predicate[datetime]) -> Iterator[datetime]:
     yield from (item for item in random_datetimes() if predicate(item))
 
@@ -452,15 +483,11 @@ def generate_strings(predicate: Predicate[str]) -> Iterator[str]:
 
 
 def generate_ints(predicate: Predicate[int]) -> Iterator[int]:
-    yield from (item for item in random_ints() if predicate(item))
-
-
-def generate_uuids(predicate: Predicate[UUID]) -> Iterator[UUID]:
-    yield from (item for item in random_uuids() if predicate(item))
+    yield from satisfying(random_ints(), predicate, _FILTER_ATTEMPTS)
 
 
 def generate_anys(predicate: Predicate[Any]) -> Iterator[Any]:
-    yield from (item for item in random_anys() if predicate(item))
+    yield from satisfying(random_anys(), predicate, _FILTER_ATTEMPTS)
 
 
 def evaluate_comp(predicate: Predicate[Any], x: Any) -> bool | None:

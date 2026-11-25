@@ -1,6 +1,7 @@
 import sys
 from datetime import datetime
 from typing import Any
+from uuid import UUID
 
 import pytest
 from more_itertools import first, take
@@ -36,7 +37,9 @@ from predicate import (
 )
 from predicate.generator.generate_predicate import generate_in_predicates, generate_not_in_predicates
 from predicate.generator.helpers import (
+    generate_anys,
     generate_even_numbers,
+    generate_ints,
     generate_odd_numbers,
     random_anys,
     random_bools,
@@ -62,6 +65,7 @@ from predicate.generator.helpers import (
     random_strings_lower,
     random_tuples,
     random_uuids,
+    random_uuids_between,
     random_values_of_type,
 )
 
@@ -372,6 +376,32 @@ def test_random_values_of_type_any():
     all_any = all_p(is_bool_p | is_datetime_p | is_float_p | is_int_p | is_str_p | is_dict_p)
 
     assert all_any(values)
+
+
+@pytest.mark.parametrize("generate", [generate_ints, generate_anys])
+def test_generate_with_unsatisfiable_predicate_ends(generate):
+    # No random value is ever equal to this one, so filtering must give up instead of looping forever
+    assert list(generate(eq_p("never generated"))) == []
+
+
+def test_random_uuids_between():
+    lower, upper = UUID(int=100), UUID(int=200)
+
+    assert all(lower <= uuid <= upper for uuid in take(50, random_uuids_between(lower.int, upper.int)))
+
+
+@pytest.mark.parametrize(("lower", "upper"), [(5, 4), (-1, -1), (2**128, 2**128)])
+def test_random_uuids_between_empty_range(lower, upper):
+    assert list(random_uuids_between(lower, upper)) == []
+
+
+def test_random_values_of_type_uuid():
+    assert all(isinstance(value, UUID) for value in take(10, random_values_of_type(UUID)))
+
+
+def test_random_values_of_type_object():
+    # every value is an object, so object accepts what Any does
+    assert len(take(10, random_values_of_type(object))) == 10
 
 
 def test_random_values_of_type_unknown():

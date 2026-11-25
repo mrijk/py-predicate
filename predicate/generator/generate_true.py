@@ -102,7 +102,6 @@ from predicate.generator.helpers import (
     generate_ints,
     generate_lambda,
     generate_strings,
-    generate_uuids,
     ignore_unknown_kwargs,
     random_anys,
     random_ast_nodes,
@@ -161,8 +160,10 @@ from predicate.generator.helpers import (
     random_tuples,
     random_tzinfos,
     random_uuids,
+    random_uuids_between,
     random_values_of_type,
     sample_optional_fields,
+    satisfying,
     set_from_list,
     unused_name,
     with_parameters,
@@ -328,22 +329,6 @@ def generate_exception(_predicate: ExceptionPredicate[Any]) -> Iterator[Any]:
     yield from []
 
 
-def _satisfying(values: Iterator[Any], predicate: Predicate[Any], attempts: int) -> Iterator[Any]:
-    """Return the values that satisfy the predicate; stops after attempts misses in a row, so it can't hang.
-
-    E.g. is_tuple_p & is_empty_p: random tuples are only rarely empty.
-    """
-    misses = 0
-    for value in values:
-        if predicate(value):
-            misses = 0
-            yield value
-        else:
-            misses += 1
-            if misses == attempts:
-                return
-
-
 @generate_true.register(AndPredicate)
 def generate_and(predicate: AndPredicate[Any]) -> Iterator[Any]:
     if optimize(predicate) == always_false_p:
@@ -360,11 +345,11 @@ def generate_and(predicate: AndPredicate[Any]) -> Iterator[Any]:
 
     iterables = []
     if first_left is not _sentinel:
-        iterables.append(chain([first_left], _satisfying(left_values, predicate.right, attempts)))
+        iterables.append(chain([first_left], satisfying(left_values, predicate.right, attempts)))
     if first_right is not _sentinel:
         # Both sides often start with the same edge case, e.g. []: yield it once (#356)
         head = [] if first_right == first_left else [first_right]
-        iterables.append(chain(head, _satisfying(right_values, predicate.left, attempts)))
+        iterables.append(chain(head, satisfying(right_values, predicate.left, attempts)))
 
     if not iterables:
         raise ValueError(f"Couldn't generate values that satisfy {predicate}")
@@ -448,7 +433,7 @@ def generate_ge(predicate: GePredicate[Any], **_kwargs: Any) -> Iterator[Any]:
             yield v
             yield from random_strings_greater(v)
         case UUID():
-            yield from generate_uuids(predicate)
+            yield from random_uuids_between(lower=v.int)
         case _:
             raise ValueError(f"Can't generate for type {type(v)}")
 
@@ -466,7 +451,7 @@ def generate_gt(predicate: GtPredicate[Any]) -> Iterator[Any]:
         case str():
             yield from random_strings_greater(v)
         case UUID():
-            yield from generate_uuids(predicate)
+            yield from random_uuids_between(lower=v.int + 1)
         case _:
             raise ValueError(f"Can't generate for type {type(v)}")
 
@@ -551,7 +536,7 @@ def generate_le(predicate: LePredicate[Any]) -> Iterator[Any]:
             yield v
             yield from random_strings_lower(v)
         case UUID():
-            yield from generate_uuids(predicate)
+            yield from random_uuids_between(upper=v.int)
         case _:
             raise ValueError(f"Can't generate for type {type(v)}")
 
@@ -622,7 +607,7 @@ def generate_lt(predicate: LtPredicate[Any]) -> Iterator[Any]:
         case str():
             yield from random_strings_lower(v)
         case UUID():
-            yield from generate_uuids(predicate)
+            yield from random_uuids_between(upper=v.int - 1)
         case _:
             raise ValueError(f"Can't generate for type {type(v)}")
 
@@ -741,7 +726,7 @@ def _generator_for_item(item: Any, predicate: NotInPredicate[Any]) -> Iterator[A
         case str():
             return generate_strings(predicate)
         case UUID():
-            return generate_uuids(predicate)
+            return (uuid for uuid in random_uuids() if predicate(uuid))
         case _:
             raise ValueError(f"Can't generate for type {type(item)}")
 
