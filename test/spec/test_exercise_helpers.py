@@ -42,7 +42,12 @@ from predicate import (
     is_struct_p,
 )
 from predicate.predicate import Predicate
-from predicate.spec.exercise_helpers import annotation_to_predicate, bind_shared_type_vars, take_async
+from predicate.spec.exercise_helpers import (
+    annotation_to_predicate,
+    bind_shared_type_vars,
+    generate_values,
+    take_async,
+)
 from predicate.spec.instrument import instrument
 from predicate.spec.spec import SpecViolationError
 from spec.test_functions.typed_dicts_postponed import Options
@@ -699,3 +704,12 @@ async def test_take_async_stops_when_exhausted():
         yield 2
 
     assert await take_async(two(), 5) == [1, 2]
+
+
+def test_generate_values_without_return_predicate():
+    from predicate import is_int_p
+
+    return_p, values = generate_values({"args": {"x": is_int_p}}, 3)
+
+    assert return_p("anything")
+    assert len(values) == 3

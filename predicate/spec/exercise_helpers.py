@@ -657,9 +657,9 @@ def _generate_with_pre_condition[T](candidates: Iterable[T], *, pre: Callable[..
     return values
 
 
-def generate_values(spec: Spec, n: int) -> tuple[Any, ...]:
+def generate_values(spec: Spec, n: Annotated[int, ge_p(0)]) -> tuple[Any, ...]:
     parameters = spec["args"]
-    return_p = spec["ret"]
+    return_p = spec.get("ret", always_true_p)  # ret is optional: without one any result will do
     if predicates := tuple(parameters.items()):
         candidates = generate_true(is_dict_of_p(*predicates))
         if pre := spec.get("pre"):
