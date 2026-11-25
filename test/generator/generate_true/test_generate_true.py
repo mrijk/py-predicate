@@ -497,6 +497,16 @@ def test_generate_xor_always_false():
     assert not list(generate_true(predicate))
 
 
+def test_generate_xor_with_a_side_that_has_no_value():
+    # x < 0 xor x >= 0 is always true, but the optimizer doesn't see it: for ge_p(0) ^ that, one side has no value at all
+    always_true = lt_p(0) ^ ~(ne_p(0) ^ gt_p(0))
+
+    values = take(8, generate_true(ge_p(0) ^ always_true))
+
+    assert len(values) == 8
+    assert all(value < 0 for value in values)
+
+
 def test_generate_always_true_p():
     predicate = always_true_p
 

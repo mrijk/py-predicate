@@ -395,6 +395,13 @@ def test_random_uuids_between_empty_range(lower, upper):
     assert list(random_uuids_between(lower, upper)) == []
 
 
+def test_random_dicts_with_few_distinct_keys():
+    # Only one key exists, so the dicts hold at most that key, instead of waiting for more forever
+    dicts = take(20, random_dicts(key_p=eq_p(3)))
+
+    assert all(set(d) <= {3} for d in dicts)
+
+
 def test_random_values_of_type_uuid():
     assert all(isinstance(value, UUID) for value in take(10, random_values_of_type(UUID)))
 

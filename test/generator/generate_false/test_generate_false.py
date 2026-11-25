@@ -96,6 +96,10 @@ from predicate.is_callable_predicate import is_callable_p as is_callable_signatu
         eq_false_p,
         eq_true_p,
         has_key_p(eq_p("foo")),
+        has_key_p(le_p(5)),  # keys of the type key_p is about, not str keys: le_p(5) raises for those
+        has_key_p(ge_le_p(0, 10) | eq_p(20)),
+        has_key_p(always_true_p),
+        has_key_p(ne_p(3)),  # the only dicts without a key != 3 hold the key 3
         in_p([2, 3, 4]),
         is_bool_p,
         is_bytes_p,
@@ -522,6 +526,15 @@ def test_generate_false_or_always_true():
     predicate = eq_p(False) | ~eq_p(False)
 
     assert list(take(5, generate_false(predicate))) == []
+
+
+def test_generate_false_xor_without_values():
+    # x < 0 xor x >= 0 is always true, but the optimizer doesn't see it: searching for a false value must end
+    always_true = lt_p(0) ^ ~(ne_p(0) ^ gt_p(0))
+
+    assert list(take(5, generate_false(always_true))) == []
+    # not_in_p([0]) is the only side that can be false, and it is false at 0
+    assert set(take(5, generate_false(not_in_p([0]) & always_true))) == {0}
 
 
 def test_generate_false_xor_overlapping():

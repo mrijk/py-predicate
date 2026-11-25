@@ -57,11 +57,12 @@ from predicate.generator.helpers import (
     random_uuids_between,
     random_values_of_type,
     sample_optional_fields,
+    satisfying,
     unused_name,
     with_parameters,
 )
 from predicate.gt_predicate import GtPredicate
-from predicate.has_key_predicate import HasKeyPredicate, has_key_p
+from predicate.has_key_predicate import HasKeyPredicate
 from predicate.has_length_predicate import HasLengthPredicate
 from predicate.has_path_predicate import HasPathPredicate
 from predicate.implements_protocol_predicate import ImplementsProtocolPredicate, protocol_members
@@ -199,9 +200,8 @@ def generate_is_close_p(predicate: IsClosePredicate[Any]) -> Iterator[Any]:
 
 @generate_false.register(HasKeyPredicate)
 def generate_has_key(predicate: HasKeyPredicate[Any]) -> Iterator[Any]:
-    without_predicate_key = ~has_key_p(predicate.key_p)
-
-    yield from (random_dict for random_dict in random_dicts() if without_predicate_key(random_dict))
+    # Keys that don't satisfy key_p, so no key does; of the type key_p is about, not just str keys
+    yield from random_dicts(key_p=~predicate.key_p)
 
 
 @generate_false.register(HasLengthPredicate)
@@ -727,11 +727,13 @@ def generate_xor(predicate: XorPredicate[Any]) -> Iterator[Any]:
     else:
         from predicate.generator.generate_true import generate_true
 
-        not_right_and_not_left = (item for item in generate_false(predicate.right) if not predicate.left(item))
+        # Bounded, so a side without such a value ends its stream instead of searching forever
+        attempts = 100
+        not_right_and_not_left = satisfying(generate_false(predicate.right), ~predicate.left, attempts)
         if optimize(predicate.left & predicate.right) == always_false_p:
             yield from not_right_and_not_left
 
-        left_and_right = (item for item in generate_true(predicate.left) if predicate.right(item))
+        left_and_right = satisfying(generate_true(predicate.left), predicate.right, attempts)
 
         yield from random_first_from_iterables(left_and_right, not_right_and_not_left)
 

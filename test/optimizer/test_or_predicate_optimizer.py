@@ -1,3 +1,5 @@
+import pytest
+
 from predicate import (
     all_p,
     always_false_p,
@@ -565,3 +567,29 @@ def test_or_no_xor_right(p, q, r):
     predicate = (p & ~q) | (~r & q)
 
     assert not can_optimize(predicate)
+
+
+@pytest.mark.parametrize(
+    "predicate",
+    [
+        ne_p(0) | ge_p(0),
+        le_p(0) | ne_p(0),
+        not_in_p([0]) | ge_p(0),
+        not_in_p([1, 2]) | ge_p(1),
+        ne_p(3) | in_p([3, 4]),
+    ],
+)
+def test_or_not_equal_and_other_side_holds_at_the_value(predicate):
+    # ne(v) is false only at v, so ne(v) | p is always true when p holds at v
+    assert optimize(predicate) == always_true_p
+
+
+@pytest.mark.parametrize(
+    "predicate",
+    [
+        not_in_p([1, 0]) | ge_p(1),  # 0 is neither
+        ne_p(0) | eq_p("a"),  # can't be told for a str
+    ],
+)
+def test_or_not_equal_and_other_side_fails_at_the_value(predicate):
+    assert optimize(predicate) != always_true_p

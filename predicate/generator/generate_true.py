@@ -1282,8 +1282,10 @@ def generate_xor(predicate: XorPredicate[Any]) -> Iterator[Any]:
     if optimize(predicate) == always_false_p:
         yield from []
     else:
-        left_and_not_right = (item for item in generate_true(predicate.left) if not predicate.right(item))
-        right_and_not_left = (item for item in generate_true(predicate.right) if not predicate.left(item))
+        # Bounded, so a side without such a value ends its stream instead of searching forever
+        attempts = 100
+        left_and_not_right = satisfying(generate_true(predicate.left), ~predicate.right, attempts)
+        right_and_not_left = satisfying(generate_true(predicate.right), ~predicate.left, attempts)
         yield from random_first_from_iterables(left_and_not_right, right_and_not_left)
 
 

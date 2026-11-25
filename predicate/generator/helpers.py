@@ -18,7 +18,7 @@ from enum import Enum, Flag
 from fractions import Fraction
 from functools import cache, reduce, wraps
 from inspect import Parameter, Signature, signature
-from itertools import chain, count, cycle
+from itertools import chain, count, cycle, islice
 from operator import or_
 from pathlib import PurePath
 from random import choices
@@ -157,6 +157,9 @@ def random_lengths(length_p: Predicate[Any]) -> Iterator[int]:
     )
 
 
+_KEY_ATTEMPTS: Final = 100
+
+
 def random_dicts(
     key_p: Predicate[Any] = is_str_p, value_p: Predicate[Any] = is_int_p, size_p: Predicate[Any] = default_size_p
 ) -> Iterator[dict[Any, Any]]:
@@ -166,7 +169,9 @@ def random_dicts(
     valid_values = generate_true(value_p)
     valid_sizes = random_lengths(size_p)
 
-    yield from (dict(zip(take(s, unique_everseen(valid_keys)), valid_values, strict=False)) for s in valid_sizes)
+    # A bounded draw per dict: when the keys have few distinct values (e.g. only 3), the dict is smaller, not endless
+    keys = (take(s, unique_everseen(islice(valid_keys, _KEY_ATTEMPTS))) for s in valid_sizes)
+    yield from (dict(zip(key_list, valid_values, strict=False)) for key_list in keys)
 
 
 if sys.version_info >= (3, 15):
