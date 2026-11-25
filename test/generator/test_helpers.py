@@ -60,6 +60,7 @@ from predicate.generator.helpers import (
     random_lists,
     random_predicates,
     random_sets,
+    random_signatures,
     random_strings,
     random_strings_greater,
     random_strings_lower,
@@ -111,6 +112,15 @@ def test_random_functions():
 
     assert all(callable(f) and f.__name__ != "<lambda>" for f in functions)
     assert all(0 <= len(signature(f).parameters) <= 5 for f in functions)
+
+
+def test_random_signatures_have_no_keyword_names():
+    import keyword
+
+    # the names come from [a-z]{2,3}, which includes keywords like 'as': inspect.Parameter rejects them
+    signatures = take(2000, random_signatures(ge_p(10)))
+
+    assert not any(keyword.iskeyword(name) for sig in signatures for name in sig.parameters)
 
 
 def test_random_callable_objects():

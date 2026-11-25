@@ -3,6 +3,7 @@ import asyncio
 import atexit
 import io
 import ipaddress
+import keyword
 import logging
 import math
 import random
@@ -33,6 +34,7 @@ from predicate.eq_predicate import EqPredicate, eq_p
 from predicate.generator.generate_predicate import PredicateKlass, generate_predicate, typed_predicate_type_registry
 from predicate.is_instance_predicate import is_int_p, is_str_p
 from predicate.ne_predicate import NePredicate
+from predicate.not_in_predicate import not_in_p
 from predicate.not_predicate import NotPredicate
 from predicate.or_predicate import OrPredicate
 from predicate.predicate import Predicate
@@ -89,9 +91,12 @@ def generate_lambda(arg_names: list[str]) -> types.FunctionType:
 
 default_nr_of_parameters_p: Final = eq_p(1)
 
+# A keyword (e.g. `as`) is not allowed as a parameter, field or lambda argument name
+_name_p: Final = not_in_p(keyword.kwlist)
+
 
 def random_lambdas(nr_of_parameters_p: Predicate[Any] = default_nr_of_parameters_p) -> Iterator[types.FunctionType]:
-    value_p = regex_p("[a-z]{2,3}")
+    value_p = regex_p("[a-z]{2,3}") & _name_p
     valid_parameter_lists = random_lists(length_p=nr_of_parameters_p, value_p=value_p)
     yield from (generate_lambda(list(arg_names)) for arg_names in valid_parameter_lists)
 
@@ -100,7 +105,7 @@ default_size_p: Final = ge_le_p(lower=0, upper=5)
 
 
 def random_signatures(nr_of_parameters_p: Predicate[Any] = default_size_p) -> Iterator[Signature]:
-    value_p = regex_p("[a-z]{2,3}")
+    value_p = regex_p("[a-z]{2,3}") & _name_p
     valid_parameter_lists = random_lists(length_p=nr_of_parameters_p, value_p=value_p)
 
     def to_signature(names: list[str]) -> Signature:
@@ -386,7 +391,7 @@ def random_anys() -> Iterator[Any]:
 
 def random_named_tuples() -> Iterator[tuple[Any, ...]]:
     # ponytail: every value gets a fresh namedtuple class; cache classes if that turns out to be slow
-    field_names = random_lists(length_p=ge_le_p(lower=0, upper=4), value_p=regex_p("[a-z]{2,4}"))
+    field_names = random_lists(length_p=ge_le_p(lower=0, upper=4), value_p=regex_p("[a-z]{2,4}") & _name_p)
     for names in field_names:
         klass = namedtuple("RandomNamedTuple", unique_everseen(names))  # type: ignore[misc]  # noqa: PYI024
         yield klass(*take(len(klass._fields), random_anys()))
@@ -688,14 +693,14 @@ def random_ios() -> Iterator[io.IOBase]:
 
 
 def random_named_tuple_classes() -> Iterator[type]:
-    field_names = random_lists(length_p=ge_le_p(lower=0, upper=4), value_p=regex_p("[a-z]{2,4}"))
+    field_names = random_lists(length_p=ge_le_p(lower=0, upper=4), value_p=regex_p("[a-z]{2,4}") & _name_p)
     yield from (namedtuple("RandomNamedTuple", unique_everseen(names)) for names in field_names)  # noqa: PYI024
 
 
 def random_typed_dict_classes() -> Iterator[type]:
     from typing import TypedDict
 
-    field_names = random_lists(length_p=ge_le_p(lower=0, upper=4), value_p=regex_p("[a-z]{2,4}"))
+    field_names = random_lists(length_p=ge_le_p(lower=0, upper=4), value_p=regex_p("[a-z]{2,4}") & _name_p)
     field_types = [int, str, float, bool, list[int]]
     for names in field_names:
         yield TypedDict("RandomTypedDict", {name: random.choice(field_types) for name in names})  # type: ignore[operator]
