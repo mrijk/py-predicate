@@ -24,15 +24,17 @@ from operator import or_
 from pathlib import PurePath
 from random import choices
 from time import gmtime, struct_time
-from typing import Any, Final, ForwardRef, Iterator
+from typing import Annotated, Any, Final, ForwardRef, Iterator
 from uuid import UUID, uuid4
 
 from more_itertools import interleave, random_permutation, repeatfunc, take, unique_everseen
 
 from predicate.and_predicate import AndPredicate
 from predicate.eq_predicate import EqPredicate, eq_p
+from predicate.function_predicate import fn_p
 from predicate.generator.generate_predicate import PredicateKlass, generate_predicate, typed_predicate_type_registry
 from predicate.is_instance_predicate import is_int_p, is_str_p
+from predicate.is_named_tuple_predicate import is_named_tuple_class
 from predicate.ne_predicate import NePredicate
 from predicate.not_in_predicate import not_in_p
 from predicate.not_predicate import NotPredicate
@@ -397,7 +399,14 @@ def random_named_tuples() -> Iterator[tuple[Any, ...]]:
         yield klass(*take(len(klass._fields), random_anys()))
 
 
-def random_named_tuple_instances(klass: type) -> Iterator[tuple[Any, ...]]:
+_named_tuple_class_p: Final = fn_p(
+    is_named_tuple_class,
+    generate_true_fn=lambda: random_named_tuple_classes(),  # noqa: PLW0108  defined further down
+    generate_false_fn=random_ints,
+)
+
+
+def random_named_tuple_instances(klass: Annotated[type, _named_tuple_class_p]) -> Iterator[tuple[Any, ...]]:
     from predicate import generate_true
     from predicate.spec.exercise_helpers import annotation_to_predicate, class_hints
 

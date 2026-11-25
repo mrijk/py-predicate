@@ -10,6 +10,7 @@ Add OS-level isolation (sandbox-exec, bwrap, a container) if untrusted code must
 
 import asyncio
 import copy
+import inspect
 import io
 import json
 import os
@@ -101,7 +102,9 @@ def _exercise(file: str, name: str, calls: int) -> dict[str, Any]:
     except InvalidSpecError as e:
         return {"status": "not-exercisable", "detail": str(e)}
     mutated: list[str] = []
-    results = exercise(fn, _with_mutation_check(spec, mutated), calls)
+    # `old` is reserved for the snapshot, so a function with such a parameter can't have its mutations detected
+    checked = spec if "old" in inspect.signature(fn).parameters else _with_mutation_check(spec, mutated)
+    results = exercise(fn, checked, calls)
     count = asyncio.run(_consume_async(results)) if hasattr(results, "__aiter__") else len(list(results))
     if mutated:
         return {"status": "mutates-args", "detail": f"mutates {', '.join(sorted(set(mutated)))}"}

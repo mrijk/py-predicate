@@ -192,3 +192,13 @@ def test_exercise_arguments_that_cannot_be_copied(tmp_path):
     modules = analyze(tmp_path / "mod.py", exercise=True, calls=5, timeout=5, runs=1)
 
     assert modules[0]["functions"][0]["exercise"]["status"] == "ok"
+
+
+def test_exercise_function_with_a_parameter_named_old(tmp_path):
+    (tmp_path / "mod.py").write_text(
+        "def replace(s: str, old: str, new: str) -> str:\n    return s.replace(old, new)\n"
+    )
+
+    modules = analyze(tmp_path / "mod.py", exercise=True, calls=5, timeout=5, runs=1)
+
+    assert modules[0]["functions"][0]["exercise"]["status"] == "ok"

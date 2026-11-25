@@ -58,6 +58,7 @@ from predicate.generator.helpers import (
     random_iterables,
     random_lengths,
     random_lists,
+    random_named_tuple_instances,
     random_predicates,
     random_sets,
     random_signatures,
@@ -509,3 +510,12 @@ def test_random_predicates_of_any_accept_any_value():
     for predicate in take(200, random_predicates(klass=Any)):
         for value in values:
             assert predicate(value) in (True, False)
+
+
+def test_random_named_tuple_instances_is_exercisable():
+    from more_itertools import consume
+
+    from predicate.spec.exercise_function import exercise_function
+
+    # klass is constrained to named tuple classes, so exercising never passes e.g. object
+    consume(exercise_function(random_named_tuple_instances, None, 20))
