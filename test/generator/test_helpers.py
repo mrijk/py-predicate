@@ -70,6 +70,7 @@ from predicate.generator.helpers import (
     random_uuids,
     random_uuids_between,
     random_values_of_type,
+    sample_optional_fields,
 )
 
 
@@ -529,3 +530,12 @@ def test_ignore_unknown_kwargs_is_exercisable():
 
     # the argument is constrained to singledispatch functions, so exercising never passes a plain function
     consume(exercise_function(ignore_unknown_kwargs, None, 20))
+
+
+def test_sample_optional_fields():
+    generators = {"a": iter([1]), "b": iter([]), "c": iter(["x", "y"])}
+
+    samples = [sample_optional_fields(generators) for _ in range(20)]
+
+    assert all(set(sample) <= {"a", "c"} for sample in samples)  # b has no value to give
+    assert sample_optional_fields({}) == {}

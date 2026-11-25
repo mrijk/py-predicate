@@ -463,8 +463,9 @@ def random_constrained_pairs_of_type(klass: type) -> Iterator[tuple[Any, Any]]:
 _MISSING = object()
 
 
-def sample_optional_fields(optional: dict[str, Any], generators: dict[str, Iterator[Any]]) -> dict[str, Any]:
-    optional_keys = random.sample(list(optional), k=random.randint(0, len(optional)))
+def sample_optional_fields(generators: dict[str, Iterator[Any]]) -> dict[str, Any]:
+    """Return values for a random subset of the optional fields, one generator per field."""
+    optional_keys = random.sample(list(generators), k=random.randint(0, len(generators)))
     values = {key: next(generators[key], _MISSING) for key in optional_keys}
     return {key: value for key, value in values.items() if value is not _MISSING}
 

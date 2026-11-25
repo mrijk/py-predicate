@@ -946,9 +946,7 @@ def _false_struct_required_fields(predicate: StructPredicate[Any]) -> Iterator[A
     dict_of_predicate = DictOfPredicate(key_value_predicates=list(required.items()))
 
     optional_generators = {key: generate_false(value_p) for key, value_p in optional.items()}
-    yield from (
-        d | sample_optional_fields(optional, optional_generators) for d in generate_dict_of_p(dict_of_predicate)
-    )
+    yield from (d | sample_optional_fields(optional_generators) for d in generate_dict_of_p(dict_of_predicate))
 
 
 def _false_struct_extra_key_dicts(predicate: StructPredicate[Any]) -> Iterator[Any]:
@@ -963,7 +961,7 @@ def _false_struct_extra_key_dicts(predicate: StructPredicate[Any]) -> Iterator[A
     optional_true_generators = {key: generate_true(value_p) for key, value_p in optional.items()}
     for extra_key in (key for key in random_strings(length_p=default_at_least_one_length_p) if key not in known_keys):
         required_fields = {key: next(required_true_generators[key]) for key in required}
-        yield required_fields | sample_optional_fields(optional, optional_true_generators) | {extra_key: None}
+        yield required_fields | sample_optional_fields(optional_true_generators) | {extra_key: None}
 
 
 @generate_false.register(StructPredicate)
