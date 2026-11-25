@@ -29,7 +29,7 @@
         "pure": true,
         "exercise": {
           "status": "failed",
-          "detail": "SpecViolationError: Not conform spec: {'result': False, 'reason': '<generator object _ at 0x10926a740> is not an instance of type AbstractContextManager'}",
+          "detail": "SpecViolationError: Not conform spec: {'result': False, 'reason': '<generator object mutations at 0x10b3fd560> is not an instance of type AbstractContextManager'}",
           "runs": 3,
           "flaky": false,
           "statuses": {
@@ -50,13 +50,13 @@
         "category": "system",
         "reason": "calls typer.echo (__main__.py:36) -> calls sys.getdefaultencoding (_compat.py:50)",
         "exercise": {
-          "status": "failed",
-          "detail": "ValueError: max_workers must be greater than 0",
+          "status": "blocked",
+          "detail": "open M for writing",
           "runs": 3,
           "flaky": true,
           "statuses": {
-            "failed": 2,
-            "blocked": 1
+            "blocked": 1,
+            "failed": 2
           }
         }
       }
@@ -152,7 +152,7 @@
         "reason": "calls os.environ.get (sandbox.py:135)",
         "exercise": {
           "status": "blocked",
-          "detail": "open /tmp/x947j2ob for writing",
+          "detail": "open /tmp/hckx816c for writing",
           "runs": 3,
           "flaky": false,
           "statuses": {
@@ -192,7 +192,7 @@
         "pure": true,
         "exercise": {
           "status": "failed",
-          "detail": "ValueError: Unknown predicate type: ''",
+          "detail": "ValueError: not enough values to unpack (expected 1, got 0)",
           "runs": 3,
           "flaky": false,
           "statuses": {
@@ -206,22 +206,6 @@
     "path": "predicate/generator/generate_false.py",
     "file_name": "generate_false.py",
     "functions": [
-      {
-        "name": "generate_has_length",
-        "line": 207,
-        "pure": false,
-        "category": "randomness",
-        "reason": "calls random_iterables (generate_false.py:209) -> calls random.choice (helpers.py:350)",
-        "exercise": {
-          "status": "timeout",
-          "detail": "no result within 5.0s",
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "timeout": 3
-          }
-        }
-      },
       {
         "name": "generate_has_path",
         "line": 222,
@@ -288,21 +272,7 @@
         "reason": "calls generate_anys (generate_false.py:545) -> calls random.randint (helpers.py:331)",
         "exercise": {
           "status": "failed",
-          "detail": "IndexError: tuple index out of range",
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "failed": 3
-          }
-        }
-      },
-      {
-        "name": "generate_false",
-        "line": 581,
-        "pure": true,
-        "exercise": {
-          "status": "failed",
-          "detail": "InvalidSpecError: Spec predicate is not a constrained annotation",
+          "detail": "TypeError: isinstance() arg 2 must be a type, a tuple of types, or a union",
           "runs": 3,
           "flaky": false,
           "statuses": {
@@ -332,12 +302,26 @@
         "reason": "calls random_first_from_iterables (generate_false.py:612) -> calls random.choice (helpers.py:53)",
         "exercise": {
           "status": "failed",
-          "detail": "ValueError: Couldn't generate values that satisfy ge_p(1) | (in_p(0) | lt_p(0))",
+          "detail": "ValueError: Couldn't generate values that satisfy ne_p(0) ^ le_p(0) | le_p(1)",
           "runs": 3,
           "flaky": true,
           "statuses": {
-            "failed": 2,
-            "ok": 1
+            "ok": 2,
+            "failed": 1
+          }
+        }
+      },
+      {
+        "name": "generate_false",
+        "line": 594,
+        "pure": true,
+        "exercise": {
+          "status": "failed",
+          "detail": "InvalidSpecError: Spec predicate is not a constrained annotation",
+          "runs": 3,
+          "flaky": false,
+          "statuses": {
+            "failed": 3
           }
         }
       },
@@ -349,7 +333,7 @@
         "reason": "calls _generate_at_least_one_false (generate_false.py:670) -> calls random.randint (generate_false.py:748)",
         "exercise": {
           "status": "failed",
-          "detail": "ValueError: first() was called on an empty iterable, and no default value was provided.",
+          "detail": "TypeError: '>' not supported between instances of 'int' and 'NoneType'",
           "runs": 3,
           "flaky": false,
           "statuses": {
@@ -364,13 +348,13 @@
         "category": "randomness",
         "reason": "calls _generate_at_least_one_false (generate_false.py:709) -> calls random.randint (generate_false.py:748)",
         "exercise": {
-          "status": "timeout",
-          "detail": "no result within 5.0s",
+          "status": "failed",
+          "detail": "TypeError: '>' not supported between instances of 'int' and 'NoneType'",
           "runs": 3,
           "flaky": true,
           "statuses": {
-            "timeout": 1,
-            "failed": 2
+            "failed": 2,
+            "timeout": 1
           }
         }
       },
@@ -381,30 +365,13 @@
         "category": "randomness",
         "reason": "calls generate_set_of_p (generate_false.py:720) -> calls random.randint (generate_false.py:748)",
         "exercise": {
-          "status": "timeout",
-          "detail": "no result within 5.0s",
-          "runs": 3,
-          "flaky": true,
-          "statuses": {
-            "timeout": 1,
-            "failed": 2
-          }
-        }
-      },
-      {
-        "name": "generate_xor",
-        "line": 723,
-        "pure": false,
-        "category": "randomness",
-        "reason": "calls random_first_from_iterables (generate_false.py:738) -> calls random.choice (helpers.py:53)",
-        "exercise": {
           "status": "failed",
-          "detail": "ValueError: Couldn't generate values that satisfy ne_p(0) | ~~lt_p(0) ^ eq_p(0) & ge_p(0)",
+          "detail": "ValueError: first() was called on an empty iterable, and no default value was provided.",
           "runs": 3,
           "flaky": true,
           "statuses": {
-            "failed": 1,
-            "ok": 2
+            "failed": 2,
+            "timeout": 1
           }
         }
       },
@@ -415,13 +382,13 @@
         "category": "randomness",
         "reason": "calls random_anys (generate_false.py:761) -> calls random.randint (helpers.py:331)",
         "exercise": {
-          "status": "failed",
-          "detail": "TypeError: '>' not supported between instances of 'generator' and 'int'",
+          "status": "timeout",
+          "detail": "no result within 5.0s",
           "runs": 3,
           "flaky": true,
           "statuses": {
-            "failed": 2,
-            "timeout": 1
+            "timeout": 1,
+            "failed": 2
           }
         }
       },
@@ -463,10 +430,9 @@
           "status": "timeout",
           "detail": "no result within 5.0s",
           "runs": 3,
-          "flaky": true,
+          "flaky": false,
           "statuses": {
-            "timeout": 1,
-            "ok": 2
+            "timeout": 3
           }
         }
       },
@@ -506,9 +472,10 @@
           "status": "timeout",
           "detail": "no result within 5.0s",
           "runs": 3,
-          "flaky": false,
+          "flaky": true,
           "statuses": {
-            "timeout": 3
+            "ok": 1,
+            "timeout": 2
           }
         }
       },
@@ -518,11 +485,28 @@
         "pure": true,
         "exercise": {
           "status": "failed",
-          "detail": "ValueError: Couldn't generate values that satisfy (~(le_p(0) | le_p(0)) | lt_p(0) | (in_p(0) | gt_p(0)) & ~~ne_p(0)) & (in_p(0) ^ lt_p(0)) & eq_p(0)",
+          "detail": "ValueError: Couldn't generate values that satisfy le_p(0) | ~(ne_p(0) & le_p(0) & (not_in_p(0) & not_in_p(0)))",
           "runs": 3,
           "flaky": false,
           "statuses": {
             "failed": 3
+          }
+        }
+      },
+      {
+        "name": "generate_struct",
+        "line": 969,
+        "pure": false,
+        "category": "randomness",
+        "reason": "calls _false_struct_required_fields (generate_false.py:971) -> calls random.sample (helpers.py:467)",
+        "exercise": {
+          "status": "failed",
+          "detail": "RuntimeError: generator raised StopIteration",
+          "runs": 3,
+          "flaky": true,
+          "statuses": {
+            "ok": 1,
+            "failed": 2
           }
         }
       }
@@ -588,12 +572,12 @@
         "reason": "calls random_first_from_iterables (generate_true.py:357) -> calls random.choice (helpers.py:53)",
         "exercise": {
           "status": "failed",
-          "detail": "ValueError: Couldn't generate values that satisfy gt_p(-1) & ((not_in_p(0) | eq_p(0) ^ in_p(0)) & (~not_in_p(0) | lt_p(0)))",
+          "detail": "ValueError: Couldn't generate values that satisfy lt_p(0) & (in_p(0) ^ le_p(0) ^ le_p(0))",
           "runs": 3,
           "flaky": true,
           "statuses": {
-            "failed": 1,
-            "ok": 2
+            "ok": 2,
+            "failed": 1
           }
         }
       },
@@ -637,10 +621,9 @@
           "status": "timeout",
           "detail": "no result within 5.0s",
           "runs": 3,
-          "flaky": true,
+          "flaky": false,
           "statuses": {
-            "timeout": 1,
-            "ok": 2
+            "timeout": 3
           }
         }
       },
@@ -690,7 +673,7 @@
       },
       {
         "name": "generate_true",
-        "line": 581,
+        "line": 594,
         "pure": true,
         "exercise": {
           "status": "failed",
@@ -722,12 +705,11 @@
         "pure": true,
         "exercise": {
           "status": "failed",
-          "detail": "ValueError: Couldn't generate values that satisfy (gt_p(-1) ^ ge_p(0)) & gt_p(0)",
+          "detail": "ValueError: Couldn't generate values that satisfy gt_p(0) & ~(ne_p(0) ^ lt_p(0))",
           "runs": 3,
-          "flaky": true,
+          "flaky": false,
           "statuses": {
-            "failed": 2,
-            "timeout": 1
+            "failed": 3
           }
         }
       },
@@ -742,6 +724,21 @@
           "flaky": false,
           "statuses": {
             "failed": 3
+          }
+        }
+      },
+      {
+        "name": "generate_not",
+        "line": 711,
+        "pure": true,
+        "exercise": {
+          "status": "failed",
+          "detail": "ValueError: Couldn't generate values that satisfy gt_p(0) | ~(ne_p(0) ^ le_p(0) & ne_p(0))",
+          "runs": 3,
+          "flaky": true,
+          "statuses": {
+            "ok": 2,
+            "failed": 1
           }
         }
       },
@@ -777,10 +774,10 @@
       },
       {
         "name": "generate_is_instance_p",
-        "line": 1127,
+        "line": 1139,
         "pure": false,
         "category": "randomness",
-        "reason": "calls _family_generator (generate_true.py:1146) -> calls random.choice (generate_true.py:897)",
+        "reason": "calls _family_generator (generate_true.py:1158) -> calls random.choice (generate_true.py:897)",
         "exercise": {
           "status": "failed",
           "detail": "InvalidSpecError: Spec predicate is not a constrained annotation",
@@ -793,20 +790,6 @@
       },
       {
         "name": "generate_dict_of_p",
-        "line": 1210,
-        "pure": true,
-        "exercise": {
-          "status": "failed",
-          "detail": "InvalidSpecError: Spec predicate is not a constrained annotation",
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "failed": 3
-          }
-        }
-      },
-      {
-        "name": "generate_frozendict_of_p",
         "line": 1222,
         "pure": true,
         "exercise": {
@@ -820,8 +803,22 @@
         }
       },
       {
+        "name": "generate_frozendict_of_p",
+        "line": 1234,
+        "pure": true,
+        "exercise": {
+          "status": "failed",
+          "detail": "InvalidSpecError: Spec predicate is not a constrained annotation",
+          "runs": 3,
+          "flaky": false,
+          "statuses": {
+            "failed": 3
+          }
+        }
+      },
+      {
         "name": "generate_match_p",
-        "line": 1297,
+        "line": 1309,
         "pure": true,
         "exercise": {
           "status": "failed",
@@ -835,13 +832,13 @@
       },
       {
         "name": "generate_count",
-        "line": 1383,
+        "line": 1395,
         "pure": false,
         "category": "randomness",
-        "reason": "calls random.choice (generate_true.py:1394)",
+        "reason": "calls random.choice (generate_true.py:1406)",
         "exercise": {
           "status": "failed",
-          "detail": "ValueError: Indices for islice() must be None or an integer: 0 <= x <= sys.maxsize.",
+          "detail": "ValueError: Stop argument for islice() must be None or an integer: 0 <= x <= sys.maxsize.",
           "runs": 3,
           "flaky": false,
           "statuses": {
@@ -856,8 +853,8 @@
     "file_name": "helpers.py",
     "functions": [
       {
-        "name": "random_frozensets",
-        "line": 253,
+        "name": "random_sets",
+        "line": 244,
         "pure": true,
         "exercise": {
           "status": "timeout",
@@ -867,6 +864,21 @@
           "statuses": {
             "timeout": 2,
             "ok": 1
+          }
+        }
+      },
+      {
+        "name": "random_frozensets",
+        "line": 253,
+        "pure": true,
+        "exercise": {
+          "status": "timeout",
+          "detail": "no result within 5.0s",
+          "runs": 3,
+          "flaky": true,
+          "statuses": {
+            "ok": 2,
+            "timeout": 1
           }
         }
       },
@@ -910,7 +922,7 @@
         "reason": "calls random.sample (helpers.py:467)",
         "exercise": {
           "status": "failed",
-          "detail": "KeyError: 'KQUybOOnmN'",
+          "detail": "KeyError: 'IK3'",
           "runs": 3,
           "flaky": false,
           "statuses": {
@@ -970,21 +982,7 @@
         "pure": true,
         "exercise": {
           "status": "failed",
-          "detail": "ValueError: duplicate parameter name: 'b'",
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "failed": 3
-          }
-        }
-      },
-      {
-        "name": "ignore_unknown_kwargs",
-        "line": 578,
-        "pure": true,
-        "exercise": {
-          "status": "failed",
-          "detail": "AttributeError: 'function' object has no attribute 'register'",
+          "detail": "ValueError: duplicate parameter name: 'x'",
           "runs": 3,
           "flaky": false,
           "statuses": {
@@ -994,10 +992,10 @@
       },
       {
         "name": "random_supports",
-        "line": 637,
+        "line": 650,
         "pure": false,
         "category": "randomness",
-        "reason": "calls random_ints (helpers.py:639) -> calls random.randint (helpers.py:331)",
+        "reason": "calls random_ints (helpers.py:652) -> calls random.randint (helpers.py:331)",
         "exercise": {
           "status": "timeout",
           "detail": "no result within 5.0s",
@@ -1080,12 +1078,12 @@
         "reason": "calls _base (strategies.py:76) -> calls exec (reflection.py:371)",
         "exercise": {
           "status": "blocked",
-          "detail": "os.mkdir ('/private/var/folders/04/k8fzb_917tq2nxr723qmz_pm0000gn/T/tmplp7l6ypi/.hypothesis/tmp', 511)",
+          "detail": "os.mkdir ('/private/var/folders/04/k8fzb_917tq2nxr723qmz_pm0000gn/T/tmpay9gisrl/.hypothesis/tmp', 511)",
           "runs": 3,
           "flaky": true,
           "statuses": {
-            "blocked": 1,
-            "ok": 2
+            "ok": 2,
+            "blocked": 1
           }
         }
       },
@@ -1097,12 +1095,12 @@
         "reason": "calls from_predicate (strategies.py:82) -> calls exec (reflection.py:371)",
         "exercise": {
           "status": "blocked",
-          "detail": "os.mkdir ('/private/var/folders/04/k8fzb_917tq2nxr723qmz_pm0000gn/T/tmp6s56b4_m/.hypothesis/tmp', 511)",
+          "detail": "os.mkdir ('/private/var/folders/04/k8fzb_917tq2nxr723qmz_pm0000gn/T/tmpd7c6i762/.hypothesis/tmp', 511)",
           "runs": 3,
           "flaky": true,
           "statuses": {
-            "blocked": 1,
-            "ok": 2
+            "ok": 2,
+            "blocked": 1
           }
         }
       },
@@ -1154,7 +1152,7 @@
         "pure": true,
         "exercise": {
           "status": "failed",
-          "detail": "UnexpectedCharacters: No terminal matches '9' in the current parser context, at line 1 col 1\n\n9\n^\nExpected one of: \n\t* GE_P\n\t* LPAR\n\t* WORD\n\t* TRUE\n\t* FALSE\n\t* TILDE\n\t* LE_P\n",
+          "detail": "UnexpectedCharacters: No terminal matches '0' in the current parser context, at line 1 col 7\n\nLKIJzU0grJ\n      ^\nExpected one of: \n\t* VBAR\n\t* AMPERSAND\n\t* CIRCUMFLEX\n\t* __ANON_0\n",
           "runs": 3,
           "flaky": false,
           "statuses": {
@@ -1232,7 +1230,7 @@
         "reason": "calls _resolve_class_spec (exercise_class.py:95) -> calls sys.modules.get (type_checking.py:182)",
         "exercise": {
           "status": "failed",
-          "detail": "InvalidSpecError: Parameter '' not in function signature",
+          "detail": "InvalidSpecError: Unannotated parameter 'aa' not in spec",
           "runs": 3,
           "flaky": false,
           "statuses": {
@@ -1270,7 +1268,7 @@
         "reason": "calls _resolve_function_spec (exercise_function.py:56) -> calls sys.modules.get (type_checking.py:182)",
         "exercise": {
           "status": "failed",
-          "detail": "InvalidSpecError: Parameter '' not in function signature",
+          "detail": "InvalidSpecError: Cannot derive spec for '<lambda>': missing return annotation; pass a Spec or annotate it",
           "runs": 3,
           "flaky": false,
           "statuses": {
@@ -1286,7 +1284,7 @@
         "reason": "calls _resolve_function_spec (exercise_function.py:79) -> calls sys.modules.get (type_checking.py:182)",
         "exercise": {
           "status": "failed",
-          "detail": "InvalidSpecError: Cannot derive spec for 'callable_object': parameter 'aa' has no annotation; pass a Spec or annotate it",
+          "detail": "InvalidSpecError: Cannot derive spec for '<lambda>': missing return annotation; pass a Spec or annotate it",
           "runs": 3,
           "flaky": false,
           "statuses": {
@@ -1328,8 +1326,8 @@
           "runs": 3,
           "flaky": true,
           "statuses": {
-            "failed": 2,
-            "ok": 1
+            "ok": 2,
+            "failed": 1
           }
         }
       },
@@ -1341,7 +1339,7 @@
         "reason": "calls resolved_signature (exercise_helpers.py:509) -> calls sys.modules.get (type_checking.py:182)",
         "exercise": {
           "status": "failed",
-          "detail": "InvalidSpecError: Parameter '' not in function signature",
+          "detail": "InvalidSpecError: Return annotation not in spec",
           "runs": 3,
           "flaky": false,
           "statuses": {
@@ -1385,7 +1383,7 @@
         "reason": "calls type_var_failure (exercise_helpers.py:763) -> calls sys.modules.get (exercise_helpers.py:343)",
         "exercise": {
           "status": "failed",
-          "detail": "SpecViolationError: Not conform spec: fn constraint failed for inputs {} -> False",
+          "detail": "SpecViolationError: Not conform spec: {'result': False, 'predicate': {'result': True}, 'reason': 'not eq_p(False)'}",
           "runs": 3,
           "flaky": false,
           "statuses": {
@@ -1399,7 +1397,7 @@
         "pure": true,
         "exercise": {
           "status": "failed",
-          "detail": "SpecViolationError: Not conform spec: yielded {'result': False, 'index': 0, 'value': '', 'reason': \"'' is equal to ''\"} for inputs {'': 0}",
+          "detail": "SpecViolationError: Not conform spec: yielded {'result': False, 'index': 0, 'value': False, 'reason': 'False is equal to 0'} for inputs {}",
           "runs": 3,
           "flaky": false,
           "statuses": {
@@ -1413,7 +1411,7 @@
         "pure": true,
         "exercise": {
           "status": "failed",
-          "detail": "Exception: W5OMHzk",
+          "detail": "RuntimeError: ",
           "runs": 3,
           "flaky": false,
           "statuses": {
@@ -1435,7 +1433,7 @@
         "reason": "calls resolve_signature (instrument_function.py:46) -> calls sys.modules.get (type_checking.py:182)",
         "exercise": {
           "status": "failed",
-          "detail": "InvalidSpecError: Snapshot parameter '0jfd2' not in function signature",
+          "detail": "InvalidSpecError: Snapshot parameter 'A' not in function signature",
           "runs": 3,
           "flaky": false,
           "statuses": {

@@ -41,6 +41,7 @@ from predicate.generator.helpers import (
     generate_even_numbers,
     generate_ints,
     generate_odd_numbers,
+    ignore_unknown_kwargs,
     random_anys,
     random_bools,
     random_bytes,
@@ -519,3 +520,12 @@ def test_random_named_tuple_instances_is_exercisable():
 
     # klass is constrained to named tuple classes, so exercising never passes e.g. object
     consume(exercise_function(random_named_tuple_instances, None, 20))
+
+
+def test_ignore_unknown_kwargs_is_exercisable():
+    from more_itertools import consume
+
+    from predicate.spec.exercise_function import exercise_function
+
+    # the argument is constrained to singledispatch functions, so exercising never passes a plain function
+    consume(exercise_function(ignore_unknown_kwargs, None, 20))

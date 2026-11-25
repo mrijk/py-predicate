@@ -24,7 +24,7 @@ from operator import or_
 from pathlib import PurePath
 from random import choices
 from time import gmtime, struct_time
-from typing import Annotated, Any, Final, ForwardRef, Iterator
+from typing import Annotated, Any, Final, ForwardRef, Iterator, Protocol, runtime_checkable
 from uuid import UUID, uuid4
 
 from more_itertools import interleave, random_permutation, repeatfunc, take, unique_everseen
@@ -575,12 +575,25 @@ def accepted_kwargs(f: Callable[..., Any], kwargs: dict[Any, Any]) -> dict[str, 
     return {key: value for key, value in kwargs.items() if key in names}
 
 
-def ignore_unknown_kwargs[F: Callable[..., Any]](dispatcher: F) -> F:
+@runtime_checkable
+class SingleDispatch(Protocol):
+    """What functools.singledispatch returns, which has no class to refer to at runtime."""
+
+    registry: Any
+
+    def dispatch(self, cls: Any) -> Callable[..., Any]: ...
+
+    def register(self, cls: Any, func: Any = None) -> Callable[..., Any]: ...
+
+    def __call__(self, *args: Any, **kwargs: Any) -> Any: ...
+
+
+def ignore_unknown_kwargs(dispatcher: SingleDispatch) -> SingleDispatch:
     """Drop keyword arguments the dispatched generator doesn't accept."""
 
     @wraps(dispatcher)
     def wrapper(predicate: Predicate[Any], /, **kwargs: Any) -> Any:
-        f = dispatcher.dispatch(type(predicate))  # type: ignore[attr-defined]
+        f = dispatcher.dispatch(type(predicate))
         return f(predicate, **accepted_kwargs(f, kwargs))
 
     wrapper.register = dispatcher.register  # type: ignore[attr-defined]

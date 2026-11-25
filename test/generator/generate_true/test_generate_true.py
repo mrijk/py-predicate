@@ -824,3 +824,18 @@ def test_generate_has_length_p_with_klass(length_p, value_p):
 def test_generate_true_ignores_unknown_kwargs():
     assert all(isinstance(value, str) for value in take(5, generate_true(is_str_p, length_p=ge_p(1))))
     assert take(3, generate_true(eq_p(2), length_p=ge_p(1))) == [2, 2, 2]
+
+
+def test_generate_true_is_instance_protocol():
+    from typing import Protocol, runtime_checkable
+
+    @runtime_checkable
+    class Greeter(Protocol):
+        name: str
+
+        def greet(self, who: str) -> str: ...
+
+    values = take(5, generate_true(is_instance_p(Greeter)))
+
+    assert len(values) == 5
+    assert all(isinstance(value, Greeter) for value in values)

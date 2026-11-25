@@ -948,8 +948,16 @@ _MAX_CONSTRUCT_ATTEMPTS: Final = 20
 _construct_depth = 0
 
 
+def _protocol_instances(protocol: Any) -> Iterator[Any]:
+    """Return instances of generated classes that implement the protocol, as a protocol can't be instantiated."""
+    implementations = generate_implements_protocol(ImplementsProtocolPredicate(protocol=protocol, args_match=True))
+    return (implementation() for implementation in implementations)
+
+
 def _constructed_instances(klass: Any) -> Iterator[Any]:
     """Return instances of a class built from its fully annotated __init__ (#305); the last resort for a class."""
+    if _is_protocol_class(klass):
+        return _protocol_instances(klass)
     candidates = [(c, params) for c in _constructible_classes(klass) if (params := _init_params(c)) is not None]
     if not candidates:
         raise ValueError(f"No generator found for {klass}")
@@ -1122,6 +1130,10 @@ def _get_type_registry() -> dict[Any, Callable[[], Iterator[Any]]]:
         type_registry[Template] = random_templates
 
     return type_registry
+
+
+def _is_protocol_class(klass: Any) -> bool:
+    return isinstance(klass, type) and issubclass(klass, Protocol) and klass is not Protocol
 
 
 @generate_true.register(IsInstancePredicate)
