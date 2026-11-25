@@ -34,12 +34,13 @@ from datetime import date, datetime, time, timedelta, timezone, tzinfo
 from decimal import Decimal
 from enum import Enum
 from fractions import Fraction
-from functools import cache, partial, singledispatch
+from functools import cache, partial, reduce, singledispatch
 from inspect import Parameter, Signature, getmembers, isfunction, signature
 from itertools import chain, cycle, islice, repeat
+from operator import or_
 from pathlib import PurePath
 from time import struct_time
-from types import CodeType, ModuleType, UnionType
+from types import CodeType, ModuleType, NoneType, UnionType
 from typing import (
     Any,
     Final,
@@ -52,6 +53,7 @@ from typing import (
     SupportsIndex,
     SupportsInt,
     SupportsRound,
+    cast,
     get_args,
     get_origin,
 )
@@ -911,7 +913,7 @@ def _random_classes_with_metaclass(metaclass: type) -> Iterator[type]:
 
 
 def _typed_generator(klass: Any, annotation: Any) -> Iterator[Any] | None:
-    """Return a generator for callables, metaclasses and async types, which depend on the annotation, or None."""
+    """Return a generator for callables, metaclasses, async types and unions, or None."""
     if klass is Callable and (args := get_args(annotation)) and args[-1] is not Any:
         return _random_returning_callables(args[-1])
     if isinstance(klass, type) and issubclass(klass, type) and klass is not type:
@@ -920,7 +922,19 @@ def _typed_generator(klass: Any, annotation: Any) -> Iterator[Any] | None:
         return _random_async_iterators(annotation)
     if klass is Awaitable:
         return _random_awaitables(annotation)
+    if klass is UnionType:
+        return _random_unions()
     return None
+
+
+# ponytail: builtin classes only; more classes make the unions more varied, but they never need to be exotic
+_union_members: Final = (bool, bytes, complex, dict, float, frozenset, int, list, NoneType, set, str, tuple)
+
+
+def _random_unions() -> Iterator[UnionType]:
+    """Return unions like int | str: at least two distinct classes, since int | int is just int."""
+    while True:
+        yield cast(UnionType, reduce(or_, random.sample(_union_members, random.randint(2, 4))))
 
 
 def _family_generator(klass: Any, annotation: Any) -> Iterator[Any] | None:

@@ -1,4 +1,6 @@
 import abc
+from types import UnionType
+from typing import get_args
 
 import pytest
 from more_itertools import take
@@ -6,6 +8,7 @@ from more_itertools import take
 from generator.generate_true.helpers import assert_generated_true
 from predicate import generate_true, is_subclass_p
 from predicate.predicate import Predicate
+from predicate.spec.exercise_helpers import annotation_to_predicate
 
 
 @pytest.mark.parametrize(
@@ -51,3 +54,13 @@ def test_generate_is_subclass_of_empty_tuple():
 def test_generate_is_subclass_of_type():
     # The metaclass `type` is its own class: a bare type.__subclasses__() call is unbound
     assert_generated_true(is_subclass_p(type))
+
+
+def test_generate_union_types():
+    # is_subclass_p takes int | str, so the exercise needs unions to build it from
+    predicate = annotation_to_predicate(UnionType)
+
+    unions = take(50, generate_true(predicate))
+
+    assert all(isinstance(union, UnionType) for union in unions)
+    assert all(len(get_args(union)) >= 2 for union in unions)
