@@ -40,7 +40,7 @@ from itertools import chain, cycle, islice, repeat
 from operator import or_
 from pathlib import PurePath
 from time import struct_time
-from types import CodeType, ModuleType, NoneType, UnionType
+from types import CodeType, FrameType, ModuleType, NoneType, UnionType
 from typing import (
     Any,
     Final,
@@ -123,6 +123,7 @@ from predicate.generator.helpers import (
     random_floats,
     random_forward_refs,
     random_fractions,
+    random_frames,
     random_frozensets,
     random_hashables,
     random_ints,
@@ -1072,6 +1073,7 @@ def _get_type_registry() -> dict[Any, Callable[[], Iterator[Any]]]:
         MutableMapping: random_dicts,
         Predicate: random_predicates,
         UUID: random_uuids,
+        FrameType: random_frames,
         ModuleType: random_modules,
         Signature: random_signatures,
         bool: random_bools,

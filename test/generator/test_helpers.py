@@ -52,6 +52,7 @@ from predicate.generator.helpers import (
     random_dicts,
     random_first_from_iterables,
     random_floats,
+    random_frames,
     random_frozensets,
     random_functions,
     random_hashables,
@@ -539,3 +540,26 @@ def test_sample_optional_fields():
 
     assert all(set(sample) <= {"a", "c"} for sample in samples)  # b has no value to give
     assert sample_optional_fields({}) == {}
+
+
+def test_random_frames():
+    from types import FrameType
+
+    frames = take(30, random_frames())
+
+    assert all(isinstance(frame, FrameType) for frame in frames)
+    assert len({len(list(_frame_chain(frame))) for frame in frames}) > 1  # frames of different depths
+
+
+def _frame_chain(frame):
+    while frame:
+        yield frame
+        frame = frame.f_back
+
+
+def test_generate_true_is_instance_frame():
+    from types import FrameType
+
+    from predicate import generate_true, is_instance_p
+
+    assert all(isinstance(frame, FrameType) for frame in take(5, generate_true(is_instance_p(FrameType))))

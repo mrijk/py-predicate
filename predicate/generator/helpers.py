@@ -366,6 +366,15 @@ def random_tuples(
     yield from (tuple(random_list) for random_list in random_lists(length_p=length_p, value_p=value_p))
 
 
+def random_frames() -> Iterator[types.FrameType]:
+    """Return live frames of different depths: a frame can't be constructed, only captured from running code."""
+
+    def capture(depth: int) -> types.FrameType:
+        return capture(depth - 1) if depth else sys._getframe()  # noqa: SLF001
+
+    yield from (capture(depth) for depth in random_ints(lower=0, upper=5))
+
+
 def random_modules() -> Iterator[types.ModuleType]:
     # ponytail: only modules that are already imported, so generating never triggers an import
     modules = [module for module in sys.modules.values() if isinstance(module, types.ModuleType)]
