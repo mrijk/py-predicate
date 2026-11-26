@@ -557,3 +557,26 @@ def test_generate_false_ignores_unknown_kwargs():
 
 def test_generate_false_has_length_when_every_length_is_valid():
     assert take(3, generate_false(has_length_p(ge_p(0)))) == []
+
+
+def test_exactly_n_false_ends_when_the_rest_has_no_false_values():
+    from predicate.exactly_predicate import exactly_n
+    from predicate.match_predicate import match_p
+
+    # always_true_p has no false values: the stream ends instead of raising (PEP 479)
+    assert list(generate_false(match_p(exactly_n(1, eq_p(1)), always_true_p))) == []
+
+
+def test_match_false_ends_when_the_rest_has_no_false_values():
+    from predicate.match_predicate import match_p
+
+    assert list(generate_false(match_p(eq_p(1), always_true_p))) == []
+
+
+def test_match_false_with_an_empty_pattern():
+    from predicate.match_predicate import match_p
+
+    # an empty pattern matches everything, so there is nothing false; unless the whole iterable must match
+    assert list(generate_false(match_p())) == []
+    assert all(not match_p(full_match=True)(value) for value in take(10, generate_false(match_p(full_match=True))))
+    assert take(10, generate_false(match_p(full_match=True)))

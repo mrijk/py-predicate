@@ -770,6 +770,13 @@ def generate_tee(_predicate: TeePredicate[Any]) -> Iterator[Any]:
 def generate_match_p(match_predicate: MatchPredicate[Any]) -> Iterator[Any]:
     predicates = match_predicate.predicates
 
+    if (
+        not predicates
+    ):  # an empty pattern matches every iterable, unless the whole iterable has to match: then any item fails
+        if match_predicate.full_match:
+            yield from ([item] for item in random_anys())
+        return
+
     predicate, *rest_predicates = predicates
 
     match predicate:
@@ -779,8 +786,8 @@ def generate_match_p(match_predicate: MatchPredicate[Any]) -> Iterator[Any]:
             if rest_predicates:
                 iter_first = generate_false(predicate)
                 iter_rest: Iterator[Any] = generate_false(MatchPredicate(predicates=rest_predicates))
-                while True:
-                    yield list(chain([next(iter_first)], next(iter_rest)))
+                # zip ends the stream when a part has no false values; a bare next() would raise (PEP 479)
+                yield from (list(chain([first], rest)) for first, rest in zip(iter_first, iter_rest, strict=False))
             else:
                 yield from zip(generate_false(predicate), strict=False)
 
@@ -797,8 +804,7 @@ def generate_exactly_n(exactly_predicate: ExactlyPredicate[Any], *, predicates: 
     if predicates:
         iter_first = generate_false(list_of_predicate, length_p=length_p)
         iter_rest: Iterator[Any] = generate_false(MatchPredicate(predicates=predicates))
-        while True:
-            yield list(chain(next(iter_first), next(iter_rest)))
+        yield from (list(chain(first, rest)) for first, rest in zip(iter_first, iter_rest, strict=False))
     else:
         yield from generate_false(list_of_predicate, length_p=length_p)
 
