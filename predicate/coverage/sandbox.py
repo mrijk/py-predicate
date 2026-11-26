@@ -41,14 +41,19 @@ class SandboxViolation(
     """Raised by the audit hook when the function tries something that isn't allowed."""
 
 
+def _is_blocked(event: str, args: tuple[Any, ...]) -> bool:
+    if event == "ctypes.dlopen" and args[0] is None:
+        return False  # importing ctypes opens the running program itself; loading a named library stays blocked
+    # creating a socket is harmless (asyncio does it for its event loop), using one is not
+    return event in _BLOCKED_EVENTS or (event.startswith(_BLOCKED_PREFIXES) and event != "socket.__new__")
+
+
 def _violation(event: str, args: tuple[Any, ...]) -> str | None:
     if event == "open":
         path, mode, flags = args
         writes = bool(set(mode or "") & set("wax+")) or bool((flags or 0) & _WRITE_FLAGS)
         return f"open {path} for writing" if writes and str(path) != os.devnull else None
-    # creating a socket is harmless (asyncio does it for its event loop), using one is not
-    blocked = event in _BLOCKED_EVENTS or (event.startswith(_BLOCKED_PREFIXES) and event != "socket.__new__")
-    return f"{event} {args[:2]}"[:_RESULT_LIMIT] if blocked else None
+    return f"{event} {args[:2]}"[:_RESULT_LIMIT] if _is_blocked(event, args) else None
 
 
 def _install_audit_hook(violations: list[str]) -> None:

@@ -745,8 +745,11 @@ def _get_bound_arguments(sig: Signature, arguments: dict[str, Any]) -> dict[Type
 
 
 def capture_old(spec: Spec, value: dict[str, Any]) -> dict[str, Any]:
-    """Capture the spec's snapshots of the argument values, to be taken before the call (#238)."""
-    return {name: capture(value[name]) for name, capture in spec.get("snapshot", {}).items()}
+    """Capture the spec's snapshots of the argument values, to be taken before the call (#238).
+
+    An argument that isn't generated (e.g. a parameter left to its default) has nothing to snapshot.
+    """
+    return {name: capture(value[name]) for name, capture in spec.get("snapshot", {}).items() if name in value}
 
 
 def verify_result(

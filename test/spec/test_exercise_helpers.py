@@ -45,6 +45,7 @@ from predicate.predicate import Predicate
 from predicate.spec.exercise_helpers import (
     annotation_to_predicate,
     bind_shared_type_vars,
+    capture_old,
     generate_values,
     take_async,
 )
@@ -713,3 +714,10 @@ def test_generate_values_without_return_predicate():
 
     assert return_p("anything")
     assert len(values) == 3
+
+
+def test_capture_old_skips_arguments_that_are_not_generated():
+
+    spec = {"args": {}, "snapshot": {"x": list, "missing": list}}
+
+    assert capture_old(spec, {"x": [1]}) == {"x": [1]}

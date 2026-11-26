@@ -202,3 +202,15 @@ def test_exercise_function_with_a_parameter_named_old(tmp_path):
     modules = analyze(tmp_path / "mod.py", exercise=True, calls=5, timeout=5, runs=1)
 
     assert modules[0]["functions"][0]["exercise"]["status"] == "ok"
+
+
+def test_exercise_importing_ctypes_is_not_blocked_but_loading_a_library_is(tmp_path):
+    (tmp_path / "mod.py").write_text(
+        "def imports_ctypes(x: int) -> int:\n    import ctypes\n\n    return x + ctypes.sizeof(ctypes.c_int)\n\n\n"
+        "def loads_library(x: int) -> int:\n    import ctypes\n\n    ctypes.CDLL('libc.so.6')\n    return x\n"
+    )
+
+    modules = analyze(tmp_path / "mod.py", exercise=True, calls=3, timeout=5, runs=1)
+
+    exercise = {f["name"]: f["exercise"]["status"] for f in modules[0]["functions"]}
+    assert exercise == {"imports_ctypes": "ok", "loads_library": "blocked"}
