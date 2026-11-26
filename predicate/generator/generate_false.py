@@ -706,11 +706,10 @@ def generate_set_of_p(
 ) -> Iterator[Any]:
     predicate = set_of_predicate.predicate
 
-    while True:
-        result = set(_generate_at_least_one_false(predicate, length_p=length_p))
-        # This check is needed because {False, 0} and {True, 1} result in {False} and {True}
-        if not set_of_predicate(result):
-            yield result
+    results = (set(_generate_at_least_one_false(predicate, length_p=length_p)) for _ in repeat(None))
+    # Filtering is needed because {False, 0} and {True, 1} result in {False} and {True}. It is bounded, so a predicate
+    # without false values (e.g. always_true_p) ends the stream instead of searching forever
+    yield from satisfying(results, ~set_of_predicate, attempts=100)
 
 
 @generate_false.register(FrozenSetOfPredicate)
@@ -744,7 +743,8 @@ def _generate_at_least_one_false(
 ) -> tuple[Any]:
     from predicate import generate_true
 
-    length = max(first(generate_true(length_p)), 1)
+    # The first positive length, or 1 when length_p has none (random_lengths only gives lengths that can exist)
+    length = next((n for n in random_lengths(length_p) if n > 0), 1)
 
     nr_false_values = random.randint(1, length) if length > 1 else 1
     nr_true_values = length - nr_false_values

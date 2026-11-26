@@ -580,3 +580,24 @@ def test_match_false_with_an_empty_pattern():
     assert list(generate_false(match_p())) == []
     assert all(not match_p(full_match=True)(value) for value in take(10, generate_false(match_p(full_match=True))))
     assert take(10, generate_false(match_p(full_match=True)))
+
+
+def test_set_of_false_ends_when_no_element_can_be_false():
+    from predicate import is_frozenset_of_p, is_set_of_p
+
+    # always_true_p has no false values, so no set has an element failing it: the stream ends instead of hanging
+    assert list(generate_false(is_set_of_p(always_true_p))) == []
+    assert list(generate_false(is_frozenset_of_p(always_true_p))) == []
+    assert list(generate_false(is_frozenset_of_p(ge_p(0) | lt_p(0)))) == []
+
+
+def test_set_of_false_with_a_length_that_is_never_true_or_not_an_int():
+    from predicate import fn_p, in_p, is_none_p, is_set_of_p
+    from predicate.generator.helpers import random_ints
+
+    # the optimizer can't tell that no length is both in (1, 2) and above 5
+    never = in_p([1, 2]) & fn_p(lambda x: x > 5, generate_true_fn=lambda: random_ints(lower=6))
+    for length_p in (never, is_none_p):
+        values = take(5, generate_false(is_set_of_p(ge_p(0)), length_p=length_p))
+        assert values
+        assert all(not is_set_of_p(ge_p(0))(value) for value in values)

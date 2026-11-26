@@ -579,8 +579,16 @@ def callable_object_with_signature(sig: Signature) -> Callable[..., Any]:
 
 
 def with_parameters(sig: Signature, *parameters: Parameter) -> Signature:
+    """Add the parameters to the signature, leaving out the ones that don't fit, e.g. a name that is already in use."""
+    return reduce(_with_parameter, parameters, sig)
+
+
+def _with_parameter(sig: Signature, parameter: Parameter) -> Signature:
     # A stable sort on kind keeps the order of the original parameters, so the result is a valid signature
-    return sig.replace(parameters=sorted([*sig.parameters.values(), *parameters], key=lambda p: p.kind))
+    try:
+        return sig.replace(parameters=sorted([*sig.parameters.values(), parameter], key=lambda p: p.kind))
+    except ValueError:  # duplicate name, or a parameter without a default after one with a default
+        return sig
 
 
 def unused_name(sig: Signature) -> str:

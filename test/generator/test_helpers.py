@@ -586,3 +586,29 @@ def test_random_lengths_for_a_length_that_is_never_true():
     # the optimizer can't tell that no length is both in (1, 2) and above 5
     never = in_p([1, 2]) & fn_p(lambda x: x > 5, generate_true_fn=lambda: random_ints(lower=6))
     assert list(random_lengths(never)) == []
+
+
+def test_with_parameters_leaves_out_what_does_not_fit():
+    from inspect import Parameter, Signature
+
+    from predicate.generator.helpers import with_parameters
+
+    sig = Signature([Parameter("a", Parameter.POSITIONAL_OR_KEYWORD)])
+    # "a" is in use, and a parameter without a default can't follow one with a default
+    result = with_parameters(
+        sig,
+        Parameter("a", Parameter.KEYWORD_ONLY),
+        Parameter("b", Parameter.POSITIONAL_OR_KEYWORD, default=1),
+        Parameter("c", Parameter.POSITIONAL_OR_KEYWORD),
+        Parameter("d", Parameter.KEYWORD_ONLY),
+    )
+    assert list(result.parameters) == ["a", "b", "d"]
+
+
+def test_with_parameters_is_exercisable():
+    from more_itertools import consume
+
+    from predicate.generator.helpers import with_parameters
+    from predicate.spec.exercise_function import exercise_function
+
+    consume(exercise_function(with_parameters, None, 30))
