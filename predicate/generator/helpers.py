@@ -141,7 +141,7 @@ def random_callable_objects(nr_of_parameters_p: Predicate[Any] = default_size_p)
     yield from (callable_object_with_signature(sig) for sig in random_signatures(nr_of_parameters_p))
 
 
-def random_lengths(length_p: Predicate[Any]) -> Iterator[int]:
+def random_lengths(length_p: Predicate[int]) -> Iterator[int]:
     """Return collection lengths: 0 (the empty collection) at most once and first, then only positive lengths (#356).
 
     The empty collection is a valuable edge case, but exercise with a small n only sees the start of the stream.
@@ -152,16 +152,17 @@ def random_lengths(length_p: Predicate[Any]) -> Iterator[int]:
         yield 0
     lengths = generate_true(length_p)
     # ponytail: a length_p without a positive length in 100 draws (e.g. eq_p(0)) is taken to allow only 0
-    # length_p may accept non-ints (e.g. Predicate[Any]); no int in 100 draws means there is no usable length
-    head = [n for n in take(100, lengths) if isinstance(n, int) and not isinstance(n, bool)]
+    # length_p may accept non-ints (e.g. Predicate[Any]) or negative ones (e.g. ~ge_p(0)): without a usable length in
+    # 100 draws there is none, and the stream is not searched further, as it may never give one
+    head = [n for n in take(100, lengths) if _is_length(n)]
     if not head:
         return
     positive = any(n > 0 for n in head)
-    yield from (
-        n
-        for n in chain(head, lengths)
-        if isinstance(n, int) and not isinstance(n, bool) and (n > 0 if positive else n >= 0)
-    )
+    yield from (n for n in chain(head, lengths) if _is_length(n) and (n > 0 if positive else n >= 0))
+
+
+def _is_length(n: Any) -> bool:
+    return isinstance(n, int) and not isinstance(n, bool) and n >= 0
 
 
 _KEY_ATTEMPTS: Final = 100

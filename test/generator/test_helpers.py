@@ -572,3 +572,8 @@ def test_random_values_of_type_is_exercisable():
 
     # klass is limited to the classes there are values for, so exercising never passes e.g. type
     consume(exercise_function(random_values_of_type, None, 30))
+
+
+def test_random_lengths_without_a_valid_length():
+    # a collection has no negative length: nothing is usable, and looking through the negative numbers never ends
+    assert take(3, random_lengths(~ge_p(0))) == []

@@ -23,6 +23,7 @@ from predicate import (
     gt_lt_p,
     gt_p,
     has_key_p,
+    has_length_p,
     in_p,
     intersects_p,
     is_bool_p,
@@ -552,3 +553,7 @@ def test_generate_false_is_callable_signature():
 
 def test_generate_false_ignores_unknown_kwargs():
     assert all(value != 2 for value in take(5, generate_false(eq_p(2), length_p=ge_p(1))))
+
+
+def test_generate_false_has_length_when_every_length_is_valid():
+    assert take(3, generate_false(has_length_p(ge_p(0)))) == []
