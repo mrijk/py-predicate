@@ -1399,9 +1399,8 @@ def generate_count(count_predicate: CountPredicate[Any]) -> Iterator[Any]:
     predicate = count_predicate.predicate
     length_p = count_predicate.length_p
 
-    valid_counts = generate_true(length_p)
-
-    for count in valid_counts:
+    # only counts that can exist: length_p may also allow negative ones, e.g. ge_p(-5)
+    for count in random_lengths(length_p):
         true_values = take(count, generate_true(predicate))
 
         # lists and tuples keep duplicates, so the count is preserved (sets would not)

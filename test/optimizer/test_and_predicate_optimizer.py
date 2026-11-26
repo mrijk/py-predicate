@@ -949,3 +949,15 @@ def test_and_disjoint_ranges_is_always_false():
 
 def test_and_touching_ranges_not_always_false():
     assert optimize(ge_p(0) & le_p(0)) == eq_p(0)
+
+
+def test_and_ne_excludes_the_bound():
+    assert optimize(ne_p(0) & le_p(0)) == lt_p(0)
+    assert optimize(le_p(0) & ne_p(0)) == lt_p(0)
+    assert optimize(ne_p(0) & ge_p(0)) == gt_p(0)
+    assert optimize(ne_p(1) & le_p(0)) == le_p(0)  # ne(1) is implied by le(0): not an excluded bound
+    assert optimize(ne_p(-1) & le_p(0)) == ne_p(-1) & le_p(0)
+
+
+def test_and_not_of_excluded_bound_with_the_bound_is_always_false():
+    assert optimize(~(ne_p(0) & le_p(0)) & lt_p(0)) == always_false_p

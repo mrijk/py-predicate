@@ -858,3 +858,17 @@ def test_protocol_members_is_exercisable():
     from predicate.spec.exercise_function import exercise_function
 
     consume(exercise_function(protocol_members, None, 30))
+
+
+def test_count_with_negative_counts_allowed():
+    from predicate import count_p, eq_p, ge_p
+
+    # ge_p(-5) also allows counts below 0, which no iterable has
+    values = take(20, generate_true(count_p(eq_p(1), ge_p(-5))))
+    assert all(count_p(eq_p(1), ge_p(-5))(value) for value in values)
+
+
+def test_count_without_a_possible_count():
+    from predicate import count_p, eq_p, lt_p
+
+    assert list(generate_true(count_p(eq_p(1), lt_p(0)))) == []

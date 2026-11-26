@@ -110,6 +110,14 @@ def is_contradiction(left: Predicate[Any], right: Predicate[Any]) -> bool:
     return is_contradiction_at_values(left, right) or _ranges_are_disjoint(left, right)
 
 
+def exclude_bound(left: Predicate[Any], right: Predicate[Any]) -> Predicate[Any] | None:
+    """Return lt_p(v) for ne_p(v) & le_p(v) and gt_p(v) for ne_p(v) & ge_p(v), in either order, otherwise None."""
+    for ne, bound in ((left, right), (right, left)):
+        if isinstance(ne, NePredicate) and isinstance(bound, LePredicate | GePredicate) and ne.v == bound.v:
+            return LtPredicate(v=ne.v) if isinstance(bound, LePredicate) else GtPredicate(v=ne.v)
+    return None
+
+
 @dataclass
 class MaybeOptimized[T]:
     """Base class to hold optimized predicate."""
