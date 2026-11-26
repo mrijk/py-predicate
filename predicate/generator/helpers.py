@@ -141,6 +141,18 @@ def random_callable_objects(nr_of_parameters_p: Predicate[Any] = default_size_p)
     yield from (callable_object_with_signature(sig) for sig in random_signatures(nr_of_parameters_p))
 
 
+class NoValuesFoundError(ValueError):
+    """No value was found that satisfies the predicate, e.g. for a predicate that is never true."""
+
+
+def values_or_nothing(values: Iterator[Any]) -> Iterator[Any]:
+    """Return the values, or no values at all when the predicate they are generated for has none."""
+    try:
+        yield from values
+    except NoValuesFoundError:
+        return
+
+
 def random_lengths(length_p: Predicate[int]) -> Iterator[int]:
     """Return collection lengths: 0 (the empty collection) at most once and first, then only positive lengths (#356).
 
@@ -150,7 +162,7 @@ def random_lengths(length_p: Predicate[int]) -> Iterator[int]:
 
     if length_p(0):
         yield 0
-    lengths = generate_true(length_p)
+    lengths = values_or_nothing(generate_true(length_p))
     # ponytail: a length_p without a positive length in 100 draws (e.g. eq_p(0)) is taken to allow only 0
     # length_p may accept non-ints (e.g. Predicate[Any]) or negative ones (e.g. ~ge_p(0)): without a usable length in
     # 100 draws there is none, and the stream is not searched further, as it may never give one

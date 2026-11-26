@@ -91,6 +91,7 @@ from predicate.function_predicate import FnPredicate
 from predicate.ge_predicate import GePredicate, ge_p
 from predicate.generator.generate_predicate import generate_predicate, predicate_type_registry
 from predicate.generator.helpers import (
+    NoValuesFoundError,
     accepted_kwargs,
     accepts_candidate_types,
     default_length_p,
@@ -167,6 +168,7 @@ from predicate.generator.helpers import (
     satisfying,
     set_from_list,
     unused_name,
+    values_or_nothing,
     with_parameters,
 )
 from predicate.gt_predicate import GtPredicate
@@ -353,7 +355,7 @@ def generate_and(predicate: AndPredicate[Any]) -> Iterator[Any]:
         iterables.append(chain(head, satisfying(right_values, predicate.left, attempts)))
 
     if not iterables:
-        raise ValueError(f"Couldn't generate values that satisfy {predicate}")
+        raise NoValuesFoundError(f"Couldn't generate values that satisfy {predicate}")
 
     yield from random_first_from_iterables(*iterables)
 
@@ -652,7 +654,7 @@ def generate_implements_protocol(predicate: ImplementsProtocolPredicate[Any]) ->
 @generate_true.register(RecurPredicate)
 def generate_recur(predicate: RecurPredicate[Any], *, length_p: Predicate[Any] = default_length_p) -> Iterator[Any]:
     # One stream of start values, so every sequence can start with a different value (and type)
-    starts = generate_true(predicate.predicate_1)
+    starts = values_or_nothing(generate_true(predicate.predicate_1))
 
     for length, start in zip(random_lengths(length_p), starts, strict=False):
         yield from [recur_values(predicate, length, start) if length else []] if length or predicate.empty else []
@@ -664,7 +666,7 @@ def recur_values(predicate: RecurPredicate[Any], length: int, start: Any) -> lis
             yield x
             # Each next value must satisfy the predicate built from its predecessor; when there is none (e.g. nothing
             # is lower than the empty string) the sequence ends here, which is shorter but still valid
-            successors = take(1, generate_true(predicate.predicate_n(x)))
+            successors = take(1, values_or_nothing(generate_true(predicate.predicate_n(x))))
             if not successors:
                 return
             [x] = successors
@@ -1401,7 +1403,9 @@ def generate_count(count_predicate: CountPredicate[Any]) -> Iterator[Any]:
 
     # only counts that can exist: length_p may also allow negative ones, e.g. ge_p(-5)
     for count in random_lengths(length_p):
-        true_values = take(count, generate_true(predicate))
+        true_values = take(count, values_or_nothing(generate_true(predicate)))
+        if len(true_values) < count:  # the predicate can't be true that often
+            return
 
         # lists and tuples keep duplicates, so the count is preserved (sets would not)
         make = random.choice((list, tuple))

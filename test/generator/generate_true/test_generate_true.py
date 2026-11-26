@@ -872,3 +872,29 @@ def test_count_without_a_possible_count():
     from predicate import count_p, eq_p, lt_p
 
     assert list(generate_true(count_p(eq_p(1), lt_p(0)))) == []
+
+
+def test_count_with_a_length_that_is_never_true():
+    from predicate import count_p, eq_p, fn_p, in_p
+    from predicate.generator.helpers import random_ints
+
+    never = in_p([1, 2]) & fn_p(lambda x: x > 5, generate_true_fn=lambda: random_ints(lower=6))
+    assert list(generate_true(count_p(eq_p(1), never))) == []
+
+
+def test_count_of_a_predicate_that_is_never_true():
+    from predicate import always_false_p, count_p, gt_p
+
+    # only the count 0 is possible: the stream ends after it instead of coming up short for the larger counts
+    predicate = count_p(always_false_p, gt_p(-1))
+    values = list(generate_true(predicate))
+    assert values
+    assert all(predicate(value) for value in values)
+
+
+def test_recur_with_a_start_that_is_never_true():
+    from predicate import eq_p, fn_p, in_p, recur_p
+    from predicate.generator.helpers import random_ints
+
+    never = in_p([1, 2]) & fn_p(lambda x: x > 5, generate_true_fn=lambda: random_ints(lower=6))
+    assert list(generate_true(recur_p(lambda x: eq_p(x), empty=False, predicate_1=never))) == []

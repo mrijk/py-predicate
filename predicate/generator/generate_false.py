@@ -31,6 +31,7 @@ from predicate.frozenset_of_predicate import FrozenSetOfPredicate
 from predicate.function_predicate import FnPredicate
 from predicate.ge_predicate import GePredicate
 from predicate.generator.helpers import (
+    NoValuesFoundError,
     accepts_candidate_types,
     default_length_p,
     default_size_p,
@@ -607,7 +608,7 @@ def generate_or(predicate: OrPredicate[Any]) -> Iterator[Any]:
         iterables.append(item for item in generate_false(right) if not left(item))
 
     if not iterables:
-        raise ValueError(f"Couldn't generate values that satisfy {predicate}")
+        raise NoValuesFoundError(f"Couldn't generate values that satisfy {predicate}")
 
     yield from random_first_from_iterables(*iterables)
 

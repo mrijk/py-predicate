@@ -7,7 +7,7 @@ from predicate.eq_predicate import EqPredicate
 from predicate.implies import implies
 from predicate.in_predicate import InPredicate
 from predicate.not_predicate import NotPredicate
-from predicate.optimizer.helpers import MaybeOptimized, NotOptimized, Optimized
+from predicate.optimizer.helpers import MaybeOptimized, NotOptimized, Optimized, is_contradiction
 from predicate.or_predicate import OrPredicate
 from predicate.predicate import Predicate
 from predicate.xor_predicate import XorPredicate
@@ -28,6 +28,8 @@ def optimize_xor_predicate[T](predicate: XorPredicate[T]) -> MaybeOptimized[T]: 
             return Optimized(optimize(~right))
         case _, _ if left == right:  # p ^ p == False
             return Optimized(always_false_p)
+        case _, _ if is_contradiction(left, right):  # p ^ q == p | q when p & q is false
+            return Optimized(optimize(left | right))
 
         case InPredicate(v1), InPredicate(v2) if isinstance(v1, Iterable) and isinstance(v2, Iterable):
             return Optimized(optimize(InPredicate(v=set(v1) ^ set(v2))))

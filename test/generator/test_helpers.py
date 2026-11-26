@@ -577,3 +577,12 @@ def test_random_values_of_type_is_exercisable():
 def test_random_lengths_without_a_valid_length():
     # a collection has no negative length: nothing is usable, and looking through the negative numbers never ends
     assert take(3, random_lengths(~ge_p(0))) == []
+
+
+def test_random_lengths_for_a_length_that_is_never_true():
+    from predicate import fn_p, in_p
+    from predicate.generator.helpers import random_ints, random_lengths
+
+    # the optimizer can't tell that no length is both in (1, 2) and above 5
+    never = in_p([1, 2]) & fn_p(lambda x: x > 5, generate_true_fn=lambda: random_ints(lower=6))
+    assert list(random_lengths(never)) == []
