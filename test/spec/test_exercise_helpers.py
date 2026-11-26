@@ -740,3 +740,19 @@ def test_derived_spec_for_kwargs_is_a_constrained_annotation():
     # a spec that isn't a narrowing of the annotation is still rejected
     with pytest.raises(InvalidSpecError, match="not a constrained annotation"):
         check_signature_against_spec(f, {"args": {"x": is_str_p}, "ret": eq_p(1)})
+
+
+def test_verify_result_with_arguments_named_like_the_return_value_or_old():
+    from predicate import always_true_p
+    from predicate.spec.exercise_helpers import verify_result
+
+    seen = []
+
+    def fn(**kwargs):
+        seen.append(kwargs)
+        return True
+
+    # a parameter named like the return value (here '') or like old would be a duplicate keyword in the call
+    spec = {"args": {}, "ret": always_true_p, "fn": fn, "ret_name": "", "snapshot": {"a": lambda v: v}}
+    verify_result(spec, always_true_p, {"": 1, "old": 2}, 5, old={"a": 3})
+    assert seen == [{"": 5, "old": {"a": 3}}]

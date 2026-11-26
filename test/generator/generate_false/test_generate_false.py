@@ -612,3 +612,13 @@ def test_filtering_false_generators_end_when_no_value_is_false():
     assert list(generate_false(comp_p(lambda x: 1, eq_p(1)))) == []
     # a set that has an element in common with every random set
     assert set() in list(generate_false(intersects_p(set(range(-1000, 1000)))))
+
+
+def test_generate_is_instance_is_exercisable():
+    from more_itertools import consume
+
+    from predicate.generator.generate_false import generate_is_instance_p
+    from predicate.spec.exercise_function import exercise_function
+
+    # the classes are annotated as types, so exercising never draws a non-type such as 5 for isinstance
+    consume(exercise_function(generate_is_instance_p, None, 30))

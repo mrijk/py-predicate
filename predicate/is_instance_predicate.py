@@ -4,10 +4,12 @@ from dataclasses import dataclass
 from datetime import date, datetime, time, timedelta
 from pathlib import PurePath
 from types import ModuleType
-from typing import Any, Hashable, TypeGuard, get_origin, override
+from typing import Annotated, Any, Hashable, TypeGuard, get_origin, override
 from uuid import UUID
 
 from predicate import always_false_p
+from predicate.ge_predicate import ge_p
+from predicate.has_length_predicate import has_length_p
 from predicate.helpers import join_with_or
 from predicate.predicate import Explanation, Predicate
 
@@ -16,7 +18,7 @@ from predicate.predicate import Explanation, Predicate
 class IsInstancePredicate[T](Predicate[T]):
     """A predicate class that models the 'isinstance' predicate."""
 
-    instance_klass: tuple[Any, ...]
+    instance_klass: Annotated[tuple[type, ...], has_length_p(ge_p(1))]
 
     def __call__(self, x: object) -> TypeGuard[T]:
         # This is different from standard Python behavior: a False/True value is not an int!

@@ -1,14 +1,20 @@
 from dataclasses import dataclass
-from typing import Any, override
+from datetime import datetime
+from typing import Annotated, Any, Final, override
+from uuid import UUID
 
+from predicate.in_predicate import in_p
 from predicate.predicate import Explanation, Predicate
+
+# The classes random predicates can be generated for, see random_predicates
+_generatable_klass_p: Final = in_p((bool, datetime, float, int, str, UUID, Any))
 
 
 @dataclass
 class IsPredicateOfPredicate[T](Predicate[T]):
     """A predicate class that models the 'isPredicateOf' predicate."""
 
-    predicate_klass: type
+    predicate_klass: Annotated[type, _generatable_klass_p]
 
     def __call__(self, x: Any) -> bool:
         match x:

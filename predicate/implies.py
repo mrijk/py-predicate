@@ -78,7 +78,7 @@ def _(predicate: GePredicate[SupportsComparison], other: Predicate[Any]) -> bool
 def _(predicate: GtPredicate[SupportsComparison], other: Predicate[Any]) -> bool:
     match other:
         case IsInstancePredicate(instance_klass):
-            return predicate.klass == instance_klass[0]  # type: ignore
+            return predicate.klass == instance_klass[0]
         case GePredicate(v):
             return bool(predicate.v >= v)
         case GtPredicate(v):
@@ -119,7 +119,7 @@ def _(predicate: LtPredicate[SupportsComparison], other: Predicate[Any]) -> bool
 def _(predicate: EqPredicate[Any], other: Predicate[Any]) -> bool:
     match other:
         case IsInstancePredicate(instance_klass):
-            return predicate.klass == instance_klass[0]  # type: ignore
+            return predicate.klass == instance_klass[0]
         case EqPredicate(v):
             return bool(predicate.v == v)
         case NePredicate(v):

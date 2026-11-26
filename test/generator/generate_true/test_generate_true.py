@@ -904,3 +904,14 @@ def test_comp_true_ends_when_no_value_is_true():
     from predicate import comp_p, eq_p
 
     assert list(generate_true(comp_p(lambda x: 0, eq_p(1)))) == []
+
+
+def test_generate_predicate_of_is_exercisable():
+    from more_itertools import consume
+
+    from predicate.generator.generate_true import generate_predicate_of
+    from predicate.spec.exercise_function import exercise_function
+
+    # the class is annotated with the ones predicates can be generated for, not an arbitrary class like bytearray
+    for _ in range(5):
+        consume(exercise_function(generate_predicate_of, None, 30))

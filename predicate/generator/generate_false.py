@@ -61,6 +61,7 @@ from predicate.generator.helpers import (
     sample_optional_fields,
     satisfying,
     unused_name,
+    values_or_nothing,
     with_parameters,
 )
 from predicate.gt_predicate import GtPredicate
@@ -744,8 +745,11 @@ def _generate_at_least_one_false(
 ) -> tuple[Any]:
     from predicate import generate_true
 
-    # The first positive length, or 1 when length_p has none (random_lengths only gives lengths that can exist)
-    length = next((n for n in random_lengths(length_p) if n > 0), 1)
+    # The first int length, at least 1; also 1 when length_p has none (never true, or not ints). Short lists matter: a
+    # false value late in a long list is not false for a match that only looks at the first items (exactly_n)
+    # Bounded: a length_p that only gives other values (e.g. None) would be searched forever
+    draws = take(100, values_or_nothing(generate_true(length_p)))
+    length = max(next((n for n in draws if isinstance(n, int) and not isinstance(n, bool)), 1), 1)
 
     nr_false_values = random.randint(1, length) if length > 1 else 1
     nr_true_values = length - nr_false_values

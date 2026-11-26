@@ -773,11 +773,13 @@ def verify_result(
 
     extra = {"old": old or {}} if spec.get("snapshot") else {}
 
-    if (fn := spec.get("fn")) and not fn(**value, **{ret_name(spec): result}, **extra):
+    # Merged rather than spread into the call: a parameter named like the return value or old would be a duplicate
+    # keyword. check_signature_against_spec rejects such a spec, so with a checked spec the merge changes nothing
+    if (fn := spec.get("fn")) and not fn(**{**value, ret_name(spec): result, **extra}):
         raise SpecViolationError(f"Not conform spec: fn constraint failed for inputs {value} -> {result}")
 
     if fn_p := spec.get("fn_p"):
-        fn_p_result = fn_p(**value, **extra)
+        fn_p_result = fn_p(**{**value, **extra})
         if not fn_p_result(result):
             raise SpecViolationError(f"Not conform spec: {explain(fn_p_result, result)}")
 
