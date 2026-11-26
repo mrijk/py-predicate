@@ -721,3 +721,22 @@ def test_capture_old_skips_arguments_that_are_not_generated():
     spec = {"args": {}, "snapshot": {"x": list, "missing": list}}
 
     assert capture_old(spec, {"x": [1]}) == {"x": [1]}
+
+
+def test_derived_spec_for_kwargs_is_a_constrained_annotation():
+    from predicate import eq_p, is_str_p
+    from predicate.spec.exercise import exercise
+    from predicate.spec.exercise_function import get_spec_from_function_annotation
+    from predicate.spec.exercise_helpers import check_signature_against_spec
+    from predicate.spec.spec import InvalidSpecError
+
+    def f(x: int, **kwargs: Any) -> int:
+        return x
+
+    # the spec exercise derives itself (eq_p({}) for **kwargs) must pass the check it is given to again
+    spec = get_spec_from_function_annotation(f)
+    assert len(list(exercise(f, spec, 5))) == 5
+
+    # a spec that isn't a narrowing of the annotation is still rejected
+    with pytest.raises(InvalidSpecError, match="not a constrained annotation"):
+        check_signature_against_spec(f, {"args": {"x": is_str_p}, "ret": eq_p(1)})

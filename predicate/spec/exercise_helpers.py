@@ -540,7 +540,12 @@ def _narrows_annotation(spec_p: Predicate[Any], parameter: Parameter) -> bool:
     if isinstance(spec_p, IsPredicateOfPredicate):  # the predicate for Predicate[X], see exercise_param_predicate
         return get_origin(parameter.annotation) is Predicate
     # implies() can't compare generic aliases such as Iterable[int] and Iterable[T], so also accept a bound annotation
-    return bool(implies(spec_p, param_predicate(parameter))) or spec_p in _bound_predicates(parameter)
+    # Also accept what exercise derives itself: for **kwargs it is eq_p({}), which implies() can't compare to the annotation
+    return (
+        bool(implies(spec_p, param_predicate(parameter)))
+        or spec_p in _bound_predicates(parameter)
+        or spec_p == exercise_param_predicate(parameter)
+    )
 
 
 def _check_parameter(key: str, parameter: Parameter, parameters: dict[str, Predicate[Any]]) -> None:

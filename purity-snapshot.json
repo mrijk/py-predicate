@@ -29,7 +29,7 @@
         "pure": true,
         "exercise": {
           "status": "failed",
-          "detail": "SpecViolationError: Not conform spec: {'result': False, 'reason': '<generator object mutations at 0x1088fd630> is not an instance of type AbstractContextManager'}",
+          "detail": "SpecViolationError: Not conform spec: {'result': False, 'reason': '<generator object mutations at 0x109239630> is not an instance of type AbstractContextManager'}",
           "runs": 3,
           "flaky": false,
           "statuses": {
@@ -50,13 +50,12 @@
         "category": "system",
         "reason": "calls typer.echo (__main__.py:36) -> calls sys.getdefaultencoding (_compat.py:50)",
         "exercise": {
-          "status": "failed",
-          "detail": "ValueError: max_workers must be greater than 0",
+          "status": "blocked",
+          "detail": "open . for writing",
           "runs": 3,
-          "flaky": true,
+          "flaky": false,
           "statuses": {
-            "failed": 2,
-            "blocked": 1
+            "blocked": 3
           }
         }
       }
@@ -152,7 +151,7 @@
         "reason": "calls os.environ.get (sandbox.py:140)",
         "exercise": {
           "status": "blocked",
-          "detail": "open /tmp/bf1gay9f for writing",
+          "detail": "open /tmp/vl6gycoh for writing",
           "runs": 3,
           "flaky": false,
           "statuses": {
@@ -207,21 +206,6 @@
     "file_name": "generate_false.py",
     "functions": [
       {
-        "name": "generate_has_key",
-        "line": 203,
-        "pure": true,
-        "exercise": {
-          "status": "failed",
-          "detail": "NoValuesFoundError: Couldn't generate values that satisfy (lt_p(0) ^ gt_p(0)) & eq_p(0)",
-          "runs": 3,
-          "flaky": true,
-          "statuses": {
-            "ok": 2,
-            "failed": 1
-          }
-        }
-      },
-      {
         "name": "generate_has_path",
         "line": 224,
         "pure": true,
@@ -258,34 +242,6 @@
         "exercise": {
           "status": "failed",
           "detail": "TypeError: isinstance() arg 2 must be a type, a tuple of types, or a union",
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "failed": 3
-          }
-        }
-      },
-      {
-        "name": "generate_compiled",
-        "line": 587,
-        "pure": true,
-        "exercise": {
-          "status": "failed",
-          "detail": "InvalidSpecError: Spec predicate is not a constrained annotation",
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "failed": 3
-          }
-        }
-      },
-      {
-        "name": "generate_false",
-        "line": 629,
-        "pure": true,
-        "exercise": {
-          "status": "failed",
-          "detail": "InvalidSpecError: Spec predicate is not a constrained annotation",
           "runs": 3,
           "flaky": false,
           "statuses": {
@@ -337,9 +293,10 @@
           "status": "timeout",
           "detail": "no result within 5.0s",
           "runs": 3,
-          "flaky": false,
+          "flaky": true,
           "statuses": {
-            "timeout": 3
+            "ok": 1,
+            "timeout": 2
           }
         }
       },
@@ -351,7 +308,7 @@
         "reason": "calls random_anys (generate_false.py:763) -> calls random.randint (helpers.py:344)",
         "exercise": {
           "status": "failed",
-          "detail": "TypeError: '>=' not supported between instances of 'generator' and 'int'",
+          "detail": "TypeError: '>' not supported between instances of 'generator' and 'int'",
           "runs": 3,
           "flaky": false,
           "statuses": {
@@ -366,14 +323,13 @@
         "category": "randomness",
         "reason": "calls random.choice (generate_false.py:827)",
         "exercise": {
-          "status": "failed",
-          "detail": "NoValuesFoundError: Couldn't generate values that satisfy (ge_p(0) | (ge_p(0) | lt_p(0) ^ (le_p(0) | ge_p(0) | le_p(0)))) ^ ne_p(0) | ne_p(0)",
+          "status": "timeout",
+          "detail": "no result within 5.0s",
           "runs": 3,
           "flaky": true,
           "statuses": {
-            "failed": 1,
             "timeout": 1,
-            "ok": 1
+            "ok": 2
           }
         }
       },
@@ -383,7 +339,7 @@
         "pure": true,
         "exercise": {
           "status": "failed",
-          "detail": "NoValuesFoundError: Couldn't generate values that satisfy (ne_p(0) | eq_p(0)) ^ ne_p(0) | le_p(0) ^ not_in_p(0) | (eq_p(0) | lt_p(0))",
+          "detail": "NoValuesFoundError: Couldn't generate values that satisfy (~~(ne_p(0) ^ ge_p(0)) ^ ~gt_p(0)) & in_p(0)",
           "runs": 3,
           "flaky": true,
           "statuses": {
@@ -404,8 +360,8 @@
           "runs": 3,
           "flaky": true,
           "statuses": {
-            "ok": 2,
-            "failed": 1
+            "ok": 1,
+            "failed": 2
           }
         }
       }
@@ -415,84 +371,6 @@
     "path": "predicate/generator/generate_true.py",
     "file_name": "generate_true.py",
     "functions": [
-      {
-        "name": "generate_free_type_var",
-        "line": 312,
-        "pure": false,
-        "category": "randomness",
-        "reason": "calls random.choice (generate_true.py:316)",
-        "exercise": {
-          "status": "failed",
-          "detail": "InvalidSpecError: Spec predicate is not a constrained annotation",
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "failed": 3
-          }
-        }
-      },
-      {
-        "name": "generate_constrained_type_var",
-        "line": 319,
-        "pure": false,
-        "category": "randomness",
-        "reason": "calls random.choice (generate_true.py:323)",
-        "exercise": {
-          "status": "failed",
-          "detail": "InvalidSpecError: Spec predicate is not a constrained annotation",
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "failed": 3
-          }
-        }
-      },
-      {
-        "name": "generate_always_true",
-        "line": 326,
-        "pure": false,
-        "category": "randomness",
-        "reason": "calls random_anys (generate_true.py:328) -> calls random.randint (helpers.py:344)",
-        "exercise": {
-          "status": "failed",
-          "detail": "InvalidSpecError: Spec predicate is not a constrained annotation",
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "failed": 3
-          }
-        }
-      },
-      {
-        "name": "generate_eq",
-        "line": 364,
-        "pure": true,
-        "exercise": {
-          "status": "failed",
-          "detail": "InvalidSpecError: Spec predicate is not a constrained annotation",
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "failed": 3
-          }
-        }
-      },
-      {
-        "name": "generate_ge",
-        "line": 426,
-        "pure": false,
-        "category": "time",
-        "reason": "calls random_datetimes (generate_true.py:430) -> calls datetime.now (helpers.py:224)",
-        "exercise": {
-          "status": "failed",
-          "detail": "InvalidSpecError: Spec predicate is not a constrained annotation",
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "failed": 3
-          }
-        }
-      },
       {
         "name": "generate_has_path",
         "line": 516,
@@ -522,20 +400,6 @@
         }
       },
       {
-        "name": "generate_true",
-        "line": 629,
-        "pure": true,
-        "exercise": {
-          "status": "failed",
-          "detail": "InvalidSpecError: Spec predicate is not a constrained annotation",
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "failed": 3
-          }
-        }
-      },
-      {
         "name": "generate_recur",
         "line": 655,
         "pure": true,
@@ -545,8 +409,8 @@
           "runs": 3,
           "flaky": true,
           "statuses": {
-            "timeout": 2,
-            "ok": 1
+            "ok": 2,
+            "timeout": 1
           }
         }
       },
@@ -565,35 +429,6 @@
         }
       },
       {
-        "name": "generate_not",
-        "line": 715,
-        "pure": true,
-        "exercise": {
-          "status": "failed",
-          "detail": "NoValuesFoundError: Couldn't generate values that satisfy ne_p(0) | ge_p(0) ^ not_in_p(0)",
-          "runs": 3,
-          "flaky": true,
-          "statuses": {
-            "ok": 2,
-            "failed": 1
-          }
-        }
-      },
-      {
-        "name": "generate_compiled",
-        "line": 754,
-        "pure": true,
-        "exercise": {
-          "status": "failed",
-          "detail": "InvalidSpecError: Spec predicate is not a constrained annotation",
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "failed": 3
-          }
-        }
-      },
-      {
         "name": "generate_predicate_of",
         "line": 790,
         "pure": false,
@@ -601,7 +436,7 @@
         "reason": "calls random_predicates (generate_true.py:792) -> calls random.choice (helpers.py:53)",
         "exercise": {
           "status": "failed",
-          "detail": "InvalidSpecError: Spec predicate is not a constrained annotation",
+          "detail": "TypeError: unhashable type: 'hamt'",
           "runs": 3,
           "flaky": false,
           "statuses": {
@@ -617,54 +452,11 @@
         "reason": "calls _family_generator (generate_true.py:1163) -> calls random.choice (generate_true.py:901)",
         "exercise": {
           "status": "failed",
-          "detail": "InvalidSpecError: Spec predicate is not a constrained annotation",
+          "detail": "IndexError: tuple index out of range",
           "runs": 3,
           "flaky": false,
           "statuses": {
             "failed": 3
-          }
-        }
-      },
-      {
-        "name": "generate_dict_of_p",
-        "line": 1227,
-        "pure": true,
-        "exercise": {
-          "status": "failed",
-          "detail": "InvalidSpecError: Spec predicate is not a constrained annotation",
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "failed": 3
-          }
-        }
-      },
-      {
-        "name": "generate_frozendict_of_p",
-        "line": 1239,
-        "pure": true,
-        "exercise": {
-          "status": "failed",
-          "detail": "InvalidSpecError: Spec predicate is not a constrained annotation",
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "failed": 3
-          }
-        }
-      },
-      {
-        "name": "generate_frozenset_of_p",
-        "line": 1289,
-        "pure": true,
-        "exercise": {
-          "status": "timeout",
-          "detail": "no result within 5.0s",
-          "runs": 3,
-          "flaky": true,
-          "statuses": {
-            "ok": 2,
-            "timeout": 1
           }
         }
       },
@@ -689,36 +481,6 @@
     "file_name": "helpers.py",
     "functions": [
       {
-        "name": "random_lengths",
-        "line": 156,
-        "pure": true,
-        "exercise": {
-          "status": "timeout",
-          "detail": "no result within 5.0s",
-          "runs": 3,
-          "flaky": true,
-          "statuses": {
-            "ok": 2,
-            "timeout": 1
-          }
-        }
-      },
-      {
-        "name": "random_sets",
-        "line": 257,
-        "pure": true,
-        "exercise": {
-          "status": "timeout",
-          "detail": "no result within 5.0s",
-          "runs": 3,
-          "flaky": true,
-          "statuses": {
-            "ok": 1,
-            "timeout": 2
-          }
-        }
-      },
-      {
         "name": "random_frozensets",
         "line": 266,
         "pure": true,
@@ -728,24 +490,8 @@
           "runs": 3,
           "flaky": true,
           "statuses": {
-            "ok": 2,
-            "timeout": 1
-          }
-        }
-      },
-      {
-        "name": "random_ints",
-        "line": 336,
-        "pure": false,
-        "category": "randomness",
-        "reason": "calls random.randint (helpers.py:344)",
-        "exercise": {
-          "status": "failed",
-          "detail": "InvalidSpecError: Spec predicate is not a constrained annotation",
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "failed": 3
+            "timeout": 1,
+            "ok": 2
           }
         }
       }
@@ -779,7 +525,7 @@
         "reason": "calls _check_supported (from_spec.py:39) -> calls sys.modules.get (type_checking.py:182)",
         "exercise": {
           "status": "failed",
-          "detail": "InvalidSpecError: Parameter '' not in function signature",
+          "detail": "NotImplementedError: given_spec only supports functions for now, not classes or callable objects",
           "runs": 3,
           "flaky": false,
           "statuses": {
@@ -794,35 +540,19 @@
     "file_name": "strategies.py",
     "functions": [
       {
-        "name": "from_predicate_false",
-        "line": 80,
+        "name": "from_predicate",
+        "line": 63,
         "pure": false,
         "category": "dynamic-code",
-        "reason": "calls from_predicate (strategies.py:82) -> calls exec (reflection.py:371)",
+        "reason": "calls _base (strategies.py:76) -> calls exec (reflection.py:371)",
         "exercise": {
           "status": "blocked",
-          "detail": "os.mkdir ('/private/var/folders/04/k8fzb_917tq2nxr723qmz_pm0000gn/T/tmp52x_xd8q/.hypothesis/tmp', 511)",
+          "detail": "os.mkdir ('/private/var/folders/04/k8fzb_917tq2nxr723qmz_pm0000gn/T/tmpyk2rsvhw/.hypothesis/tmp', 511)",
           "runs": 3,
           "flaky": true,
           "statuses": {
             "ok": 2,
             "blocked": 1
-          }
-        }
-      },
-      {
-        "name": "given_predicate",
-        "line": 99,
-        "pure": false,
-        "category": "global-state",
-        "reason": "calls given (strategies.py:103) -> nonlocal statement (core.py:2158)",
-        "exercise": {
-          "status": "failed",
-          "detail": "InvalidSpecError: Spec predicate is not a constrained annotation",
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "failed": 3
           }
         }
       }
@@ -838,27 +568,7 @@
         "pure": true,
         "exercise": {
           "status": "failed",
-          "detail": "UnexpectedCharacters: No terminal matches '7' in the current parser context, at line 1 col 5\n\nJnED7Chj\n    ^\nExpected one of: \n\t* __ANON_0\n\t* CIRCUMFLEX\n\t* AMPERSAND\n\t* VBAR\n",
-          "runs": 3,
-          "flaky": false,
-          "statuses": {
-            "failed": 3
-          }
-        }
-      }
-    ]
-  },
-  {
-    "path": "predicate/predicate.py",
-    "file_name": "predicate.py",
-    "functions": [
-      {
-        "name": "predicate_partial",
-        "line": 203,
-        "pure": true,
-        "exercise": {
-          "status": "failed",
-          "detail": "InvalidSpecError: Spec predicate is not a constrained annotation",
+          "detail": "UnexpectedCharacters: No terminal matches '1' in the current parser context, at line 1 col 1\n\n1azHaDT\n^\nExpected one of: \n\t* TILDE\n\t* FALSE\n\t* LPAR\n\t* WORD\n\t* LE_P\n\t* GE_P\n\t* TRUE\n",
           "runs": 3,
           "flaky": false,
           "statuses": {
@@ -916,7 +626,7 @@
         "reason": "calls _resolve_class_spec (exercise_class.py:95) -> calls sys.modules.get (type_checking.py:182)",
         "exercise": {
           "status": "failed",
-          "detail": "InvalidSpecError: Parameter '' not in function signature",
+          "detail": "InvalidSpecError: Cannot derive spec for 'function': missing return annotation; pass a Spec or annotate it",
           "runs": 3,
           "flaky": false,
           "statuses": {
@@ -938,7 +648,7 @@
         "reason": "calls resolved_signature (exercise_function.py:34) -> calls sys.modules.get (type_checking.py:182)",
         "exercise": {
           "status": "failed",
-          "detail": "InvalidSpecError: Cannot derive spec for 'function': parameter 'rg6t' has no annotation; pass a Spec or annotate it",
+          "detail": "InvalidSpecError: Cannot derive spec for '<lambda>': missing return annotation; pass a Spec or annotate it",
           "runs": 3,
           "flaky": false,
           "statuses": {
@@ -954,7 +664,7 @@
         "reason": "calls _resolve_function_spec (exercise_function.py:56) -> calls sys.modules.get (type_checking.py:182)",
         "exercise": {
           "status": "failed",
-          "detail": "InvalidSpecError: Cannot derive spec for '<lambda>': missing return annotation; pass a Spec or annotate it",
+          "detail": "InvalidSpecError: Parameter '' not in function signature",
           "runs": 3,
           "flaky": false,
           "statuses": {
@@ -970,7 +680,7 @@
         "reason": "calls _resolve_function_spec (exercise_function.py:79) -> calls sys.modules.get (type_checking.py:182)",
         "exercise": {
           "status": "failed",
-          "detail": "InvalidSpecError: Parameter '' not in function signature",
+          "detail": "InvalidSpecError: Cannot derive spec for '<lambda>': missing return annotation; pass a Spec or annotate it",
           "runs": 3,
           "flaky": false,
           "statuses": {
@@ -1010,10 +720,9 @@
           "status": "failed",
           "detail": "InvalidSpecError: Return annotation not in spec",
           "runs": 3,
-          "flaky": true,
+          "flaky": false,
           "statuses": {
-            "ok": 1,
-            "failed": 2
+            "failed": 3
           }
         }
       },
@@ -1025,7 +734,7 @@
         "reason": "calls resolved_signature (exercise_helpers.py:509) -> calls sys.modules.get (type_checking.py:182)",
         "exercise": {
           "status": "failed",
-          "detail": "InvalidSpecError: Parameter '' not in function signature",
+          "detail": "InvalidSpecError: Unannotated parameter 'llC' not in spec",
           "runs": 3,
           "flaky": false,
           "statuses": {
@@ -1035,7 +744,7 @@
       },
       {
         "name": "generate_values",
-        "line": 660,
+        "line": 665,
         "pure": true,
         "exercise": {
           "status": "failed",
@@ -1043,20 +752,20 @@
           "runs": 3,
           "flaky": true,
           "statuses": {
-            "ok": 1,
-            "failed": 2
+            "ok": 2,
+            "failed": 1
           }
         }
       },
       {
         "name": "verify_result",
-        "line": 755,
+        "line": 760,
         "pure": false,
         "category": "system",
-        "reason": "calls type_var_failure (exercise_helpers.py:766) -> calls sys.modules.get (exercise_helpers.py:343)",
+        "reason": "calls type_var_failure (exercise_helpers.py:771) -> calls sys.modules.get (exercise_helpers.py:343)",
         "exercise": {
           "status": "failed",
-          "detail": "SpecViolationError: Not conform spec: {'result': False, 'reason': '0 is equal to False'}",
+          "detail": "TypeError: predicate.generator.generate_true._returning.<locals>.function() got multiple values for keyword argument ''",
           "runs": 3,
           "flaky": false,
           "statuses": {
@@ -1066,11 +775,11 @@
       },
       {
         "name": "verify_items",
-        "line": 808,
+        "line": 813,
         "pure": true,
         "exercise": {
           "status": "failed",
-          "detail": "SpecViolationError: Not conform spec: yielded {'result': False, 'index': 0, 'value': False, 'left': {'result': False, 'left': {'result': False, 'left': {'result': True, 'explanation': {'result': True}}, 'right': {'result': False, 'explanation': {'result': False, 'left': {'result': True}, 'right': {'result': True}}}}, 'right': {'result': False, 'left': {'result': True, 'explanation': {'result': True}}, 'right': {'result': False, 'explanation': {'result': False, 'left': {'result': False, 'left': {",
+          "detail": "SpecViolationError: Not conform spec: yielded {'result': False, 'index': 0, 'value': datetime.datetime(2026, 11, 26, 19, 26, 17, 180828), 'reason': 'datetime.datetime(2026, 11, 26, 19, 26, 17, 180828) is not equal to False'} for inputs {'ZlQ': 1, 'RXF': 9, 'oaEPq': 10, 'NTSZkvqX': 4, '8VGE': 0}",
           "runs": 3,
           "flaky": false,
           "statuses": {
@@ -1080,11 +789,11 @@
       },
       {
         "name": "check_exception",
-        "line": 815,
+        "line": 820,
         "pure": true,
         "exercise": {
           "status": "failed",
-          "detail": "ValueError: xpHaGov6",
+          "detail": "RuntimeError: jrg5U",
           "runs": 3,
           "flaky": false,
           "statuses": {
@@ -1106,12 +815,11 @@
         "reason": "calls resolve_signature (instrument_function.py:46) -> calls sys.modules.get (type_checking.py:182)",
         "exercise": {
           "status": "failed",
-          "detail": "InvalidSpecError: Snapshot parameter 'M' not in function signature",
+          "detail": "InvalidSpecError: Snapshot parameter 'P7i0F' not in function signature",
           "runs": 3,
-          "flaky": true,
+          "flaky": false,
           "statuses": {
-            "failed": 2,
-            "ok": 1
+            "failed": 3
           }
         }
       },
@@ -1183,7 +891,7 @@
         "pure": true,
         "exercise": {
           "status": "failed",
-          "detail": "ValueError: Type not allowed: eq_p(False)",
+          "detail": "ValueError: Type not allowed: ne_p(False)",
           "runs": 3,
           "flaky": false,
           "statuses": {
@@ -1197,7 +905,7 @@
         "pure": true,
         "exercise": {
           "status": "failed",
-          "detail": "ValueError: Type not allowed: ne_p(False)",
+          "detail": "ValueError: Type not allowed: eq_p(False)",
           "runs": 3,
           "flaky": false,
           "statuses": {
@@ -1211,7 +919,7 @@
         "pure": true,
         "exercise": {
           "status": "failed",
-          "detail": "ValueError: Type not allowed: ne_p(False)",
+          "detail": "ValueError: Type not allowed: eq_p(False)",
           "runs": 3,
           "flaky": false,
           "statuses": {
