@@ -24,7 +24,7 @@ from operator import or_
 from pathlib import PurePath
 from random import choices
 from time import gmtime, struct_time
-from typing import Annotated, Any, Final, ForwardRef, Iterator, Protocol, runtime_checkable
+from typing import Annotated, Any, Final, ForwardRef, Iterator, Literal, Protocol, runtime_checkable
 from uuid import UUID, uuid4
 
 from more_itertools import interleave, random_permutation, repeatfunc, take, unique_everseen
@@ -426,7 +426,11 @@ def random_named_tuple_instances(klass: Annotated[type, _named_tuple_class_p]) -
         yield klass(*(next(generator) for generator in generators))
 
 
-def random_values_of_type(klass: type) -> Iterator[Any]:
+# The classes random_values_of_type can build values of; a Literal so exercise passes exactly these (like PredicateKlass)
+type ValueKlass = Literal[bool, datetime, float, int, str, UUID, Any, object]  # type: ignore[valid-type]
+
+
+def random_values_of_type(klass: ValueKlass) -> Iterator[Any]:
     type_registry: dict[type, Callable[[], Iterator[Any]]] = {
         bool: random_bools,
         datetime: random_datetimes,

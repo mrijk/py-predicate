@@ -563,3 +563,12 @@ def test_generate_true_is_instance_frame():
     from predicate import generate_true, is_instance_p
 
     assert all(isinstance(frame, FrameType) for frame in take(5, generate_true(is_instance_p(FrameType))))
+
+
+def test_random_values_of_type_is_exercisable():
+    from more_itertools import consume
+
+    from predicate.spec.exercise_function import exercise_function
+
+    # klass is limited to the classes there are values for, so exercising never passes e.g. type
+    consume(exercise_function(random_values_of_type, None, 30))
