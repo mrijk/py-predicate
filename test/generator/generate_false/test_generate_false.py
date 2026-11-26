@@ -601,3 +601,14 @@ def test_set_of_false_with_a_length_that_is_never_true_or_not_an_int():
         values = take(5, generate_false(is_set_of_p(ge_p(0)), length_p=length_p))
         assert values
         assert all(not is_set_of_p(ge_p(0))(value) for value in values)
+
+
+def test_filtering_false_generators_end_when_no_value_is_false():
+    from predicate import comp_p, intersects_p, is_superset_p, juxt_p
+
+    # every set is a superset of the empty set, every comp here is true, and the juxt is always true
+    assert list(generate_false(is_superset_p(set()))) == []
+    assert list(generate_false(juxt_p(eq_p(1), evaluate=always_true_p))) == []
+    assert list(generate_false(comp_p(lambda x: 1, eq_p(1)))) == []
+    # a set that has an element in common with every random set
+    assert set() in list(generate_false(intersects_p(set(range(-1000, 1000)))))

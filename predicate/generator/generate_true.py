@@ -91,6 +91,7 @@ from predicate.function_predicate import FnPredicate
 from predicate.ge_predicate import GePredicate, ge_p
 from predicate.generator.generate_predicate import generate_predicate, predicate_type_registry
 from predicate.generator.helpers import (
+    FILTER_ATTEMPTS,
     NoValuesFoundError,
     accepted_kwargs,
     accepts_candidate_types,
@@ -575,7 +576,7 @@ def generate_intersects(predicate: IntersectsPredicate[Any]) -> Iterator[Any]:
 @generate_true.register(CompPredicate)
 def generate_comp_p(predicate: CompPredicate[Any, Any]) -> Iterator[Any]:
     # fn can't be inverted, so filter random values; inputs that make fn raise are skipped
-    yield from (value for value in random_anys() if evaluate_comp(predicate, value) is True)
+    yield from satisfying(random_anys(), lambda value: evaluate_comp(predicate, value) is True, FILTER_ATTEMPTS)
 
 
 @generate_true.register(FnPredicate)

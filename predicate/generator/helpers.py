@@ -496,7 +496,7 @@ def sample_optional_fields(generators: dict[str, Iterator[Any]]) -> dict[str, An
     return {key: value for key, value in values.items() if value is not _MISSING}
 
 
-def satisfying(values: Iterator[Any], predicate: Predicate[Any], attempts: int) -> Iterator[Any]:
+def satisfying(values: Iterator[Any], predicate: Callable[[Any], bool], attempts: int) -> Iterator[Any]:
     """Return the values that satisfy the predicate; stops after attempts misses in a row, so it can't hang.
 
     E.g. is_tuple_p & is_empty_p: random tuples are only rarely empty.
@@ -513,27 +513,27 @@ def satisfying(values: Iterator[Any], predicate: Predicate[Any], attempts: int) 
 
 
 # Random ints, uuids and anys are cheap to draw, so a predicate gets many chances before it is given up on
-_FILTER_ATTEMPTS: Final = 1000
+FILTER_ATTEMPTS: Final = 1000
 
 
 def generate_datetimes(predicate: Predicate[datetime]) -> Iterator[datetime]:
-    yield from (item for item in random_datetimes() if predicate(item))
+    yield from satisfying(random_datetimes(), predicate, FILTER_ATTEMPTS)
 
 
 def generate_floats(predicate: Predicate[float]) -> Iterator[float]:
-    yield from (item for item in random_floats() if predicate(item))
+    yield from satisfying(random_floats(), predicate, FILTER_ATTEMPTS)
 
 
 def generate_strings(predicate: Predicate[str]) -> Iterator[str]:
-    yield from (item for item in random_strings() if predicate(item))
+    yield from satisfying(random_strings(), predicate, FILTER_ATTEMPTS)
 
 
 def generate_ints(predicate: Predicate[int]) -> Iterator[int]:
-    yield from satisfying(random_ints(), predicate, _FILTER_ATTEMPTS)
+    yield from satisfying(random_ints(), predicate, FILTER_ATTEMPTS)
 
 
 def generate_anys(predicate: Predicate[Any]) -> Iterator[Any]:
-    yield from satisfying(random_anys(), predicate, _FILTER_ATTEMPTS)
+    yield from satisfying(random_anys(), predicate, FILTER_ATTEMPTS)
 
 
 def evaluate_comp(predicate: Predicate[Any], x: Any) -> bool | None:
@@ -685,7 +685,7 @@ def random_decimals() -> Iterator[Decimal]:
 def random_supports(protocol: type) -> Iterator[Any]:
     """Generate values for a typing.Supports* protocol, keeping the candidates that implement it."""
     candidates = interleave(random_ints(), random_floats(), random_complex_numbers(), random_decimals(), random_bytes())
-    yield from (value for value in candidates if isinstance(value, protocol))
+    yield from satisfying(candidates, lambda value: isinstance(value, protocol), FILTER_ATTEMPTS)
 
 
 def random_sized() -> Iterator[Any]:

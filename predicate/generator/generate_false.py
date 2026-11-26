@@ -31,6 +31,7 @@ from predicate.frozenset_of_predicate import FrozenSetOfPredicate
 from predicate.function_predicate import FnPredicate
 from predicate.ge_predicate import GePredicate
 from predicate.generator.helpers import (
+    FILTER_ATTEMPTS,
     NoValuesFoundError,
     accepts_candidate_types,
     default_length_p,
@@ -374,7 +375,7 @@ def generate_falsy(_predicate: IsFalsyPredicate[Any]) -> Iterator[Any]:
 @generate_false.register(CompPredicate)
 def generate_comp_p(predicate: CompPredicate[Any, Any]) -> Iterator[Any]:
     # fn can't be inverted, so filter random values; inputs that make fn raise are skipped
-    yield from (value for value in random_anys() if evaluate_comp(predicate, value) is False)
+    yield from satisfying(random_anys(), lambda value: evaluate_comp(predicate, value) is False, FILTER_ATTEMPTS)
 
 
 @generate_false.register(FnPredicate)
@@ -603,9 +604,9 @@ def generate_or(predicate: OrPredicate[Any]) -> Iterator[Any]:
 
     iterables = []
     if found_left:
-        iterables.append(item for item in generate_false(left) if not right(item))
+        iterables.append(satisfying(generate_false(left), lambda item: not right(item), FILTER_ATTEMPTS))
     if found_right:
-        iterables.append(item for item in generate_false(right) if not left(item))
+        iterables.append(satisfying(generate_false(right), lambda item: not left(item), FILTER_ATTEMPTS))
 
     if not iterables:
         raise NoValuesFoundError(f"Couldn't generate values that satisfy {predicate}")
@@ -759,7 +760,7 @@ def _generate_at_least_one_false(
 
 @generate_false.register(JuxtPredicate)
 def generate_juxt_p(predicate: JuxtPredicate[Any]) -> Iterator[Any]:
-    yield from (item for item in random_anys() if not predicate(item))
+    yield from satisfying(random_anys(), lambda item: not predicate(item), FILTER_ATTEMPTS)
 
 
 @generate_false.register(TeePredicate)
@@ -870,30 +871,30 @@ def generate_is(is_predicate: IsPredicate[Any]) -> Iterator[Any]:
 
 @generate_false.register(IsSubsetPredicate)
 def generate_is_subset(predicate: IsSubsetPredicate[Any]) -> Iterator[Any]:
-    yield from (s for s in random_sets() if not predicate(s))
+    yield from satisfying(random_sets(), lambda s: not predicate(s), FILTER_ATTEMPTS)
 
 
 @generate_false.register(IsRealSubsetPredicate)
 def generate_is_real_subset(predicate: IsRealSubsetPredicate[Any]) -> Iterator[Any]:
     yield predicate.v  # v is not a real subset of itself
-    yield from (s for s in random_sets() if not predicate(s))
+    yield from satisfying(random_sets(), lambda s: not predicate(s), FILTER_ATTEMPTS)
 
 
 @generate_false.register(IsSupersetPredicate)
 def generate_is_superset(predicate: IsSupersetPredicate[Any]) -> Iterator[Any]:
-    yield from (s for s in random_sets() if not predicate(s))
+    yield from satisfying(random_sets(), lambda s: not predicate(s), FILTER_ATTEMPTS)
 
 
 @generate_false.register(IsRealSupersetPredicate)
 def generate_is_real_superset(predicate: IsRealSupersetPredicate[Any]) -> Iterator[Any]:
     yield predicate.v  # v is not a real superset of itself
-    yield from (s for s in random_sets() if not predicate(s))
+    yield from satisfying(random_sets(), lambda s: not predicate(s), FILTER_ATTEMPTS)
 
 
 @generate_false.register(IntersectsPredicate)
 def generate_is_intersects(predicate: IntersectsPredicate[Any]) -> Iterator[Any]:
     yield set()  # empty set is disjoint from anything
-    yield from (s for s in random_sets() if not predicate(s))
+    yield from satisfying(random_sets(), lambda s: not predicate(s), FILTER_ATTEMPTS)
 
 
 @generate_false.register(ReducePredicate)
@@ -912,12 +913,12 @@ def generate_regex(predicate: RegexPredicate[Any]) -> Iterator[Any]:
 
 @generate_false.register(IsCallablePredicate)
 def generate_is_callable(predicate: IsCallablePredicate[Any]) -> Iterator[Any]:
-    yield from (item for item in random_anys() if not predicate(item))
+    yield from satisfying(random_anys(), lambda item: not predicate(item), FILTER_ATTEMPTS)
 
 
 @generate_false.register(IsPartialPredicate)
 def generate_is_partial(predicate: IsPartialPredicate[Any]) -> Iterator[Any]:
-    yield from (item for item in random_anys() if not predicate(item))
+    yield from satisfying(random_anys(), lambda item: not predicate(item), FILTER_ATTEMPTS)
 
 
 @generate_false.register(RecurPredicate)

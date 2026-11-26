@@ -612,3 +612,14 @@ def test_with_parameters_is_exercisable():
     from predicate.spec.exercise_function import exercise_function
 
     consume(exercise_function(with_parameters, None, 30))
+
+
+def test_filtering_generators_end_when_no_value_satisfies():
+    from predicate import fn_p
+    from predicate.generator.helpers import generate_datetimes, generate_floats, generate_strings, random_supports
+
+    never = fn_p(lambda x: False)
+    assert list(generate_floats(never)) == []
+    assert list(generate_datetimes(never)) == []
+    assert list(generate_strings(never)) == []
+    assert list(random_supports(str)) == []  # no random number, bytes, ... implements str

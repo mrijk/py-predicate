@@ -898,3 +898,9 @@ def test_recur_with_a_start_that_is_never_true():
 
     never = in_p([1, 2]) & fn_p(lambda x: x > 5, generate_true_fn=lambda: random_ints(lower=6))
     assert list(generate_true(recur_p(lambda x: eq_p(x), empty=False, predicate_1=never))) == []
+
+
+def test_comp_true_ends_when_no_value_is_true():
+    from predicate import comp_p, eq_p
+
+    assert list(generate_true(comp_p(lambda x: 0, eq_p(1)))) == []
