@@ -839,3 +839,22 @@ def test_generate_true_is_instance_protocol():
 
     assert len(values) == 5
     assert all(isinstance(value, Greeter) for value in values)
+
+
+def test_generate_implements_protocol_is_exercisable():
+    from more_itertools import consume
+
+    from predicate.generator.generate_true import generate_implements_protocol
+    from predicate.spec.exercise_function import exercise_function
+
+    # the protocol is annotated as a Protocol, so exercising never draws a plain class such as object
+    consume(exercise_function(generate_implements_protocol, None, 30))
+
+
+def test_protocol_members_is_exercisable():
+    from more_itertools import consume
+
+    from predicate.implements_protocol_predicate import protocol_members
+    from predicate.spec.exercise_function import exercise_function
+
+    consume(exercise_function(protocol_members, None, 30))

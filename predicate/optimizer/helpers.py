@@ -1,4 +1,4 @@
-from collections.abc import Iterable
+from collections.abc import Callable, Iterable
 from dataclasses import dataclass
 from typing import Any
 
@@ -67,6 +67,47 @@ def is_tautology_at_values(left: Predicate[Any], right: Predicate[Any]) -> bool:
         if values is not None and all(holds_at(other, v) for v in values):
             return True
     return False
+
+
+def _bounds(left: Predicate[Any], right: Predicate[Any]) -> tuple[Any, Any, bool, bool] | None:
+    """Return (lower, upper, lower is inclusive, upper is inclusive) of a gt_p / ge_p with a lt_p / le_p."""
+    for low, up in ((left, right), (right, left)):
+        if isinstance(low, GtPredicate | GePredicate) and isinstance(up, LtPredicate | LePredicate):
+            return low.v, up.v, isinstance(low, GePredicate), isinstance(up, LePredicate)
+    return None
+
+
+def _ranges_cover_everything(left: Predicate[Any], right: Predicate[Any]) -> bool:
+    """gt(b) | lt(a) covers everything when b < a, or when b == a and either end is inclusive."""
+    if bounds := _bounds(left, right):
+        lower, upper, low_incl, up_incl = bounds
+        return _compare(lower, upper, low_incl or up_incl, lambda a, b: a < b)
+    return False
+
+
+def _ranges_are_disjoint(left: Predicate[Any], right: Predicate[Any]) -> bool:
+    """gt(b) & lt(a) is empty when b > a, or when b == a and either end is exclusive."""
+    if bounds := _bounds(left, right):
+        lower, upper, low_incl, up_incl = bounds
+        return _compare(lower, upper, not (low_incl and up_incl), lambda a, b: a > b)
+    return False
+
+
+def _compare(lower: Any, upper: Any, equal_counts: bool, strictly: Callable[[Any, Any], bool]) -> bool:
+    try:
+        return strictly(lower, upper) or (equal_counts and lower == upper)
+    except TypeError:  # e.g. ge_p(0) with lt_p("a")
+        return False
+
+
+def is_tautology(left: Predicate[Any], right: Predicate[Any]) -> bool:
+    """Whether left | right is always true, judged from the values or ranges in the two predicates."""
+    return is_tautology_at_values(left, right) or _ranges_cover_everything(left, right)
+
+
+def is_contradiction(left: Predicate[Any], right: Predicate[Any]) -> bool:
+    """Whether left & right is always false, judged from the values or ranges in the two predicates."""
+    return is_contradiction_at_values(left, right) or _ranges_are_disjoint(left, right)
 
 
 @dataclass

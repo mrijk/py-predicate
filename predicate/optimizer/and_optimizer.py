@@ -15,7 +15,7 @@ from predicate.le_predicate import LePredicate
 from predicate.lt_predicate import LtPredicate
 from predicate.not_in_predicate import NotInPredicate
 from predicate.not_predicate import NotPredicate
-from predicate.optimizer.helpers import MaybeOptimized, NotOptimized, Optimized, is_contradiction_at_values
+from predicate.optimizer.helpers import MaybeOptimized, NotOptimized, Optimized, is_contradiction
 from predicate.or_predicate import OrPredicate
 from predicate.predicate import Predicate
 from predicate.range_predicate import GeLePredicate, GeLtPredicate, GtLePredicate, GtLtPredicate
@@ -42,7 +42,7 @@ def optimize_and_predicate[T](predicate: AndPredicate[T]) -> MaybeOptimized[T]: 
             return Optimized(predicate=always_false_p)  # p & ~p == False
 
         # eq(v) is only true at v and in_p(S) only at the members of S: false if the other side fails at all of them
-        case _, _ if is_contradiction_at_values(left, right):
+        case _, _ if is_contradiction(left, right):
             return Optimized(always_false_p)
 
         # comparison optimizations

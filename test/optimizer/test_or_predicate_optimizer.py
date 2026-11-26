@@ -593,3 +593,15 @@ def test_or_not_equal_and_other_side_holds_at_the_value(predicate):
 )
 def test_or_not_equal_and_other_side_fails_at_the_value(predicate):
     assert optimize(predicate) != always_true_p
+
+
+def test_or_overlapping_ranges_is_always_true():
+    assert optimize(gt_p(-1) | lt_p(0)) == always_true_p
+    assert optimize(lt_p(0) | gt_p(-1)) == always_true_p
+    assert optimize(ge_p(0) | lt_p(0)) == always_true_p
+    assert optimize(gt_p(0) | le_p(0)) == always_true_p
+
+
+def test_or_touching_or_gapped_ranges_not_always_true():
+    assert optimize(gt_p(0) | lt_p(0)) == gt_p(0) | lt_p(0)
+    assert optimize(gt_p(5) | lt_p(0)) == gt_p(5) | lt_p(0)
