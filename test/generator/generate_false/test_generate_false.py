@@ -622,3 +622,13 @@ def test_generate_is_instance_is_exercisable():
 
     # the classes are annotated as types, so exercising never draws a non-type such as 5 for isinstance
     consume(exercise_function(generate_is_instance_p, None, 30))
+
+
+def test_struct_false_ends_extra_key_values_when_a_required_field_is_never_true():
+    from predicate.struct_predicate import StructPredicate
+
+    predicate = StructPredicate(required={"a": always_false_p}, optional={})
+    # no dict has a valid "a" to be extended with an extra key: those dicts end instead of raising (PEP 479)
+    values = take(10, generate_false(predicate))
+    assert values
+    assert all(not predicate(value) for value in values)
