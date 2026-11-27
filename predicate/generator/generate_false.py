@@ -821,7 +821,8 @@ def generate_count(count_predicate: CountPredicate[Any]) -> Iterator[Any]:
     predicate = count_predicate.predicate
     length_p = count_predicate.length_p
 
-    invalid_counts = (c for c in generate_false(length_p) if c >= 0)
+    # Bounded: a length_p whose false values are all negative (e.g. ge_p(0)) has no invalid count and ends the stream
+    invalid_counts = satisfying(generate_false(length_p), lambda c: c >= 0, FILTER_ATTEMPTS)
 
     for count in invalid_counts:
         true_values = take(count, generate_true(predicate))

@@ -946,3 +946,8 @@ def test_generate_has_path_true_is_exercisable():
 
     for _ in range(5):
         consume(exercise_function(generate_has_path, None, 20))
+
+
+def test_generate_set_of_with_more_distinct_values_than_exist_ends():
+    # there are only 2 bools: a set of 3 or more can't exist, and searching for one must not hang
+    assert list(generate_true(is_set_of_p(is_bool_p), length_p=ge_p(3))) == []

@@ -1282,9 +1282,9 @@ def generate_set_of_p(
 ) -> Iterator[Any]:
     predicate = set_of_predicate.predicate
 
-    for length in random_lengths(length_p):
-        values = take(length, generate_true(predicate))
-
+    lists = (take(length, generate_true(predicate)) for length in random_lengths(length_p))
+    # Bounded: a predicate without that many distinct values (e.g. 3 bools) ends the stream instead of searching forever
+    for values in satisfying(lists, lambda values: any(True for _ in set_from_list(values)), FILTER_ATTEMPTS):
         yield from set_from_list(values, order)
 
 

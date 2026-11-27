@@ -86,6 +86,7 @@ from predicate import (
     tee_p,
     zero_p,
 )
+from predicate.count_predicate import count_p
 from predicate.is_callable_predicate import is_callable_p as is_callable_signature_p
 
 
@@ -655,3 +656,8 @@ def test_generate_has_path_is_exercisable():
     # the path is annotated as non-empty: an empty path can't be called, let alone generated for
     for _ in range(5):
         consume(exercise_function(generate_has_path, None, 20))
+
+
+def test_generate_count_without_invalid_count_ends():
+    # every count that is not ge_p(0) is negative: there is no invalid count, and searching for one must not hang
+    assert list(generate_false(count_p(ne_p(0), ge_p(0)))) == []
