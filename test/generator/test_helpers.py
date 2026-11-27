@@ -257,6 +257,12 @@ def test_random_frozensets():
     assert all_frozensets(sets)
 
 
+def test_random_sets_that_cannot_be_that_large_end():
+    # there are only 2 bools: a set of 3 or more can't exist, and searching for one must not hang
+    assert list(random_sets(length_p=ge_p(3), value_p=is_bool_p)) == []
+    assert list(random_frozensets(length_p=ge_p(3), value_p=is_bool_p)) == []
+
+
 def test_random_sets_with_limits():
     length_p = ge_le_p(lower=3, upper=5)
     sets = take(10, random_sets(length_p=length_p))

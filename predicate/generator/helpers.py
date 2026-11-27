@@ -257,10 +257,9 @@ non_empty_length_p: Final = ge_le_p(lower=1, upper=10)
 def random_sets(length_p: Predicate[Any] = default_length_p, value_p: Predicate[Any] = is_int_p) -> Iterator[set[Any]]:
     from predicate import generate_true
 
-    for length in random_lengths(length_p):
-        values = take(length, generate_true(value_p))
-        if len(result := set(values)) == length:
-            yield result
+    # ponytail: stops when value_p can't give that many distinct values (e.g. 3 bools), so it can't hang
+    candidates = ((length, set(take(length, generate_true(value_p)))) for length in random_lengths(length_p))
+    yield from (result for _, result in satisfying(candidates, lambda c: len(c[1]) == c[0], FILTER_ATTEMPTS))
 
 
 def random_frozensets(
