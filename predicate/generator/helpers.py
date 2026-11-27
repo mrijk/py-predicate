@@ -170,7 +170,10 @@ def random_lengths(length_p: Predicate[int]) -> Iterator[int]:
     if not head:
         return
     positive = any(n > 0 for n in head)
-    yield from (n for n in chain(head, lengths) if _is_length(n) and (n > 0 if positive else n >= 0))
+    # Bounded: when only 0 is allowed, a random length is rarely 0, and the search for the next one must end
+    yield from satisfying(
+        chain(head, lengths), lambda n: _is_length(n) and (n > 0 if positive else n >= 0), FILTER_ATTEMPTS
+    )
 
 
 def _is_length(n: Any) -> bool:

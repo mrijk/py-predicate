@@ -1,5 +1,6 @@
 import sys
 from datetime import datetime
+from itertools import chain, repeat
 from typing import Any
 from uuid import UUID
 
@@ -34,6 +35,7 @@ from predicate import (
     is_template_p,
     is_tuple_p,
     is_uuid_p,
+    le_p,
 )
 from predicate.generator.generate_predicate import generate_in_predicates, generate_not_in_predicates
 from predicate.generator.helpers import (
@@ -629,3 +631,10 @@ def test_filtering_generators_end_when_no_value_satisfies():
     assert list(generate_datetimes(never)) == []
     assert list(generate_strings(never)) == []
     assert list(random_supports(str)) == []  # no random number, bytes, ... implements str
+
+
+def test_random_lengths_that_only_allow_zero_end(monkeypatch):
+    # a rare 0 in the first draws must not make the search for the next 0 run forever
+    monkeypatch.setattr("predicate.generate_true", lambda predicate: chain([0], repeat(-1)))
+
+    assert list(random_lengths(le_p(0))) == [0, 0]
