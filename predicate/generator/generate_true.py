@@ -796,7 +796,7 @@ def generate_truthy(_predicate: IsTruthyPredicate[Any]) -> Iterator[Any]:
 
 @generate_true.register(IsPredicateOfPredicate)
 def generate_predicate_of(predicate: IsPredicateOfPredicate[Any], **kwargs: Any) -> Iterator[Any]:
-    yield from random_predicates(**kwargs, klass=predicate.predicate_klass)
+    yield from random_predicates(**({"max_depth": predicate.max_depth} | kwargs), klass=predicate.predicate_klass)
 
 
 _supports_protocols: Final = (

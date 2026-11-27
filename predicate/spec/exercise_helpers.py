@@ -272,6 +272,9 @@ def _type_var_predicate(type_var: TypeVar) -> Predicate[Any]:
 
 
 # typing.NamedTuple and typing.TypedDict are functions at runtime: issubclass() and __subclasses__() reject them
+# Random predicates of depth 10 can be so large that generating values for them takes seconds
+_MAX_PREDICATE_DEPTH: Final = 5
+
 _named_tuple_class_p: Final[Predicate[Any]] = fn_p(is_named_tuple_class, generate_true_fn=random_named_tuple_classes)
 
 
@@ -423,7 +426,9 @@ def annotation_to_predicate(annotation: Any) -> Predicate[Any]:  # noqa: C901 # 
         return io_predicate
     origin = get_origin(annotation)
     if origin is Predicate and get_args(annotation) == (Any,):
-        return is_predicate_of_p(Any)  # generates predicates that can be applied to a value of any type
+        return is_predicate_of_p(
+            Any, _MAX_PREDICATE_DEPTH
+        )  # generates predicates that can be applied to a value of any type
     if origin in _type_narrowing_origins:
         return always_true_p  # TypeGuard/TypeIs is bool at runtime
     if origin in _union_origins:
@@ -613,7 +618,9 @@ def exercise_param_predicate(param: Parameter) -> Predicate[Any]:
         and isinstance(klass := first(get_args(param.annotation), None), type)
         and klass is not Any
     ):
-        return is_predicate_of_p(klass)  # generates predicates that can evaluate a klass, unlike is_Predicate_p
+        return is_predicate_of_p(
+            klass, _MAX_PREDICATE_DEPTH
+        )  # generates predicates that can evaluate a klass, unlike is_Predicate_p
     return param_predicate(param)
 
 

@@ -33,7 +33,7 @@ from predicate.predicate import Predicate
 def construct[T](false_set: list[T], true_set: list[T], attempts: int = 30) -> Predicate[T] | None:
     predicates = initial_predicates()
 
-    while attempts:
+    while attempts > 0:
         sorted_by_match = sort_by_match(list(predicates), false_set=false_set, true_set=true_set)
 
         if perfect_match(matched := first(sorted_by_match), false_set=false_set, true_set=true_set):
