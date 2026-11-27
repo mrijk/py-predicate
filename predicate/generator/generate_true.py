@@ -659,8 +659,13 @@ def generate_recur(predicate: RecurPredicate[Any], *, length_p: Predicate[Any] =
     # One stream of start values, so every sequence can start with a different value (and type)
     starts = values_or_nothing(generate_true(predicate.predicate_1))
 
-    for length, start in zip(random_lengths(length_p), starts, strict=False):
-        yield from [recur_values(predicate, length, start) if length else []] if length or predicate.empty else []
+    lengths = random_lengths(length_p)
+    if not predicate.empty:
+        # Bounded: a length_p that only allows 0 (e.g. eq_p(0)) gives no sequence at all, so it ends instead of spinning
+        lengths = satisfying(lengths, lambda length: length > 0, FILTER_ATTEMPTS)
+
+    for length, start in zip(lengths, starts, strict=False):
+        yield recur_values(predicate, length, start) if length else []
 
 
 def recur_values(predicate: RecurPredicate[Any], length: int, start: Any) -> list[Any]:

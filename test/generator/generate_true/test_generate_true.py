@@ -84,6 +84,7 @@ from predicate import (
     neg_p,
     not_in_p,
     pos_p,
+    recur_p,
     regex_p,
     tee_p,
     zero_p,
@@ -951,3 +952,10 @@ def test_generate_has_path_true_is_exercisable():
 def test_generate_set_of_with_more_distinct_values_than_exist_ends():
     # there are only 2 bools: a set of 3 or more can't exist, and searching for one must not hang
     assert list(generate_true(is_set_of_p(is_bool_p), length_p=ge_p(3))) == []
+
+
+def test_generate_recur_not_empty_with_only_empty_lengths_ends():
+    # a non-empty recur can't have length 0, and searching for another length must not hang
+    predicate = recur_p(lambda x: eq_p(0), empty=False, predicate_1=eq_p(0))
+
+    assert list(generate_true(predicate, length_p=eq_p(0))) == []
