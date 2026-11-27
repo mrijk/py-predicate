@@ -6,10 +6,42 @@ from collections.abc import Iterator
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from types import ModuleType
-from typing import Any
+from typing import Annotated, Any, NotRequired, Required, TypedDict, cast
 
 from predicate.coverage.sandbox import exercise_sandboxed
+from predicate.ge_predicate import ge_p
 from predicate.is_pure_predicate import find_impurity
+
+
+class ExerciseResult(TypedDict, total=False):
+    """What exercising a function gives: see predicate.coverage.sandbox, plus how often it was repeated."""
+
+    status: Required[str]
+    detail: str
+    calls: int
+    runs: int
+    flaky: bool
+    statuses: dict[str, int]
+
+
+class FunctionInfo(TypedDict):
+    """A public function and whether it is pure, with the exercise result when it was exercised."""
+
+    name: str
+    line: int
+    pure: bool
+    category: NotRequired[str]
+    reason: NotRequired[str]
+    exercise: NotRequired[ExerciseResult]
+
+
+class ModuleInfo(TypedDict):
+    """A module and its public functions; error is set when the module could not be imported."""
+
+    path: str
+    file_name: str
+    functions: list[FunctionInfo]
+    error: NotRequired[str]
 
 
 def _package_name(file: Path) -> tuple[Path, str] | None:
@@ -53,22 +85,25 @@ def _public_functions(module: ModuleType) -> Iterator[tuple[str, Any]]:
     )
 
 
-def _function_entry(name: str, fn: Any) -> dict[str, Any]:
+def _function_entry(name: str, fn: Any) -> FunctionInfo:
     impurity = find_impurity(fn)
-    entry = {"name": name, "line": fn.__code__.co_firstlineno, "pure": impurity is None}
-    return entry if impurity is None else entry | {"category": impurity.category, "reason": impurity.reason}
+    entry = FunctionInfo(name=name, line=fn.__code__.co_firstlineno, pure=impurity is None)
+    if impurity is not None:
+        entry["category"] = impurity.category
+        entry["reason"] = impurity.reason
+    return entry
 
 
-def _analyze_file(file: Path) -> dict[str, Any]:
+def _analyze_file(file: Path) -> ModuleInfo:
     try:
         module = _load(file)
     except BaseException as e:  # noqa: BLE001 - importing user code can fail in any way
-        return {"path": str(file), "file_name": file.name, "error": f"{type(e).__name__}: {e}", "functions": []}
+        return ModuleInfo(path=str(file), file_name=file.name, error=f"{type(e).__name__}: {e}", functions=[])
     functions = [_function_entry(name, fn) for name, fn in _public_functions(module)]
-    return {"path": str(file), "file_name": file.name, "functions": sorted(functions, key=lambda f: f["line"])}
+    return ModuleInfo(path=str(file), file_name=file.name, functions=sorted(functions, key=lambda f: f["line"]))
 
 
-def _exercise_repeated(file: Path, name: str, calls: int, timeout: float, runs: int) -> dict[str, Any]:
+def _exercise_repeated(file: Path, name: str, calls: int, timeout: float, runs: int) -> ExerciseResult:
     """Exercise a function `runs` times with fresh random inputs; differing statuses make the result flaky."""
     results = []
     for _ in range(runs):
@@ -77,12 +112,20 @@ def _exercise_repeated(file: Path, name: str, calls: int, timeout: float, runs: 
             break
     statuses = Counter(r["status"] for r in results)
     first_problem = next((r for r in results if r["status"] != "ok"), results[0])
-    return first_problem | {"runs": len(results), "flaky": len(statuses) > 1, "statuses": dict(statuses)}
+    return cast(
+        ExerciseResult, first_problem | {"runs": len(results), "flaky": len(statuses) > 1, "statuses": dict(statuses)}
+    )
 
 
 def analyze(
-    path: Path, *, exercise: bool = False, calls: int = 10, timeout: float = 10.0, jobs: int = 4, runs: int = 3
-) -> list[dict[str, Any]]:
+    path: Path,
+    *,
+    exercise: bool = False,
+    calls: int = 10,
+    timeout: float = 10.0,
+    jobs: Annotated[int, ge_p(1)] = 4,
+    runs: int = 3,
+) -> list[ModuleInfo]:
     """Report the purity of all public module-level functions found under path. Imports (executes) the modules.
 
     With exercise=True each function is also exercised `runs` times in a sandboxed subprocess, see
@@ -99,21 +142,21 @@ def analyze(
     return modules
 
 
-def summarize(modules: list[dict[str, Any]]) -> dict[str, int]:
+def summarize(modules: list[ModuleInfo]) -> dict[str, int]:
     functions = [f for m in modules for f in m["functions"]]
     pure = sum(f["pure"] for f in functions)
     return {"total": len(functions), "pure": pure, "impure": len(functions) - pure}
 
 
-def summarize_exercise(modules: list[dict[str, Any]]) -> dict[str, int]:
+def summarize_exercise(modules: list[ModuleInfo]) -> dict[str, int]:
     return dict(Counter(f["exercise"]["status"] for m in modules for f in m["functions"] if "exercise" in f))
 
 
-def count_flaky(modules: list[dict[str, Any]]) -> int:
+def count_flaky(modules: list[ModuleInfo]) -> int:
     return sum(f.get("exercise", {}).get("flaky", False) for m in modules for f in m["functions"])
 
 
-def failed_only(modules: list[dict[str, Any]]) -> list[dict[str, Any]]:
+def failed_only(modules: list[ModuleInfo]) -> list[ModuleInfo]:
     """Keep only the functions whose exercise went wrong, and only the modules that still have any."""
     bad = {
         "failed",
@@ -122,5 +165,8 @@ def failed_only(modules: list[dict[str, Any]]) -> list[dict[str, Any]]:
         "timeout",
         "crashed",
     }  # not-exercisable is a property of the signature, not a failure
-    kept = [m | {"functions": [f for f in m["functions"] if f["exercise"]["status"] in bad]} for m in modules]
+    kept = [
+        ModuleInfo(**{**m, "functions": [f for f in m["functions"] if f.get("exercise", {}).get("status") in bad]})
+        for m in modules
+    ]
     return [m for m in kept if m["functions"]]

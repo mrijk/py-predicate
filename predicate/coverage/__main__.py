@@ -1,10 +1,18 @@
 import json
 from pathlib import Path
-from typing import Annotated, Any
+from typing import Annotated
 
 import typer
 
-from predicate.coverage.purity import analyze, count_flaky, failed_only, summarize, summarize_exercise
+from predicate.coverage.purity import (
+    FunctionInfo,
+    ModuleInfo,
+    analyze,
+    count_flaky,
+    failed_only,
+    summarize,
+    summarize_exercise,
+)
 
 app = typer.Typer(add_completion=False)
 
@@ -41,7 +49,7 @@ def purity(
     _report(modules, shown, exercise)
 
 
-def _report(modules: list[dict[str, Any]], shown: list[dict[str, Any]], exercise: bool) -> None:
+def _report(modules: list[ModuleInfo], shown: list[ModuleInfo], exercise: bool) -> None:
     summary = summarize(modules)
     total = summary["total"]
     percentage = 100 * summary["pure"] / total if total else 0
@@ -55,7 +63,7 @@ def _report(modules: list[dict[str, Any]], shown: list[dict[str, Any]], exercise
             typer.echo(f"{module['path']}:{fn['line']} {fn['name']}: {_verdict(fn)}")
 
 
-def _verdict(fn: dict[str, Any]) -> str:
+def _verdict(fn: FunctionInfo) -> str:
     result = "pure" if fn["pure"] else "IMPURE"
     outcome = fn.get("exercise")
     if outcome is None:

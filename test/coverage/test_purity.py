@@ -1,6 +1,7 @@
 import json
 from pathlib import Path
 
+import pytest
 from typer.testing import CliRunner
 
 from predicate.coverage.__main__ import app
@@ -214,3 +215,15 @@ def test_exercise_importing_ctypes_is_not_blocked_but_loading_a_library_is(tmp_p
 
     exercise = {f["name"]: f["exercise"]["status"] for f in modules[0]["functions"]}
     assert exercise == {"imports_ctypes": "ok", "loads_library": "blocked"}
+
+
+@pytest.mark.parametrize("name", ["summarize", "summarize_exercise", "count_flaky", "failed_only"])
+def test_report_functions_are_exercisable(name):
+    from more_itertools import consume
+
+    from predicate.coverage import purity
+    from predicate.spec.exercise_function import exercise_function
+
+    # the modules are typed as ModuleInfo, so exercise draws no dict without "functions"
+    for _ in range(3):
+        consume(exercise_function(getattr(purity, name), None, 20))

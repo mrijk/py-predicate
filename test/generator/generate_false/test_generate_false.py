@@ -632,3 +632,26 @@ def test_struct_false_ends_extra_key_values_when_a_required_field_is_never_true(
     values = take(10, generate_false(predicate))
     assert values
     assert all(not predicate(value) for value in values)
+
+
+def test_has_path_false_ends_when_a_part_has_no_false_values():
+    from predicate import always_true_p, eq_p
+    from predicate.has_path_predicate import HasPathPredicate
+
+    # nothing is false for always_true_p: the stream ends instead of raising (PEP 479)
+    for path in ([always_true_p], [eq_p("a"), always_true_p]):
+        predicate = HasPathPredicate(path=path)
+        values = list(generate_false(predicate))
+        assert values
+        assert all(not predicate(value) for value in values)
+
+
+def test_generate_has_path_is_exercisable():
+    from more_itertools import consume
+
+    from predicate.generator.generate_false import generate_has_path
+    from predicate.spec.exercise_function import exercise_function
+
+    # the path is annotated as non-empty: an empty path can't be called, let alone generated for
+    for _ in range(5):
+        consume(exercise_function(generate_has_path, None, 20))

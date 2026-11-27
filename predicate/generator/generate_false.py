@@ -235,12 +235,11 @@ def generate_has_path(predicate: HasPathPredicate[Any]) -> Iterator[Any]:
     if rest_path:
         valid_keys = generate_true(root_p)
         false_rest_values: Iterator[Any] = generate_false(HasPathPredicate(path=rest_path))
-        while True:
-            yield {next(valid_keys): next(false_rest_values)}
+        # zip ends the stream when a part has no values (e.g. nothing is false for always_true_p); a bare next() would
+        # raise a RuntimeError in a generator (PEP 479)
+        yield from ({key: value} for key, value in zip(valid_keys, false_rest_values, strict=False))
     else:
-        false_keys = generate_false(root_p)
-        while True:
-            yield {next(false_keys): None}
+        yield from ({key: None} for key in generate_false(root_p))
 
 
 @generate_false.register(GeLePredicate)
