@@ -1322,6 +1322,10 @@ def generate_tee(_predicate: TeePredicate[Any]) -> Iterator[Any]:
 def generate_match_p(match_predicate: MatchPredicate[Any]) -> Iterator[Any]:
     predicates = match_predicate.predicates
 
+    if not predicates:  # an empty pattern matches every iterable, unless the whole iterable has to match: then only []
+        yield from repeat([]) if match_predicate.full_match else random_lists()
+        return
+
     predicate, *rest_predicates = predicates
 
     match predicate:

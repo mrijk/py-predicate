@@ -24,3 +24,8 @@ def test_generate_match(predicates):
     predicate = match_p(*predicates)
 
     assert_generated_true(predicate)
+
+
+@pytest.mark.parametrize("full_match", [False, True])
+def test_generate_match_empty_pattern(full_match):
+    assert_generated_true(match_p(full_match=full_match))
