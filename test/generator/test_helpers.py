@@ -1,12 +1,15 @@
 import sys
 from datetime import datetime
+from itertools import chain, repeat
 from typing import Any
+from uuid import UUID
 
 import pytest
 from more_itertools import first, take
 
 from predicate import (
     all_p,
+    always_true_p,
     eq_p,
     ge_le_p,
     ge_p,
@@ -32,10 +35,15 @@ from predicate import (
     is_template_p,
     is_tuple_p,
     is_uuid_p,
+    le_p,
 )
+from predicate.generator.generate_predicate import generate_in_predicates, generate_not_in_predicates
 from predicate.generator.helpers import (
+    generate_anys,
     generate_even_numbers,
+    generate_ints,
     generate_odd_numbers,
+    ignore_unknown_kwargs,
     random_anys,
     random_bools,
     random_bytes,
@@ -46,6 +54,7 @@ from predicate.generator.helpers import (
     random_dicts,
     random_first_from_iterables,
     random_floats,
+    random_frames,
     random_frozensets,
     random_functions,
     random_hashables,
@@ -53,14 +62,18 @@ from predicate.generator.helpers import (
     random_iterables,
     random_lengths,
     random_lists,
+    random_named_tuple_instances,
     random_predicates,
     random_sets,
+    random_signatures,
     random_strings,
     random_strings_greater,
     random_strings_lower,
     random_tuples,
     random_uuids,
+    random_uuids_between,
     random_values_of_type,
+    sample_optional_fields,
 )
 
 
@@ -105,6 +118,15 @@ def test_random_functions():
 
     assert all(callable(f) and f.__name__ != "<lambda>" for f in functions)
     assert all(0 <= len(signature(f).parameters) <= 5 for f in functions)
+
+
+def test_random_signatures_have_no_keyword_names():
+    import keyword
+
+    # the names come from [a-z]{2,3}, which includes keywords like 'as': inspect.Parameter rejects them
+    signatures = take(2000, random_signatures(ge_p(10)))
+
+    assert not any(keyword.iskeyword(name) for sig in signatures for name in sig.parameters)
 
 
 def test_random_callable_objects():
@@ -235,6 +257,12 @@ def test_random_frozensets():
 
     assert first(sets) == frozenset()
     assert all_frozensets(sets)
+
+
+def test_random_sets_that_cannot_be_that_large_end():
+    # there are only 2 bools: a set of 3 or more can't exist, and searching for one must not hang
+    assert list(random_sets(length_p=ge_p(3), value_p=is_bool_p)) == []
+    assert list(random_frozensets(length_p=ge_p(3), value_p=is_bool_p)) == []
 
 
 def test_random_sets_with_limits():
@@ -372,6 +400,39 @@ def test_random_values_of_type_any():
     assert all_any(values)
 
 
+@pytest.mark.parametrize("generate", [generate_ints, generate_anys])
+def test_generate_with_unsatisfiable_predicate_ends(generate):
+    # No random value is ever equal to this one, so filtering must give up instead of looping forever
+    assert list(generate(eq_p("never generated"))) == []
+
+
+def test_random_uuids_between():
+    lower, upper = UUID(int=100), UUID(int=200)
+
+    assert all(lower <= uuid <= upper for uuid in take(50, random_uuids_between(lower.int, upper.int)))
+
+
+@pytest.mark.parametrize(("lower", "upper"), [(5, 4), (-1, -1), (2**128, 2**128)])
+def test_random_uuids_between_empty_range(lower, upper):
+    assert list(random_uuids_between(lower, upper)) == []
+
+
+def test_random_dicts_with_few_distinct_keys():
+    # Only one key exists, so the dicts hold at most that key, instead of waiting for more forever
+    dicts = take(20, random_dicts(key_p=eq_p(3)))
+
+    assert all(set(d) <= {3} for d in dicts)
+
+
+def test_random_values_of_type_uuid():
+    assert all(isinstance(value, UUID) for value in take(10, random_values_of_type(UUID)))
+
+
+def test_random_values_of_type_object():
+    # every value is an object, so object accepts what Any does
+    assert len(take(10, random_values_of_type(object))) == 10
+
+
 def test_random_values_of_type_unknown():
     with pytest.raises(ValueError, match="No generator found for <class 'complex'"):
         take(10, random_values_of_type(complex))
@@ -391,6 +452,18 @@ def test_random_lengths_without_zero():
 
 def test_random_lengths_only_zero():
     assert take(5, random_lengths(eq_p(0))) == [0, 0, 0, 0, 0]
+
+
+def test_random_lengths_ignores_non_ints():
+    assert all(isinstance(length, int) for length in take(50, random_lengths(always_true_p)))
+
+
+def test_random_lengths_ignores_bools():
+    assert not any(isinstance(length, bool) for length in take(50, random_lengths(always_true_p)))
+
+
+def test_random_lengths_without_ints():
+    assert list(random_lengths(is_str_p)) == []
 
 
 @pytest.mark.parametrize("generator", [random_lists, random_sets, random_tuples, random_dicts, random_iterables])
@@ -437,8 +510,131 @@ def test_random_strings_and_bytes_with_empty_length_range():
     assert take(5, random_bytes(length_p=ge_le_p(1, 0))) == []
 
 
+def test_random_in_predicates_are_not_empty():
+    # An empty in_p() has no type, so its false values were of any type and broke lt_p(0) & co
+    for generator in (generate_in_predicates, generate_not_in_predicates):
+        assert all(predicate.v for predicate in take(50, generator(max_depth=3, klass=int)))
+
+
 def test_random_predicates_of_any_accept_any_value():
     values = [0, "a", None, 1.5, [1], datetime(2020, 1, 1)]
     for predicate in take(200, random_predicates(klass=Any)):
         for value in values:
             assert predicate(value) in (True, False)
+
+
+def test_random_named_tuple_instances_is_exercisable():
+    from more_itertools import consume
+
+    from predicate.spec.exercise_function import exercise_function
+
+    # klass is constrained to named tuple classes, so exercising never passes e.g. object
+    consume(exercise_function(random_named_tuple_instances, None, 20))
+
+
+def test_ignore_unknown_kwargs_is_exercisable():
+    from more_itertools import consume
+
+    from predicate.spec.exercise_function import exercise_function
+
+    # the argument is constrained to singledispatch functions, so exercising never passes a plain function
+    consume(exercise_function(ignore_unknown_kwargs, None, 20))
+
+
+def test_sample_optional_fields():
+    generators = {"a": iter([1]), "b": iter([]), "c": iter(["x", "y"])}
+
+    samples = [sample_optional_fields(generators) for _ in range(20)]
+
+    assert all(set(sample) <= {"a", "c"} for sample in samples)  # b has no value to give
+    assert sample_optional_fields({}) == {}
+
+
+def test_random_frames():
+    from types import FrameType
+
+    frames = take(30, random_frames())
+
+    assert all(isinstance(frame, FrameType) for frame in frames)
+    assert len({len(list(_frame_chain(frame))) for frame in frames}) > 1  # frames of different depths
+
+
+def _frame_chain(frame):
+    while frame:
+        yield frame
+        frame = frame.f_back
+
+
+def test_generate_true_is_instance_frame():
+    from types import FrameType
+
+    from predicate import generate_true, is_instance_p
+
+    assert all(isinstance(frame, FrameType) for frame in take(5, generate_true(is_instance_p(FrameType))))
+
+
+def test_random_values_of_type_is_exercisable():
+    from more_itertools import consume
+
+    from predicate.spec.exercise_function import exercise_function
+
+    # klass is limited to the classes there are values for, so exercising never passes e.g. type
+    consume(exercise_function(random_values_of_type, None, 30))
+
+
+def test_random_lengths_without_a_valid_length():
+    # a collection has no negative length: nothing is usable, and looking through the negative numbers never ends
+    assert take(3, random_lengths(~ge_p(0))) == []
+
+
+def test_random_lengths_for_a_length_that_is_never_true():
+    from predicate import fn_p, in_p
+    from predicate.generator.helpers import random_ints, random_lengths
+
+    # the optimizer can't tell that no length is both in (1, 2) and above 5
+    never = in_p([1, 2]) & fn_p(lambda x: x > 5, generate_true_fn=lambda: random_ints(lower=6))
+    assert list(random_lengths(never)) == []
+
+
+def test_with_parameters_leaves_out_what_does_not_fit():
+    from inspect import Parameter, Signature
+
+    from predicate.generator.helpers import with_parameters
+
+    sig = Signature([Parameter("a", Parameter.POSITIONAL_OR_KEYWORD)])
+    # "a" is in use, and a parameter without a default can't follow one with a default
+    result = with_parameters(
+        sig,
+        Parameter("a", Parameter.KEYWORD_ONLY),
+        Parameter("b", Parameter.POSITIONAL_OR_KEYWORD, default=1),
+        Parameter("c", Parameter.POSITIONAL_OR_KEYWORD),
+        Parameter("d", Parameter.KEYWORD_ONLY),
+    )
+    assert list(result.parameters) == ["a", "b", "d"]
+
+
+def test_with_parameters_is_exercisable():
+    from more_itertools import consume
+
+    from predicate.generator.helpers import with_parameters
+    from predicate.spec.exercise_function import exercise_function
+
+    consume(exercise_function(with_parameters, None, 30))
+
+
+def test_filtering_generators_end_when_no_value_satisfies():
+    from predicate import fn_p
+    from predicate.generator.helpers import generate_datetimes, generate_floats, generate_strings, random_supports
+
+    never = fn_p(lambda x: False)
+    assert list(generate_floats(never)) == []
+    assert list(generate_datetimes(never)) == []
+    assert list(generate_strings(never)) == []
+    assert list(random_supports(str)) == []  # no random number, bytes, ... implements str
+
+
+def test_random_lengths_that_only_allow_zero_end(monkeypatch):
+    # a rare 0 in the first draws must not make the search for the next 0 run forever
+    monkeypatch.setattr("predicate.generate_true", lambda predicate: chain([0], repeat(-1)))
+
+    assert list(random_lengths(le_p(0))) == [0, 0]

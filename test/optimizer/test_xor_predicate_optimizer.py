@@ -343,3 +343,13 @@ def test_xor_optimize_p_xor_not_p_and_q_keeps_meaning():
     for predicate in (p ^ (~p & q), p ^ (q & ~p)):
         optimized = optimize(predicate)
         assert all(predicate(x) == optimized(x) for x in range(-10, 11))
+
+
+def test_xor_of_exclusive_predicates_is_or():
+    assert optimize(eq_p(0) ^ lt_p(0)) == le_p(0)
+    assert optimize(lt_p(0) ^ gt_p(0)) == lt_p(0) | gt_p(0)
+    assert optimize(lt_p(5) ^ gt_p(0)) == lt_p(5) ^ gt_p(0)
+
+
+def test_and_with_xor_of_exclusive_predicates_is_always_false():
+    assert optimize(gt_p(0) & (eq_p(0) ^ lt_p(0))) == always_false_p

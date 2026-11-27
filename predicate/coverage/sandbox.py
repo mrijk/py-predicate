@@ -10,6 +10,7 @@ Add OS-level isolation (sandbox-exec, bwrap, a container) if untrusted code must
 
 import asyncio
 import copy
+import inspect
 import io
 import json
 import os
@@ -40,14 +41,19 @@ class SandboxViolation(
     """Raised by the audit hook when the function tries something that isn't allowed."""
 
 
+def _is_blocked(event: str, args: tuple[Any, ...]) -> bool:
+    if event == "ctypes.dlopen" and args[0] is None:
+        return False  # importing ctypes opens the running program itself; loading a named library stays blocked
+    # creating a socket is harmless (asyncio does it for its event loop), using one is not
+    return event in _BLOCKED_EVENTS or (event.startswith(_BLOCKED_PREFIXES) and event != "socket.__new__")
+
+
 def _violation(event: str, args: tuple[Any, ...]) -> str | None:
     if event == "open":
         path, mode, flags = args
         writes = bool(set(mode or "") & set("wax+")) or bool((flags or 0) & _WRITE_FLAGS)
         return f"open {path} for writing" if writes and str(path) != os.devnull else None
-    # creating a socket is harmless (asyncio does it for its event loop), using one is not
-    blocked = event in _BLOCKED_EVENTS or (event.startswith(_BLOCKED_PREFIXES) and event != "socket.__new__")
-    return f"{event} {args[:2]}"[:_RESULT_LIMIT] if blocked else None
+    return f"{event} {args[:2]}"[:_RESULT_LIMIT] if _is_blocked(event, args) else None
 
 
 def _install_audit_hook(violations: list[str]) -> None:
@@ -68,6 +74,13 @@ def _without_addresses(value: Any) -> str:
     return re.sub(r"0x[0-9a-f]+", "0x", repr(value))
 
 
+def _snapshot(value: Any) -> Any:
+    try:
+        return copy.deepcopy(value)
+    except TypeError:  # generators, locks, modules...: can't be copied, so a mutation can't be detected either
+        return value
+
+
 def _with_mutation_check(spec: "Spec", mutated: list[str]) -> "Spec":
     """Add a snapshot of deep-copied arguments (#238) and a `fn` that records the arguments the call changed."""
 
@@ -75,7 +88,7 @@ def _with_mutation_check(spec: "Spec", mutated: list[str]) -> "Spec":
         mutated.extend(k for k, v in (old or {}).items() if not _same(v, current[k]))
         return True
 
-    return spec | {"snapshot": dict.fromkeys(spec["args"], copy.deepcopy), "fn": unchanged}
+    return spec | {"snapshot": dict.fromkeys(spec["args"], _snapshot), "fn": unchanged}
 
 
 async def _consume_async(results: Any) -> int:
@@ -94,7 +107,9 @@ def _exercise(file: str, name: str, calls: int) -> dict[str, Any]:
     except InvalidSpecError as e:
         return {"status": "not-exercisable", "detail": str(e)}
     mutated: list[str] = []
-    results = exercise(fn, _with_mutation_check(spec, mutated), calls)
+    # `old` is reserved for the snapshot, so a function with such a parameter can't have its mutations detected
+    checked = spec if "old" in inspect.signature(fn).parameters else _with_mutation_check(spec, mutated)
+    results = exercise(fn, checked, calls)
     count = asyncio.run(_consume_async(results)) if hasattr(results, "__aiter__") else len(list(results))
     if mutated:
         return {"status": "mutates-args", "detail": f"mutates {', '.join(sorted(set(mutated)))}"}

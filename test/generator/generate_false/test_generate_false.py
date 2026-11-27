@@ -23,6 +23,7 @@ from predicate import (
     gt_lt_p,
     gt_p,
     has_key_p,
+    has_length_p,
     in_p,
     intersects_p,
     is_bool_p,
@@ -85,6 +86,7 @@ from predicate import (
     tee_p,
     zero_p,
 )
+from predicate.count_predicate import count_p
 from predicate.is_callable_predicate import is_callable_p as is_callable_signature_p
 
 
@@ -96,6 +98,10 @@ from predicate.is_callable_predicate import is_callable_p as is_callable_signatu
         eq_false_p,
         eq_true_p,
         has_key_p(eq_p("foo")),
+        has_key_p(le_p(5)),  # keys of the type key_p is about, not str keys: le_p(5) raises for those
+        has_key_p(ge_le_p(0, 10) | eq_p(20)),
+        has_key_p(always_true_p),
+        has_key_p(ne_p(3)),  # the only dicts without a key != 3 hold the key 3
         in_p([2, 3, 4]),
         is_bool_p,
         is_bytes_p,
@@ -518,6 +524,21 @@ def test_generate_false_xor_always_true():
     assert values == []
 
 
+def test_generate_false_or_always_true():
+    predicate = eq_p(False) | ~eq_p(False)
+
+    assert list(take(5, generate_false(predicate))) == []
+
+
+def test_generate_false_xor_without_values():
+    # x < 0 xor x >= 0 is always true, but the optimizer doesn't see it: searching for a false value must end
+    always_true = lt_p(0) ^ ~(ne_p(0) ^ gt_p(0))
+
+    assert list(take(5, generate_false(always_true))) == []
+    # not_in_p([0]) is the only side that can be false, and it is false at 0
+    assert set(take(5, generate_false(not_in_p([0]) & always_true))) == {0}
+
+
 def test_generate_false_xor_overlapping():
     # XOR where AND doesn't optimize to always_false_p — covers the left_and_right path
     predicate = ge_p(2) ^ gt_p(5)
@@ -533,3 +554,110 @@ def test_generate_false_is_callable_signature():
 
 def test_generate_false_ignores_unknown_kwargs():
     assert all(value != 2 for value in take(5, generate_false(eq_p(2), length_p=ge_p(1))))
+
+
+def test_generate_false_has_length_when_every_length_is_valid():
+    assert take(3, generate_false(has_length_p(ge_p(0)))) == []
+
+
+def test_exactly_n_false_ends_when_the_rest_has_no_false_values():
+    from predicate.exactly_predicate import exactly_n
+    from predicate.match_predicate import match_p
+
+    # always_true_p has no false values: the stream ends instead of raising (PEP 479)
+    assert list(generate_false(match_p(exactly_n(1, eq_p(1)), always_true_p))) == []
+
+
+def test_match_false_ends_when_the_rest_has_no_false_values():
+    from predicate.match_predicate import match_p
+
+    assert list(generate_false(match_p(eq_p(1), always_true_p))) == []
+
+
+def test_match_false_with_an_empty_pattern():
+    from predicate.match_predicate import match_p
+
+    # an empty pattern matches everything, so there is nothing false; unless the whole iterable must match
+    assert list(generate_false(match_p())) == []
+    assert all(not match_p(full_match=True)(value) for value in take(10, generate_false(match_p(full_match=True))))
+    assert take(10, generate_false(match_p(full_match=True)))
+
+
+def test_set_of_false_ends_when_no_element_can_be_false():
+    from predicate import is_frozenset_of_p, is_set_of_p
+
+    # always_true_p has no false values, so no set has an element failing it: the stream ends instead of hanging
+    assert list(generate_false(is_set_of_p(always_true_p))) == []
+    assert list(generate_false(is_frozenset_of_p(always_true_p))) == []
+    assert list(generate_false(is_frozenset_of_p(ge_p(0) | lt_p(0)))) == []
+
+
+def test_set_of_false_with_a_length_that_is_never_true_or_not_an_int():
+    from predicate import fn_p, in_p, is_none_p, is_set_of_p
+    from predicate.generator.helpers import random_ints
+
+    # the optimizer can't tell that no length is both in (1, 2) and above 5
+    never = in_p([1, 2]) & fn_p(lambda x: x > 5, generate_true_fn=lambda: random_ints(lower=6))
+    for length_p in (never, is_none_p):
+        values = take(5, generate_false(is_set_of_p(ge_p(0)), length_p=length_p))
+        assert values
+        assert all(not is_set_of_p(ge_p(0))(value) for value in values)
+
+
+def test_filtering_false_generators_end_when_no_value_is_false():
+    from predicate import comp_p, intersects_p, is_superset_p, juxt_p
+
+    # every set is a superset of the empty set, every comp here is true, and the juxt is always true
+    assert list(generate_false(is_superset_p(set()))) == []
+    assert list(generate_false(juxt_p(eq_p(1), evaluate=always_true_p))) == []
+    assert list(generate_false(comp_p(lambda x: 1, eq_p(1)))) == []
+    # a set that has an element in common with every random set
+    assert set() in list(generate_false(intersects_p(set(range(-1000, 1000)))))
+
+
+def test_generate_is_instance_is_exercisable():
+    from more_itertools import consume
+
+    from predicate.generator.generate_false import generate_is_instance_p
+    from predicate.spec.exercise_function import exercise_function
+
+    # the classes are annotated as types, so exercising never draws a non-type such as 5 for isinstance
+    consume(exercise_function(generate_is_instance_p, None, 30))
+
+
+def test_struct_false_ends_extra_key_values_when_a_required_field_is_never_true():
+    from predicate.struct_predicate import StructPredicate
+
+    predicate = StructPredicate(required={"a": always_false_p}, optional={})
+    # no dict has a valid "a" to be extended with an extra key: those dicts end instead of raising (PEP 479)
+    values = take(10, generate_false(predicate))
+    assert values
+    assert all(not predicate(value) for value in values)
+
+
+def test_has_path_false_ends_when_a_part_has_no_false_values():
+    from predicate import always_true_p, eq_p
+    from predicate.has_path_predicate import HasPathPredicate
+
+    # nothing is false for always_true_p: the stream ends instead of raising (PEP 479)
+    for path in ([always_true_p], [eq_p("a"), always_true_p]):
+        predicate = HasPathPredicate(path=path)
+        values = list(generate_false(predicate))
+        assert values
+        assert all(not predicate(value) for value in values)
+
+
+def test_generate_has_path_is_exercisable():
+    from more_itertools import consume
+
+    from predicate.generator.generate_false import generate_has_path
+    from predicate.spec.exercise_function import exercise_function
+
+    # the path is annotated as non-empty: an empty path can't be called, let alone generated for
+    for _ in range(5):
+        consume(exercise_function(generate_has_path, None, 20))
+
+
+def test_generate_count_without_invalid_count_ends():
+    # every count that is not ge_p(0) is negative: there is no invalid count, and searching for one must not hang
+    assert list(generate_false(count_p(ne_p(0), ge_p(0)))) == []

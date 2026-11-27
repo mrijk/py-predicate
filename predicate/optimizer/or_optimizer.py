@@ -14,7 +14,7 @@ from predicate.le_predicate import LePredicate
 from predicate.lt_predicate import LtPredicate
 from predicate.not_in_predicate import NotInPredicate
 from predicate.not_predicate import NotPredicate
-from predicate.optimizer.helpers import MaybeOptimized, NotOptimized, Optimized
+from predicate.optimizer.helpers import MaybeOptimized, NotOptimized, Optimized, is_tautology
 from predicate.or_predicate import OrPredicate
 from predicate.predicate import Predicate
 from predicate.set_predicates import IntersectsPredicate
@@ -33,6 +33,11 @@ def optimize_or_predicate[T](predicate: OrPredicate[T]) -> MaybeOptimized[T]:  #
             return Optimized(predicate=left)
         case _, _ if left == negate(right):
             return Optimized(predicate=always_true_p)  # p | ~p == True
+
+        # ne(v) is false only at v and not_in(S) only at the members of S: all that is left is for the other side to hold there;
+        # or two overlapping ranges
+        case _, _ if is_tautology(left, right):
+            return Optimized(always_true_p)
 
         #
         case InPredicate(v1), EqPredicate(v2) if v2 not in v1 and isinstance(v1, Iterable):

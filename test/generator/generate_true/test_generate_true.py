@@ -84,6 +84,7 @@ from predicate import (
     neg_p,
     not_in_p,
     pos_p,
+    recur_p,
     regex_p,
     tee_p,
     zero_p,
@@ -497,6 +498,16 @@ def test_generate_xor_always_false():
     assert not list(generate_true(predicate))
 
 
+def test_generate_xor_with_a_side_that_has_no_value():
+    # x < 0 xor x >= 0 is always true, but the optimizer doesn't see it: for ge_p(0) ^ that, one side has no value at all
+    always_true = lt_p(0) ^ ~(ne_p(0) ^ gt_p(0))
+
+    values = take(8, generate_true(ge_p(0) ^ always_true))
+
+    assert len(values) == 8
+    assert all(value < 0 for value in values)
+
+
 def test_generate_always_true_p():
     predicate = always_true_p
 
@@ -814,3 +825,137 @@ def test_generate_has_length_p_with_klass(length_p, value_p):
 def test_generate_true_ignores_unknown_kwargs():
     assert all(isinstance(value, str) for value in take(5, generate_true(is_str_p, length_p=ge_p(1))))
     assert take(3, generate_true(eq_p(2), length_p=ge_p(1))) == [2, 2, 2]
+
+
+def test_generate_true_is_instance_protocol():
+    from typing import Protocol, runtime_checkable
+
+    @runtime_checkable
+    class Greeter(Protocol):
+        name: str
+
+        def greet(self, who: str) -> str: ...
+
+    values = take(5, generate_true(is_instance_p(Greeter)))
+
+    assert len(values) == 5
+    assert all(isinstance(value, Greeter) for value in values)
+
+
+def test_generate_implements_protocol_is_exercisable():
+    from more_itertools import consume
+
+    from predicate.generator.generate_true import generate_implements_protocol
+    from predicate.spec.exercise_function import exercise_function
+
+    # the protocol is annotated as a Protocol, so exercising never draws a plain class such as object
+    consume(exercise_function(generate_implements_protocol, None, 30))
+
+
+def test_protocol_members_is_exercisable():
+    from more_itertools import consume
+
+    from predicate.implements_protocol_predicate import protocol_members
+    from predicate.spec.exercise_function import exercise_function
+
+    consume(exercise_function(protocol_members, None, 30))
+
+
+def test_count_with_negative_counts_allowed():
+    from predicate import count_p, eq_p, ge_p
+
+    # ge_p(-5) also allows counts below 0, which no iterable has
+    values = take(20, generate_true(count_p(eq_p(1), ge_p(-5))))
+    assert all(count_p(eq_p(1), ge_p(-5))(value) for value in values)
+
+
+def test_count_without_a_possible_count():
+    from predicate import count_p, eq_p, lt_p
+
+    assert list(generate_true(count_p(eq_p(1), lt_p(0)))) == []
+
+
+def test_count_with_a_length_that_is_never_true():
+    from predicate import count_p, eq_p, fn_p, in_p
+    from predicate.generator.helpers import random_ints
+
+    never = in_p([1, 2]) & fn_p(lambda x: x > 5, generate_true_fn=lambda: random_ints(lower=6))
+    assert list(generate_true(count_p(eq_p(1), never))) == []
+
+
+def test_count_of_a_predicate_that_is_never_true():
+    from predicate import always_false_p, count_p, gt_p
+
+    # only the count 0 is possible: the stream ends after it instead of coming up short for the larger counts
+    predicate = count_p(always_false_p, gt_p(-1))
+    values = list(generate_true(predicate))
+    assert values
+    assert all(predicate(value) for value in values)
+
+
+def test_recur_with_a_start_that_is_never_true():
+    from predicate import eq_p, fn_p, in_p, recur_p
+    from predicate.generator.helpers import random_ints
+
+    never = in_p([1, 2]) & fn_p(lambda x: x > 5, generate_true_fn=lambda: random_ints(lower=6))
+    assert list(generate_true(recur_p(lambda x: eq_p(x), empty=False, predicate_1=never))) == []
+
+
+def test_comp_true_ends_when_no_value_is_true():
+    from predicate import comp_p, eq_p
+
+    assert list(generate_true(comp_p(lambda x: 0, eq_p(1)))) == []
+
+
+def test_generate_predicate_of_is_exercisable():
+    from more_itertools import consume
+
+    from predicate.generator.generate_true import generate_predicate_of
+    from predicate.spec.exercise_function import exercise_function
+
+    # the class is annotated with the ones predicates can be generated for, not an arbitrary class like bytearray
+    for _ in range(5):
+        consume(exercise_function(generate_predicate_of, None, 30))
+
+
+def test_has_path_true_with_keys_that_are_not_strings():
+    from predicate import always_true_p, eq_p, is_int_p, is_str_p
+    from predicate.has_path_predicate import HasPathPredicate
+
+    # a generated key such as True or 0 is a value, not a predicate
+    for path in ([always_true_p], [is_int_p, is_str_p], [eq_p(True)]):
+        predicate = HasPathPredicate(path=path)
+        values = take(5, generate_true(predicate))
+        assert values
+        assert all(predicate(value) for value in values)
+
+
+def test_has_path_true_ends_when_no_value_has_the_path():
+    from predicate import always_false_p, eq_p
+    from predicate.has_path_predicate import HasPathPredicate
+
+    # no key, or no value for the key: the stream ends instead of raising (PEP 479) or searching forever
+    assert list(generate_true(HasPathPredicate(path=[always_false_p]))) == []
+    assert list(generate_true(HasPathPredicate(path=[eq_p("a"), always_false_p]))) == []
+
+
+def test_generate_has_path_true_is_exercisable():
+    from more_itertools import consume
+
+    from predicate.generator.generate_true import generate_has_path
+    from predicate.spec.exercise_function import exercise_function
+
+    for _ in range(5):
+        consume(exercise_function(generate_has_path, None, 20))
+
+
+def test_generate_set_of_with_more_distinct_values_than_exist_ends():
+    # there are only 2 bools: a set of 3 or more can't exist, and searching for one must not hang
+    assert list(generate_true(is_set_of_p(is_bool_p), length_p=ge_p(3))) == []
+
+
+def test_generate_recur_not_empty_with_only_empty_lengths_ends():
+    # a non-empty recur can't have length 0, and searching for another length must not hang
+    predicate = recur_p(lambda x: eq_p(0), empty=False, predicate_1=eq_p(0))
+
+    assert list(generate_true(predicate, length_p=eq_p(0))) == []

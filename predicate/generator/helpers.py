@@ -3,6 +3,7 @@ import asyncio
 import atexit
 import io
 import ipaddress
+import keyword
 import logging
 import math
 import random
@@ -18,21 +19,24 @@ from enum import Enum, Flag
 from fractions import Fraction
 from functools import cache, reduce, wraps
 from inspect import Parameter, Signature, signature
-from itertools import chain, count, cycle
+from itertools import chain, count, cycle, islice
 from operator import or_
 from pathlib import PurePath
 from random import choices
 from time import gmtime, struct_time
-from typing import Any, Final, ForwardRef, Iterator
+from typing import Annotated, Any, Final, ForwardRef, Iterator, Literal, Protocol, runtime_checkable
 from uuid import UUID, uuid4
 
 from more_itertools import interleave, random_permutation, repeatfunc, take, unique_everseen
 
 from predicate.and_predicate import AndPredicate
 from predicate.eq_predicate import EqPredicate, eq_p
+from predicate.function_predicate import fn_p
 from predicate.generator.generate_predicate import PredicateKlass, generate_predicate, typed_predicate_type_registry
 from predicate.is_instance_predicate import is_int_p, is_str_p
+from predicate.is_named_tuple_predicate import is_named_tuple_class
 from predicate.ne_predicate import NePredicate
+from predicate.not_in_predicate import not_in_p
 from predicate.not_predicate import NotPredicate
 from predicate.or_predicate import OrPredicate
 from predicate.predicate import Predicate
@@ -89,9 +93,12 @@ def generate_lambda(arg_names: list[str]) -> types.FunctionType:
 
 default_nr_of_parameters_p: Final = eq_p(1)
 
+# A keyword (e.g. `as`) is not allowed as a parameter, field or lambda argument name
+_name_p: Final = not_in_p(keyword.kwlist)
+
 
 def random_lambdas(nr_of_parameters_p: Predicate[Any] = default_nr_of_parameters_p) -> Iterator[types.FunctionType]:
-    value_p = regex_p("[a-z]{2,3}")
+    value_p = regex_p("[a-z]{2,3}") & _name_p
     valid_parameter_lists = random_lists(length_p=nr_of_parameters_p, value_p=value_p)
     yield from (generate_lambda(list(arg_names)) for arg_names in valid_parameter_lists)
 
@@ -100,7 +107,7 @@ default_size_p: Final = ge_le_p(lower=0, upper=5)
 
 
 def random_signatures(nr_of_parameters_p: Predicate[Any] = default_size_p) -> Iterator[Signature]:
-    value_p = regex_p("[a-z]{2,3}")
+    value_p = regex_p("[a-z]{2,3}") & _name_p
     valid_parameter_lists = random_lists(length_p=nr_of_parameters_p, value_p=value_p)
 
     def to_signature(names: list[str]) -> Signature:
@@ -134,7 +141,19 @@ def random_callable_objects(nr_of_parameters_p: Predicate[Any] = default_size_p)
     yield from (callable_object_with_signature(sig) for sig in random_signatures(nr_of_parameters_p))
 
 
-def random_lengths(length_p: Predicate[Any]) -> Iterator[int]:
+class NoValuesFoundError(ValueError):
+    """No value was found that satisfies the predicate, e.g. for a predicate that is never true."""
+
+
+def values_or_nothing(values: Iterator[Any]) -> Iterator[Any]:
+    """Return the values, or no values at all when the predicate they are generated for has none."""
+    try:
+        yield from values
+    except NoValuesFoundError:
+        return
+
+
+def random_lengths(length_p: Predicate[int]) -> Iterator[int]:
     """Return collection lengths: 0 (the empty collection) at most once and first, then only positive lengths (#356).
 
     The empty collection is a valuable edge case, but exercise with a small n only sees the start of the stream.
@@ -143,11 +162,25 @@ def random_lengths(length_p: Predicate[Any]) -> Iterator[int]:
 
     if length_p(0):
         yield 0
-    lengths = generate_true(length_p)
+    lengths = values_or_nothing(generate_true(length_p))
     # ponytail: a length_p without a positive length in 100 draws (e.g. eq_p(0)) is taken to allow only 0
-    head = take(100, lengths)
+    # length_p may accept non-ints (e.g. Predicate[Any]) or negative ones (e.g. ~ge_p(0)): without a usable length in
+    # 100 draws there is none, and the stream is not searched further, as it may never give one
+    head = [n for n in take(100, lengths) if _is_length(n)]
+    if not head:
+        return
     positive = any(n > 0 for n in head)
-    yield from (n for n in chain(head, lengths) if (n > 0 if positive else n >= 0))
+    # Bounded: when only 0 is allowed, a random length is rarely 0, and the search for the next one must end
+    yield from satisfying(
+        chain(head, lengths), lambda n: _is_length(n) and (n > 0 if positive else n >= 0), FILTER_ATTEMPTS
+    )
+
+
+def _is_length(n: Any) -> bool:
+    return isinstance(n, int) and not isinstance(n, bool) and n >= 0
+
+
+_KEY_ATTEMPTS: Final = 100
 
 
 def random_dicts(
@@ -159,7 +192,9 @@ def random_dicts(
     valid_values = generate_true(value_p)
     valid_sizes = random_lengths(size_p)
 
-    yield from (dict(zip(take(s, unique_everseen(valid_keys)), valid_values, strict=False)) for s in valid_sizes)
+    # A bounded draw per dict: when the keys have few distinct values (e.g. only 3), the dict is smaller, not endless
+    keys = (take(s, unique_everseen(islice(valid_keys, _KEY_ATTEMPTS))) for s in valid_sizes)
+    yield from (dict(zip(key_list, valid_values, strict=False)) for key_list in keys)
 
 
 if sys.version_info >= (3, 15):
@@ -225,10 +260,9 @@ non_empty_length_p: Final = ge_le_p(lower=1, upper=10)
 def random_sets(length_p: Predicate[Any] = default_length_p, value_p: Predicate[Any] = is_int_p) -> Iterator[set[Any]]:
     from predicate import generate_true
 
-    for length in random_lengths(length_p):
-        values = take(length, generate_true(value_p))
-        if len(result := set(values)) == length:
-            yield result
+    # ponytail: stops when value_p can't give that many distinct values (e.g. 3 bools), so it can't hang
+    candidates = ((length, set(take(length, generate_true(value_p)))) for length in random_lengths(length_p))
+    yield from (result for _, result in satisfying(candidates, lambda c: len(c[1]) == c[0], FILTER_ATTEMPTS))
 
 
 def random_frozensets(
@@ -347,6 +381,15 @@ def random_tuples(
     yield from (tuple(random_list) for random_list in random_lists(length_p=length_p, value_p=value_p))
 
 
+def random_frames() -> Iterator[types.FrameType]:
+    """Return live frames of different depths: a frame can't be constructed, only captured from running code."""
+
+    def capture(depth: int) -> types.FrameType:
+        return capture(depth - 1) if depth else sys._getframe()  # noqa: SLF001
+
+    yield from (capture(depth) for depth in random_ints(lower=0, upper=5))
+
+
 def random_modules() -> Iterator[types.ModuleType]:
     # ponytail: only modules that are already imported, so generating never triggers an import
     modules = [module for module in sys.modules.values() if isinstance(module, types.ModuleType)]
@@ -358,19 +401,36 @@ def random_uuids() -> Iterator[UUID]:
     yield from repeatfunc(uuid4)
 
 
+_MAX_UUID: Final = 2**128 - 1
+
+
+def random_uuids_between(lower: int = 0, upper: int = _MAX_UUID) -> Iterator[UUID]:
+    """Return uuids whose int lies in lower..upper (both inclusive), the order of uuids; none if the range is empty."""
+    lower, upper = max(lower, 0), min(upper, _MAX_UUID)  # a UUID's int is 0..2**128 - 1
+    if lower <= upper:
+        yield from repeatfunc(lambda: UUID(int=random.randint(lower, upper)))
+
+
 def random_anys() -> Iterator[Any]:
     yield from interleave(random_bools(), random_ints(), random_strings(), random_floats(), random_datetimes())
 
 
 def random_named_tuples() -> Iterator[tuple[Any, ...]]:
     # ponytail: every value gets a fresh namedtuple class; cache classes if that turns out to be slow
-    field_names = random_lists(length_p=ge_le_p(lower=0, upper=4), value_p=regex_p("[a-z]{2,4}"))
+    field_names = random_lists(length_p=ge_le_p(lower=0, upper=4), value_p=regex_p("[a-z]{2,4}") & _name_p)
     for names in field_names:
         klass = namedtuple("RandomNamedTuple", unique_everseen(names))  # type: ignore[misc]  # noqa: PYI024
         yield klass(*take(len(klass._fields), random_anys()))
 
 
-def random_named_tuple_instances(klass: type) -> Iterator[tuple[Any, ...]]:
+_named_tuple_class_p: Final = fn_p(
+    is_named_tuple_class,
+    generate_true_fn=lambda: random_named_tuple_classes(),  # noqa: PLW0108  defined further down
+    generate_false_fn=random_ints,
+)
+
+
+def random_named_tuple_instances(klass: Annotated[type, _named_tuple_class_p]) -> Iterator[tuple[Any, ...]]:
     from predicate import generate_true
     from predicate.spec.exercise_helpers import annotation_to_predicate, class_hints
 
@@ -381,18 +441,23 @@ def random_named_tuple_instances(klass: type) -> Iterator[tuple[Any, ...]]:
         yield klass(*(next(generator) for generator in generators))
 
 
-def random_values_of_type(klass: type) -> Iterator[Any]:
+# The classes random_values_of_type can build values of; a Literal so exercise passes exactly these (like PredicateKlass)
+type ValueKlass = Literal[bool, datetime, float, int, str, UUID, Any, object]  # type: ignore[valid-type]
+
+
+def random_values_of_type(klass: ValueKlass) -> Iterator[Any]:
     type_registry: dict[type, Callable[[], Iterator[Any]]] = {
         bool: random_bools,
         datetime: random_datetimes,
         int: random_ints,
         float: random_floats,
         str: random_strings,
+        UUID: random_uuids,
     }
 
     if generator := type_registry.get(klass):
         yield from generator()
-    elif klass == Any:
+    elif klass in (Any, object):  # every value is an object
         yield from random_anys()
     else:
         raise ValueError(f"No generator found for {klass}")
@@ -426,34 +491,51 @@ def random_constrained_pairs_of_type(klass: type) -> Iterator[tuple[Any, Any]]:
 _MISSING = object()
 
 
-def sample_optional_fields(optional: dict[str, Any], generators: dict[str, Iterator[Any]]) -> dict[str, Any]:
-    optional_keys = random.sample(list(optional), k=random.randint(0, len(optional)))
+def sample_optional_fields(generators: dict[str, Iterator[Any]]) -> dict[str, Any]:
+    """Return values for a random subset of the optional fields, one generator per field."""
+    optional_keys = random.sample(list(generators), k=random.randint(0, len(generators)))
     values = {key: next(generators[key], _MISSING) for key in optional_keys}
     return {key: value for key, value in values.items() if value is not _MISSING}
 
 
+def satisfying(values: Iterator[Any], predicate: Callable[[Any], bool], attempts: int) -> Iterator[Any]:
+    """Return the values that satisfy the predicate; stops after attempts misses in a row, so it can't hang.
+
+    E.g. is_tuple_p & is_empty_p: random tuples are only rarely empty.
+    """
+    misses = 0
+    for value in values:
+        if predicate(value):
+            misses = 0
+            yield value
+        else:
+            misses += 1
+            if misses == attempts:
+                return
+
+
+# Random ints, uuids and anys are cheap to draw, so a predicate gets many chances before it is given up on
+FILTER_ATTEMPTS: Final = 1000
+
+
 def generate_datetimes(predicate: Predicate[datetime]) -> Iterator[datetime]:
-    yield from (item for item in random_datetimes() if predicate(item))
+    yield from satisfying(random_datetimes(), predicate, FILTER_ATTEMPTS)
 
 
 def generate_floats(predicate: Predicate[float]) -> Iterator[float]:
-    yield from (item for item in random_floats() if predicate(item))
+    yield from satisfying(random_floats(), predicate, FILTER_ATTEMPTS)
 
 
 def generate_strings(predicate: Predicate[str]) -> Iterator[str]:
-    yield from (item for item in random_strings() if predicate(item))
+    yield from satisfying(random_strings(), predicate, FILTER_ATTEMPTS)
 
 
 def generate_ints(predicate: Predicate[int]) -> Iterator[int]:
-    yield from (item for item in random_ints() if predicate(item))
-
-
-def generate_uuids(predicate: Predicate[UUID]) -> Iterator[UUID]:
-    yield from (item for item in random_uuids() if predicate(item))
+    yield from satisfying(random_ints(), predicate, FILTER_ATTEMPTS)
 
 
 def generate_anys(predicate: Predicate[Any]) -> Iterator[Any]:
-    yield from (item for item in random_anys() if predicate(item))
+    yield from satisfying(random_anys(), predicate, FILTER_ATTEMPTS)
 
 
 def evaluate_comp(predicate: Predicate[Any], x: Any) -> bool | None:
@@ -499,8 +581,16 @@ def callable_object_with_signature(sig: Signature) -> Callable[..., Any]:
 
 
 def with_parameters(sig: Signature, *parameters: Parameter) -> Signature:
+    """Add the parameters to the signature, leaving out the ones that don't fit, e.g. a name that is already in use."""
+    return reduce(_with_parameter, parameters, sig)
+
+
+def _with_parameter(sig: Signature, parameter: Parameter) -> Signature:
     # A stable sort on kind keeps the order of the original parameters, so the result is a valid signature
-    return sig.replace(parameters=sorted([*sig.parameters.values(), *parameters], key=lambda p: p.kind))
+    try:
+        return sig.replace(parameters=sorted([*sig.parameters.values(), parameter], key=lambda p: p.kind))
+    except ValueError:  # duplicate name, or a parameter without a default after one with a default
+        return sig
 
 
 def unused_name(sig: Signature) -> str:
@@ -522,12 +612,25 @@ def accepted_kwargs(f: Callable[..., Any], kwargs: dict[Any, Any]) -> dict[str, 
     return {key: value for key, value in kwargs.items() if key in names}
 
 
-def ignore_unknown_kwargs[F: Callable[..., Any]](dispatcher: F) -> F:
+@runtime_checkable
+class SingleDispatch(Protocol):
+    """What functools.singledispatch returns, which has no class to refer to at runtime."""
+
+    registry: Any
+
+    def dispatch(self, cls: Any) -> Callable[..., Any]: ...
+
+    def register(self, cls: Any, func: Any = None) -> Callable[..., Any]: ...
+
+    def __call__(self, *args: Any, **kwargs: Any) -> Any: ...
+
+
+def ignore_unknown_kwargs(dispatcher: SingleDispatch) -> SingleDispatch:
     """Drop keyword arguments the dispatched generator doesn't accept."""
 
     @wraps(dispatcher)
     def wrapper(predicate: Predicate[Any], /, **kwargs: Any) -> Any:
-        f = dispatcher.dispatch(type(predicate))  # type: ignore[attr-defined]
+        f = dispatcher.dispatch(type(predicate))
         return f(predicate, **accepted_kwargs(f, kwargs))
 
     wrapper.register = dispatcher.register  # type: ignore[attr-defined]
@@ -539,7 +642,7 @@ def ignore_unknown_kwargs[F: Callable[..., Any]](dispatcher: F) -> F:
 def random_enum_members(klass: type[Enum]) -> Iterator[Enum]:
     members = list(klass)
     if not members:
-        raise ValueError(f"Can't generate values for {klass.__name__}: it has no members")
+        return
     if issubclass(klass, Flag):
         # Flags are meant to be combined, so also yield random combinations, including the empty flag
         yield from repeatfunc(lambda: reduce(or_, random.sample(members, random.randint(0, len(members))), klass(0)))
@@ -584,7 +687,7 @@ def random_decimals() -> Iterator[Decimal]:
 def random_supports(protocol: type) -> Iterator[Any]:
     """Generate values for a typing.Supports* protocol, keeping the candidates that implement it."""
     candidates = interleave(random_ints(), random_floats(), random_complex_numbers(), random_decimals(), random_bytes())
-    yield from (value for value in candidates if isinstance(value, protocol))
+    yield from satisfying(candidates, lambda value: isinstance(value, protocol), FILTER_ATTEMPTS)
 
 
 def random_sized() -> Iterator[Any]:
@@ -649,14 +752,14 @@ def random_ios() -> Iterator[io.IOBase]:
 
 
 def random_named_tuple_classes() -> Iterator[type]:
-    field_names = random_lists(length_p=ge_le_p(lower=0, upper=4), value_p=regex_p("[a-z]{2,4}"))
+    field_names = random_lists(length_p=ge_le_p(lower=0, upper=4), value_p=regex_p("[a-z]{2,4}") & _name_p)
     yield from (namedtuple("RandomNamedTuple", unique_everseen(names)) for names in field_names)  # noqa: PYI024
 
 
 def random_typed_dict_classes() -> Iterator[type]:
     from typing import TypedDict
 
-    field_names = random_lists(length_p=ge_le_p(lower=0, upper=4), value_p=regex_p("[a-z]{2,4}"))
+    field_names = random_lists(length_p=ge_le_p(lower=0, upper=4), value_p=regex_p("[a-z]{2,4}") & _name_p)
     field_types = [int, str, float, bool, list[int]]
     for names in field_names:
         yield TypedDict("RandomTypedDict", {name: random.choice(field_types) for name in names})  # type: ignore[operator]

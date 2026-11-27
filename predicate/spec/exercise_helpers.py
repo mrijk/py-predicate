@@ -15,6 +15,7 @@ from typing import (
     IO,
     Annotated,
     Any,
+    AsyncIterable,
     BinaryIO,
     Callable,
     Final,
@@ -49,6 +50,7 @@ from predicate.explain import explain
 from predicate.frozendict_of_predicate import is_frozendict_of_p
 from predicate.frozenset_of_predicate import is_frozenset_of_p
 from predicate.function_predicate import fn_p
+from predicate.ge_predicate import ge_p
 from predicate.generator.helpers import random_named_tuple_classes, random_typed_dict_classes
 from predicate.has_length_predicate import is_empty_p
 from predicate.implies import implies
@@ -270,6 +272,9 @@ def _type_var_predicate(type_var: TypeVar) -> Predicate[Any]:
 
 
 # typing.NamedTuple and typing.TypedDict are functions at runtime: issubclass() and __subclasses__() reject them
+# Random predicates of depth 10 can be so large that generating values for them takes seconds
+_MAX_PREDICATE_DEPTH: Final = 5
+
 _named_tuple_class_p: Final[Predicate[Any]] = fn_p(is_named_tuple_class, generate_true_fn=random_named_tuple_classes)
 
 
@@ -421,7 +426,9 @@ def annotation_to_predicate(annotation: Any) -> Predicate[Any]:  # noqa: C901 # 
         return io_predicate
     origin = get_origin(annotation)
     if origin is Predicate and get_args(annotation) == (Any,):
-        return is_predicate_of_p(Any)  # generates predicates that can be applied to a value of any type
+        return is_predicate_of_p(
+            Any, _MAX_PREDICATE_DEPTH
+        )  # generates predicates that can be applied to a value of any type
     if origin in _type_narrowing_origins:
         return always_true_p  # TypeGuard/TypeIs is bool at runtime
     if origin in _union_origins:
@@ -538,7 +545,12 @@ def _narrows_annotation(spec_p: Predicate[Any], parameter: Parameter) -> bool:
     if isinstance(spec_p, IsPredicateOfPredicate):  # the predicate for Predicate[X], see exercise_param_predicate
         return get_origin(parameter.annotation) is Predicate
     # implies() can't compare generic aliases such as Iterable[int] and Iterable[T], so also accept a bound annotation
-    return bool(implies(spec_p, param_predicate(parameter))) or spec_p in _bound_predicates(parameter)
+    # Also accept what exercise derives itself: for **kwargs it is eq_p({}), which implies() can't compare to the annotation
+    return (
+        bool(implies(spec_p, param_predicate(parameter)))
+        or spec_p in _bound_predicates(parameter)
+        or spec_p == exercise_param_predicate(parameter)
+    )
 
 
 def _check_parameter(key: str, parameter: Parameter, parameters: dict[str, Predicate[Any]]) -> None:
@@ -606,7 +618,9 @@ def exercise_param_predicate(param: Parameter) -> Predicate[Any]:
         and isinstance(klass := first(get_args(param.annotation), None), type)
         and klass is not Any
     ):
-        return is_predicate_of_p(klass)  # generates predicates that can evaluate a klass, unlike is_Predicate_p
+        return is_predicate_of_p(
+            klass, _MAX_PREDICATE_DEPTH
+        )  # generates predicates that can evaluate a klass, unlike is_Predicate_p
     return param_predicate(param)
 
 
@@ -655,9 +669,9 @@ def _generate_with_pre_condition[T](candidates: Iterable[T], *, pre: Callable[..
     return values
 
 
-def generate_values(spec: Spec, n: int) -> tuple[Any, ...]:
+def generate_values(spec: Spec, n: Annotated[int, ge_p(0)]) -> tuple[Any, ...]:
     parameters = spec["args"]
-    return_p = spec["ret"]
+    return_p = spec.get("ret", always_true_p)  # ret is optional: without one any result will do
     if predicates := tuple(parameters.items()):
         candidates = generate_true(is_dict_of_p(*predicates))
         if pre := spec.get("pre"):
@@ -743,8 +757,11 @@ def _get_bound_arguments(sig: Signature, arguments: dict[str, Any]) -> dict[Type
 
 
 def capture_old(spec: Spec, value: dict[str, Any]) -> dict[str, Any]:
-    """Capture the spec's snapshots of the argument values, to be taken before the call (#238)."""
-    return {name: capture(value[name]) for name, capture in spec.get("snapshot", {}).items()}
+    """Capture the spec's snapshots of the argument values, to be taken before the call (#238).
+
+    An argument that isn't generated (e.g. a parameter left to its default) has nothing to snapshot.
+    """
+    return {name: capture(value[name]) for name, capture in spec.get("snapshot", {}).items() if name in value}
 
 
 def verify_result(
@@ -763,11 +780,13 @@ def verify_result(
 
     extra = {"old": old or {}} if spec.get("snapshot") else {}
 
-    if (fn := spec.get("fn")) and not fn(**value, **{ret_name(spec): result}, **extra):
+    # Merged rather than spread into the call: a parameter named like the return value or old would be a duplicate
+    # keyword. check_signature_against_spec rejects such a spec, so with a checked spec the merge changes nothing
+    if (fn := spec.get("fn")) and not fn(**{**value, ret_name(spec): result, **extra}):
         raise SpecViolationError(f"Not conform spec: fn constraint failed for inputs {value} -> {result}")
 
     if fn_p := spec.get("fn_p"):
-        fn_p_result = fn_p(**value, **extra)
+        fn_p_result = fn_p(**{**value, **extra})
         if not fn_p_result(result):
             raise SpecViolationError(f"Not conform spec: {explain(fn_p_result, result)}")
 
@@ -788,12 +807,14 @@ def yield_predicate(f: Callable[..., Any]) -> Predicate[Any] | None:
     return annotation_to_predicate(args[0]) if args else always_true_p
 
 
-async def take_async(values: Any, n: int) -> list[Any]:
-    """Return the first n items of an async iterator, like take()."""
-    items: list[Any] = []
-    async for item in values:
-        items.append(item)
-        if len(items) == n:
+async def take_async[T](values: AsyncIterable[T], n: Annotated[int, ge_p(0)]) -> list[T]:
+    """Return the first n items of an async iterable, like take()."""
+    items: list[T] = []
+    iterator = aiter(values)
+    while len(items) < n:  # checked before pulling an item, so n == 0 doesn't consume an endless iterable
+        try:
+            items.append(await anext(iterator))
+        except StopAsyncIteration:
             break
     return items
 

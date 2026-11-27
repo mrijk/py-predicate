@@ -125,3 +125,9 @@ def test_construct_not_possible():
     matched = construct(false_set=false_set, true_set=true_set)
 
     assert matched is None
+
+
+def test_construct_without_attempts_gives_nothing():
+    # the sets overlap, so no predicate matches: a negative number of attempts must not search forever
+    assert construct([1, 2], [1, 2], attempts=0) is None
+    assert construct([1, 2], [1, 2], attempts=-4) is None

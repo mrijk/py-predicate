@@ -1,7 +1,9 @@
 from collections.abc import Mapping
 from dataclasses import dataclass
-from typing import Any, override
+from typing import Annotated, Any, override
 
+from predicate.ge_predicate import ge_p
+from predicate.has_length_predicate import has_length_p
 from predicate.helpers import predicates_repr
 from predicate.predicate import Explanation, Predicate
 
@@ -10,7 +12,7 @@ from predicate.predicate import Explanation, Predicate
 class HasPathPredicate[T](Predicate[T]):
     """A predicate class that models the 'length' predicate."""
 
-    path: list[Predicate[Any]]
+    path: Annotated[list[Predicate[Any]], has_length_p(ge_p(1))]  # an empty path has nothing to look for
 
     def __call__(self, x: Any) -> bool:
         if isinstance(x, Mapping):

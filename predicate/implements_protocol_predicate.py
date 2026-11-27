@@ -1,12 +1,13 @@
 from dataclasses import dataclass
 from inspect import getmembers, isfunction
-from typing import Any, override
+from typing import Annotated, Any, override
 
+from predicate.is_protocol_predicate import is_protocol_p
 from predicate.predicate import Explanation, Predicate
 from predicate.same_signature_predicate import same_signature_p
 
 
-def protocol_members(protocol: type) -> set[str]:
+def protocol_members(protocol: Annotated[type, is_protocol_p()]) -> set[str]:
     # ponytail: __protocol_attrs__ is private API (3.12+); typing.get_protocol_members once we require 3.13
     return set(protocol.__protocol_attrs__)  # type: ignore[attr-defined]
 
@@ -15,7 +16,7 @@ def protocol_members(protocol: type) -> set[str]:
 class ImplementsProtocolPredicate[T](Predicate[T]):
     """A predicate class that models the 'implements a protocol' predicate."""
 
-    protocol: type
+    protocol: Annotated[type, is_protocol_p()]
     args_match: bool
 
     def __call__(self, x: type) -> bool:

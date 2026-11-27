@@ -219,3 +219,12 @@ def test_generators_can_be_exercised_from_their_annotation(generate_func):
     # klass is annotated with the classes the generators support, so exercise draws no unsupported class
     for _ in range(5):
         assert len(list(exercise(generate_func, None, 10))) == 10
+
+
+def test_generate_predicate_is_exercisable():
+    from more_itertools import consume
+
+    from predicate.spec.exercise_function import exercise_function
+
+    # the annotation only allows predicate types that have a generator, so exercising never meets an unknown type
+    consume(exercise_function(generate_predicate, None, 30))

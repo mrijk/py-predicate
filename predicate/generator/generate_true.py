@@ -34,12 +34,13 @@ from datetime import date, datetime, time, timedelta, timezone, tzinfo
 from decimal import Decimal
 from enum import Enum
 from fractions import Fraction
-from functools import cache, partial, singledispatch
+from functools import cache, partial, reduce, singledispatch
 from inspect import Parameter, Signature, getmembers, isfunction, signature
 from itertools import chain, cycle, islice, repeat
+from operator import or_
 from pathlib import PurePath
 from time import struct_time
-from types import CodeType, ModuleType, UnionType
+from types import CodeType, FrameType, ModuleType, NoneType, UnionType
 from typing import (
     Any,
     Final,
@@ -52,6 +53,7 @@ from typing import (
     SupportsIndex,
     SupportsInt,
     SupportsRound,
+    cast,
     get_args,
     get_origin,
 )
@@ -89,6 +91,8 @@ from predicate.function_predicate import FnPredicate
 from predicate.ge_predicate import GePredicate, ge_p
 from predicate.generator.generate_predicate import generate_predicate, predicate_type_registry
 from predicate.generator.helpers import (
+    FILTER_ATTEMPTS,
+    NoValuesFoundError,
     accepted_kwargs,
     accepts_candidate_types,
     default_length_p,
@@ -100,7 +104,6 @@ from predicate.generator.helpers import (
     generate_ints,
     generate_lambda,
     generate_strings,
-    generate_uuids,
     ignore_unknown_kwargs,
     random_anys,
     random_ast_nodes,
@@ -122,6 +125,7 @@ from predicate.generator.helpers import (
     random_floats,
     random_forward_refs,
     random_fractions,
+    random_frames,
     random_frozensets,
     random_hashables,
     random_ints,
@@ -159,10 +163,13 @@ from predicate.generator.helpers import (
     random_tuples,
     random_tzinfos,
     random_uuids,
+    random_uuids_between,
     random_values_of_type,
     sample_optional_fields,
+    satisfying,
     set_from_list,
     unused_name,
+    values_or_nothing,
     with_parameters,
 )
 from predicate.gt_predicate import GtPredicate
@@ -326,22 +333,6 @@ def generate_exception(_predicate: ExceptionPredicate[Any]) -> Iterator[Any]:
     yield from []
 
 
-def _satisfying(values: Iterator[Any], predicate: Predicate[Any], attempts: int) -> Iterator[Any]:
-    """Return the values that satisfy the predicate; stops after attempts misses in a row, so it can't hang.
-
-    E.g. is_tuple_p & is_empty_p: random tuples are only rarely empty.
-    """
-    misses = 0
-    for value in values:
-        if predicate(value):
-            misses = 0
-            yield value
-        else:
-            misses += 1
-            if misses == attempts:
-                return
-
-
 @generate_true.register(AndPredicate)
 def generate_and(predicate: AndPredicate[Any]) -> Iterator[Any]:
     if optimize(predicate) == always_false_p:
@@ -358,14 +349,14 @@ def generate_and(predicate: AndPredicate[Any]) -> Iterator[Any]:
 
     iterables = []
     if first_left is not _sentinel:
-        iterables.append(chain([first_left], _satisfying(left_values, predicate.right, attempts)))
+        iterables.append(chain([first_left], satisfying(left_values, predicate.right, attempts)))
     if first_right is not _sentinel:
         # Both sides often start with the same edge case, e.g. []: yield it once (#356)
         head = [] if first_right == first_left else [first_right]
-        iterables.append(chain(head, _satisfying(right_values, predicate.left, attempts)))
+        iterables.append(chain(head, satisfying(right_values, predicate.left, attempts)))
 
     if not iterables:
-        raise ValueError(f"Couldn't generate values that satisfy {predicate}")
+        raise NoValuesFoundError(f"Couldn't generate values that satisfy {predicate}")
 
     yield from random_first_from_iterables(*iterables)
 
@@ -446,7 +437,7 @@ def generate_ge(predicate: GePredicate[Any], **_kwargs: Any) -> Iterator[Any]:
             yield v
             yield from random_strings_greater(v)
         case UUID():
-            yield from generate_uuids(predicate)
+            yield from random_uuids_between(lower=v.int)
         case _:
             raise ValueError(f"Can't generate for type {type(v)}")
 
@@ -464,7 +455,7 @@ def generate_gt(predicate: GtPredicate[Any]) -> Iterator[Any]:
         case str():
             yield from random_strings_greater(v)
         case UUID():
-            yield from generate_uuids(predicate)
+            yield from random_uuids_between(lower=v.int + 1)
         case _:
             raise ValueError(f"Can't generate for type {type(v)}")
 
@@ -512,10 +503,10 @@ def _create_value_predicate(path: list[Predicate[Any]]) -> Predicate[Any]:
             valid_value = _create_value_predicate(rest)
             return is_list_of_p(valid_value)
         case [root, *rest]:
-            valid_keys = generate_true(root)
-            valid_key = next(valid_keys)
-            valid_value = _create_value_predicate(rest)
-            return is_dict_of_p((valid_key, valid_value))
+            # No key to build the path with (e.g. always_false_p): then no value can have this path
+            if not (valid_keys := take(1, generate_true(root))):
+                return always_false_p
+            return is_dict_of_p((eq_p(valid_keys[0]), _create_value_predicate(rest)))
         case []:
             return always_true_p
         case _:
@@ -526,13 +517,15 @@ def _create_value_predicate(path: list[Predicate[Any]]) -> Predicate[Any]:
 def generate_has_path(predicate: HasPathPredicate[Any]) -> Iterator[Any]:
     root, *rest = predicate.path
 
-    valid_keys = generate_true(root)
+    valid_value = _create_value_predicate(rest)
 
-    while True:
-        valid_key = next(valid_keys)
-        valid_value = _create_value_predicate(rest)
-        dict_of = is_dict_of_p((valid_key, valid_value))
-        yield from generate_true(dict_of, length_p=ge_p(1))
+    for valid_key in generate_true(root):
+        # eq_p: a generated key such as True or 0 would be taken for a predicate otherwise
+        dicts = generate_true(is_dict_of_p((eq_p(valid_key), valid_value)), length_p=ge_p(1))
+        # The value predicate doesn't depend on the key: when it has no values at all, no other key will help either
+        if not (first_dicts := take(1, dicts)):
+            return
+        yield from chain(first_dicts, dicts)
 
 
 @generate_true.register(LePredicate)
@@ -549,7 +542,7 @@ def generate_le(predicate: LePredicate[Any]) -> Iterator[Any]:
             yield v
             yield from random_strings_lower(v)
         case UUID():
-            yield from generate_uuids(predicate)
+            yield from random_uuids_between(upper=v.int)
         case _:
             raise ValueError(f"Can't generate for type {type(v)}")
 
@@ -585,7 +578,7 @@ def generate_intersects(predicate: IntersectsPredicate[Any]) -> Iterator[Any]:
 @generate_true.register(CompPredicate)
 def generate_comp_p(predicate: CompPredicate[Any, Any]) -> Iterator[Any]:
     # fn can't be inverted, so filter random values; inputs that make fn raise are skipped
-    yield from (value for value in random_anys() if evaluate_comp(predicate, value) is True)
+    yield from satisfying(random_anys(), lambda value: evaluate_comp(predicate, value) is True, FILTER_ATTEMPTS)
 
 
 @generate_true.register(FnPredicate)
@@ -620,7 +613,7 @@ def generate_lt(predicate: LtPredicate[Any]) -> Iterator[Any]:
         case str():
             yield from random_strings_lower(v)
         case UUID():
-            yield from generate_uuids(predicate)
+            yield from random_uuids_between(upper=v.int - 1)
         case _:
             raise ValueError(f"Can't generate for type {type(v)}")
 
@@ -664,12 +657,15 @@ def generate_implements_protocol(predicate: ImplementsProtocolPredicate[Any]) ->
 @generate_true.register(RecurPredicate)
 def generate_recur(predicate: RecurPredicate[Any], *, length_p: Predicate[Any] = default_length_p) -> Iterator[Any]:
     # One stream of start values, so every sequence can start with a different value (and type)
-    starts = generate_true(predicate.predicate_1)
+    starts = values_or_nothing(generate_true(predicate.predicate_1))
 
-    for length in random_lengths(length_p):
-        yield from (
-            [recur_values(predicate, length, next(starts)) if length else []] if length or predicate.empty else []
-        )
+    lengths = random_lengths(length_p)
+    if not predicate.empty:
+        # Bounded: a length_p that only allows 0 (e.g. eq_p(0)) gives no sequence at all, so it ends instead of spinning
+        lengths = satisfying(lengths, lambda length: length > 0, FILTER_ATTEMPTS)
+
+    for length, start in zip(lengths, starts, strict=False):
+        yield recur_values(predicate, length, start) if length else []
 
 
 def recur_values(predicate: RecurPredicate[Any], length: int, start: Any) -> list[Any]:
@@ -678,7 +674,7 @@ def recur_values(predicate: RecurPredicate[Any], length: int, start: Any) -> lis
             yield x
             # Each next value must satisfy the predicate built from its predecessor; when there is none (e.g. nothing
             # is lower than the empty string) the sequence ends here, which is shorter but still valid
-            successors = take(1, generate_true(predicate.predicate_n(x)))
+            successors = take(1, values_or_nothing(generate_true(predicate.predicate_n(x))))
             if not successors:
                 return
             [x] = successors
@@ -741,7 +737,7 @@ def _generator_for_item(item: Any, predicate: NotInPredicate[Any]) -> Iterator[A
         case str():
             return generate_strings(predicate)
         case UUID():
-            return generate_uuids(predicate)
+            return (uuid for uuid in random_uuids() if predicate(uuid))
         case _:
             raise ValueError(f"Can't generate for type {type(item)}")
 
@@ -800,7 +796,7 @@ def generate_truthy(_predicate: IsTruthyPredicate[Any]) -> Iterator[Any]:
 
 @generate_true.register(IsPredicateOfPredicate)
 def generate_predicate_of(predicate: IsPredicateOfPredicate[Any], **kwargs: Any) -> Iterator[Any]:
-    yield from random_predicates(**kwargs, klass=predicate.predicate_klass)
+    yield from random_predicates(**({"max_depth": predicate.max_depth} | kwargs), klass=predicate.predicate_klass)
 
 
 _supports_protocols: Final = (
@@ -913,7 +909,7 @@ def _random_classes_with_metaclass(metaclass: type) -> Iterator[type]:
 
 
 def _typed_generator(klass: Any, annotation: Any) -> Iterator[Any] | None:
-    """Return a generator for callables, metaclasses and async types, which depend on the annotation, or None."""
+    """Return a generator for callables, metaclasses, async types and unions, or None."""
     if klass is Callable and (args := get_args(annotation)) and args[-1] is not Any:
         return _random_returning_callables(args[-1])
     if isinstance(klass, type) and issubclass(klass, type) and klass is not type:
@@ -922,7 +918,19 @@ def _typed_generator(klass: Any, annotation: Any) -> Iterator[Any] | None:
         return _random_async_iterators(annotation)
     if klass is Awaitable:
         return _random_awaitables(annotation)
+    if klass is UnionType:
+        return _random_unions()
     return None
+
+
+# ponytail: builtin classes only; more classes make the unions more varied, but they never need to be exotic
+_union_members: Final = (bool, bytes, complex, dict, float, frozenset, int, list, NoneType, set, str, tuple)
+
+
+def _random_unions() -> Iterator[UnionType]:
+    """Return unions like int | str: at least two distinct classes, since int | int is just int."""
+    while True:
+        yield cast(UnionType, reduce(or_, random.sample(_union_members, random.randint(2, 4))))
 
 
 def _family_generator(klass: Any, annotation: Any) -> Iterator[Any] | None:
@@ -951,8 +959,16 @@ _MAX_CONSTRUCT_ATTEMPTS: Final = 20
 _construct_depth = 0
 
 
+def _protocol_instances(protocol: Any) -> Iterator[Any]:
+    """Return instances of generated classes that implement the protocol, as a protocol can't be instantiated."""
+    implementations = generate_implements_protocol(ImplementsProtocolPredicate(protocol=protocol, args_match=True))
+    return (implementation() for implementation in implementations)
+
+
 def _constructed_instances(klass: Any) -> Iterator[Any]:
     """Return instances of a class built from its fully annotated __init__ (#305); the last resort for a class."""
+    if _is_protocol_class(klass):
+        return _protocol_instances(klass)
     candidates = [(c, params) for c in _constructible_classes(klass) if (params := _init_params(c)) is not None]
     if not candidates:
         raise ValueError(f"No generator found for {klass}")
@@ -969,7 +985,7 @@ def _constructible_classes(klass: Any) -> list[Any]:
 
 def _all_subclasses(klass: type) -> list[type]:
     # ponytail: only subclasses that are already imported, like random_modules
-    direct: list[type] = klass.__subclasses__()
+    direct: list[type] = type.__subclasses__(klass)  # not klass.__subclasses__(): that is unbound for type itself
     return list(dict.fromkeys(chain(direct, *(_all_subclasses(subclass) for subclass in direct))))
 
 
@@ -1067,6 +1083,7 @@ def _get_type_registry() -> dict[Any, Callable[[], Iterator[Any]]]:
         MutableMapping: random_dicts,
         Predicate: random_predicates,
         UUID: random_uuids,
+        FrameType: random_frames,
         ModuleType: random_modules,
         Signature: random_signatures,
         bool: random_bools,
@@ -1125,6 +1142,10 @@ def _get_type_registry() -> dict[Any, Callable[[], Iterator[Any]]]:
         type_registry[Template] = random_templates
 
     return type_registry
+
+
+def _is_protocol_class(klass: Any) -> bool:
+    return isinstance(klass, type) and issubclass(klass, Protocol) and klass is not Protocol
 
 
 @generate_true.register(IsInstancePredicate)
@@ -1266,9 +1287,9 @@ def generate_set_of_p(
 ) -> Iterator[Any]:
     predicate = set_of_predicate.predicate
 
-    for length in random_lengths(length_p):
-        values = take(length, generate_true(predicate))
-
+    lists = (take(length, generate_true(predicate)) for length in random_lengths(length_p))
+    # Bounded: a predicate without that many distinct values (e.g. 3 bools) ends the stream instead of searching forever
+    for values in satisfying(lists, lambda values: any(True for _ in set_from_list(values)), FILTER_ATTEMPTS):
         yield from set_from_list(values, order)
 
 
@@ -1285,8 +1306,10 @@ def generate_xor(predicate: XorPredicate[Any]) -> Iterator[Any]:
     if optimize(predicate) == always_false_p:
         yield from []
     else:
-        left_and_not_right = (item for item in generate_true(predicate.left) if not predicate.right(item))
-        right_and_not_left = (item for item in generate_true(predicate.right) if not predicate.left(item))
+        # Bounded, so a side without such a value ends its stream instead of searching forever
+        attempts = 100
+        left_and_not_right = satisfying(generate_true(predicate.left), ~predicate.right, attempts)
+        right_and_not_left = satisfying(generate_true(predicate.right), ~predicate.left, attempts)
         yield from random_first_from_iterables(left_and_not_right, right_and_not_left)
 
 
@@ -1299,6 +1322,10 @@ def generate_tee(_predicate: TeePredicate[Any]) -> Iterator[Any]:
 def generate_match_p(match_predicate: MatchPredicate[Any]) -> Iterator[Any]:
     predicates = match_predicate.predicates
 
+    if not predicates:  # an empty pattern matches every iterable, unless the whole iterable has to match: then only []
+        yield from repeat([]) if match_predicate.full_match else random_lists()
+        return
+
     predicate, *rest_predicates = predicates
 
     match predicate:
@@ -1308,8 +1335,8 @@ def generate_match_p(match_predicate: MatchPredicate[Any]) -> Iterator[Any]:
             if rest_predicates:
                 iter_first = generate_true(predicate)
                 iter_rest: Iterator[Any] = generate_true(MatchPredicate(predicates=rest_predicates))
-                while True:
-                    yield [next(iter_first)] + list(next(iter_rest))
+                for first, rest in zip(iter_first, iter_rest, strict=False):
+                    yield [first] + list(rest)
             else:
                 yield from zip(generate_true(predicate), strict=False)
 
@@ -1326,8 +1353,8 @@ def generate_exactly_n(exactly_predicate: ExactlyPredicate[Any], *, predicates: 
     if predicates:
         iter_first = generate_true(list_of_predicate, length_p=length_p)
         iter_rest: Iterator[Any] = generate_true(MatchPredicate(predicates=predicates))
-        while True:
-            yield list(next(iter_first)) + list(next(iter_rest))
+        for first, rest in zip(iter_first, iter_rest, strict=False):
+            yield list(first) + list(rest)
     else:
         yield from generate_true(list_of_predicate, length_p=length_p)
 
@@ -1345,8 +1372,8 @@ def generate_repeat(repeat_predicate: RepeatPredicate[Any], *, predicates: list[
     if predicates:
         iter_first = generate_true(list_of_predicate, length_p=length_p)
         iter_rest: Iterator[Any] = generate_true(MatchPredicate(predicates=predicates))
-        while True:
-            yield list(next(iter_first)) + list(next(iter_rest))
+        for first, rest in zip(iter_first, iter_rest, strict=False):
+            yield list(first) + list(rest)
     else:
         yield from generate_true(is_list_of_p(predicate=predicate), length_p=length_p)
 
@@ -1386,11 +1413,11 @@ def generate_count(count_predicate: CountPredicate[Any]) -> Iterator[Any]:
     predicate = count_predicate.predicate
     length_p = count_predicate.length_p
 
-    valid_counts = generate_true(length_p)
-
-    while True:
-        count = next(valid_counts)
-        true_values = take(count, generate_true(predicate))
+    # only counts that can exist: length_p may also allow negative ones, e.g. ge_p(-5)
+    for count in random_lengths(length_p):
+        true_values = take(count, values_or_nothing(generate_true(predicate)))
+        if len(true_values) < count:  # the predicate can't be true that often
+            return
 
         # lists and tuples keep duplicates, so the count is preserved (sets would not)
         make = random.choice((list, tuple))
@@ -1403,7 +1430,9 @@ def generate_count(count_predicate: CountPredicate[Any]) -> Iterator[Any]:
 
 def _yield_subclasses(klasses: list[type]) -> Iterator[Any]:
     while True:
-        candidates = [candidate for klass in klasses for candidate in (klass, *klass.__subclasses__())]
+        candidates = [candidate for klass in klasses for candidate in (klass, *type.__subclasses__(klass))]
+        if not candidates:  # e.g. is_subclass_p(()): nothing is a subclass of no class
+            return
         # An abstract class (e.g. Predicate) can't be used as a concrete one; keep it if nothing else is left
         yield from [candidate for candidate in candidates if not inspect.isabstract(candidate)] or candidates
 
@@ -1455,4 +1484,4 @@ def generate_struct(predicate: StructPredicate[Any]) -> Iterator[Any]:
     # Without required keys there is nothing to zip, so start from an endless supply of empty dicts
     required_dicts = generate_dict_of_p(dict_of_predicate) if required else repeat({})
 
-    yield from (d | sample_optional_fields(optional, optional_generators) for d in required_dicts)
+    yield from (d | sample_optional_fields(optional_generators) for d in required_dicts)

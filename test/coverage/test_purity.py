@@ -1,6 +1,7 @@
 import json
 from pathlib import Path
 
+import pytest
 from typer.testing import CliRunner
 
 from predicate.coverage.__main__ import app
@@ -139,7 +140,7 @@ def test_flaky(monkeypatch, tmp_path):
     )
     (tmp_path / "mod.py").write_text("def f(x: int) -> int:\n    return x\n\ndef g(x: int) -> int:\n    return x\n")
 
-    modules = analyze(tmp_path / "mod.py", exercise=True, jobs=1)
+    modules = analyze(tmp_path / "mod.py", exercise=True, jobs=1, runs=3)
 
     f, g = (fn["exercise"] for fn in modules[0]["functions"])
     assert f == {"status": "failed", "detail": "boom", "runs": 3, "flaky": True, "statuses": {"ok": 2, "failed": 1}}
@@ -180,3 +181,49 @@ def test_exercise_detects_mutated_arguments(tmp_path):
     exercise = {f["name"]: f["exercise"] for f in modules[0]["functions"]}
     assert exercise["append"] == exercise["append"] | {"status": "mutates-args", "detail": "mutates lst"}
     assert exercise["concat"]["status"] == "ok"
+
+
+def test_exercise_arguments_that_cannot_be_copied(tmp_path):
+    (tmp_path / "mod.py").write_text(
+        "from collections.abc import AsyncIterable\n\n\n"
+        "async def first(values: AsyncIterable[int]) -> int | None:\n"
+        "    async for value in values:\n        return value\n    return None\n"
+    )
+
+    modules = analyze(tmp_path / "mod.py", exercise=True, calls=5, timeout=5, runs=1)
+
+    assert modules[0]["functions"][0]["exercise"]["status"] == "ok"
+
+
+def test_exercise_function_with_a_parameter_named_old(tmp_path):
+    (tmp_path / "mod.py").write_text(
+        "def replace(s: str, old: str, new: str) -> str:\n    return s.replace(old, new)\n"
+    )
+
+    modules = analyze(tmp_path / "mod.py", exercise=True, calls=5, timeout=5, runs=1)
+
+    assert modules[0]["functions"][0]["exercise"]["status"] == "ok"
+
+
+def test_exercise_importing_ctypes_is_not_blocked_but_loading_a_library_is(tmp_path):
+    (tmp_path / "mod.py").write_text(
+        "def imports_ctypes(x: int) -> int:\n    import ctypes\n\n    return x + ctypes.sizeof(ctypes.c_int)\n\n\n"
+        "def loads_library(x: int) -> int:\n    import ctypes\n\n    ctypes.CDLL('libc.so.6')\n    return x\n"
+    )
+
+    modules = analyze(tmp_path / "mod.py", exercise=True, calls=3, timeout=5, runs=1)
+
+    exercise = {f["name"]: f["exercise"]["status"] for f in modules[0]["functions"]}
+    assert exercise == {"imports_ctypes": "ok", "loads_library": "blocked"}
+
+
+@pytest.mark.parametrize("name", ["summarize", "summarize_exercise", "count_flaky", "failed_only"])
+def test_report_functions_are_exercisable(name):
+    from more_itertools import consume
+
+    from predicate.coverage import purity
+    from predicate.spec.exercise_function import exercise_function
+
+    # the modules are typed as ModuleInfo, so exercise draws no dict without "functions"
+    for _ in range(3):
+        consume(exercise_function(getattr(purity, name), None, 20))

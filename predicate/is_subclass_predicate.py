@@ -11,7 +11,7 @@ from predicate.predicate import Explanation, Predicate
 class IsSubclassPredicate[T](Predicate[T]):
     """A predicate class that models the 'issubclass' predicate."""
 
-    class_or_tuple: type | UnionType | tuple[Any, ...]
+    class_or_tuple: type | UnionType | tuple[type, ...]
 
     def __call__(self, x: type) -> bool:
         if x is None:
@@ -50,7 +50,7 @@ class IsSubclassPredicate[T](Predicate[T]):
         return {"reason": f"{x} is not a subclass of type {klasses}"}
 
 
-def is_subclass_p(klass: type | UnionType | tuple[Any, ...]) -> Predicate[Any]:
+def is_subclass_p(klass: type | UnionType | tuple[type, ...]) -> Predicate[Any]:
     """Return True if value is an instance of one of the classes, otherwise False."""
     return IsSubclassPredicate(class_or_tuple=klass)
 

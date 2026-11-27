@@ -199,7 +199,7 @@ def _to_value(predicate: Predicate[Any]) -> tuple[str, Any]:  # noqa: C901
             return "unknown", {}
 
 
-def _to_subclass(class_or_tuple: type | UnionType | tuple[Any, ...]) -> tuple[str, Any]:
+def _to_subclass(class_or_tuple: type | UnionType | tuple[type, ...]) -> tuple[str, Any]:
     match class_or_tuple:
         case tuple(klasses):
             names = [k.__name__ for k in klasses]

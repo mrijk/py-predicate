@@ -1,7 +1,9 @@
+from __future__ import annotations
+
 from collections.abc import Iterable
 from datetime import datetime
 from itertools import repeat
-from typing import Any, Iterator, Literal
+from typing import Annotated, Any, Iterator, Literal
 
 from predicate.all_predicate import AllPredicate
 from predicate.always_false_predicate import always_false_p
@@ -11,7 +13,7 @@ from predicate.any_predicate import AnyPredicate
 from predicate.eq_predicate import EqPredicate
 from predicate.ge_predicate import GePredicate
 from predicate.gt_predicate import GtPredicate
-from predicate.in_predicate import InPredicate
+from predicate.in_predicate import InPredicate, in_p
 from predicate.is_async_predicate import is_async_p
 from predicate.is_falsy_predicate import is_falsy_p
 from predicate.is_instance_predicate import is_instance_p
@@ -38,19 +40,21 @@ from predicate.xor_predicate import XorPredicate
 type PredicateKlass = Literal[bool, datetime, float, int, str]  # type: ignore[valid-type]
 
 
+def predicate_type_registry() -> dict[type, Any]:
+    return typed_predicate_type_registry() | {
+        type(predicate): _constant_predicates(predicate) for predicate in _constant_predicate_instances
+    }
+
+
 def generate_predicate(
-    predicate_type: type[Predicate[Any]], max_depth: int, klass: PredicateKlass
+    predicate_type: Annotated[type[Predicate[Any]], in_p(predicate_type_registry())],
+    max_depth: int,
+    klass: PredicateKlass,
 ) -> Iterator[Predicate[Any]]:
     if generator := predicate_type_registry().get(predicate_type):
         yield from generator(max_depth=max_depth, klass=klass)
     else:
         raise ValueError(f"No generator found for {predicate_type}")
-
-
-def predicate_type_registry() -> dict[type, Any]:
-    return typed_predicate_type_registry() | {
-        type(predicate): _constant_predicates(predicate) for predicate in _constant_predicate_instances
-    }
 
 
 def typed_predicate_type_registry() -> dict[type, Any]:
@@ -194,16 +198,24 @@ def generate_gt_predicates(max_depth: int, klass: PredicateKlass) -> Iterator[An
 
 
 def generate_in_predicates(max_depth: int, klass: PredicateKlass) -> Iterator[Any]:
-    from predicate.generator.helpers import random_iterables
+    from predicate.generator.helpers import non_empty_length_p, random_iterables
 
-    yield from (InPredicate(set(iterable)) for iterable in random_iterables(value_p=is_instance_p(klass)))
+    # At least one member: an empty set has no type, so its false values would be of any type, not klass
+    yield from (
+        InPredicate(set(iterable))
+        for iterable in random_iterables(length_p=non_empty_length_p, value_p=is_instance_p(klass))
+    )
 
 
 def generate_not_in_predicates(max_depth: int, klass: PredicateKlass) -> Iterator[Any]:
     from predicate import is_instance_p
-    from predicate.generator.helpers import random_iterables
+    from predicate.generator.helpers import non_empty_length_p, random_iterables
 
-    yield from (NotInPredicate(set(iterable)) for iterable in random_iterables(value_p=is_instance_p(klass)))
+    # At least one member: an empty set has no type, so its false values would be of any type, not klass
+    yield from (
+        NotInPredicate(set(iterable))
+        for iterable in random_iterables(length_p=non_empty_length_p, value_p=is_instance_p(klass))
+    )
 
 
 def generate_le_predicates(max_depth: int, klass: PredicateKlass) -> Iterator[Any]:

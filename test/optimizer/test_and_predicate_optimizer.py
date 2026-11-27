@@ -917,3 +917,47 @@ def test_optimize_le_and_ge_equal():
     # le(v) & ge(v) => eq(v) — reversed operand order, equal bounds
 
     assert optimize(le_p(2) & ge_p(2)) == eq_p(2)
+
+
+@pytest.mark.parametrize(
+    "predicate",
+    [
+        eq_p(1) & gt_p(5),
+        gt_p(5) & eq_p(1),
+        in_p([1, 2]) & gt_p(5),
+        lt_p(0) & in_p([1, 2]),
+    ],
+)
+def test_and_equal_and_other_side_fails_at_the_value(predicate):
+    # eq(v) is only true at v, so eq(v) & p is always false when p fails at v
+    assert optimize(predicate) == always_false_p
+
+
+def test_and_in_and_other_side_holds_at_some_value():
+    predicate = in_p([1, 9]) & gt_p(5)
+
+    assert optimize(predicate) != always_false_p
+
+
+def test_and_disjoint_ranges_is_always_false():
+    assert optimize(lt_p(0) & gt_p(5)) == always_false_p
+    assert optimize(gt_p(5) & lt_p(0)) == always_false_p
+    assert optimize(lt_p(0) & ge_p(0)) == always_false_p
+    assert optimize(le_p(0) & gt_p(0)) == always_false_p
+    assert optimize(ge_p(5) & le_p(0)) == always_false_p
+
+
+def test_and_touching_ranges_not_always_false():
+    assert optimize(ge_p(0) & le_p(0)) == eq_p(0)
+
+
+def test_and_ne_excludes_the_bound():
+    assert optimize(ne_p(0) & le_p(0)) == lt_p(0)
+    assert optimize(le_p(0) & ne_p(0)) == lt_p(0)
+    assert optimize(ne_p(0) & ge_p(0)) == gt_p(0)
+    assert optimize(ne_p(1) & le_p(0)) == le_p(0)  # ne(1) is implied by le(0): not an excluded bound
+    assert optimize(ne_p(-1) & le_p(0)) == ne_p(-1) & le_p(0)
+
+
+def test_and_not_of_excluded_bound_with_the_bound_is_always_false():
+    assert optimize(~(ne_p(0) & le_p(0)) & lt_p(0)) == always_false_p

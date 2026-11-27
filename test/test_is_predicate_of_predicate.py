@@ -62,3 +62,15 @@ def test_is_predicate_of_type_explain_not_predicate():
 
     expected = {"reason": "Value `foo` is not a predicate", "result": False}
     assert explain(predicate, "foo") == expected
+
+
+def test_is_predicate_of_max_depth():
+    from more_itertools import take
+
+    from predicate import generate_true
+
+    def largest(depth):
+        return max(len(repr(p)) for p in take(500, generate_true(is_predicate_of_p(bool, max_depth=depth))))
+
+    assert is_predicate_of_p(int) == is_predicate_of_p(int, max_depth=10)
+    assert largest(2) < largest(10)

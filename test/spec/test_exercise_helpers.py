@@ -42,7 +42,13 @@ from predicate import (
     is_struct_p,
 )
 from predicate.predicate import Predicate
-from predicate.spec.exercise_helpers import annotation_to_predicate, bind_shared_type_vars
+from predicate.spec.exercise_helpers import (
+    annotation_to_predicate,
+    bind_shared_type_vars,
+    capture_old,
+    generate_values,
+    take_async,
+)
 from predicate.spec.instrument import instrument
 from predicate.spec.spec import SpecViolationError
 from spec.test_functions.typed_dicts_postponed import Options
@@ -676,3 +682,77 @@ def test_bind_shared_type_vars_replaces_a_shared_type_var():
     (item_type,) = get_args(bound["xs"].annotation)
     assert item_type in (int, str, float)
     assert get_args(bound["p"].annotation) == (item_type,)
+
+
+async def _count_up():
+    n = 0
+    while True:
+        yield n
+        n += 1
+
+
+async def test_take_async_stops_after_n_items():
+    assert await take_async(_count_up(), 3) == [0, 1, 2]
+
+
+async def test_take_async_nothing_for_zero():
+    assert await take_async(_count_up(), 0) == []
+
+
+async def test_take_async_stops_when_exhausted():
+    async def two():
+        yield 1
+        yield 2
+
+    assert await take_async(two(), 5) == [1, 2]
+
+
+def test_generate_values_without_return_predicate():
+    from predicate import is_int_p
+
+    return_p, values = generate_values({"args": {"x": is_int_p}}, 3)
+
+    assert return_p("anything")
+    assert len(values) == 3
+
+
+def test_capture_old_skips_arguments_that_are_not_generated():
+
+    spec = {"args": {}, "snapshot": {"x": list, "missing": list}}
+
+    assert capture_old(spec, {"x": [1]}) == {"x": [1]}
+
+
+def test_derived_spec_for_kwargs_is_a_constrained_annotation():
+    from predicate import eq_p, is_str_p
+    from predicate.spec.exercise import exercise
+    from predicate.spec.exercise_function import get_spec_from_function_annotation
+    from predicate.spec.exercise_helpers import check_signature_against_spec
+    from predicate.spec.spec import InvalidSpecError
+
+    def f(x: int, **kwargs: Any) -> int:
+        return x
+
+    # the spec exercise derives itself (eq_p({}) for **kwargs) must pass the check it is given to again
+    spec = get_spec_from_function_annotation(f)
+    assert len(list(exercise(f, spec, 5))) == 5
+
+    # a spec that isn't a narrowing of the annotation is still rejected
+    with pytest.raises(InvalidSpecError, match="not a constrained annotation"):
+        check_signature_against_spec(f, {"args": {"x": is_str_p}, "ret": eq_p(1)})
+
+
+def test_verify_result_with_arguments_named_like_the_return_value_or_old():
+    from predicate import always_true_p
+    from predicate.spec.exercise_helpers import verify_result
+
+    seen = []
+
+    def fn(**kwargs):
+        seen.append(kwargs)
+        return True
+
+    # a parameter named like the return value (here '') or like old would be a duplicate keyword in the call
+    spec = {"args": {}, "ret": always_true_p, "fn": fn, "ret_name": "", "snapshot": {"a": lambda v: v}}
+    verify_result(spec, always_true_p, {"": 1, "old": 2}, 5, old={"a": 3})
+    assert seen == [{"": 5, "old": {"a": 3}}]

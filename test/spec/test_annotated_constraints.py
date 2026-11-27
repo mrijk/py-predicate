@@ -7,7 +7,7 @@ import annotated_types as at
 import pytest
 from more_itertools import take
 
-from predicate import exercise, ge_lt_p, generate_true
+from predicate import exercise, ge_lt_p, ge_p, generate_true
 from predicate.spec.exercise_helpers import annotation_to_predicate
 from predicate.spec.instrument import instrument
 
@@ -41,6 +41,7 @@ CASES = [
     ),
     (Annotated[str, at.Predicate(str.isupper)], "ABC", "abc"),
     (Annotated[int, at.Predicate(ge_lt_p(0, 150))], 30, 200),
+    (Annotated[int, ge_p(0)], 0, -1),  # a predicate itself as metadata
     (at.LowerCase[str], "abc", "ABC"),
     (at.UpperCase[str], "ABC", "abc"),
     (at.IsDigits[str], "123", "a1"),  # type: ignore[type-arg, misc]  # IsDigits is a non-generic alias to mypy
