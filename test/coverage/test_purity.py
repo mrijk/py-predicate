@@ -140,7 +140,7 @@ def test_flaky(monkeypatch, tmp_path):
     )
     (tmp_path / "mod.py").write_text("def f(x: int) -> int:\n    return x\n\ndef g(x: int) -> int:\n    return x\n")
 
-    modules = analyze(tmp_path / "mod.py", exercise=True, jobs=1)
+    modules = analyze(tmp_path / "mod.py", exercise=True, jobs=1, runs=3)
 
     f, g = (fn["exercise"] for fn in modules[0]["functions"])
     assert f == {"status": "failed", "detail": "boom", "runs": 3, "flaky": True, "statuses": {"ok": 2, "failed": 1}}

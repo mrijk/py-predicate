@@ -1015,7 +1015,7 @@ transitive impurity the category is that of the root cause. ``find_impurity`` in
 the same information for a single function.
 
 With ``--exercise`` the CLI also calls each function with inputs generated from its annotations, each in a separate
-sandboxed subprocess (``--calls``, ``--timeout`` and ``--jobs`` tune this). Each function is exercised ``--runs`` times (default 3) with fresh
+sandboxed subprocess (``--calls``, ``--timeout`` and ``--jobs`` tune this). Each function is exercised ``--runs`` times (default 5) with fresh
 random inputs; if the runs give different statuses the result is marked ``"flaky": true``, with the counts in ``statuses``. Add ``--failed`` to list and snapshot only the functions whose exercise ended in
 ``failed``, ``blocked``, ``timeout`` or ``crashed``, like ``complexipy --failed``. The sandbox runs in an empty temporary
 directory with a minimal environment, and blocks file writes and deletes, spawning processes and network access. The

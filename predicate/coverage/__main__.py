@@ -35,7 +35,7 @@ def purity(
     failed: Annotated[
         bool, typer.Option("--failed", help="With --exercise: only list/snapshot failed exercises")
     ] = False,
-    runs: Annotated[int, typer.Option(help="Times each function is exercised; differing results are flaky")] = 3,
+    runs: Annotated[int, typer.Option(help="Times each function is exercised; differing results are flaky")] = 5,
 ) -> None:
     """Report pure and impure public functions. Note: this imports (executes) the analyzed modules."""
     if failed and not exercise:

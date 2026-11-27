@@ -915,3 +915,34 @@ def test_generate_predicate_of_is_exercisable():
     # the class is annotated with the ones predicates can be generated for, not an arbitrary class like bytearray
     for _ in range(5):
         consume(exercise_function(generate_predicate_of, None, 30))
+
+
+def test_has_path_true_with_keys_that_are_not_strings():
+    from predicate import always_true_p, eq_p, is_int_p, is_str_p
+    from predicate.has_path_predicate import HasPathPredicate
+
+    # a generated key such as True or 0 is a value, not a predicate
+    for path in ([always_true_p], [is_int_p, is_str_p], [eq_p(True)]):
+        predicate = HasPathPredicate(path=path)
+        values = take(5, generate_true(predicate))
+        assert values
+        assert all(predicate(value) for value in values)
+
+
+def test_has_path_true_ends_when_no_value_has_the_path():
+    from predicate import always_false_p, eq_p
+    from predicate.has_path_predicate import HasPathPredicate
+
+    # no key, or no value for the key: the stream ends instead of raising (PEP 479) or searching forever
+    assert list(generate_true(HasPathPredicate(path=[always_false_p]))) == []
+    assert list(generate_true(HasPathPredicate(path=[eq_p("a"), always_false_p]))) == []
+
+
+def test_generate_has_path_true_is_exercisable():
+    from more_itertools import consume
+
+    from predicate.generator.generate_true import generate_has_path
+    from predicate.spec.exercise_function import exercise_function
+
+    for _ in range(5):
+        consume(exercise_function(generate_has_path, None, 20))

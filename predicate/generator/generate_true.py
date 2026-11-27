@@ -503,10 +503,10 @@ def _create_value_predicate(path: list[Predicate[Any]]) -> Predicate[Any]:
             valid_value = _create_value_predicate(rest)
             return is_list_of_p(valid_value)
         case [root, *rest]:
-            valid_keys = generate_true(root)
-            valid_key = next(valid_keys)
-            valid_value = _create_value_predicate(rest)
-            return is_dict_of_p((valid_key, valid_value))
+            # No key to build the path with (e.g. always_false_p): then no value can have this path
+            if not (valid_keys := take(1, generate_true(root))):
+                return always_false_p
+            return is_dict_of_p((eq_p(valid_keys[0]), _create_value_predicate(rest)))
         case []:
             return always_true_p
         case _:
@@ -517,13 +517,15 @@ def _create_value_predicate(path: list[Predicate[Any]]) -> Predicate[Any]:
 def generate_has_path(predicate: HasPathPredicate[Any]) -> Iterator[Any]:
     root, *rest = predicate.path
 
-    valid_keys = generate_true(root)
+    valid_value = _create_value_predicate(rest)
 
-    while True:
-        valid_key = next(valid_keys)
-        valid_value = _create_value_predicate(rest)
-        dict_of = is_dict_of_p((valid_key, valid_value))
-        yield from generate_true(dict_of, length_p=ge_p(1))
+    for valid_key in generate_true(root):
+        # eq_p: a generated key such as True or 0 would be taken for a predicate otherwise
+        dicts = generate_true(is_dict_of_p((eq_p(valid_key), valid_value)), length_p=ge_p(1))
+        # The value predicate doesn't depend on the key: when it has no values at all, no other key will help either
+        if not (first_dicts := take(1, dicts)):
+            return
+        yield from chain(first_dicts, dicts)
 
 
 @generate_true.register(LePredicate)

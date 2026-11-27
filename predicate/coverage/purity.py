@@ -124,7 +124,7 @@ def analyze(
     calls: int = 10,
     timeout: float = 10.0,
     jobs: Annotated[int, ge_p(1)] = 4,
-    runs: int = 3,
+    runs: int = 5,
 ) -> list[ModuleInfo]:
     """Report the purity of all public module-level functions found under path. Imports (executes) the modules.
 
