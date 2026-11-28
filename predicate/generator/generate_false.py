@@ -10,7 +10,7 @@ from types import UnionType
 from typing import Any, Final, Hashable, get_args
 from uuid import UUID
 
-from more_itertools import first, flatten, interleave, random_permutation, take
+from more_itertools import first, flatten, interleave, interleave_longest, random_permutation, take
 
 from predicate.accepts_predicate import AcceptsPredicate
 from predicate.all_predicate import AllPredicate
@@ -652,7 +652,7 @@ def generate_frozendict_of_p(frozendict_of_predicate: FrozenDictOfPredicate) -> 
     dict_of_predicate = frozendict_of_predicate.dict_of_predicate
     if sys.version_info >= (3, 15):
         # interleave invalid frozendicts with dicts that would be valid, but aren't frozen
-        yield from interleave(
+        yield from interleave_longest(
             (frozendict(d) for d in generate_dict_of_p(dict_of_predicate)),  # noqa: F821
             generate_true(dict_of_predicate),
         )
